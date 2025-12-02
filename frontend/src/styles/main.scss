@@ -1,0 +1,82 @@
+// TailwindCSS基础样式
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+// 变量
+@import './variables.scss';
+
+// 全局样式
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  font-family: 'PingFang SC', 'Microsoft YaHei', 'Hiragino Sans GB', 'Inter', 'Roboto', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+// 滚动条样式
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--el-fill-color-lighter);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--el-color-primary-light-5);
+  border-radius: 4px;
+  
+  &:hover {
+    background: var(--el-color-primary);
+  }
+}
+
+// Element Plus自定义样式
+.el-button {
+  transition: all 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-2px);
+  }
+  
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+// 工具类
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+.card {
+  background: var(--el-bg-color);
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  padding: 24px;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    box-shadow: 0 8px 24px rgba(76, 175, 80, 0.2);
+    transform: translateY(-4px);
+  }
+}
+
+.text-gradient {
+  background: linear-gradient(135deg, var(--el-color-primary) 0%, var(--el-color-success) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}

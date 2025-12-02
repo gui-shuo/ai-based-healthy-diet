@@ -1,0 +1,75 @@
+# Git属性配置
+# 确保跨平台的换行符一致性
+
+# 自动检测文本文件并标准化换行符
+* text=auto
+
+# 明确指定文本文件
+*.md text
+*.txt text
+*.sql text
+*.json text
+*.xml text
+*.yml text
+*.yaml text
+*.properties text
+
+# 源代码文件
+*.java text
+*.js text
+*.jsx text
+*.ts text
+*.tsx text
+*.vue text
+*.css text
+*.scss text
+*.sass text
+*.html text
+
+# 配置文件
+*.conf text
+*.config text
+.gitignore text
+.gitattributes text
+.editorconfig text
+
+# Shell脚本
+*.sh text eol=lf
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+
+# 二进制文件
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.zip binary
+*.tar.gz binary
+*.jar binary
+*.war binary
+*.ear binary
+
+# 字体文件
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.eot binary
+*.otf binary
+
+# 视频文件
+*.mp4 binary
+*.mov binary
+*.avi binary
+
+# 音频文件
+*.mp3 binary
+*.wav binary
+
+# 导出diff和merge工具忽略的文件
+*.lock linguist-generated=true
+package-lock.json linguist-generated=true
+yarn.lock linguist-generated=true
+pom.xml.tag linguist-generated=true

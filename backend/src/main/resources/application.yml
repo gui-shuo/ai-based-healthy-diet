@@ -1,0 +1,116 @@
+spring:
+  application:
+    name: nutriai-backend
+  
+  profiles:
+    active: dev
+  
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/nutriai?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false
+    username: root
+    password: ${DB_PASSWORD:root}
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+  
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQL8Dialect
+    open-in-view: false
+  
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: ${REDIS_PASSWORD:}
+      database: 0
+      lettuce:
+        pool:
+          max-active: 20
+          max-idle: 10
+          min-idle: 5
+          max-wait: 2000
+  
+  jackson:
+    time-zone: GMT+8
+    date-format: yyyy-MM-dd HH:mm:ss
+    default-property-inclusion: non_null
+    serialization:
+      write-dates-as-timestamps: false
+
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+  compression:
+    enabled: true
+    mime-types: application/json,application/xml,text/html,text/xml,text/plain
+
+# JWT配置
+jwt:
+  secret: ${JWT_SECRET:nutriai-jwt-secret-key-2025-change-in-production}
+  expiration: 86400000  # 24小时（毫秒）
+  refresh-expiration: 604800000  # 7天（毫秒）
+
+# 通义千问API配置
+tongyi:
+  api-key: ${TONGYI_API_KEY:}
+  model: qwen-max
+  max-tokens: 2000
+  temperature: 0.7
+  top-p: 0.9
+
+# 阿里云OSS配置
+aliyun:
+  oss:
+    endpoint: ${OSS_ENDPOINT:oss-cn-hangzhou.aliyuncs.com}
+    access-key-id: ${OSS_ACCESS_KEY_ID:}
+    access-key-secret: ${OSS_ACCESS_KEY_SECRET:}
+    bucket-name: ${OSS_BUCKET:nutriai-assets}
+
+# 日志配置
+logging:
+  level:
+    root: INFO
+    com.nutriai: DEBUG
+    org.springframework.web: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+  pattern:
+    console: '%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{50} - %msg%n'
+    file: '%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{50} - %msg%n'
+  file:
+    name: logs/nutriai-backend.log
+    max-size: 10MB
+    max-history: 30
+
+# 系统配置
+nutriai:
+  # AI配额配置
+  ai-quota:
+    free: 3         # 普通会员每日AI咨询次数
+    silver: 10      # 白银会员每日AI咨询次数
+    gold: 20        # 黄金会员每日AI咨询次数
+  
+  # 会员成长值配置
+  growth-points:
+    login: 10           # 每日登录
+    ai-chat: 5          # 完成AI咨询
+    invite-register: 20 # 邀请好友注册
+    invite-active: 30   # 邀请好友激活（完成首次AI咨询）
+    upgrade-silver: 100 # 升级白银会员所需成长值
+    upgrade-gold: 300   # 升级黄金会员所需成长值
+  
+  # 文件上传配置
+  upload:
+    max-size: 10485760  # 10MB
+    allowed-types: jpg,jpeg,png,gif,pdf,txt
