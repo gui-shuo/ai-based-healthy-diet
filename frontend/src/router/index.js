@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { ElMessage } from 'element-plus'
 
 const routes = [
   {
@@ -21,77 +22,39 @@ const routes = [
     meta: { title: '注册' }
   },
   {
-    path: '/user',
-    component: () => import('@/layouts/UserLayout.vue'),
-    meta: { requiresAuth: true },
-    children: [
-      {
-        path: 'profile',
-        name: 'UserProfile',
-        component: () => import('@/views/user/ProfileView.vue'),
-        meta: { title: '个人资料' }
-      },
-      {
-        path: 'records',
-        name: 'DietRecords',
-        component: () => import('@/views/user/DietRecordsView.vue'),
-        meta: { title: '饮食记录' }
-      },
-      {
-        path: 'plans',
-        name: 'DietPlans',
-        component: () => import('@/views/user/DietPlansView.vue'),
-        meta: { title: '我的计划' }
-      },
-      {
-        path: 'favorites',
-        name: 'Favorites',
-        component: () => import('@/views/user/FavoritesView.vue'),
-        meta: { title: '收藏夹' }
-      }
-    ]
+    path: '/profile',
+    name: 'Profile',
+    component: () => import('@/views/ProfileView.vue'),
+    meta: { requiresAuth: true, title: '个人中心' }
   },
   {
     path: '/membership',
     name: 'Membership',
-    component: () => import('@/views/membership/MembershipView.vue'),
+    component: () => import('@/views/MemberView.vue'),
     meta: { requiresAuth: true, title: '会员中心' }
   },
   {
     path: '/ai-chat',
     name: 'AIChat',
-    component: () => import('@/views/ai/ChatView.vue'),
+    component: () => import('@/views/AIChatView.vue'),
     meta: { requiresAuth: true, title: 'AI营养师' }
   },
   {
+    path: '/food-records',
+    name: 'FoodRecords',
+    component: () => import('@/views/FoodRecordView.vue'),
+    meta: { requiresAuth: true, title: '饮食记录' }
+  },
+  {
     path: '/admin',
-    component: () => import('@/layouts/AdminLayout.vue'),
-    meta: { requiresAuth: true, requiresAdmin: true },
-    children: [
-      {
-        path: 'dashboard',
-        name: 'AdminDashboard',
-        component: () => import('@/views/admin/DashboardView.vue'),
-        meta: { title: '数据看板' }
-      },
-      {
-        path: 'users',
-        name: 'UserManagement',
-        component: () => import('@/views/admin/UserManagementView.vue'),
-        meta: { title: '用户管理' }
-      },
-      {
-        path: 'ai-logs',
-        name: 'AILogs',
-        component: () => import('@/views/admin/AILogsView.vue'),
-        meta: { title: 'AI日志' }
-      }
-    ]
+    name: 'Admin',
+    component: () => import('@/views/AdminView.vue'),
+    meta: { requiresAuth: true, requiresAdmin: true, title: '后台管理' }
   },
   {
     path: '/:pathMatch(.*)*',
     name: 'NotFound',
-    component: () => import('@/views/error/NotFoundView.vue'),
+    component: () => import('@/views/HomeView.vue'),
     meta: { title: '页面未找到' }
   }
 ]
@@ -108,28 +71,46 @@ const router = createRouter({
   }
 })
 
-// 路由守卫
+// 全局前置守卫
 router.beforeEach((to, from, next) => {
   const authStore = useAuthStore()
-  
+
   // 设置页面标题
-  document.title = to.meta.title 
-    ? `${to.meta.title} - AI健康饮食规划助手` 
-    : 'AI健康饮食规划助手'
-  
-  // 检查是否需要登录
-  if (to.meta.requiresAuth && !authStore.isLoggedIn) {
-    next({ name: 'Login', query: { redirect: to.fullPath } })
-    return
-  }
-  
-  // 检查是否需要管理员权限
-  if (to.meta.requiresAdmin && !authStore.isAdmin) {
+  document.title = to.meta.title ? `${to.meta.title} - AI健康饮食规划助手` : 'AI健康饮食规划助手'
+
+  // 如果已登录，不允许访问登录/注册页面
+  if (to.meta.hideForAuth && authStore.isLoggedIn) {
+    ElMessage.info('您已登录')
     next({ name: 'Home' })
     return
   }
-  
+
+  // 检查是否需要登录
+  if (to.meta.requiresAuth) {
+    if (!authStore.isLoggedIn) {
+      ElMessage.warning('请先登录')
+      next({
+        name: 'Login',
+        query: { redirect: to.fullPath }
+      })
+      return
+    }
+
+    // 检查是否需要管理员权限
+    if (to.meta.requiresAdmin && !authStore.isAdmin) {
+      ElMessage.error('您没有访问权限')
+      next({ name: 'Home' })
+      return
+    }
+  }
+
   next()
+})
+
+// 全局后置钩子
+router.afterEach((to, from) => {
+  // 可以在这里添加页面访问统计等逻辑
+  console.log(`路由跳转: ${from.path} -> ${to.path}`)
 })
 
 export default router

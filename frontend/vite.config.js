@@ -55,30 +55,31 @@ export default defineConfig({
     outDir: 'dist',
     assetsDir: 'assets',
     sourcemap: false,
-    minify: 'terser',
-    terserOptions: {
-      compress: {
-        drop_console: true,
-        drop_debugger: true
-      }
-    },
+    minify: 'esbuild',
     rollupOptions: {
       output: {
-        manualChunks: {
-          'vue-vendor': ['vue', 'vue-router', 'pinia'],
-          'element-plus': ['element-plus'],
-          'echarts': ['echarts'],
-          'utils': ['axios', 'dayjs', 'lodash-es']
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            // 将第三方库拆分成单独的chunks
+            if (id.includes('element-plus')) {
+              return 'element-plus'
+            }
+            if (id.includes('echarts')) {
+              return 'echarts'
+            }
+            return 'vendor'
+          }
         }
       }
     },
-    chunkSizeWarningLimit: 1000
+    chunkSizeWarningLimit: 1500
   },
   
   css: {
     preprocessorOptions: {
       scss: {
-        additionalData: `@import "@/styles/variables.scss";`
+        // 使用@use替代@import，不再需要additionalData
+        // additionalData: `@import "@/styles/variables.scss";`
       }
     }
   }

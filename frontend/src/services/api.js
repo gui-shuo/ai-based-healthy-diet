@@ -1,96 +1,80 @@
 import axios from 'axios'
 import { ElMessage } from 'element-plus'
+import { useAuthStore } from '@/stores/auth'
 import router from '@/router'
 
 // 创建axios实例
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL,
-  timeout: 30000,
+  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api',
+  timeout: 15000,
   headers: {
     'Content-Type': 'application/json'
   }
 })
 
+// 是否正在刷新token
+let isRefreshing = false
+// 重试队列
+let requests = []
+
 // 请求拦截器
 api.interceptors.request.use(
-  config => {
-    const token = localStorage.getItem('nutri_token')
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`
+  (config) => {
+    // 添加请求ID
+    config.headers['X-Request-ID'] = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+
+    // 添加认证token
+    const authStore = useAuthStore()
+    if (authStore.token) {
+      config.headers['Authorization'] = `Bearer ${authStore.token}`
     }
-    
-    // 添加请求ID用于追踪
-    config.headers['X-Request-ID'] = generateRequestId()
-    
+
     return config
   },
-  error => {
-    console.error('Request error:', error)
+  (error) => {
     return Promise.reject(error)
   }
 )
 
 // 响应拦截器
 api.interceptors.response.use(
-  response => {
-    // 如果返回的data包含code字段，说明是统一响应格式
-    if (response.data && 'code' in response.data) {
-      const { code, message, data } = response.data
-      
-      if (code === 200) {
-        return data
-      } else {
-        ElMessage.error(message || '请求失败')
-        return Promise.reject(new Error(message))
-      }
-    }
-    
-    return response.data
+  (response) => {
+    return response
   },
-  error => {
-    if (error.response) {
-      const { status, data } = error.response
-      
-      switch (status) {
-        case 401:
-          ElMessage.error('登录已过期，请重新登录')
-          localStorage.removeItem('nutri_token')
-          localStorage.removeItem('nutri_user')
+  async (error) => {
+    const config = error.config
+
+    // 401错误，token过期
+    if (error.response?.status === 401) {
+      if (!isRefreshing) {
+        isRefreshing = true
+        const authStore = useAuthStore()
+
+        try {
+          const refreshed = await authStore.refreshAccessToken()
+          if (refreshed) {
+            requests.forEach(cb => cb(authStore.token))
+            requests = []
+            return api.request(config)
+          }
+        } catch (e) {
+          authStore.logout()
           router.push('/login')
-          break
-          
-        case 403:
-          ElMessage.error('没有权限访问')
-          break
-          
-        case 404:
-          ElMessage.error('请求的资源不存在')
-          break
-          
-        case 429:
-          ElMessage.error('请求过于频繁，请稍后再试')
-          break
-          
-        case 500:
-          ElMessage.error('服务器内部错误')
-          break
-          
-        default:
-          ElMessage.error(data?.message || '请求失败')
+        } finally {
+          isRefreshing = false
+        }
       }
-    } else if (error.request) {
-      ElMessage.error('网络连接失败，请检查网络')
-    } else {
-      ElMessage.error(error.message || '请求失败')
+
+      return new Promise(resolve => {
+        requests.push(token => {
+          config.headers['Authorization'] = `Bearer ${token}`
+          resolve(api.request(config))
+        })
+      })
     }
-    
+
     return Promise.reject(error)
   }
 )
-
-// 生成请求ID
-function generateRequestId() {
-  return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
-}
 
 export default api
