@@ -14,11 +14,11 @@
         <el-tag size="small" effect="plain">智能对话</el-tag>
       </div>
       <div class="header-right">
-        <el-button :icon="FolderOpened" circle @click="showHistory = true" title="历史记录" />
-        <el-button :icon="Star" circle @click="showFavorites = true" title="收藏" />
-        <el-button :icon="Delete" circle @click="handleClearHistory" title="清空对话" />
-        <el-button :icon="Download" circle @click="handleExport" title="导出对话" />
-        <el-button :icon="Setting" circle @click="showSettings = true" title="设置" />
+        <el-button :icon="FolderOpened" circle @click.stop="handleShowHistory" title="历史记录" />
+        <el-button :icon="Star" circle @click.stop="handleShowFavorites" title="收藏" />
+        <el-button :icon="Delete" circle @click.stop="handleClearHistory" title="清空对话" />
+        <el-button :icon="Download" circle @click.stop="handleExport" title="导出对话" />
+        <el-button :icon="Setting" circle @click.stop="handleShowSettings" title="设置" />
       </div>
     </div>
 
@@ -56,6 +56,9 @@
       v-model="showSettings"
       title="聊天设置"
       width="500px"
+      :append-to-body="true"
+      :close-on-click-modal="false"
+      :destroy-on-close="false"
     >
       <el-form label-width="120px">
         <el-form-item label="AI模型">
@@ -90,6 +93,8 @@
       title="历史记录"
       width="700px"
       :append-to-body="true"
+      :close-on-click-modal="false"
+      :destroy-on-close="false"
     >
       <div class="history-list">
         <el-empty v-if="historyList.length === 0" description="暂无历史记录" />
@@ -125,6 +130,8 @@
       title="我的收藏"
       width="700px"
       :append-to-body="true"
+      :close-on-click-modal="false"
+      :destroy-on-close="false"
     >
       <div class="favorites-list">
         <el-empty v-if="favoriteMessages.length === 0" description="暂无收藏" />
@@ -586,6 +593,25 @@ const handleExport = () => {
   }
 }
 
+// 显示历史记录
+const handleShowHistory = () => {
+  console.log('📖 打开历史记录')
+  loadHistoryList()
+  showHistory.value = true
+}
+
+// 显示收藏
+const handleShowFavorites = () => {
+  console.log('⭐ 打开收藏列表')
+  showFavorites.value = true
+}
+
+// 显示设置
+const handleShowSettings = () => {
+  console.log('⚙️ 打开设置')
+  showSettings.value = true
+}
+
 // 保存设置
 const handleSaveSettings = () => {
   // 保存设置到本地存储
@@ -776,13 +802,7 @@ onMounted(() => {
   loadHistoryList()
 })
 
-// 清理
-onUnmounted(() => {
-  // 保存当前对话
-  if (settings.autoSave && messages.value.length > 0) {
-    saveCurrentConversation()
-  }
-})
+// 清理（已移至下方的 onUnmounted）
 
 // 键盘快捷键
 const handleKeydown = (e) => {
@@ -821,29 +841,12 @@ onMounted(() => {
 onUnmounted(() => {
   document.removeEventListener('keydown', handleKeydown)
   
-  // 清理可能残留的 Dialog 和 MessageBox
-  setTimeout(() => {
-    const dialogs = document.querySelectorAll('.el-dialog__wrapper')
-    dialogs.forEach(dialog => {
-      console.log('AIChatView 卸载时清理 Dialog')
-      dialog.remove()
-    })
-    
-    const messageBoxes = document.querySelectorAll('.el-message-box__wrapper')
-    messageBoxes.forEach(box => {
-      console.log('AIChatView 卸载时清理 MessageBox')
-      box.remove()
-    })
-    
-    const overlays = document.querySelectorAll('body > .el-overlay')
-    overlays.forEach(overlay => {
-      const hasActiveModal = document.querySelector('.el-message-box__wrapper, .el-dialog__wrapper, .el-drawer__wrapper')
-      if (!hasActiveModal) {
-        console.log('AIChatView 卸载时清理遮罩层')
-        overlay.remove()
-      }
-    })
-  }, 50)
+  // 保存当前对话
+  if (settings.autoSave && messages.value.length > 0) {
+    saveCurrentConversation()
+  }
+  
+  // 不再在组件卸载时清理遮罩层，让 Element Plus 自己管理
 })
 </script>
 
@@ -892,6 +895,13 @@ onUnmounted(() => {
 .header-right {
   display: flex;
   gap: 8px;
+  position: relative;
+  z-index: 10;
+}
+
+.header-right .el-button {
+  position: relative;
+  z-index: 10;
 }
 
 /* 主体内容 */
@@ -1150,6 +1160,12 @@ onUnmounted(() => {
 // 确保遮罩层正确显示
 .el-overlay {
   background-color: rgba(0, 0, 0, 0.5) !important;
+  z-index: 2000 !important;
+}
+
+// 确保对话框正确显示
+.el-dialog {
+  z-index: 2001 !important;
 }
 
 // 确保MessageBox居中显示
@@ -1158,5 +1174,6 @@ onUnmounted(() => {
   top: 50% !important;
   left: 50% !important;
   transform: translate(-50%, -50%) !important;
+  z-index: 2001 !important;
 }
 </style>

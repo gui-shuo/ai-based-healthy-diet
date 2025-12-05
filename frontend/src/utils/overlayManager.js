@@ -62,14 +62,25 @@ class OverlayManager {
       return
     }
 
+    // 检查是否有活动的对话框（更准确的检测）
+    const hasActiveDialog = document.querySelector('.el-dialog')
+    const hasActiveMessageBox = document.querySelector('.el-message-box')
+    const hasActiveDrawer = document.querySelector('.el-drawer')
+    
+    if (hasActiveDialog || hasActiveMessageBox || hasActiveDrawer) {
+      return
+    }
+
     const overlays = document.querySelectorAll('body > .el-overlay, body > .el-loading-mask')
     
-    if (overlays.length > 0) {
-      console.log('🧹 清理孤立遮罩层:', overlays.length)
-      overlays.forEach(overlay => {
+    overlays.forEach(overlay => {
+      // 只清理真正空的遮罩层
+      const hasContent = overlay.querySelector('.el-dialog, .el-message-box, .el-drawer')
+      if (!hasContent && overlay.children.length === 0) {
+        console.log('🧹 清理空遮罩层')
         overlay.remove()
-      })
-    }
+      }
+    })
   }
 
   /**
@@ -80,10 +91,10 @@ class OverlayManager {
       return
     }
 
-    // 提高清理频率到 100ms（之前是 200ms）
+    // 降低清理频率到 2000ms，避免过于激进
     this.cleanupInterval = setInterval(() => {
       this.cleanupAllOverlays()
-    }, 100)
+    }, 2000)
   }
 
   /**
@@ -108,21 +119,23 @@ class OverlayManager {
       mutations.forEach((mutation) => {
         mutation.addedNodes.forEach((node) => {
           if (node.nodeType === 1 && node.classList && node.classList.contains('el-overlay')) {
-            // 延迟检查，给 Element Plus 时间创建完整的结构
-            // MessageBox 创建时，遮罩层会先于包装器创建
+            // 延迟检查，给 Element Plus 足够时间创建完整的结构
             setTimeout(() => {
-              // 检查是否在有效的包装器内
-              const isInWrapper = node.closest('.el-message-box__wrapper, .el-dialog__wrapper, .el-drawer__wrapper')
+              // 检查遮罩层内是否有内容
+              const hasContent = node.querySelector('.el-dialog, .el-message-box, .el-drawer')
               
-              // 检查是否有活动的弹窗
-              const hasActiveModal = document.querySelector('.el-message-box__wrapper, .el-dialog__wrapper, .el-drawer__wrapper')
+              // 检查是否有活动的对话框
+              const hasActiveDialog = document.querySelector('.el-dialog')
+              const hasActiveMessageBox = document.querySelector('.el-message-box')
+              const hasActiveDrawer = document.querySelector('.el-drawer')
               
-              // 只有在没有活动弹窗且不在包装器内时才移除
-              if (!hasActiveModal && !isInWrapper && node.parentElement === document.body) {
-                console.log('👀 检测到孤立遮罩层，延迟移除:', node)
+              // 只有在没有任何活动弹窗且遮罩层为空时才移除
+              if (!hasActiveDialog && !hasActiveMessageBox && !hasActiveDrawer && 
+                  !hasContent && node.children.length === 0 && node.parentElement === document.body) {
+                console.log('👀 检测到空遮罩层，移除')
                 node.remove()
               }
-            }, 100) // 延迟 100ms，给 Element Plus 足够的时间创建包装器
+            }, 500) // 延迟 500ms，给 Element Plus 足够的时间
           }
         })
       })

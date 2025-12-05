@@ -14,29 +14,10 @@ const pinia = createPinia()
 app.use(pinia)
 app.use(router)
 
-// 初始化遮罩层管理器
+// 初始化遮罩层管理器（使用更保守的策略）
 overlayManager.init()
 
-// 在路由切换前和切换后都清理遮罩层
-router.beforeEach((to, from, next) => {
-  // 路由切换前立即清理
-  overlayManager.cleanupAllOverlays()
-  next()
-})
-
-router.afterEach(() => {
-  // 路由切换后立即清理
-  overlayManager.cleanupAllOverlays()
-  
-  // 再延迟清理一次，确保彻底
-  setTimeout(() => {
-    overlayManager.cleanupAllOverlays()
-  }, 50)
-  
-  // 第三次清理
-  setTimeout(() => {
-    overlayManager.cleanupAllOverlays()
-  }, 200)
-})
+// 不再在路由切换时激进清理遮罩层
+// 让 Element Plus 自己管理对话框的生命周期
 
 app.mount('#app')

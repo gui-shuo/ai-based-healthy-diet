@@ -124,25 +124,28 @@ router.afterEach((to, from) => {
   // 可以在这里添加页面访问统计等逻辑
   console.log(`路由跳转: ${from.path} -> ${to.path}`)
   
-  // 清理可能残留的 MessageBox 和遮罩层
+  // 更保守的清理策略：只在路由切换时清理真正孤立的遮罩层
   setTimeout(() => {
-    // 清理所有 MessageBox
-    const messageBoxes = document.querySelectorAll('.el-message-box__wrapper')
-    messageBoxes.forEach(box => {
-      console.log('路由切换后清理 MessageBox')
-      box.remove()
-    })
+    // 检查是否有活动的对话框
+    const hasActiveDialog = document.querySelector('.el-dialog')
+    const hasActiveMessageBox = document.querySelector('.el-message-box')
+    const hasActiveDrawer = document.querySelector('.el-drawer')
     
-    // 清理所有孤立的遮罩层
+    // 如果有任何活动的弹窗，不清理
+    if (hasActiveDialog || hasActiveMessageBox || hasActiveDrawer) {
+      return
+    }
+    
+    // 只清理真正孤立的遮罩层（没有内容的）
     const overlays = document.querySelectorAll('body > .el-overlay')
     overlays.forEach(overlay => {
-      const hasActiveModal = document.querySelector('.el-message-box__wrapper, .el-dialog__wrapper, .el-drawer__wrapper')
-      if (!hasActiveModal) {
-        console.log('路由切换后清理遮罩层')
+      const hasContent = overlay.querySelector('.el-dialog, .el-message-box, .el-drawer')
+      if (!hasContent && overlay.children.length === 0) {
+        console.log('路由切换后清理空遮罩层')
         overlay.remove()
       }
     })
-  }, 100)
+  }, 300)
 })
 
 // 捕获并忽略导航错误
