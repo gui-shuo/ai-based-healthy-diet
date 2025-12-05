@@ -12,9 +12,16 @@
     </template>
 
     <el-skeleton :loading="loading" animated :rows="8">
-      <div class="chart-container">
-        <v-chart :option="chartOption" :autoresize="true" style="height: 300px" />
+      <div class="chart-container" v-if="!loading && chartData.dates.length > 0">
+        <v-chart 
+          :key="`chart-${timeRange}`" 
+          :option="chartOption" 
+          :autoresize="true" 
+          :init-options="{ renderer: 'canvas' }"
+          style="height: 300px" 
+        />
       </div>
+      <el-empty v-else-if="!loading" description="暂无数据" :image-size="100" />
 
       <!-- 成长值统计 -->
       <div class="growth-stats">
@@ -36,7 +43,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import VChart from 'vue-echarts'
 import { use } from 'echarts/core'
 import { CanvasRenderer } from 'echarts/renderers'
@@ -133,11 +140,10 @@ const chartOption = computed(() => ({
     }
   },
   grid: {
-    left: '3%',
-    right: '3%',
-    bottom: '3%',
-    top: '10%',
-    containLabel: true
+    left: '50',
+    right: '20',
+    bottom: '30',
+    top: '30'
   },
   xAxis: {
     type: 'category',
@@ -276,6 +282,12 @@ const handleTimeRangeChange = () => {
 
 onMounted(() => {
   fetchGrowthRecords()
+})
+
+// 组件卸载前清理
+onBeforeUnmount(() => {
+  // vue-echarts 会自动清理实例，但我们确保数据也被清空
+  growthData.value = []
 })
 </script>
 

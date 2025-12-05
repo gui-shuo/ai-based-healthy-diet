@@ -19,6 +19,8 @@
                 <el-dropdown-menu>
                   <el-dropdown-item command="profile">个人中心</el-dropdown-item>
                   <el-dropdown-item command="ai-chat">AI营养师</el-dropdown-item>
+                  <el-dropdown-item command="diet-plan">AI饮食计划</el-dropdown-item>
+                  <el-dropdown-item command="food-recognition">AI食物识别</el-dropdown-item>
                   <el-dropdown-item command="food-records">饮食记录</el-dropdown-item>
                   <el-dropdown-item command="membership">会员中心</el-dropdown-item>
                   <el-dropdown-item divided command="logout">退出登录</el-dropdown-item>
@@ -56,6 +58,16 @@
               <h3>AI营养师</h3>
               <p>智能对话，获取专业营养建议</p>
             </div>
+            <div class="feature-card" @click="goToFeature('diet-plan')">
+              <el-icon :size="48" color="#22c55e"><calendar /></el-icon>
+              <h3>AI饮食计划</h3>
+              <p>智能生成个性化饮食计划</p>
+            </div>
+            <div class="feature-card" @click="goToFeature('food-recognition')">
+              <el-icon :size="48" color="#22c55e"><camera /></el-icon>
+              <h3>AI食物识别</h3>
+              <p>拍照识别食物，智能分析营养</p>
+            </div>
             <div class="feature-card" @click="goToFeature('food-records')">
               <el-icon :size="48" color="#22c55e"><document /></el-icon>
               <h3>饮食记录</h3>
@@ -82,12 +94,13 @@
 
 <script setup>
 import { computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import message from '@/utils/message'
-import { ArrowDown, User, ChatDotRound, Document, Trophy } from '@element-plus/icons-vue'
+import { ArrowDown, User, ChatDotRound, Document, Trophy, Calendar, Camera } from '@element-plus/icons-vue'
 
 const router = useRouter()
+const route = useRoute()
 const authStore = useAuthStore()
 
 const isLoggedIn = computed(() => authStore.isLoggedIn)
@@ -113,19 +126,25 @@ const learnMore = () => {
   message.info('更多功能即将推出，敬请期待！')
 }
 
+const handleLogout = () => {
+  authStore.logout()
+  message.success('退出登录成功')
+  router.push('/')
+}
+
 const handleCommand = (command) => {
   if (command === 'logout') {
-    authStore.logout()
-    message.success('退出登录成功')
-    router.push('/')
-  } else if (command === 'profile') {
-    router.push('/profile')
+    handleLogout()
   } else if (command === 'ai-chat') {
-    router.push('/ai-chat')
+    if (route.path !== '/ai-chat') router.push('/ai-chat')
+  } else if (command === 'diet-plan') {
+    if (route.path !== '/diet-plan') router.push('/diet-plan')
+  } else if (command === 'food-recognition') {
+    if (route.path !== '/food-recognition') router.push('/food-recognition')
   } else if (command === 'food-records') {
-    router.push('/food-records')
+    if (route.path !== '/food-records') router.push('/food-records')
   } else if (command === 'membership') {
-    router.push('/membership')
+    if (route.path !== '/membership') router.push('/membership')
   }
 }
 
@@ -136,7 +155,11 @@ const goToFeature = (feature) => {
     return
   }
   
-  router.push(`/${feature}`)
+  // 检查是否已经在目标路由，避免重复导航
+  const targetPath = `/${feature}`
+  if (route.path !== targetPath) {
+    router.push(targetPath)
+  }
 }
 </script>
 

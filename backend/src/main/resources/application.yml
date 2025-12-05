@@ -78,6 +78,7 @@ tongyi:
   max-tokens: 2000
   temperature: 0.7
   top-p: 0.9
+  timeout: 180  # 超时时间（秒），默认180秒（3分钟）
 
 # 阿里云OSS配置
 aliyun:
@@ -129,3 +130,18 @@ nutriai:
     allowed-types: jpg,jpeg,png,gif,pdf,txt
     local-path: d:/ProgrammingLanguage/Java/Projects/ai-based-healthy-diet/backend/uploads
     base-url: http://localhost  # 文件访问基础URL
+
+# 阿里云配置（已停用）
+#aliyun:
+#  access-key-id: ${ALIYUN_ACCESS_KEY_ID}
+#  access-key-secret: ${ALIYUN_ACCESS_KEY_SECRET}
+#  imagerecog:
+#    endpoint: imagerecog.cn-shanghai.aliyuncs.com
+#    region: cn-shanghai
+
+# 百度AI配置
+baidu:
+  ai:
+    app-id: ${BAIDU_APP_ID}
+    api-key: ${BAIDU_API_KEY}
+    secret-key: ${BAIDU_SECRET_KEY}

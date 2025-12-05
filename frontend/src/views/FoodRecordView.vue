@@ -1,6 +1,13 @@
 <template>
   <div class="food-record-container">
     <div class="food-record-layout">
+      <!-- 返回首页按钮 -->
+      <div style="margin-bottom: 16px;">
+        <el-button :icon="ArrowLeft" @click="goToHome" text>
+          返回首页
+        </el-button>
+      </div>
+      
       <!-- 头部统计卡片 -->
       <div class="stats-section">
         <NutritionStats :date="selectedDate" @date-change="handleDateChange" />
@@ -85,10 +92,14 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { Plus } from '@element-plus/icons-vue'
+import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { useRouter } from 'vue-router'
+import { Plus, ArrowLeft } from '@element-plus/icons-vue'
 import { ElMessageBox } from 'element-plus'
 import { getFoodRecords, deleteFoodRecord, getMealTypeList } from '@/services/foodRecord'
+
+// 路由
+const router = useRouter()
 import message from '@/utils/message'
 import NutritionStats from '@/components/food/NutritionStats.vue'
 import FoodRecordList from '@/components/food/FoodRecordList.vue'
@@ -148,6 +159,11 @@ const fetchRecords = async () => {
   } finally {
     loading.value = false
   }
+}
+
+// 返回首页
+const goToHome = () => {
+  router.push('/')
 }
 
 // 日期变化（来自NutritionStats组件）
@@ -225,6 +241,31 @@ const handleDelete = async (record) => {
 
 onMounted(() => {
   fetchRecords()
+})
+
+// 组件卸载前清理
+onBeforeUnmount(() => {
+  console.log('FoodRecordView 组件卸载，开始清理...')
+  
+  // 清理可能残留的 MessageBox
+  setTimeout(() => {
+    const messageBoxes = document.querySelectorAll('.el-message-box__wrapper')
+    messageBoxes.forEach(box => {
+      console.log('FoodRecordView 卸载时清理 MessageBox')
+      box.remove()
+    })
+    
+    const overlays = document.querySelectorAll('body > .el-overlay')
+    overlays.forEach(overlay => {
+      const hasActiveModal = document.querySelector('.el-message-box__wrapper, .el-dialog__wrapper, .el-drawer__wrapper')
+      if (!hasActiveModal) {
+        console.log('FoodRecordView 卸载时清理遮罩层')
+        overlay.remove()
+      }
+    })
+  }, 50)
+  
+  console.log('FoodRecordView 清理完成')
 })
 </script>
 

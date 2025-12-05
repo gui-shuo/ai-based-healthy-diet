@@ -3,7 +3,7 @@
     <template #header>
       <div class="card-header">
         <span class="title">等级对比</span>
-        <el-tag>5个等级</el-tag>
+        <el-tag type="info">5个等级</el-tag>
       </div>
     </template>
 
@@ -43,6 +43,7 @@
               <el-tag
                 v-for="(benefit, index) in row.keyBenefits.slice(0, 2)"
                 :key="index"
+                type="info"
                 size="small"
                 style="margin-right: 4px; margin-bottom: 4px"
               >
@@ -219,7 +220,7 @@ const getTagType = (limit) => {
   if (limit === -1) return 'success'
   if (limit >= 30) return 'warning'
   if (limit >= 10) return 'info'
-  return 'default'
+  return 'info'
 }
 </script>
 

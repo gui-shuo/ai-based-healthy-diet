@@ -62,16 +62,20 @@
           <div class="chart-container">
             <h3 class="chart-title">营养成分占比</h3>
             <v-chart
+              :key="`pie-${currentDate}`"
               class="chart"
               :option="nutritionPieOption"
+              :init-options="{ renderer: 'canvas' }"
               autoresize
             />
           </div>
           <div class="chart-container">
             <h3 class="chart-title">餐次卡路里分布</h3>
             <v-chart
+              :key="`bar-${currentDate}`"
               class="chart"
               :option="mealBarOption"
+              :init-options="{ renderer: 'canvas' }"
               autoresize
             />
           </div>
@@ -91,7 +95,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
 import { User, Food, Apple, Grape } from '@element-plus/icons-vue'
 import VChart from 'vue-echarts'
 import { use } from 'echarts/core'
@@ -316,6 +320,12 @@ onMounted(() => {
   } else {
     fetchStats(new Date())
   }
+})
+
+// 组件卸载前清理
+onBeforeUnmount(() => {
+  // 清空数据
+  stats.value = null
 })
 </script>
 

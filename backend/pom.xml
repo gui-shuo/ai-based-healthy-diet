@@ -166,6 +166,44 @@
             <artifactId>spring-security-test</artifactId>
             <scope>test</scope>
         </dependency>
+        
+        <!-- iText PDF生成 -->
+        <dependency>
+            <groupId>com.itextpdf</groupId>
+            <artifactId>itext7-core</artifactId>
+            <version>7.2.5</version>
+            <type>pom</type>
+        </dependency>
+        
+        <!-- iText 中文字体支持 -->
+        <dependency>
+            <groupId>com.itextpdf</groupId>
+            <artifactId>font-asian</artifactId>
+            <version>7.2.5</version>
+        </dependency>
+        
+        <!-- 阿里云图像识别SDK（已停用） -->
+        <!--
+        <dependency>
+            <groupId>com.aliyun</groupId>
+            <artifactId>imagerecog20190930</artifactId>
+            <version>2.0.1</version>
+        </dependency>
+        -->
+        
+        <!-- 百度AI SDK -->
+        <dependency>
+            <groupId>com.baidu.aip</groupId>
+            <artifactId>java-sdk</artifactId>
+            <version>4.16.18</version>
+        </dependency>
+        
+        <!-- JSON处理 -->
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20231013</version>
+        </dependency>
     </dependencies>
     
     <build>

@@ -1,12 +1,24 @@
 <template>
   <div class="membership-container">
+    <el-button :icon="ArrowLeft" @click="goToHome" text style="margin-bottom: 16px">
+      返回首页
+    </el-button>
     <h1>会员中心</h1>
     <p>会员功能开发中...</p>
   </div>
 </template>
 
 <script setup>
-// 会员中心页面 - 待实现
+import { useRouter } from 'vue-router'
+import { ArrowLeft } from '@element-plus/icons-vue'
+
+// 路由
+const router = useRouter()
+
+// 返回首页
+const goToHome = () => {
+  router.push('/')
+}
 </script>
 
 <style scoped>

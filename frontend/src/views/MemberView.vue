@@ -36,7 +36,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, onBeforeUnmount } from 'vue'
 import { getMemberInfo } from '@/services/member'
 import MemberInfoCard from '@/components/member/MemberInfoCard.vue'
 import GrowthChart from '@/components/member/GrowthChart.vue'
@@ -78,6 +78,37 @@ const fetchMemberInfo = async () => {
 
 onMounted(() => {
   fetchMemberInfo()
+})
+
+// 组件卸载前清理
+onBeforeUnmount(() => {
+  console.log('MemberView 组件卸载，开始清理...')
+  
+  // 清理可能残留的 Dialog 和 MessageBox
+  setTimeout(() => {
+    const dialogs = document.querySelectorAll('.el-dialog__wrapper')
+    dialogs.forEach(dialog => {
+      console.log('MemberView 卸载时清理 Dialog')
+      dialog.remove()
+    })
+    
+    const messageBoxes = document.querySelectorAll('.el-message-box__wrapper')
+    messageBoxes.forEach(box => {
+      console.log('MemberView 卸载时清理 MessageBox')
+      box.remove()
+    })
+    
+    const overlays = document.querySelectorAll('body > .el-overlay')
+    overlays.forEach(overlay => {
+      const hasActiveModal = document.querySelector('.el-message-box__wrapper, .el-dialog__wrapper, .el-drawer__wrapper')
+      if (!hasActiveModal) {
+        console.log('MemberView 卸载时清理遮罩层')
+        overlay.remove()
+      }
+    })
+  }, 50)
+  
+  console.log('MemberView 清理完成')
 })
 </script>
 

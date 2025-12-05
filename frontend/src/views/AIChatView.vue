@@ -3,6 +3,10 @@
     <!-- 顶部标题栏 -->
     <div class="chat-header">
       <div class="header-left">
+        <el-button :icon="ArrowLeft" @click="goToHome" text>
+          返回首页
+        </el-button>
+        <el-divider direction="vertical" />
         <h1 class="header-title">
           <el-icon class="title-icon"><ChatDotRound /></el-icon>
           AI营养师
@@ -10,6 +14,8 @@
         <el-tag size="small" effect="plain">智能对话</el-tag>
       </div>
       <div class="header-right">
+        <el-button :icon="FolderOpened" circle @click="showHistory = true" title="历史记录" />
+        <el-button :icon="Star" circle @click="showFavorites = true" title="收藏" />
         <el-button :icon="Delete" circle @click="handleClearHistory" title="清空对话" />
         <el-button :icon="Download" circle @click="handleExport" title="导出对话" />
         <el-button :icon="Setting" circle @click="showSettings = true" title="设置" />
@@ -23,6 +29,8 @@
         ref="messageListRef"
         :messages="messages"
         @regenerate="handleRegenerate"
+        @favorite="handleFavorite"
+        @unfavorite="handleUnfavorite"
       />
 
       <!-- 快捷操作 -->
@@ -75,21 +83,97 @@
         <el-button type="primary" @click="handleSaveSettings">保存</el-button>
       </template>
     </el-dialog>
+
+    <!-- 历史记录对话框 -->
+    <el-dialog
+      v-model="showHistory"
+      title="历史记录"
+      width="700px"
+      :append-to-body="true"
+    >
+      <div class="history-list">
+        <el-empty v-if="historyList.length === 0" description="暂无历史记录" />
+        <div
+          v-else
+          v-for="item in historyList"
+          :key="item.id"
+          class="history-item"
+          @click="loadHistoryConversation(item)"
+        >
+          <div class="history-header">
+            <span class="history-title">{{ item.title || '未命名对话' }}</span>
+            <span class="history-time">{{ formatTime(item.timestamp) }}</span>
+          </div>
+          <div class="history-preview">{{ item.preview }}</div>
+          <div class="history-actions">
+            <el-button
+              link
+              size="small"
+              type="danger"
+              @click.stop="deleteHistory(item.id)"
+            >
+              删除
+            </el-button>
+          </div>
+        </div>
+      </div>
+    </el-dialog>
+
+    <!-- 收藏对话框 -->
+    <el-dialog
+      v-model="showFavorites"
+      title="我的收藏"
+      width="700px"
+      :append-to-body="true"
+    >
+      <div class="favorites-list">
+        <el-empty v-if="favoriteMessages.length === 0" description="暂无收藏" />
+        <div
+          v-else
+          v-for="msg in favoriteMessages"
+          :key="msg.id"
+          class="favorite-item"
+        >
+          <div class="favorite-content" v-html="renderMarkdown(msg.content)"></div>
+          <div class="favorite-footer">
+            <span class="favorite-time">{{ formatTime(msg.timestamp) }}</span>
+            <div class="favorite-actions">
+              <el-button link size="small" @click="copyMessage(msg.content)">
+                <el-icon><DocumentCopy /></el-icon> 复制
+              </el-button>
+              <el-button link size="small" type="danger" @click="handleUnfavorite(msg)">
+                <el-icon><Delete /></el-icon> 取消收藏
+              </el-button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, onUnmounted } from 'vue'
+import { ref, reactive, computed, onMounted, onUnmounted, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import {
   ChatDotRound,
   Delete,
   Download,
-  Setting
+  FolderOpened,
+  Setting,
+  Star,
+  DocumentCopy,
+  ArrowLeft
 } from '@element-plus/icons-vue'
 import MessageList from '@/components/chat/MessageList.vue'
 import ChatInput from '@/components/chat/ChatInput.vue'
 import QuickActions from '@/components/chat/QuickActions.vue'
+import { marked } from 'marked'
+import DOMPurify from 'dompurify'
+
+// 路由
+const router = useRouter()
 
 // 组件引用
 const messageListRef = ref(null)
@@ -99,13 +183,22 @@ const chatInputRef = ref(null)
 const messages = ref([])
 const isLoading = ref(false)
 const showSettings = ref(false)
+const showHistory = ref(false)
+const showFavorites = ref(false)
+const historyList = ref([])
 
 // 设置
 const settings = reactive({
   model: 'qwen-max',
   temperature: 0.7,
   maxTokens: 2000,
-  keepContext: true
+  keepContext: true,
+  autoSave: true
+})
+
+// 收藏消息计算属性
+const favoriteMessages = computed(() => {
+  return messages.value.filter(m => m.favorite && m.role === 'assistant')
 })
 
 // 生成消息ID
@@ -431,11 +524,21 @@ const handleClearHistory = async () => {
       }
     )
 
+    // 先保存到历史记录
+    if (settings.autoSave && messages.value.length > 0) {
+      saveCurrentConversation()
+    }
+
     messages.value = []
     ElMessage.success('对话记录已清空')
   } catch {
     // 用户取消操作
   }
+}
+
+// 返回首页
+const goToHome = () => {
+  router.push('/')
 }
 
 // 导出对话
@@ -457,6 +560,11 @@ const handleExport = () => {
       
       exportContent += `### ${role} - ${time}\n\n`
       exportContent += `${msg.content}\n\n`
+      
+      if (msg.favorite) {
+        exportContent += `⭐ 已收藏\n\n`
+      }
+      
       exportContent += '---\n\n'
     })
 
@@ -509,9 +617,171 @@ const loadSettings = () => {
   }
 }
 
+// 收藏消息
+const handleFavorite = (message) => {
+  const index = messages.value.findIndex(m => m.id === message.id)
+  if (index > -1) {
+    messages.value[index].favorite = true
+    ElMessage.success('已收藏')
+    saveToLocalStorage()
+  }
+}
+
+// 取消收藏
+const handleUnfavorite = (message) => {
+  const index = messages.value.findIndex(m => m.id === message.id)
+  if (index > -1) {
+    messages.value[index].favorite = false
+    ElMessage.success('已取消收藏')
+    saveToLocalStorage()
+  }
+}
+
+// 复制消息
+const copyMessage = (content) => {
+  navigator.clipboard.writeText(content).then(() => {
+    ElMessage.success('已复制到剪贴板')
+  }).catch(() => {
+    ElMessage.error('复制失败')
+  })
+}
+
+// 渲染Markdown
+const renderMarkdown = (content) => {
+  if (!content) return ''
+  marked.setOptions({
+    breaks: true,
+    gfm: true
+  })
+  const html = marked.parse(content)
+  return DOMPurify.sanitize(html)
+}
+
+// 格式化时间
+const formatTime = (timestamp) => {
+  if (!timestamp) return ''
+  const date = new Date(timestamp)
+  const now = new Date()
+  const diff = now - date
+
+  if (diff < 60000) return '刚刚'
+  if (diff < 3600000) return `${Math.floor(diff / 60000)}分钟前`
+  if (diff < 86400000) return `${Math.floor(diff / 3600000)}小时前`
+  
+  return date.toLocaleString('zh-CN', {
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit'
+  })
+}
+
+// 生成对话标题
+const generateConversationTitle = (firstMessage) => {
+  if (!firstMessage) return '未命名对话'
+  return firstMessage.substring(0, 30) + (firstMessage.length > 30 ? '...' : '')
+}
+
+// 保存到本地存储
+const saveToLocalStorage = () => {
+  if (settings.autoSave && messages.value.length > 0) {
+    try {
+      localStorage.setItem('currentChat', JSON.stringify(messages.value))
+    } catch (error) {
+      console.error('保存失败:', error)
+    }
+  }
+}
+
+// 从本地存储加载
+const loadFromLocalStorage = () => {
+  try {
+    const saved = localStorage.getItem('currentChat')
+    if (saved) {
+      messages.value = JSON.parse(saved)
+    }
+  } catch (error) {
+    console.error('加载失败:', error)
+  }
+}
+
+// 保存当前对话
+const saveCurrentConversation = () => {
+  if (messages.value.length === 0) return
+
+  const firstUserMessage = messages.value.find(m => m.role === 'user')
+  const conversation = {
+    id: `conv_${Date.now()}`,
+    title: generateConversationTitle(firstUserMessage?.content),
+    preview: firstUserMessage?.content?.substring(0, 50) || '',
+    messages: JSON.parse(JSON.stringify(messages.value)),
+    timestamp: Date.now()
+  }
+
+  const history = JSON.parse(localStorage.getItem('chatHistory') || '[]')
+  history.unshift(conversation)
+  
+  // 最多保存50条历史记录
+  if (history.length > 50) {
+    history.length = 50
+  }
+  
+  localStorage.setItem('chatHistory', JSON.stringify(history))
+}
+
+// 加载历史记录列表
+const loadHistoryList = () => {
+  try {
+    const history = JSON.parse(localStorage.getItem('chatHistory') || '[]')
+    historyList.value = history
+  } catch (error) {
+    console.error('加载历史记录失败:', error)
+    historyList.value = []
+  }
+}
+
+// 加载历史对话
+const loadHistoryConversation = (item) => {
+  messages.value = JSON.parse(JSON.stringify(item.messages))
+  showHistory.value = false
+  ElMessage.success('历史记录已加载')
+}
+
+// 删除历史记录
+const deleteHistory = async (id) => {
+  try {
+    await ElMessageBox.confirm('确定要删除这条历史记录吗？', '确认删除', {
+      confirmButtonText: '确认',
+      cancelButtonText: '取消',
+      type: 'warning'
+    })
+
+    const history = JSON.parse(localStorage.getItem('chatHistory') || '[]')
+    const index = history.findIndex(h => h.id === id)
+    if (index > -1) {
+      history.splice(index, 1)
+      localStorage.setItem('chatHistory', JSON.stringify(history))
+      loadHistoryList()
+      ElMessage.success('已删除')
+    }
+  } catch {
+    // 用户取消
+  }
+}
+
 // 初始化
 onMounted(() => {
   loadSettings()
+  loadFromLocalStorage()
+  loadHistoryList()
+})
+
+// 清理
+onUnmounted(() => {
+  // 保存当前对话
+  if (settings.autoSave && messages.value.length > 0) {
+    saveCurrentConversation()
+  }
 })
 
 // 键盘快捷键
@@ -527,7 +797,22 @@ const handleKeydown = (e) => {
     e.preventDefault()
     handleExport()
   }
+  
+  // Ctrl/Cmd + H: 打开历史记录
+  if ((e.ctrlKey || e.metaKey) && e.key === 'h') {
+    e.preventDefault()
+    showHistory.value = true
+  }
 }
+
+// 监听消息变化，自动保存
+watch(
+  () => messages.value,
+  () => {
+    saveToLocalStorage()
+  },
+  { deep: true }
+)
 
 onMounted(() => {
   document.addEventListener('keydown', handleKeydown)
@@ -535,6 +820,30 @@ onMounted(() => {
 
 onUnmounted(() => {
   document.removeEventListener('keydown', handleKeydown)
+  
+  // 清理可能残留的 Dialog 和 MessageBox
+  setTimeout(() => {
+    const dialogs = document.querySelectorAll('.el-dialog__wrapper')
+    dialogs.forEach(dialog => {
+      console.log('AIChatView 卸载时清理 Dialog')
+      dialog.remove()
+    })
+    
+    const messageBoxes = document.querySelectorAll('.el-message-box__wrapper')
+    messageBoxes.forEach(box => {
+      console.log('AIChatView 卸载时清理 MessageBox')
+      box.remove()
+    })
+    
+    const overlays = document.querySelectorAll('body > .el-overlay')
+    overlays.forEach(overlay => {
+      const hasActiveModal = document.querySelector('.el-message-box__wrapper, .el-dialog__wrapper, .el-drawer__wrapper')
+      if (!hasActiveModal) {
+        console.log('AIChatView 卸载时清理遮罩层')
+        overlay.remove()
+      }
+    })
+  }, 50)
 })
 </script>
 
@@ -599,6 +908,95 @@ onUnmounted(() => {
   font-size: 12px;
   color: #909399;
   margin-top: 4px;
+}
+
+/* 历史记录列表 */
+.history-list {
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.history-item {
+  padding: 16px;
+  border: 1px solid #e4e7ed;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.history-item:hover {
+  border-color: #409eff;
+  background: #f0f9ff;
+}
+
+.history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.history-title {
+  font-weight: 600;
+  color: #303133;
+}
+
+.history-time {
+  font-size: 12px;
+  color: #909399;
+}
+
+.history-preview {
+  color: #606266;
+  font-size: 14px;
+  margin-bottom: 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.history-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* 收藏列表 */
+.favorites-list {
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.favorite-item {
+  padding: 16px;
+  border: 1px solid #e4e7ed;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  background: white;
+}
+
+.favorite-content {
+  color: #303133;
+  line-height: 1.6;
+  margin-bottom: 12px;
+}
+
+.favorite-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 12px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.favorite-time {
+  font-size: 12px;
+  color: #909399;
+}
+
+.favorite-actions {
+  display: flex;
+  gap: 8px;
 }
 
 /* 响应式 */

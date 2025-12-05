@@ -46,6 +46,18 @@ const routes = [
     meta: { requiresAuth: true, title: '饮食记录' }
   },
   {
+    path: '/diet-plan',
+    name: 'DietPlan',
+    component: () => import('@/views/DietPlanView.vue'),
+    meta: { requiresAuth: true, title: 'AI饮食计划' }
+  },
+  {
+    path: '/food-recognition',
+    name: 'FoodRecognition',
+    component: () => import('@/views/FoodRecognitionView.vue'),
+    meta: { requiresAuth: true, title: 'AI食物识别' }
+  },
+  {
     path: '/admin',
     name: 'Admin',
     component: () => import('@/views/AdminView.vue'),
@@ -111,6 +123,59 @@ router.beforeEach((to, from, next) => {
 router.afterEach((to, from) => {
   // 可以在这里添加页面访问统计等逻辑
   console.log(`路由跳转: ${from.path} -> ${to.path}`)
+  
+  // 清理可能残留的 MessageBox 和遮罩层
+  setTimeout(() => {
+    // 清理所有 MessageBox
+    const messageBoxes = document.querySelectorAll('.el-message-box__wrapper')
+    messageBoxes.forEach(box => {
+      console.log('路由切换后清理 MessageBox')
+      box.remove()
+    })
+    
+    // 清理所有孤立的遮罩层
+    const overlays = document.querySelectorAll('body > .el-overlay')
+    overlays.forEach(overlay => {
+      const hasActiveModal = document.querySelector('.el-message-box__wrapper, .el-dialog__wrapper, .el-drawer__wrapper')
+      if (!hasActiveModal) {
+        console.log('路由切换后清理遮罩层')
+        overlay.remove()
+      }
+    })
+  }, 100)
+})
+
+// 捕获并忽略导航错误
+const originalPush = router.push
+const originalReplace = router.replace
+
+router.push = function push(location) {
+  return originalPush.call(this, location).catch(err => {
+    // 忽略导航相关的错误
+    if (err.name !== 'NavigationDuplicated' && !err.message.includes('Avoided redundant navigation')) {
+      console.error('Navigation error:', err)
+      throw err
+    }
+    // 静默忽略重复导航
+    return Promise.resolve(false)
+  })
+}
+
+router.replace = function replace(location) {
+  return originalReplace.call(this, location).catch(err => {
+    // 忽略导航相关的错误
+    if (err.name !== 'NavigationDuplicated' && !err.message.includes('Avoided redundant navigation')) {
+      console.error('Navigation error:', err)
+      throw err
+    }
+    // 静默忽略重复导航
+    return Promise.resolve(false)
+  })
+}
+
+// 全局错误处理
+router.onError((error) => {
+  console.error('Router error:', error)
 })
 
 export default router

@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>遮罩层清理测试工具</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+    }
+    
+    h1 {
+      color: #333;
+      margin-bottom: 20px;
+    }
+    
+    .test-section {
+      margin: 20px 0;
+      padding: 20px;
+      background: #f9f9f9;
+      border-radius: 4px;
+      border-left: 4px solid #409eff;
+    }
+    
+    .test-section h3 {
+      margin-top: 0;
+      color: #409eff;
+    }
+    
+    button {
+      padding: 10px 20px;
+      margin: 5px;
+      background: #409eff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    
+    button:hover {
+      background: #66b1ff;
+    }
+    
+    button.danger {
+      background: #f56c6c;
+    }
+    
+    button.danger:hover {
+      background: #f78989;
+    }
+    
+    button.success {
+      background: #67c23a;
+    }
+    
+    button.success:hover {
+      background: #85ce61;
+    }
+    
+    .result {
+      margin-top: 15px;
+      padding: 15px;
+      background: white;
+      border-radius: 4px;
+      border: 1px solid #ddd;
+    }
+    
+    .result.success {
+      border-color: #67c23a;
+      background: #f0f9ff;
+    }
+    
+    .result.error {
+      border-color: #f56c6c;
+      background: #fef0f0;
+    }
+    
+    .overlay-info {
+      margin: 10px 0;
+      padding: 10px;
+      background: #fff;
+      border: 1px solid #e4e7ed;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 12px;
+    }
+    
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+      margin: 20px 0;
+    }
+    
+    .stat-card {
+      padding: 15px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border-radius: 8px;
+      text-align: center;
+    }
+    
+    .stat-card h4 {
+      margin: 0 0 10px 0;
+      font-size: 14px;
+      opacity: 0.9;
+    }
+    
+    .stat-card .number {
+      font-size: 32px;
+      font-weight: bold;
+    }
+    
+    .log {
+      margin-top: 20px;
+      padding: 15px;
+      background: #2c3e50;
+      color: #ecf0f1;
+      border-radius: 4px;
+      max-height: 300px;
+      overflow-y: auto;
+      font-family: monospace;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+    
+    .log-entry {
+      margin: 5px 0;
+    }
+    
+    .log-entry.info {
+      color: #3498db;
+    }
+    
+    .log-entry.success {
+      color: #2ecc71;
+    }
+    
+    .log-entry.warning {
+      color: #f39c12;
+    }
+    
+    .log-entry.error {
+      color: #e74c3c;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🧪 遮罩层清理测试工具</h1>
+    <p>这个工具可以帮助你检测和清理页面上的遮罩层元素</p>
+    
+    <div class="stats">
+      <div class="stat-card">
+        <h4>遮罩层总数</h4>
+        <div class="number" id="totalOverlays">0</div>
+      </div>
+      <div class="stat-card">
+        <h4>孤立遮罩层</h4>
+        <div class="number" id="orphanOverlays">0</div>
+      </div>
+      <div class="stat-card">
+        <h4>有效遮罩层</h4>
+        <div class="number" id="validOverlays">0</div>
+      </div>
+    </div>
+    
+    <div class="test-section">
+      <h3>🔍 检测遮罩层</h3>
+      <button onclick="detectOverlays()">检测当前遮罩层</button>
+      <button onclick="startAutoDetect()" class="success">开始自动检测（每秒）</button>
+      <button onclick="stopAutoDetect()" class="danger">停止自动检测</button>
+      <div id="detectResult" class="result" style="display: none;"></div>
+    </div>
+    
+    <div class="test-section">
+      <h3>🧹 清理遮罩层</h3>
+      <button onclick="cleanupAllOverlays()">清理所有孤立遮罩层</button>
+      <button onclick="forceCleanupAll()" class="danger">强制清理所有遮罩层</button>
+      <div id="cleanupResult" class="result" style="display: none;"></div>
+    </div>
+    
+    <div class="test-section">
+      <h3>📊 详细信息</h3>
+      <button onclick="showDetailedInfo()">显示详细信息</button>
+      <button onclick="clearLog()">清空日志</button>
+      <div id="detailInfo" class="result" style="display: none;"></div>
+    </div>
+    
+    <div class="log" id="logContainer">
+      <div class="log-entry info">等待操作...</div>
+    </div>
+  </div>
+  
+  <script>
+    let autoDetectInterval = null;
+    
+    function log(message, type = 'info') {
+      const logContainer = document.getElementById('logContainer');
+      const timestamp = new Date().toLocaleTimeString();
+      const entry = document.createElement('div');
+      entry.className = `log-entry ${type}`;
+      entry.textContent = `[${timestamp}] ${message}`;
+      logContainer.appendChild(entry);
+      logContainer.scrollTop = logContainer.scrollHeight;
+    }
+    
+    function updateStats(total, orphan, valid) {
+      document.getElementById('totalOverlays').textContent = total;
+      document.getElementById('orphanOverlays').textContent = orphan;
+      document.getElementById('validOverlays').textContent = valid;
+    }
+    
+    function detectOverlays() {
+      log('开始检测遮罩层...', 'info');
+      
+      const allOverlays = document.querySelectorAll('.el-overlay');
+      const bodyOverlays = document.querySelectorAll('body > .el-overlay');
+      const hasMessageBox = document.querySelector('.el-message-box__wrapper');
+      const hasDialog = document.querySelector('.el-dialog__wrapper');
+      const hasDrawer = document.querySelector('.el-drawer__wrapper');
+      
+      let orphanCount = 0;
+      let validCount = 0;
+      
+      const resultDiv = document.getElementById('detectResult');
+      resultDiv.style.display = 'block';
+      resultDiv.className = 'result';
+      
+      let html = '<h4>检测结果：</h4>';
+      html += `<p>总遮罩层数: <strong>${allOverlays.length}</strong></p>`;
+      html += `<p>直接在 body 下的遮罩层: <strong>${bodyOverlays.length}</strong></p>`;
+      html += `<p>活动的 MessageBox: <strong>${hasMessageBox ? '是' : '否'}</strong></p>`;
+      html += `<p>活动的 Dialog: <strong>${hasDialog ? '是' : '否'}</strong></p>`;
+      html += `<p>活动的 Drawer: <strong>${hasDrawer ? '是' : '否'}</strong></p>`;
+      
+      if (bodyOverlays.length > 0) {
+        html += '<h5>遮罩层详情：</h5>';
+        bodyOverlays.forEach((overlay, index) => {
+          const isInWrapper = overlay.closest('.el-message-box__wrapper, .el-dialog__wrapper, .el-drawer__wrapper');
+          const hasValidSibling = overlay.nextElementSibling || overlay.previousElementSibling;
+          const isOrphan = !isInWrapper && !hasValidSibling;
+          
+          if (isOrphan) orphanCount++;
+          else validCount++;
+          
+          html += `<div class="overlay-info">`;
+          html += `<strong>遮罩层 #${index + 1}</strong><br>`;
+          html += `类名: ${overlay.className}<br>`;
+          html += `z-index: ${overlay.style.zIndex || '默认'}<br>`;
+          html += `display: ${overlay.style.display || '默认'}<br>`;
+          html += `在包装器内: ${isInWrapper ? '是' : '否'}<br>`;
+          html += `有兄弟元素: ${hasValidSibling ? '是' : '否'}<br>`;
+          html += `状态: <strong style="color: ${isOrphan ? '#f56c6c' : '#67c23a'}">${isOrphan ? '孤立' : '有效'}</strong>`;
+          html += `</div>`;
+        });
+      }
+      
+      resultDiv.innerHTML = html;
+      updateStats(allOverlays.length, orphanCount, validCount);
+      
+      if (orphanCount > 0) {
+        log(`⚠️ 发现 ${orphanCount} 个孤立遮罩层！`, 'warning');
+        resultDiv.className = 'result error';
+      } else {
+        log(`✅ 没有发现孤立遮罩层`, 'success');
+        resultDiv.className = 'result success';
+      }
+    }
+    
+    function cleanupAllOverlays() {
+      log('开始清理孤立遮罩层...', 'info');
+      
+      const hasActiveModal = document.querySelector('.el-message-box__wrapper, .el-dialog__wrapper, .el-drawer__wrapper');
+      const bodyOverlays = document.querySelectorAll('body > .el-overlay');
+      
+      let cleanedCount = 0;
+      
+      bodyOverlays.forEach(overlay => {
+        const isInWrapper = overlay.closest('.el-message-box__wrapper, .el-dialog__wrapper, .el-drawer__wrapper');
+        
+        if (!hasActiveModal && !isInWrapper) {
+          overlay.remove();
+          cleanedCount++;
+        }
+      });
+      
+      const resultDiv = document.getElementById('cleanupResult');
+      resultDiv.style.display = 'block';
+      resultDiv.className = cleanedCount > 0 ? 'result success' : 'result';
+      resultDiv.innerHTML = `<p>已清理 <strong>${cleanedCount}</strong> 个孤立遮罩层</p>`;
+      
+      log(`🧹 清理完成，移除了 ${cleanedCount} 个孤立遮罩层`, 'success');
+      
+      setTimeout(detectOverlays, 100);
+    }
+    
+    function forceCleanupAll() {
+      log('⚠️ 强制清理所有遮罩层...', 'warning');
+      
+      const allOverlays = document.querySelectorAll('.el-overlay');
+      const count = allOverlays.length;
+      
+      allOverlays.forEach(overlay => overlay.remove());
+      
+      const resultDiv = document.getElementById('cleanupResult');
+      resultDiv.style.display = 'block';
+      resultDiv.className = 'result success';
+      resultDiv.innerHTML = `<p>已强制清理 <strong>${count}</strong> 个遮罩层</p>`;
+      
+      log(`🗑️ 强制清理完成，移除了 ${count} 个遮罩层`, 'success');
+      
+      setTimeout(detectOverlays, 100);
+    }
+    
+    function showDetailedInfo() {
+      log('显示详细信息...', 'info');
+      
+      const allOverlays = document.querySelectorAll('.el-overlay');
+      const allWrappers = document.querySelectorAll('.el-message-box__wrapper, .el-dialog__wrapper, .el-drawer__wrapper');
+      
+      const resultDiv = document.getElementById('detailInfo');
+      resultDiv.style.display = 'block';
+      resultDiv.className = 'result';
+      
+      let html = '<h4>DOM 结构详情：</h4>';
+      html += `<p>所有遮罩层: ${allOverlays.length}</p>`;
+      html += `<p>所有包装器: ${allWrappers.length}</p>`;
+      
+      if (allWrappers.length > 0) {
+        html += '<h5>包装器详情：</h5>';
+        allWrappers.forEach((wrapper, index) => {
+          const overlaysInWrapper = wrapper.querySelectorAll('.el-overlay');
+          html += `<div class="overlay-info">`;
+          html += `<strong>包装器 #${index + 1}</strong><br>`;
+          html += `类名: ${wrapper.className}<br>`;
+          html += `内部遮罩层数: ${overlaysInWrapper.length}`;
+          html += `</div>`;
+        });
+      }
+      
+      resultDiv.innerHTML = html;
+    }
+    
+    function startAutoDetect() {
+      if (autoDetectInterval) {
+        log('⚠️ 自动检测已在运行', 'warning');
+        return;
+      }
+      
+      log('▶️ 开始自动检测（每秒）', 'success');
+      autoDetectInterval = setInterval(detectOverlays, 1000);
+    }
+    
+    function stopAutoDetect() {
+      if (!autoDetectInterval) {
+        log('⚠️ 自动检测未运行', 'warning');
+        return;
+      }
+      
+      clearInterval(autoDetectInterval);
+      autoDetectInterval = null;
+      log('⏸️ 停止自动检测', 'info');
+    }
+    
+    function clearLog() {
+      document.getElementById('logContainer').innerHTML = '<div class="log-entry info">日志已清空</div>';
+    }
+    
+    // 页面加载时自动检测一次
+    window.addEventListener('load', () => {
+      log('页面加载完成，开始初始检测...', 'info');
+      setTimeout(detectOverlays, 500);
+    });
+  </script>
+</body>
+</html>
