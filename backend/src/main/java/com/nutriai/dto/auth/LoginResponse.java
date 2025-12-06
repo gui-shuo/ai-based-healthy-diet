@@ -56,8 +56,8 @@ public class LoginResponse {
         private String email;
         private String phone;
         private String avatar;
-        private User.UserRole role;
-        private User.UserStatus status;
+        private String role;
+        private String status;
         private LocalDateTime lastLoginTime;
         
         /**

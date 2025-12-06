@@ -74,8 +74,8 @@ public class AuthService {
                 .email(request.getEmail())
                 .phone(request.getPhone())
                 .nickname(request.getNickname() != null ? request.getNickname() : request.getUsername())
-                .role(User.UserRole.USER)
-                .status(User.UserStatus.ACTIVE)
+                .role("USER")
+                .status("active")
                 .build();
         
         userRepository.save(user);
@@ -108,10 +108,10 @@ public class AuthService {
                 });
         
         // 3. 检查账号状态
-        if (user.getStatus() == User.UserStatus.BANNED) {
+        if ("banned".equals(user.getStatus())) {
             throw BusinessException.Auth.ACCOUNT_BANNED;
         }
-        if (user.getStatus() == User.UserStatus.INACTIVE) {
+        if ("disabled".equals(user.getStatus())) {
             throw BusinessException.Auth.ACCOUNT_DISABLED;
         }
         
@@ -135,13 +135,13 @@ public class AuthService {
             accessToken = jwtUtil.generateRememberMeToken(
                     user.getId(), 
                     user.getUsername(), 
-                    user.getRole().name()
+                    user.getRole()
             );
         } else {
             accessToken = jwtUtil.generateAccessToken(
                     user.getId(), 
                     user.getUsername(), 
-                    user.getRole().name()
+                    user.getRole()
             );
         }
         

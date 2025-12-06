@@ -1,12 +1,16 @@
 package com.nutriai.config;
 
 import com.nutriai.websocket.AIWebSocketHandler;
+import com.nutriai.websocket.AdminAlertWebSocketHandler;
+import com.nutriai.websocket.AdminWebSocketHandshakeInterceptor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
+import org.springframework.web.socket.server.standard.ServletServerContainerFactoryBean;
 
 /**
  * WebSocket配置类
@@ -22,12 +26,15 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 public class WebSocketConfig implements WebSocketConfigurer {
     
     private final AIWebSocketHandler aiWebSocketHandler;
+    private final AdminAlertWebSocketHandler adminAlertWebSocketHandler;
+    private final AdminWebSocketHandshakeInterceptor handshakeInterceptor;
     
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         log.info("注册WebSocket处理器...");
         
         // 注册AI聊天WebSocket端点 - 原生WebSocket
+        // 注意：WebSocket路径会自动加上context-path，所以实际访问路径是 /api/ws/ai/chat
         registry.addHandler(aiWebSocketHandler, "/ws/ai/chat")
                 .setAllowedOriginPatterns("*")
                 .setAllowedOrigins("http://localhost:3000", "http://localhost:5173", "http://localhost:8080");
@@ -38,8 +45,29 @@ public class WebSocketConfig implements WebSocketConfigurer {
                 .setAllowedOrigins("http://localhost:3000", "http://localhost:5173", "http://localhost:8080")
                 .withSockJS();
         
+        // 注册管理后台告警WebSocket端点（添加握手拦截器）
+        // 实际访问路径：ws://localhost:8080/api/ws/admin/alerts
+        registry.addHandler(adminAlertWebSocketHandler, "/ws/admin/alerts")
+                .addInterceptors(handshakeInterceptor)
+                .setAllowedOriginPatterns("*")
+                .setAllowedOrigins("http://localhost:3000", "http://localhost:5173", "http://localhost:8080");
+        
         log.info("✅ WebSocket处理器注册完成:");
-        log.info("   - /ws/ai/chat (原生WebSocket)");
-        log.info("   - /ws/ai/chat-sockjs (SockJS降级支持)");
+        log.info("   - /api/ws/ai/chat (原生WebSocket)");
+        log.info("   - /api/ws/ai/chat-sockjs (SockJS降级支持)");
+        log.info("   - /api/ws/admin/alerts (管理后台告警 + 握手拦截器)");
+        log.info("⚠️  注意：WebSocket端点包含context-path前缀 /api");
+    }
+    
+    /**
+     * 配置WebSocket容器
+     */
+    @Bean
+    public ServletServerContainerFactoryBean createWebSocketContainer() {
+        ServletServerContainerFactoryBean container = new ServletServerContainerFactoryBean();
+        container.setMaxTextMessageBufferSize(8192);
+        container.setMaxBinaryMessageBufferSize(8192);
+        container.setMaxSessionIdleTimeout(60000L);
+        return container;
     }
 }

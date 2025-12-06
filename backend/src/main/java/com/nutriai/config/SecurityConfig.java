@@ -54,7 +54,9 @@ public class SecurityConfig {
                                 "/api/health",
                                 "/error",
                                 "/uploads/**",
-                                "/ws/**"  // WebSocket端点（WebSocket自己会验证token）
+                                "/ws/**",  // WebSocket端点（WebSocket自己会验证token）
+                                "/announcements/**",  // 公告接口（公开访问）
+                                "/public/**"  // 公开配置接口
                         ).permitAll()
                         
                         // 其他所有请求都需要认证

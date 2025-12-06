@@ -6,9 +6,13 @@
         <div class="nav-content">
           <div class="logo">
             <img src="/logo.svg" alt="NutriAI" class="logo-img" />
-            <span class="logo-text">AI健康饮食规划助手</span>
+            <span class="logo-text">{{ siteName }}</span>
           </div>
           <div class="nav-buttons">
+            <el-button link @click="goToAnnouncements">
+              <el-icon><Bell /></el-icon>
+              公告
+            </el-button>
             <el-button v-if="!isLoggedIn" @click="goToLogin" type="primary">登录</el-button>
             <el-button v-if="!isLoggedIn" @click="goToRegister">注册</el-button>
             <el-dropdown v-if="isLoggedIn" @command="handleCommand">
@@ -35,8 +39,8 @@
     <!-- 主要内容区 -->
     <main class="main-content">
       <div class="hero-section">
-        <h1 class="hero-title">AI健康饮食规划助手</h1>
-        <p class="hero-subtitle">智能营养分析 · 个性化饮食方案 · 健康管理</p>
+        <h1 class="hero-title">{{ siteName }}</h1>
+        <p class="hero-subtitle">{{ getConfig('system.site_description', '智能营养分析 · 个性化饮食方案 · 健康管理') }}</p>
         <div class="hero-buttons">
           <el-button type="primary" size="large" @click="getStarted">立即开始</el-button>
           <el-button size="large" @click="learnMore">了解更多</el-button>
@@ -86,25 +90,48 @@
     <!-- 页脚 -->
     <footer class="footer">
       <div class="container">
-        <p>&copy; 2025 AI健康饮食规划助手. All rights reserved.</p>
+        <p>&copy; 2025 {{ siteName }}. All rights reserved.</p>
       </div>
     </footer>
   </div>
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import message from '@/utils/message'
-import { ArrowDown, User, ChatDotRound, Document, Trophy, Calendar, Camera } from '@element-plus/icons-vue'
+import { ElMessage as message } from 'element-plus'
+import { Bell, ArrowDown, User, ChatDotRound, Document, Trophy, Calendar, Camera } from '@element-plus/icons-vue'
+import { usePublicConfig } from '@/composables/usePublicConfig'
 
 const router = useRouter()
 const route = useRoute()
 const authStore = useAuthStore()
 
+// 使用公开配置
+const { config, loadConfig, getConfig, applyConfig, startAutoRefresh } = usePublicConfig()
+
+// 网站名称（从配置获取，带默认值）
+const siteName = computed(() => getConfig('system.site_name', 'AI健康饮食规划助手'))
+
 const isLoggedIn = computed(() => authStore.isLoggedIn)
-const userName = computed(() => authStore.userName)
+const userName = computed(() => authStore.user?.username || '用户')
+
+// 页面加载时获取配置
+let stopAutoRefresh = null
+onMounted(async () => {
+  await loadConfig()
+  applyConfig()
+  
+  // 可选：每分钟自动刷新配置
+  // stopAutoRefresh = startAutoRefresh(60000)
+})
+
+onUnmounted(() => {
+  if (stopAutoRefresh) {
+    stopAutoRefresh()
+  }
+})
 
 const goToLogin = () => {
   router.push('/login')
@@ -112,6 +139,10 @@ const goToLogin = () => {
 
 const goToRegister = () => {
   router.push('/register')
+}
+
+const goToAnnouncements = () => {
+  router.push('/announcements')
 }
 
 const getStarted = () => {

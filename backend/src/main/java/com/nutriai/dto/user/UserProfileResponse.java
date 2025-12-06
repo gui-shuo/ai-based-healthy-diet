@@ -39,8 +39,8 @@ public class UserProfileResponse {
                 .phone(user.getPhone())
                 .avatar(user.getAvatar())
                 .nickname(user.getNickname())
-                .role(user.getRole().name())
-                .status(user.getStatus().name())
+                .role(user.getRole())
+                .status(user.getStatus())
                 .createdAt(user.getCreatedAt())
                 .lastLoginTime(user.getLastLoginTime())
                 .build();

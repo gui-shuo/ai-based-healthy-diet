@@ -58,10 +58,51 @@ const routes = [
     meta: { requiresAuth: true, title: 'AI食物识别' }
   },
   {
+    path: '/announcements',
+    name: 'Announcements',
+    component: () => import('@/views/user/Announcements.vue'),
+    meta: { title: '系统公告' }
+  },
+  {
     path: '/admin',
-    name: 'Admin',
-    component: () => import('@/views/AdminView.vue'),
-    meta: { requiresAuth: true, requiresAdmin: true, title: '后台管理' }
+    component: () => import('@/views/admin/AdminLayout.vue'),
+    meta: { requiresAuth: true, requiresAdmin: true },
+    children: [
+      {
+        path: '',
+        redirect: '/admin/dashboard'
+      },
+      {
+        path: 'dashboard',
+        name: 'AdminDashboard',
+        component: () => import('@/views/admin/Dashboard.vue'),
+        meta: { title: '数据看板' }
+      },
+      {
+        path: 'users',
+        name: 'AdminUsers',
+        component: () => import('@/views/admin/UserManagement.vue'),
+        meta: { title: '用户管理' }
+      },
+      {
+        path: 'ai-logs',
+        name: 'AdminAILogs',
+        component: () => import('@/views/admin/AILogs.vue'),
+        meta: { title: 'AI日志' }
+      },
+      {
+        path: 'config',
+        name: 'AdminConfig',
+        component: () => import('@/views/admin/SystemConfig.vue'),
+        meta: { title: '系统配置' }
+      },
+      {
+        path: 'announcements',
+        name: 'AdminAnnouncements',
+        component: () => import('@/views/admin/AnnouncementManagement.vue'),
+        meta: { title: '公告管理' }
+      }
+    ]
   },
   {
     path: '/:pathMatch(.*)*',

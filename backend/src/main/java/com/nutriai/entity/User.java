@@ -40,13 +40,20 @@ public class User {
     @Column(length = 50)
     private String nickname;
     
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private UserRole role = UserRole.USER;
+    @Column(length = 20)
+    private String role = "USER";  // USER/ADMIN/SUPER_ADMIN
     
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private UserStatus status = UserStatus.ACTIVE;
+    @Column(length = 20)
+    private String status = "ACTIVE";  // ACTIVE/DISABLED
+    
+    @Column(name = "member_level", length = 20)
+    private String memberLevel = "FREE";  // FREE/BRONZE/SILVER/GOLD
+    
+    @Column(name = "growth_value")
+    private Integer growthValue = 0;
+    
+    @Column(name = "member_expire_time")
+    private LocalDateTime memberExpireTime;
     
     @Column(name = "last_login_time")
     private LocalDateTime lastLoginTime;
@@ -69,43 +76,5 @@ public class User {
     @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
-    }
-    
-    /**
-     * 用户角色枚举
-     */
-    public enum UserRole {
-        USER("普通用户"),
-        ADMIN("管理员"),
-        SUPER_ADMIN("超级管理员");
-        
-        private final String description;
-        
-        UserRole(String description) {
-            this.description = description;
-        }
-        
-        public String getDescription() {
-            return description;
-        }
-    }
-    
-    /**
-     * 用户状态枚举
-     */
-    public enum UserStatus {
-        ACTIVE("正常"),
-        INACTIVE("未激活"),
-        BANNED("已封禁");
-        
-        private final String description;
-        
-        UserStatus(String description) {
-            this.description = description;
-        }
-        
-        public String getDescription() {
-            return description;
-        }
     }
 }
