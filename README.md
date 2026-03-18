@@ -255,12 +255,12 @@ sudo systemctl enable --now docker
 
 | Secret 名称 | 填写内容 | 示例 |
 |---|---|---|
-| `PROD_API_BASE_URL` | 前端访问后端 API 的生产地址（通常带 `/api`） | `http://115.190.164.107/api` |
-| `PROD_WS_BASE_URL` | 前端 WebSocket 生产地址（通常 `ws://.../ws`） | `ws://115.190.164.107/ws` |
+| `PROD_API_BASE_URL` | 前端访问后端 API 的生产地址（通常带 `/api`） | `https://diet.example.com/api` |
+| `PROD_WS_BASE_URL` | 前端 WebSocket 生产地址（通常 `ws://.../ws`） | `wss://diet.example.com/ws` |
 | `MYSQL_ROOT_PASSWORD` | MySQL `root` 密码（用于容器初始化与健康检查） | `MysqL_root_2026!` |
 | `MYSQL_PASSWORD` | 业务库用户 `nutriai_user` 的密码 | `NutriAI_db_2026!` |
 | `REDIS_PASSWORD` | Redis 密码（`redis-server --requirepass`） | `Redis_2026_Strong!` |
-| `JWT_SECRET` | JWT 签名密钥（建议 64+ 字节随机字符串） | `openssl rand -base64 64` 生成后粘贴 |
+| `JWT_SECRET` | JWT 签名密钥（建议 64+ 字节随机字符串） | `(generated-64-byte-base64-string)` |
 | `TONGYI_API_KEY` | 阿里云 DashScope（通义千问）API Key | `sk-xxxxxxxxxxxxxxxx` |
 | `ALIYUN_OSS_ACCESS_KEY_ID` | 阿里云 RAM 用户 AccessKey ID（用于 OSS 上传） | `LTAI5txxxxxxxxxx` |
 | `ALIYUN_OSS_ACCESS_KEY_SECRET` | 上述 AccessKey 对应的 Secret | `xxxxxxxxxxxxxxxx` |
@@ -269,6 +269,7 @@ sudo systemctl enable --now docker
 | `BAIDU_AI_SECRET_KEY` | 百度 AI 应用 Secret Key | `xxxxxxxxxxxxxxxx` |
 
 > 如果你暂时不用“百度图片识别”，可先不配置 `BAIDU_AI_*`（留空时后端不会初始化百度 AI 客户端）。
+> `JWT_SECRET` 可用 `openssl rand -base64 64` 生成后粘贴到 GitHub Secret。
 
 3) 触发部署
 
