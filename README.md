@@ -225,17 +225,55 @@ mvn verify        # 集成测试
 
 ## 🚢 部署
 
-### Docker部署
+### Docker部署（GitHub Actions 自动化，镜像在 Runner 本地构建）
+
+适用于：火山引擎 Ubuntu 24.04（2vCPU / 2GiB）服务器，公网 IP `115.190.164.107`。  
+核心思路：**在 GitHub Runner 构建前后端镜像**，上传镜像包到服务器后 `docker load`，避免在 2C2G 服务器上执行 `docker build`。
+
+1) 服务器初始化（只需一次）
 
 ```bash
-# 构建镜像
-docker-compose build
+ssh root@115.190.164.107
+sudo apt update
+sudo apt install -y docker.io docker-compose-v2
+sudo systemctl enable --now docker
+```
 
-# 启动服务
-docker-compose up -d
+2) 在 GitHub 仓库配置以下 Secrets
 
-# 查看日志
-docker-compose logs -f
+- `SERVER_HOST`: `115.190.164.107`
+- `SERVER_USER`: 服务器登录用户（如 `root`）
+- `SERVER_SSH_KEY`: 私钥内容
+- `PROD_API_BASE_URL` / `PROD_WS_BASE_URL`
+- `MYSQL_ROOT_PASSWORD` / `MYSQL_PASSWORD` / `REDIS_PASSWORD`
+- `JWT_SECRET` / `TONGYI_API_KEY`
+- `ALIYUN_OSS_ACCESS_KEY_ID` / `ALIYUN_OSS_ACCESS_KEY_SECRET`
+- `BAIDU_AI_APP_ID` / `BAIDU_AI_API_KEY` / `BAIDU_AI_SECRET_KEY`
+
+3) 触发部署
+
+- 手动触发：GitHub Actions -> `Deploy to Volcano Engine` -> `Run workflow`
+- 或推送版本标签：`git tag v1.0.0 && git push origin v1.0.0`
+
+4) 工作流执行内容（`.github/workflows/deploy.yml`）
+
+- 在 GitHub Runner 本地构建：
+  - `nutriai-backend:<tag>`
+  - `nutriai-frontend:<tag>`
+- 打包镜像为 `nutriai-images.tar.gz` 并上传到服务器
+- 上传 `docker-compose.prod.yml` 与 `.env`
+- 服务器执行：
+  - `docker load -i nutriai-images.tar.gz`
+  - `docker compose --env-file .env -f docker-compose.prod.yml up -d`
+
+5) 服务器运维常用命令
+
+```bash
+ssh root@115.190.164.107
+cd /opt/nutriai
+sudo docker compose --env-file .env -f docker-compose.prod.yml ps
+sudo docker compose --env-file .env -f docker-compose.prod.yml logs -f
+sudo docker compose --env-file .env -f docker-compose.prod.yml pull  # 仅基础镜像服务需要时
 ```
 
 ### 生产环境部署
