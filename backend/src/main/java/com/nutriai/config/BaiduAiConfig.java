@@ -2,6 +2,7 @@ package com.nutriai.config;
 
 import com.baidu.aip.imageclassify.AipImageClassify;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,19 +14,24 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class BaiduAiConfig {
     
-    @Value("${baidu.ai.app-id}")
+    @Value("${baidu.ai.app-id:}")
     private String appId;
     
-    @Value("${baidu.ai.api-key}")
+    @Value("${baidu.ai.api-key:}")
     private String apiKey;
     
-    @Value("${baidu.ai.secret-key}")
+    @Value("${baidu.ai.secret-key:}")
     private String secretKey;
     
     /**
      * 创建百度图像识别客户端
      */
     @Bean
+    @ConditionalOnExpression(
+        "T(org.springframework.util.StringUtils).hasText('${baidu.ai.app-id:}') and " +
+        "T(org.springframework.util.StringUtils).hasText('${baidu.ai.api-key:}') and " +
+        "T(org.springframework.util.StringUtils).hasText('${baidu.ai.secret-key:}')"
+    )
     public AipImageClassify aipImageClassify() {
         try {
             AipImageClassify client = new AipImageClassify(appId, apiKey, secretKey);
