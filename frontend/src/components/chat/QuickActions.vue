@@ -14,10 +14,7 @@
     </div>
 
     <transition name="expand">
-      <div
-        v-show="expanded"
-        class="actions-content"
-      >
+      <div v-show="expanded" class="actions-content">
         <!-- 常用问题 -->
         <div class="action-section">
           <h4 class="section-title">
@@ -29,8 +26,8 @@
               v-for="question in commonQuestions"
               :key="question.id"
               class="action-btn"
-              :disabled="disabled"
               @click="handleQuickAction(question.content)"
+              :disabled="disabled"
             >
               <span class="btn-icon">{{ question.icon }}</span>
               <span class="btn-text">{{ question.label }}</span>
@@ -49,8 +46,8 @@
               v-for="analysis in foodAnalysis"
               :key="analysis.id"
               class="action-btn"
-              :disabled="disabled"
               @click="handleQuickAction(analysis.content)"
+              :disabled="disabled"
             >
               <span class="btn-icon">{{ analysis.icon }}</span>
               <span class="btn-text">{{ analysis.label }}</span>
@@ -69,8 +66,8 @@
               v-for="plan in dietPlans"
               :key="plan.id"
               class="action-btn"
-              :disabled="disabled"
               @click="handleQuickAction(plan.content)"
+              :disabled="disabled"
             >
               <span class="btn-icon">{{ plan.icon }}</span>
               <span class="btn-text">{{ plan.label }}</span>
@@ -89,8 +86,8 @@
               v-for="advice in healthAdvice"
               :key="advice.id"
               class="action-btn"
-              :disabled="disabled"
               @click="handleQuickAction(advice.content)"
+              :disabled="disabled"
             >
               <span class="btn-icon">{{ advice.icon }}</span>
               <span class="btn-text">{{ advice.label }}</span>

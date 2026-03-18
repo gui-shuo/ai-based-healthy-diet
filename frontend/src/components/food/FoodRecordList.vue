@@ -1,14 +1,7 @@
 <template>
   <div class="food-record-list">
-    <el-skeleton
-      :loading="loading"
-      animated
-      :rows="5"
-    >
-      <div
-        v-if="records.length > 0"
-        class="record-items"
-      >
+    <el-skeleton :loading="loading" animated :rows="5">
+      <div v-if="records.length > 0" class="record-items">
         <div
           v-for="record in records"
           :key="record.id"
@@ -29,10 +22,7 @@
                 </div>
               </template>
             </el-image>
-            <div
-              v-else
-              class="photo-placeholder"
-            >
+            <div v-else class="photo-placeholder">
               <el-icon><Food /></el-icon>
             </div>
           </div>
@@ -40,9 +30,7 @@
           <!-- 中间信息 -->
           <div class="record-info">
             <div class="info-header">
-              <h3 class="food-name">
-                {{ record.foodName }}
-              </h3>
+              <h3 class="food-name">{{ record.foodName }}</h3>
               <el-tag
                 :type="getMealTypeTagType(record.mealType)"
                 size="small"
@@ -65,20 +53,14 @@
               </span>
             </div>
 
-            <div
-              v-if="record.notes"
-              class="info-notes"
-            >
+            <div v-if="record.notes" class="info-notes">
               <el-icon><Document /></el-icon>
               {{ record.notes }}
             </div>
           </div>
 
           <!-- 右侧操作 -->
-          <div
-            class="record-actions"
-            @click.stop
-          >
+          <div class="record-actions" @click.stop>
             <el-button
               type="danger"
               size="small"
@@ -92,10 +74,7 @@
         </div>
       </div>
 
-      <el-empty
-        v-else
-        description="暂无饮食记录"
-      />
+      <el-empty v-else description="暂无饮食记录" />
     </el-skeleton>
   </div>
 </template>

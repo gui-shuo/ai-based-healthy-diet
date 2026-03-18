@@ -1,9 +1,7 @@
 <template>
   <div class="profile-edit">
     <div class="edit-header">
-      <h2 class="title">
-        编辑资料
-      </h2>
+      <h2 class="title">编辑资料</h2>
     </div>
 
     <el-form
@@ -15,17 +13,11 @@
     >
       <!-- 头像上传 -->
       <el-form-item label="头像">
-        <AvatarUpload
-          v-model="formData.avatar"
-          @uploaded="handleAvatarUploaded"
-        />
+        <AvatarUpload v-model="formData.avatar" @uploaded="handleAvatarUploaded" />
       </el-form-item>
 
       <!-- 昵称 -->
-      <el-form-item
-        label="昵称"
-        prop="nickname"
-      >
+      <el-form-item label="昵称" prop="nickname">
         <el-input
           v-model="formData.nickname"
           placeholder="请输入昵称"
@@ -36,10 +28,7 @@
       </el-form-item>
 
       <!-- 邮箱 -->
-      <el-form-item
-        label="邮箱"
-        prop="email"
-      >
+      <el-form-item label="邮箱" prop="email">
         <el-input
           v-model="formData.email"
           placeholder="请输入邮箱"
@@ -52,10 +41,7 @@
       </el-form-item>
 
       <!-- 手机号 -->
-      <el-form-item
-        label="手机号"
-        prop="phone"
-      >
+      <el-form-item label="手机号" prop="phone">
         <el-input
           v-model="formData.phone"
           placeholder="请输入手机号"
@@ -70,14 +56,8 @@
 
       <!-- 操作按钮 -->
       <el-form-item>
-        <el-button
-          type="primary"
-          :loading="loading"
-          @click="handleSave"
-        >
-          <el-icon v-if="!loading">
-            <Select />
-          </el-icon>
+        <el-button type="primary" :loading="loading" @click="handleSave">
+          <el-icon v-if="!loading"><Select /></el-icon>
           保存修改
         </el-button>
         <el-button @click="handleCancel">

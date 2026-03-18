@@ -1,9 +1,7 @@
 <template>
   <div class="password-change">
     <div class="change-header">
-      <h2 class="title">
-        修改密码
-      </h2>
+      <h2 class="title">修改密码</h2>
     </div>
 
     <el-form
@@ -14,10 +12,7 @@
       class="change-form"
     >
       <!-- 原密码 -->
-      <el-form-item
-        label="原密码"
-        prop="oldPassword"
-      >
+      <el-form-item label="原密码" prop="oldPassword">
         <el-input
           v-model="formData.oldPassword"
           type="password"
@@ -32,10 +27,7 @@
       </el-form-item>
 
       <!-- 新密码 -->
-      <el-form-item
-        label="新密码"
-        prop="newPassword"
-      >
+      <el-form-item label="新密码" prop="newPassword">
         <el-input
           v-model="formData.newPassword"
           type="password"
@@ -53,10 +45,7 @@
       </el-form-item>
 
       <!-- 确认密码 -->
-      <el-form-item
-        label="确认新密码"
-        prop="confirmPassword"
-      >
+      <el-form-item label="确认新密码" prop="confirmPassword">
         <el-input
           v-model="formData.confirmPassword"
           type="password"
@@ -72,14 +61,8 @@
 
       <!-- 操作按钮 -->
       <el-form-item>
-        <el-button
-          type="primary"
-          :loading="loading"
-          @click="handleSubmit"
-        >
-          <el-icon v-if="!loading">
-            <Select />
-          </el-icon>
+        <el-button type="primary" :loading="loading" @click="handleSubmit">
+          <el-icon v-if="!loading"><Select /></el-icon>
           确认修改
         </el-button>
         <el-button @click="handleReset">

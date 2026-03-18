@@ -1,17 +1,9 @@
 <template>
-  <div
-    ref="messageContainer"
-    class="message-list-container"
-  >
+  <div class="message-list-container" ref="messageContainer">
     <!-- 欢迎消息 -->
-    <div
-      v-if="messages.length === 0"
-      class="welcome-message"
-    >
+    <div v-if="messages.length === 0" class="welcome-message">
       <div class="welcome-icon">
-        <el-icon :size="48">
-          <ChatDotRound />
-        </el-icon>
+        <el-icon :size="48"><ChatDotRound /></el-icon>
       </div>
       <h2>👋 你好！我是你的AI营养师</h2>
       <p>我可以帮你：</p>
@@ -21,110 +13,77 @@
         <li>💪 提供健康饮食建议</li>
         <li>🥗 推荐适合的食谱</li>
       </ul>
-      <p class="start-tip">
-        点击下方快捷按钮或直接输入问题开始吧！
-      </p>
+      <p class="start-tip">点击下方快捷按钮或直接输入问题开始吧！</p>
     </div>
 
     <!-- 消息列表 -->
-    <div
-      v-else
-      class="messages"
-    >
+    <div v-else class="messages">
       <div
         v-for="message in messages"
         :key="message.id"
         :class="['message-item', `message-${message.role}`]"
       >
         <!-- 用户消息 -->
-        <div
-          v-if="message.role === 'user'"
-          class="message-content"
-        >
+        <div v-if="message.role === 'user'" class="message-content">
           <div class="message-avatar">
-            <el-avatar
-              :size="36"
-              :src="userAvatar"
-            >
+            <el-avatar :size="36" :src="userAvatar">
               <el-icon><User /></el-icon>
             </el-avatar>
           </div>
           <div class="message-bubble user-bubble">
-            <div class="message-text">
-              {{ message.content }}
-            </div>
-            <div class="message-time">
-              {{ formatTime(message.timestamp) }}
-            </div>
+            <div class="message-text">{{ message.content }}</div>
+            <div class="message-time">{{ formatTime(message.timestamp) }}</div>
           </div>
         </div>
 
         <!-- AI消息 -->
-        <div
-          v-else
-          class="message-content"
-        >
+        <div v-else class="message-content">
           <div class="message-avatar">
-            <el-avatar
-              :size="36"
-              class="ai-avatar"
-            >
+            <el-avatar :size="36" class="ai-avatar">
               <el-icon><Cpu /></el-icon>
             </el-avatar>
           </div>
           <div class="message-bubble ai-bubble">
             <!-- 加载中 -->
-            <div
-              v-if="message.loading"
-              class="typing-indicator"
-            >
-              <span />
-              <span />
-              <span />
+            <div v-if="message.loading" class="typing-indicator">
+              <span></span>
+              <span></span>
+              <span></span>
             </div>
             <!-- 消息内容 -->
-            <div
-              v-else
-              class="message-text"
-            >
+            <div v-else class="message-text">
               <!-- 流式显示 -->
               <template v-if="message.id === streamingMessageId && streamingContent">
-                <div v-html="renderMarkdown(streamingContent)" />
+                <div v-html="renderMarkdown(streamingContent)"></div>
                 <span class="streaming-cursor">|</span>
               </template>
               <!-- 普通显示 -->
-              <div
-                v-else
-                v-html="renderMarkdown(message.content)"
-              />
+              <div v-else v-html="renderMarkdown(message.content)"></div>
             </div>
-            <div
-              v-if="!message.loading"
-              class="message-actions"
-            >
+            <div v-if="!message.loading" class="message-actions">
               <span class="message-time">{{ formatTime(message.timestamp) }}</span>
               <div class="action-buttons">
                 <el-button
                   link
                   size="small"
-                  title="复制"
                   @click="copyMessage(message.content)"
+                  title="复制"
                 >
                   <el-icon><DocumentCopy /></el-icon>
                 </el-button>
                 <el-button
                   link
                   size="small"
-                  title="重新生成"
                   @click="regenerate(message)"
+                  title="重新生成"
                 >
                   <el-icon><Refresh /></el-icon>
                 </el-button>
                 <el-button
                   link
                   size="small"
-                  :title="message.favorite ? '取消收藏' : '收藏'"
                   @click="toggleFavorite(message)"
+                  :title="message.favorite ? '取消收藏' : '收藏'"
                 >
                   <el-icon>
                     <component :is="message.favorite ? StarFilled : Star" />
@@ -139,11 +98,7 @@
 
     <!-- 滚动到底部按钮 -->
     <transition name="fade">
-      <div
-        v-if="showScrollButton"
-        class="scroll-bottom-btn"
-        @click="scrollToBottom"
-      >
+      <div v-if="showScrollButton" class="scroll-bottom-btn" @click="scrollToBottom">
         <el-button circle>
           <el-icon><ArrowDown /></el-icon>
         </el-button>

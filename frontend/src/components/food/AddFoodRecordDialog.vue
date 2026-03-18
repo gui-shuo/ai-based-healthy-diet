@@ -13,10 +13,7 @@
       class="record-form"
     >
       <!-- 餐次类型 -->
-      <el-form-item
-        label="餐次类型"
-        prop="mealType"
-      >
+      <el-form-item label="餐次类型" prop="mealType">
         <el-radio-group v-model="formData.mealType">
           <el-radio-button
             v-for="type in mealTypeList"
@@ -29,10 +26,7 @@
       </el-form-item>
 
       <!-- 食物名称 -->
-      <el-form-item
-        label="食物名称"
-        prop="foodName"
-      >
+      <el-form-item label="食物名称" prop="foodName">
         <el-input
           v-model="formData.foodName"
           placeholder="请输入食物名称"
@@ -42,10 +36,7 @@
       </el-form-item>
 
       <!-- 记录时间 -->
-      <el-form-item
-        label="记录时间"
-        prop="recordTime"
-      >
+      <el-form-item label="记录时间" prop="recordTime">
         <el-date-picker
           v-model="formData.recordTime"
           type="datetime"
@@ -63,15 +54,10 @@
 
       <!-- 营养信息 -->
       <div class="nutrition-section">
-        <h3 class="section-title">
-          营养信息
-        </h3>
+        <h3 class="section-title">营养信息</h3>
         <el-row :gutter="16">
           <el-col :span="12">
-            <el-form-item
-              label="份量(克)"
-              prop="portion"
-            >
+            <el-form-item label="份量(克)" prop="portion">
               <el-input-number
                 v-model="formData.portion"
                 :min="0"
@@ -82,10 +68,7 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item
-              label="卡路里(千卡)"
-              prop="calories"
-            >
+            <el-form-item label="卡路里(千卡)" prop="calories">
               <el-input-number
                 v-model="formData.calories"
                 :min="0"
@@ -162,14 +145,8 @@
     </el-form>
 
     <template #footer>
-      <el-button @click="handleClose">
-        取消
-      </el-button>
-      <el-button
-        type="primary"
-        :loading="loading"
-        @click="handleSubmit"
-      >
+      <el-button @click="handleClose">取消</el-button>
+      <el-button type="primary" :loading="loading" @click="handleSubmit">
         保存
       </el-button>
     </template>

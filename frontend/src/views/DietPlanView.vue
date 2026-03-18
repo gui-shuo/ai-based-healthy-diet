@@ -3,45 +3,24 @@
     <!-- 顶部标题栏 -->
     <div class="plan-header">
       <div class="header-left">
-        <el-button
-          :icon="ArrowLeft"
-          text
-          @click="goToHome"
-        >
+        <el-button :icon="ArrowLeft" @click="goToHome" text>
           返回首页
         </el-button>
         <el-divider direction="vertical" />
         <h1 class="header-title">
-          <el-icon class="title-icon">
-            <Calendar />
-          </el-icon>
+          <el-icon class="title-icon"><Calendar /></el-icon>
           AI饮食计划生成
         </h1>
-        <el-tag
-          type="success"
-          size="small"
-        >
-          智能定制
-        </el-tag>
+        <el-tag type="success" size="small">智能定制</el-tag>
       </div>
       <div class="header-right">
-        <el-button
-          :icon="Clock"
-          @click="showHistory"
-        >
+        <el-button :icon="Clock" @click="showHistory">
           历史记录
         </el-button>
-        <el-button
-          v-if="generatedPlan"
-          :icon="Download"
-          @click="handleExportPlan"
-        >
+        <el-button :icon="Download" @click="handleExportPlan" v-if="generatedPlan">
           导出计划
         </el-button>
-        <el-button
-          :icon="Refresh"
-          @click="handleReset"
-        >
+        <el-button :icon="Refresh" @click="handleReset">
           重新设置
         </el-button>
       </div>
@@ -50,10 +29,7 @@
     <!-- 主体内容 -->
     <div class="plan-body">
       <!-- 左侧：参数设置表单 -->
-      <el-card
-        v-if="!generatedPlan"
-        class="param-card"
-      >
+      <el-card class="param-card" v-if="!generatedPlan">
         <template #header>
           <div class="card-header">
             <el-icon><Setting /></el-icon>
@@ -70,99 +46,48 @@
         >
           <!-- 基本信息 -->
           <div class="form-section">
-            <h3 class="section-title">
-              基本信息
-            </h3>
+            <h3 class="section-title">基本信息</h3>
             
-            <el-form-item
-              label="计划天数"
-              prop="days"
-              required
-            >
+            <el-form-item label="计划天数" prop="days" required>
               <el-radio-group v-model="formData.days">
-                <el-radio-button :value="7">
-                  7天计划
-                </el-radio-button>
-                <el-radio-button :value="14">
-                  14天计划
-                </el-radio-button>
+                <el-radio-button :value="7">7天计划</el-radio-button>
+                <el-radio-button :value="14">14天计划</el-radio-button>
               </el-radio-group>
             </el-form-item>
 
-            <el-form-item
-              label="目标"
-              prop="goal"
-              required
-            >
-              <el-select
-                v-model="formData.goal"
-                placeholder="请选择目标"
-                style="width: 100%"
-              >
-                <el-option
-                  label="🔥 减脂塑形"
-                  value="lose_weight"
-                />
-                <el-option
-                  label="💪 增肌强体"
-                  value="gain_muscle"
-                />
-                <el-option
-                  label="❤️ 维持健康"
-                  value="maintain"
-                />
+            <el-form-item label="目标" prop="goal" required>
+              <el-select v-model="formData.goal" placeholder="请选择目标" style="width: 100%">
+                <el-option label="🔥 减脂塑形" value="lose_weight" />
+                <el-option label="💪 增肌强体" value="gain_muscle" />
+                <el-option label="❤️ 维持健康" value="maintain" />
               </el-select>
             </el-form-item>
 
             <el-form-item label="运动强度">
-              <el-select
-                v-model="formData.exerciseLevel"
-                placeholder="请选择运动强度"
-                style="width: 100%"
-              >
-                <el-option
-                  label="轻度运动（每周1-3天）"
-                  value="low"
-                />
-                <el-option
-                  label="中度运动（每周3-5天）"
-                  value="medium"
-                />
-                <el-option
-                  label="高强度运动（每周6-7天）"
-                  value="high"
-                />
+              <el-select v-model="formData.exerciseLevel" placeholder="请选择运动强度" style="width: 100%">
+                <el-option label="轻度运动（每周1-3天）" value="low" />
+                <el-option label="中度运动（每周3-5天）" value="medium" />
+                <el-option label="高强度运动（每周6-7天）" value="high" />
               </el-select>
             </el-form-item>
           </div>
 
           <!-- 个人数据 -->
           <div class="form-section">
-            <h3 class="section-title">
-              个人数据（可选）
-            </h3>
+            <h3 class="section-title">个人数据（可选）</h3>
             
             <el-row :gutter="20">
               <el-col :span="12">
                 <el-form-item label="性别">
                   <el-radio-group v-model="formData.gender">
-                    <el-radio value="male">
-                      男
-                    </el-radio>
-                    <el-radio value="female">
-                      女
-                    </el-radio>
+                    <el-radio value="male">男</el-radio>
+                    <el-radio value="female">女</el-radio>
                   </el-radio-group>
                 </el-form-item>
               </el-col>
               <el-col :span="12">
                 <el-form-item label="年龄">
-                  <el-input-number
-                    v-model="formData.age"
-                    :min="10"
-                    :max="100"
-                    style="width: 100%"
-                  />
+                  <el-input-number v-model="formData.age" :min="10" :max="100" style="width: 100%" />
                 </el-form-item>
               </el-col>
             </el-row>
@@ -170,22 +95,12 @@
             <el-row :gutter="20">
               <el-col :span="12">
                 <el-form-item label="身高 (cm)">
-                  <el-input-number
-                    v-model="formData.height"
-                    :min="100"
-                    :max="250"
-                    style="width: 100%"
-                  />
+                  <el-input-number v-model="formData.height" :min="100" :max="250" style="width: 100%" />
                 </el-form-item>
               </el-col>
               <el-col :span="12">
                 <el-form-item label="体重 (kg)">
-                  <el-input-number
-                    v-model="formData.weight"
-                    :min="30"
-                    :max="200"
-                    style="width: 100%"
-                  />
+                  <el-input-number v-model="formData.weight" :min="30" :max="200" style="width: 100%" />
                 </el-form-item>
               </el-col>
             </el-row>
@@ -204,9 +119,7 @@
 
           <!-- 饮食偏好 -->
           <div class="form-section">
-            <h3 class="section-title">
-              饮食偏好
-            </h3>
+            <h3 class="section-title">饮食偏好</h3>
             
             <el-form-item label="饮食偏好">
               <el-input
@@ -232,24 +145,20 @@
             <el-button 
               type="primary" 
               size="large" 
+              @click="handleGenerate"
               :loading="isGenerating"
               style="width: 100%"
-              @click="handleGenerate"
             >
-              <el-icon v-if="!isGenerating">
-                <MagicStick />
-              </el-icon>
+              <el-icon v-if="!isGenerating"><MagicStick /></el-icon>
               {{ isGenerating ? '正在生成中...' : '开始生成饮食计划' }}
             </el-button>
           </el-form-item>
+
         </el-form>
       </el-card>
 
       <!-- 右侧/全屏：生成的计划 -->
-      <el-card
-        v-if="generatedPlan"
-        class="result-card"
-      >
+      <el-card class="result-card" v-if="generatedPlan">
         <template #header>
           <div class="card-header">
             <div>
@@ -257,14 +166,12 @@
               <span>{{ generatedPlan.title }}</span>
             </div>
             <div class="header-actions">
-              <el-tag type="success">
-                {{ generatedPlan.days }}天计划
-              </el-tag>
+              <el-tag type="success">{{ generatedPlan.days }}天计划</el-tag>
               <el-button 
                 type="primary" 
                 :icon="Download" 
-                :loading="isExportingPdf"
                 @click="handleExportPdf"
+                :loading="isExportingPdf"
               >
                 导出PDF
               </el-button>
@@ -283,24 +190,16 @@
         <div 
           class="markdown-content" 
           v-html="renderedMarkdown"
-        />
+        ></div>
       </el-card>
 
       <!-- 生成中的加载状态 -->
-      <el-card
-        v-if="isGenerating"
-        class="loading-card"
-      >
+      <el-card class="loading-card" v-if="isGenerating">
         <div class="loading-content">
-          <el-icon class="loading-icon">
-            <Loading />
-          </el-icon>
+          <el-icon class="loading-icon"><Loading /></el-icon>
           <h3>AI正在为您生成个性化饮食计划...</h3>
           <p>{{ getEstimatedTimeText() }}</p>
-          <el-progress
-            :percentage="Math.floor(progress)"
-            :stroke-width="8"
-          />
+          <el-progress :percentage="Math.floor(progress)" :stroke-width="8" />
           <p style="margin-top: 12px; font-size: 14px; color: #909399;">
             正在逐天生成详细计划，请耐心等待...
           </p>
@@ -308,15 +207,12 @@
             v-if="currentTaskId"
             type="danger" 
             plain 
-            style="margin-top: 16px"
             @click="handleCancelGenerate"
+            style="margin-top: 16px"
           >
             取消生成
           </el-button>
-          <p
-            v-else
-            style="margin-top: 16px; color: #909399; font-size: 14px;"
-          >
+          <p v-else style="margin-top: 16px; color: #909399; font-size: 14px;">
             正在创建任务，请稍候...
           </p>
         </div>
@@ -331,10 +227,7 @@
       size="400px"
     >
       <div v-loading="historyLoading">
-        <el-empty
-          v-if="!historyLoading && historyList.length === 0"
-          description="暂无历史记录"
-        />
+        <el-empty v-if="!historyLoading && historyList.length === 0" description="暂无历史记录" />
         
         <el-timeline v-else>
           <el-timeline-item
@@ -347,24 +240,11 @@
               class="history-item" 
               shadow="hover"
             >
-              <div
-                class="history-item-content"
-                @click="loadHistoryDetail(item.planId)"
-              >
+              <div class="history-item-content" @click="loadHistoryDetail(item.planId)">
                 <h4>{{ item.title }}</h4>
                 <p>
-                  <el-tag
-                    size="small"
-                    type="primary"
-                  >
-                    {{ item.days }}天
-                  </el-tag>
-                  <el-tag
-                    size="small"
-                    style="margin-left: 8px"
-                  >
-                    {{ getGoalText(item.goal) }}
-                  </el-tag>
+                  <el-tag size="small" type="primary">{{ item.days }}天</el-tag>
+                  <el-tag size="small" style="margin-left: 8px">{{ getGoalText(item.goal) }}</el-tag>
                 </p>
               </div>
               <div class="history-item-actions">
@@ -373,8 +253,8 @@
                   :icon="Delete"
                   size="small"
                   circle
-                  title="删除记录"
                   @click.stop="confirmDeleteHistory(item.planId)"
+                  title="删除记录"
                 />
               </div>
             </el-card>

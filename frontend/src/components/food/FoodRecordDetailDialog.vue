@@ -5,15 +5,9 @@
     width="600px"
     @close="handleClose"
   >
-    <div
-      v-if="record"
-      class="record-detail"
-    >
+    <div v-if="record" class="record-detail">
       <!-- 食物照片 -->
-      <div
-        v-if="record.photoUrl"
-        class="detail-photo"
-      >
+      <div v-if="record.photoUrl" class="detail-photo">
         <el-image
           :src="record.photoUrl"
           fit="cover"
@@ -29,13 +23,8 @@
 
       <!-- 基本信息 -->
       <div class="detail-section">
-        <h3 class="section-title">
-          基本信息
-        </h3>
-        <el-descriptions
-          :column="2"
-          border
-        >
+        <h3 class="section-title">基本信息</h3>
+        <el-descriptions :column="2" border>
           <el-descriptions-item label="食物名称">
             {{ record.foodName }}
           </el-descriptions-item>
@@ -44,10 +33,7 @@
               {{ record.mealTypeName }}
             </el-tag>
           </el-descriptions-item>
-          <el-descriptions-item
-            label="记录时间"
-            :span="2"
-          >
+          <el-descriptions-item label="记录时间" :span="2">
             {{ formatDateTime(record.recordTime) }}
           </el-descriptions-item>
           <el-descriptions-item label="份量">
@@ -61,13 +47,8 @@
 
       <!-- 营养成分 -->
       <div class="detail-section">
-        <h3 class="section-title">
-          营养成分
-        </h3>
-        <el-descriptions
-          :column="2"
-          border
-        >
+        <h3 class="section-title">营养成分</h3>
+        <el-descriptions :column="2" border>
           <el-descriptions-item label="蛋白质">
             {{ record.protein || '-' }} 克
           </el-descriptions-item>
@@ -84,23 +65,14 @@
       </div>
 
       <!-- 备注 -->
-      <div
-        v-if="record.notes"
-        class="detail-section"
-      >
-        <h3 class="section-title">
-          备注
-        </h3>
-        <p class="notes-content">
-          {{ record.notes }}
-        </p>
+      <div v-if="record.notes" class="detail-section">
+        <h3 class="section-title">备注</h3>
+        <p class="notes-content">{{ record.notes }}</p>
       </div>
     </div>
 
     <template #footer>
-      <el-button @click="handleClose">
-        关闭
-      </el-button>
+      <el-button @click="handleClose">关闭</el-button>
     </template>
   </el-dialog>
 </template>
