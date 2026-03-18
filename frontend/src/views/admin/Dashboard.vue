@@ -140,7 +140,7 @@ import { ElMessage } from 'element-plus'
 import { User, ChatDotRound, Cpu, TrendCharts } from '@element-plus/icons-vue'
 // 按需导入ECharts组件
 import * as echarts from 'echarts/core'
-import { LineChart, PieChart } from 'echarts/charts'
+import { LineChart, PieChart, BarChart } from 'echarts/charts'
 import {
   TitleComponent,
   TooltipComponent,
@@ -156,6 +156,7 @@ echarts.use([
   GridComponent,
   LegendComponent,
   LineChart,
+  BarChart,
   PieChart,
   CanvasRenderer
 ])
