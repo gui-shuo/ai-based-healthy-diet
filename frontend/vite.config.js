@@ -36,6 +36,9 @@ export default defineConfig({
   server: {
     port: 3000,
     open: true,
+    watch: {
+      ignored: ['**/src/auto-imports.d.ts', '**/src/components.d.ts']
+    },
     proxy: {
       '/api': {
         target: 'http://localhost:8080',
