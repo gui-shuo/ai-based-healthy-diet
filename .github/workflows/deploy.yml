@@ -100,6 +100,19 @@ jobs:
           script: |
             set -e
 
+            # ---- 0. 环境诊断 ----
+            echo "当前用户: $(whoami)"
+            echo "Shell: $(ps -p $$ -o comm= 2>/dev/null || echo unknown)"
+            DOCKER_BIN=$(which docker 2>/dev/null || echo "")
+            echo "Docker路径: ${DOCKER_BIN:-未找到}"
+
+            # root 不需要 sudo，非 root 用 sudo
+            if [ "$(whoami)" = "root" ]; then
+              SUDO=""
+            else
+              SUDO="sudo"
+            fi
+
             echo "============================================"
             echo "🚀 开始部署 NutriAI 项目"
             echo "部署时间: $(date '+%Y-%m-%d %H:%M:%S')"
@@ -113,58 +126,60 @@ jobs:
               exit 1
             fi
 
-            sudo sed -i "s|^IMAGE_TAG=.*|IMAGE_TAG=${IMAGE_TAG}|" .env
-            sudo sed -i "s|^DOCKER_USERNAME=.*|DOCKER_USERNAME=${DOCKER_USERNAME}|" .env
-            sudo chmod 600 .env
+            $SUDO sed -i "s|^IMAGE_TAG=.*|IMAGE_TAG=${IMAGE_TAG}|" .env
+            $SUDO sed -i "s|^DOCKER_USERNAME=.*|DOCKER_USERNAME=${DOCKER_USERNAME}|" .env
+            $SUDO chmod 600 .env
+            echo "✅ .env 已更新"
 
-            # 仓库已设为公开，无需登录（docker login 会直连 Docker Hub 认证服务器，国内无法访问）
-            echo "💡 Docker Hub 仓库为公开，跳过登录"
-
-            # 检测可用的 docker compose 命令，若均不可用则自动安装插件
-            if sudo docker compose version &>/dev/null 2>&1; then
-              COMPOSE_CMD="sudo docker compose"
+            # ---- 1. 检测 docker compose 命令（POSIX 兼容写法）----
+            COMPOSE_CMD=""
+            if $SUDO docker compose version >/dev/null 2>&1; then
+              COMPOSE_CMD="$SUDO docker compose"
               echo "✅ 使用 docker compose (v2 插件)"
-            elif sudo docker-compose version &>/dev/null 2>&1; then
-              COMPOSE_CMD="sudo docker-compose"
+            elif $SUDO docker-compose version >/dev/null 2>&1; then
+              COMPOSE_CMD="$SUDO docker-compose"
               echo "✅ 使用 docker-compose (v1)"
             else
               echo "⚙️ 未找到可用的 docker compose，正在安装 docker-compose-plugin..."
-              sudo apt-get update -y -qq && sudo apt-get install -y -qq docker-compose-plugin
-              COMPOSE_CMD="sudo docker compose"
+              $SUDO apt-get update -y -qq && $SUDO apt-get install -y -qq docker-compose-plugin
+              COMPOSE_CMD="$SUDO docker compose"
               echo "✅ docker-compose-plugin 安装完成"
             fi
 
-            # 强制清理旧镜像，避免使用缓存
+            # ---- 2. 清理旧镜像 ----
             echo "🧹 清理本地旧镜像..."
-            sudo docker rmi "${DOCKER_USERNAME}/nutriai-backend:latest" 2>/dev/null || true
-            sudo docker rmi "${DOCKER_USERNAME}/nutriai-frontend:latest" 2>/dev/null || true
-            echo "✅ 旧镜像已清理，将从远程拉取最新版本"
+            $SUDO docker rmi "${DOCKER_USERNAME}/nutriai-backend:latest" 2>/dev/null || true
+            $SUDO docker rmi "${DOCKER_USERNAME}/nutriai-frontend:latest" 2>/dev/null || true
+            echo "✅ 旧镜像已清理"
 
-            # 直接用 docker pull 拉取每个镜像（绕过 compose，支持重试）
+            # ---- 3. 拉取镜像（直接 docker pull，支持重试，POSIX 兼容）----
             echo "📥 拉取最新镜像..."
-            pull_with_retry() {
-              local IMAGE=$1
-              for attempt in 1 2 3; do
-                echo "拉取 ${IMAGE}（第 ${attempt} 次）..."
-                if sudo docker pull "${IMAGE}"; then
-                  echo "✅ ${IMAGE} 拉取成功"
+
+            do_pull() {
+              IMG="$1"
+              ATTEMPT=0
+              while [ "$ATTEMPT" -lt 3 ]; do
+                ATTEMPT=$((ATTEMPT + 1))
+                echo "拉取 ${IMG}（第 ${ATTEMPT} 次）..."
+                if $SUDO docker pull "$IMG"; then
+                  echo "✅ ${IMG} 拉取成功"
                   return 0
                 fi
-                echo "⚠️ 第 ${attempt} 次失败，等待 10 秒后重试..."
+                echo "⚠️ 第 ${ATTEMPT} 次失败，等待 10 秒后重试..."
                 sleep 10
               done
-              echo "❌ ${IMAGE} 拉取失败！"
+              echo "❌ ${IMG} 拉取失败！请检查服务器网络或镜像加速配置"
               return 1
             }
 
-            pull_with_retry "${DOCKER_USERNAME}/nutriai-backend:latest"
-            pull_with_retry "${DOCKER_USERNAME}/nutriai-frontend:latest"
+            do_pull "${DOCKER_USERNAME}/nutriai-backend:latest"
+            do_pull "${DOCKER_USERNAME}/nutriai-frontend:latest"
 
-            # 启动容器
+            # ---- 4. 启动容器 ----
             echo "▶️ 启动容器..."
             $COMPOSE_CMD -f docker-compose.prod.yml up -d --remove-orphans
 
-            # 显示容器状态
+            # ---- 5. 显示状态 ----
             echo ""
             echo "📊 容器运行状态："
             $COMPOSE_CMD -f docker-compose.prod.yml ps
@@ -184,15 +199,11 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
             echo "🧹 清理旧镜像和未使用的资源..."
-
-            # 删除悬空镜像
-            sudo docker image prune -f
-
-            # 显示磁盘使用情况
+            if [ "$(whoami)" = "root" ]; then SUDO=""; else SUDO="sudo"; fi
+            $SUDO docker image prune -f
             echo ""
             echo "💾 Docker磁盘使用情况："
-            sudo docker system df
-
+            $SUDO docker system df
             echo "✅ 清理完成！"
 
       # ==================== 10. 部署结果摘要 ====================
