@@ -9,15 +9,21 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   deploy:
     name: 构建推送镜像并部署到云服务器
     runs-on: ubuntu-latest
 
     steps:
+      # ==================== 1. 代码检出 ====================
       - name: 📥 Checkout代码
         uses: actions/checkout@v4
 
+      # ==================== 2. 生成镜像标签 ====================
       - name: 🏷️ 生成镜像标签
         run: |
           if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
@@ -26,33 +32,47 @@ jobs:
             echo "IMAGE_TAG=${GITHUB_SHA::7}" >> "$GITHUB_ENV"
           fi
 
+      # ==================== 3. 设置Docker Buildx ====================
+      - name: 🔧 设置Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # ==================== 4. 登录Docker Hub ====================
       - name: 🔐 登录Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_TOKEN }}
 
+      # ==================== 5. 构建并推送后端镜像 ====================
       - name: 🐳 构建并推送后端镜像
         uses: docker/build-push-action@v5
         with:
           context: ./backend
           push: true
+          platforms: linux/amd64
           tags: |
             ${{ secrets.DOCKER_USERNAME }}/nutriai-backend:${{ env.IMAGE_TAG }}
             ${{ secrets.DOCKER_USERNAME }}/nutriai-backend:latest
+          cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/nutriai-backend:buildcache
+          cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/nutriai-backend:buildcache,mode=max
 
+      # ==================== 6. 构建并推送前端镜像 ====================
       - name: 🐳 构建并推送前端镜像
         uses: docker/build-push-action@v5
         with:
           context: ./frontend
           push: true
+          platforms: linux/amd64
           build-args: |
             VITE_API_BASE_URL=${{ secrets.PROD_API_BASE_URL }}
             VITE_WS_BASE_URL=${{ secrets.PROD_WS_BASE_URL }}
           tags: |
             ${{ secrets.DOCKER_USERNAME }}/nutriai-frontend:${{ env.IMAGE_TAG }}
             ${{ secrets.DOCKER_USERNAME }}/nutriai-frontend:latest
+          cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/nutriai-frontend:buildcache
+          cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/nutriai-frontend:buildcache,mode=max
 
+      # ==================== 7. 上传docker-compose到服务器 ====================
       - name: 📤 上传docker-compose到服务器
         uses: appleboy/scp-action@v0.1.7
         with:
@@ -63,8 +83,9 @@ jobs:
           target: "/www/wwwroot/nutriai"
           overwrite: true
 
+      # ==================== 8. SSH部署到服务器 ====================
       - name: 🚀 拉取镜像并启动容器
-        uses: appleboy/ssh-action@v1.2.0
+        uses: appleboy/ssh-action@v1.0.3
         env:
           IMAGE_TAG: ${{ env.IMAGE_TAG }}
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
@@ -74,30 +95,104 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           envs: IMAGE_TAG,DOCKER_USERNAME,DOCKER_TOKEN
-          command_timeout: 100s
+          script_stop: true
+          command_timeout: 60m
           script: |
             set -e
+
+            echo "============================================"
+            echo "🚀 开始部署 NutriAI 项目"
+            echo "部署时间: $(date '+%Y-%m-%d %H:%M:%S')"
+            echo "镜像标签: ${IMAGE_TAG}"
+            echo "============================================"
+
             cd /www/wwwroot/nutriai
+
             if [ ! -f .env ]; then
-              echo "ERROR: /www/wwwroot/nutriai/.env 不存在，请先手动创建" && exit 1
+              echo "❌ 错误：.env 文件不存在，请先手动创建 /www/wwwroot/nutriai/.env"
+              exit 1
             fi
+
             sudo sed -i "s|^IMAGE_TAG=.*|IMAGE_TAG=${IMAGE_TAG}|" .env
             sudo sed -i "s|^DOCKER_USERNAME=.*|DOCKER_USERNAME=${DOCKER_USERNAME}|" .env
             sudo chmod 600 .env
-            echo "${DOCKER_TOKEN}" | sudo docker login -u "${DOCKER_USERNAME}" --password-stdin
-            sudo docker compose --env-file .env -f docker-compose.prod.yml pull
-            sudo docker compose --env-file .env -f docker-compose.prod.yml up -d --remove-orphans
-            sudo docker compose --env-file .env -f docker-compose.prod.yml ps
-            sudo docker logout
-            echo "✅ 部署完成"
 
+            # 登录 Docker Hub
+            echo "${DOCKER_TOKEN}" | sudo docker login -u "${DOCKER_USERNAME}" --password-stdin
+
+            # 强制清理旧镜像，避免使用缓存
+            echo "🧹 清理本地旧镜像..."
+            sudo docker rmi "${DOCKER_USERNAME}/nutriai-backend:latest" 2>/dev/null || true
+            sudo docker rmi "${DOCKER_USERNAME}/nutriai-frontend:latest" 2>/dev/null || true
+            echo "✅ 旧镜像已清理，将从远程拉取最新版本"
+
+            # 拉取镜像，支持重试（最多3次）
+            echo "📥 拉取最新镜像..."
+            PULL_SUCCESS=false
+            for attempt in 1 2 3; do
+              echo "尝试拉取（第 ${attempt} 次）..."
+              if sudo docker compose --env-file .env -f docker-compose.prod.yml pull; then
+                echo "✅ 镜像拉取成功"
+                PULL_SUCCESS=true
+                break
+              fi
+              echo "⚠️ 第 ${attempt} 次拉取失败，等待 10 秒后重试..."
+              sleep 10
+            done
+
+            if [ "$PULL_SUCCESS" != "true" ]; then
+              echo "❌ 镜像拉取失败！请检查服务器网络或 Docker Hub 连接（如在国内，请配置镜像加速）"
+              sudo docker logout
+              exit 1
+            fi
+
+            # 启动容器
+            echo "▶️ 启动容器..."
+            sudo docker compose --env-file .env -f docker-compose.prod.yml up -d --remove-orphans
+
+            # 显示容器状态
+            echo ""
+            echo "📊 容器运行状态："
+            sudo docker compose --env-file .env -f docker-compose.prod.yml ps
+
+            sudo docker logout
+
+            echo ""
+            echo "============================================"
+            echo "✅ 部署完成！"
+            echo "============================================"
+
+      # ==================== 9. 清理旧镜像 ====================
+      - name: 🧹 清理服务器上的旧Docker镜像
+        uses: appleboy/ssh-action@v1.0.3
+        if: success()
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            echo "🧹 清理旧镜像和未使用的资源..."
+
+            # 删除悬空镜像
+            sudo docker image prune -f
+
+            # 显示磁盘使用情况
+            echo ""
+            echo "💾 Docker磁盘使用情况："
+            sudo docker system df
+
+            echo "✅ 清理完成！"
+
+      # ==================== 10. 部署结果摘要 ====================
       - name: 📈 部署结果摘要
+        if: always()
         run: |
-          echo "## 🎉 部署完成" >> "$GITHUB_STEP_SUMMARY"
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "## ✅ 部署成功" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "## ❌ 部署失败" >> "$GITHUB_STEP_SUMMARY"
+          fi
           echo "- 镜像标签: ${{ env.IMAGE_TAG }}" >> "$GITHUB_STEP_SUMMARY"
           echo "- 镜像仓库: docker.io/${{ secrets.DOCKER_USERNAME }}" >> "$GITHUB_STEP_SUMMARY"
           echo "- 服务器: ${{ secrets.SERVER_HOST }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "## 🎉 部署完成" >> "$GITHUB_STEP_SUMMARY"
-          echo "- 镜像标签: ${{ env.IMAGE_TAG }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "- 镜像仓库: docker.io/${{ secrets.DOCKER_USERNAME }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "- 服务器: ${{ secrets.SERVER_HOST }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- 部署时间: $(date '+%Y-%m-%d %H:%M:%S')" >> "$GITHUB_STEP_SUMMARY"
