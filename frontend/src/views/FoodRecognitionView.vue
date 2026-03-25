@@ -89,10 +89,7 @@
               :key="food"
               style="cursor: pointer"
               effect="plain"
-              @click="
-                foodName = food
-                recognizeByName()
-              "
+              @click="quickRecognize(food)"
             >
               {{ food }}
             </el-tag>
@@ -366,6 +363,12 @@ const recognizeByImage = async () => {
 // 返回首页
 const goToHome = () => {
   router.push('/')
+}
+
+// 快捷识别
+const quickRecognize = food => {
+  foodName.value = food
+  recognizeByName()
 }
 
 // 通过名称识别
