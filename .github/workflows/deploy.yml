@@ -121,6 +121,27 @@ jobs:
               echo "ERROR: 登录 CCR 失败" && exit 1
             fi
 
+            # 停止正在运行的旧容器
+            echo "==> 停止旧容器..."
+            COMPOSE_CMD=""
+            docker compose version >/dev/null 2>&1 && COMPOSE_CMD="docker compose"
+            if [ -z "$COMPOSE_CMD" ]; then
+              docker-compose version >/dev/null 2>&1 && COMPOSE_CMD="docker-compose"
+            fi
+            if [ -z "$COMPOSE_CMD" ]; then
+              echo "==> 安装 docker-compose-plugin..."
+              apt-get update -y -qq && apt-get install -y -qq docker-compose-plugin
+              COMPOSE_CMD="docker compose"
+            fi
+            echo "==> 使用: $COMPOSE_CMD"
+
+            $COMPOSE_CMD -f docker-compose.prod.yml down --remove-orphans 2>/dev/null || true
+
+            # 停止并移除可能存在的独立 Redis 容器（非 compose 管理的）
+            echo "==> 清理独立运行的 Redis 容器..."
+            docker stop nutriai-redis 2>/dev/null || true
+            docker rm nutriai-redis 2>/dev/null || true
+
             # 清理旧镜像
             echo "==> 清理旧镜像..."
             docker rmi "sgccr.ccs.tencentyun.com/${TCR_NAMESPACE}/nutriai-backend:latest" 2>/dev/null || true
@@ -158,22 +179,9 @@ jobs:
 
             echo "==> 镜像拉取完成"
 
-            # 检测 compose 命令
-            COMPOSE_CMD=""
-            docker compose version >/dev/null 2>&1 && COMPOSE_CMD="docker compose"
-            if [ -z "$COMPOSE_CMD" ]; then
-              docker-compose version >/dev/null 2>&1 && COMPOSE_CMD="docker-compose"
-            fi
-            if [ -z "$COMPOSE_CMD" ]; then
-              echo "==> 安装 docker-compose-plugin..."
-              apt-get update -y -qq && apt-get install -y -qq docker-compose-plugin
-              COMPOSE_CMD="docker compose"
-            fi
-            echo "==> 使用: $COMPOSE_CMD"
-
-            # 停止旧容器并启动（不再重新拉取镜像）
+            # 用新镜像启动所有容器（包括 compose 管理的 Redis）
             echo "==> 启动容器..."
-            $COMPOSE_CMD -f docker-compose.prod.yml up -d --remove-orphans
+            $COMPOSE_CMD -f docker-compose.prod.yml up -d --force-recreate --remove-orphans
             if [ $? -ne 0 ]; then
               echo "ERROR: 容器启动失败" && exit 1
             fi
