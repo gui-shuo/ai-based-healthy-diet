@@ -104,8 +104,6 @@ jobs:
             echo "开始部署 NutriAI 项目"
             echo "部署时间: $(date '+%Y-%m-%d %H:%M:%S')"
             echo "镜像标签: ${IMAGE_TAG}"
-            echo "用户: $(whoami)"
-            echo "Docker: $(docker version --format '{{.Server.Version}}' 2>/dev/null || echo 'unknown')"
             echo "============================================"
 
             cd /www/wwwroot/nutriai
@@ -114,18 +112,16 @@ jobs:
               echo "ERROR: .env 文件不存在" && exit 1
             fi
 
-            sed -i "s|^IMAGE_TAG=.*|IMAGE_TAG=${IMAGE_TAG}|" .env
             sed -i "s|^TCR_NAMESPACE=.*|TCR_NAMESPACE=${TCR_NAMESPACE}|" .env
             chmod 600 .env
             echo "==> .env 已更新"
 
             # 登录腾讯云 CCR
-            echo "==> 登录腾讯云容器镜像服务..."
+            echo "==> 登录腾讯云 CCR..."
             echo "${TCR_PASSWORD}" | docker login sgccr.ccs.tencentyun.com -u "${TCR_USERNAME}" --password-stdin
             if [ $? -ne 0 ]; then
               echo "ERROR: 登录 CCR 失败" && exit 1
             fi
-            echo "==> 登录成功"
 
             # 清理旧镜像
             echo "==> 清理旧镜像..."
@@ -146,7 +142,6 @@ jobs:
             if [ "$PULL_OK" != "true" ]; then
               echo "ERROR: 后端镜像拉取失败" && exit 1
             fi
-            echo "==> 后端镜像拉取成功"
 
             # 拉取前端镜像（重试3次）
             echo "==> 拉取前端镜像..."
@@ -162,10 +157,10 @@ jobs:
             if [ "$PULL_OK" != "true" ]; then
               echo "ERROR: 前端镜像拉取失败" && exit 1
             fi
-            echo "==> 前端镜像拉取成功"
+
+            echo "==> 镜像拉取完成"
 
             # 检测 compose 命令
-            echo "==> 检测 docker compose..."
             COMPOSE_CMD=""
             docker compose version >/dev/null 2>&1 && COMPOSE_CMD="docker compose"
             if [ -z "$COMPOSE_CMD" ]; then
@@ -178,7 +173,7 @@ jobs:
             fi
             echo "==> 使用: $COMPOSE_CMD"
 
-            # 启动容器
+            # 停止旧容器并启动（不再重新拉取镜像）
             echo "==> 启动容器..."
             $COMPOSE_CMD -f docker-compose.prod.yml up -d --remove-orphans
             if [ $? -ne 0 ]; then
@@ -193,7 +188,7 @@ jobs:
 
             echo ""
             echo "============================================"
-            echo "部署完成！"
+            echo "部署完成！前端: 3000, 后端: 8080"
             echo "============================================"
 
       # ==================== 9. 清理旧镜像 ====================

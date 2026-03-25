@@ -15,7 +15,7 @@ services:
       - nutriai-network
 
   backend:
-    image: sgccr.ccs.tencentyun.com/${TCR_NAMESPACE}/nutriai-backend:${IMAGE_TAG}
+    image: sgccr.ccs.tencentyun.com/${TCR_NAMESPACE}/nutriai-backend:latest
     restart: always
     depends_on:
       redis:
@@ -46,12 +46,12 @@ services:
       - nutriai-network
 
   frontend:
-    image: sgccr.ccs.tencentyun.com/${TCR_NAMESPACE}/nutriai-frontend:${IMAGE_TAG}
+    image: sgccr.ccs.tencentyun.com/${TCR_NAMESPACE}/nutriai-frontend:latest
     restart: always
     depends_on:
       - backend
     ports:
-      - "80:80"
+      - "3000:80"
     networks:
       - nutriai-network
 
