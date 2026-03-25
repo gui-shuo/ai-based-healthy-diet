@@ -41,6 +41,7 @@ public class MemberService {
     /**
      * 获取会员信息
      */
+    @Transactional
     public MemberInfoResponse getMemberInfo(Long userId) {
         log.info("==========================================");
         log.info("开始查询会员信息");
@@ -68,11 +69,29 @@ public class MemberService {
             log.info("找到的会员: id={}, userId={}", found.getId(), found.getUserId());
         }
         
-        Member member = memberOpt
-                .orElseThrow(() -> {
-                    log.error("未找到userId={}的会员记录", userId);
-                    return BusinessException.User.USER_NOT_FOUND;
-                });
+        // 如果用户没有会员记录，自动创建一个
+        Member member = memberOpt.orElseGet(() -> {
+            log.info("为userId={}自动创建会员记录", userId);
+            // 确认用户存在
+            userRepository.findById(userId)
+                    .orElseThrow(() -> BusinessException.User.USER_NOT_FOUND);
+            // 获取初始等级（最低等级）
+            MemberLevel initialLevel = memberLevelRepository.findByLevelOrder(1)
+                    .orElseThrow(() -> new RuntimeException("未找到初始会员等级"));
+            // 生成邀请码
+            String invitationCode = generateInvitationCode(userId);
+            Member newMember = Member.builder()
+                    .userId(userId)
+                    .levelId(initialLevel.getId())
+                    .totalGrowth(0)
+                    .currentGrowth(0)
+                    .invitationCode(invitationCode)
+                    .invitationCount(0)
+                    .isActive(true)
+                    .activatedAt(LocalDateTime.now())
+                    .build();
+            return memberRepository.save(newMember);
+        });
         
         // 检查并自动升级
         checkAndUpgradeLevel(member);
@@ -345,5 +364,17 @@ public class MemberService {
             "EXPIRED", "已过期"
         );
         return statusNames.getOrDefault(status, status);
+    }
+    
+    /**
+     * 生成邀请码
+     */
+    private String generateInvitationCode(Long userId) {
+        String code;
+        do {
+            code = String.format("INV%06d%s", userId,
+                    UUID.randomUUID().toString().substring(0, 6));
+        } while (memberRepository.existsByInvitationCode(code));
+        return code;
     }
 }
