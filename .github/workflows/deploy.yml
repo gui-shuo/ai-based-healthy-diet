@@ -131,7 +131,7 @@ jobs:
             PULL_SUCCESS=false
             for attempt in 1 2 3; do
               echo "尝试拉取（第 ${attempt} 次）..."
-              if sudo docker compose -f docker-compose.prod.yml pull; then
+              if sudo docker-compose -f docker-compose.prod.yml pull; then
                 echo "✅ 镜像拉取成功"
                 PULL_SUCCESS=true
                 break
@@ -147,12 +147,12 @@ jobs:
 
             # 启动容器
             echo "▶️ 启动容器..."
-            sudo docker compose -f docker-compose.prod.yml up -d --remove-orphans
+            sudo docker-compose -f docker-compose.prod.yml up -d --remove-orphans
 
             # 显示容器状态
             echo ""
             echo "📊 容器运行状态："
-            sudo docker compose -f docker-compose.prod.yml ps
+            sudo docker-compose -f docker-compose.prod.yml ps
 
             echo ""
             echo "============================================"
