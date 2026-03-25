@@ -52,9 +52,9 @@ public class AIConfig {
     public ChatLanguageModel chatLanguageModel() {
         log.info("初始化ChatLanguageModel - 模型: {}, Timeout配置: {}秒", modelName, timeout);
         
-        if (apiKey == null || apiKey.isEmpty()) {
-            log.warn("通义千问API Key未配置！请在application.yml中设置 tongyi.api-key");
-            log.warn("或设置环境变量: TONGYI_API_KEY");
+        String effectiveKey = (apiKey != null && !apiKey.isEmpty()) ? apiKey : "not-configured";
+        if ("not-configured".equals(effectiveKey)) {
+            log.warn("⚠️ 通义千问API Key未配置！AI功能将不可用。请设置环境变量: TONGYI_API_KEY");
         }
         
         // 通过环境变量设置DashScope的超时（DashScope SDK会读取这些环境变量）
@@ -65,7 +65,7 @@ public class AIConfig {
         log.info("✓ 已设置DashScope超时环境变量: {}秒", timeout);
         
         return QwenChatModel.builder()
-                .apiKey(apiKey)
+                .apiKey(effectiveKey)
                 .modelName(modelName)
                 .build();
     }
@@ -78,8 +78,13 @@ public class AIConfig {
     public StreamingChatLanguageModel streamingChatLanguageModel() {
         log.info("初始化StreamingChatLanguageModel - 模型: {}, MaxTokens: {}", modelName, maxTokens);
         
+        String effectiveKey = (apiKey != null && !apiKey.isEmpty()) ? apiKey : "not-configured";
+        if ("not-configured".equals(effectiveKey)) {
+            log.warn("⚠️ 通义千问API Key未配置！AI流式功能将不可用。");
+        }
+        
         return QwenStreamingChatModel.builder()
-                .apiKey(apiKey)
+                .apiKey(effectiveKey)
                 .modelName(modelName)
                 .build();
     }
