@@ -8,6 +8,8 @@ import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -180,10 +182,16 @@ public class JwtUtil {
     
     /**
      * 获取签名密钥
+     * 使用SHA-512对原始密钥进行哈希，确保始终生成512位安全密钥
      */
     private SecretKey getSigningKey() {
-        byte[] keyBytes = secret.getBytes(StandardCharsets.UTF_8);
-        return Keys.hmacShaKeyFor(keyBytes);
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-512");
+            byte[] keyBytes = digest.digest(secret.getBytes(StandardCharsets.UTF_8));
+            return Keys.hmacShaKeyFor(keyBytes);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("SHA-512 algorithm not available", e);
+        }
     }
     
     /**
