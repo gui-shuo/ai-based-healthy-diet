@@ -39,31 +39,31 @@ jobs:
 
       - name: 📦 打包镜像与部署文件
         run: |
-          umask 077
+          set -eo pipefail
           mkdir -p deploy-package
           docker save nutriai-backend:${{ env.IMAGE_TAG }} nutriai-frontend:${{ env.IMAGE_TAG }} | gzip > deploy-package/nutriai-images.tar.gz
           cp docker-compose.prod.yml deploy-package/docker-compose.prod.yml
+          echo "✅ 打包完成："
+          ls -lh deploy-package/
 
-      - name: 🔐 准备服务器临时目录权限
-        uses: appleboy/ssh-action@v1.2.0
-        with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SERVER_SSH_KEY }}
-          script: |
-            set -e
-            mkdir -p /tmp/nutriai-deploy
-            chmod 700 /tmp/nutriai-deploy
+      - name: 🔑 配置SSH密钥
+        run: |
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          echo "${{ secrets.SERVER_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H "${{ secrets.SERVER_HOST }}" >> ~/.ssh/known_hosts 2>/dev/null
 
       - name: 📤 上传部署包到服务器
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SERVER_SSH_KEY }}
-          source: "deploy-package/nutriai-images.tar.gz,deploy-package/docker-compose.prod.yml"
-          target: "/tmp/nutriai-deploy"
-          strip_components: 1
+        run: |
+          set -e
+          SSH_OPTS="-i ~/.ssh/deploy_key"
+          REMOTE="${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}"
+          ssh $SSH_OPTS "$REMOTE" "mkdir -p /tmp/nutriai-deploy && chmod 700 /tmp/nutriai-deploy"
+          scp $SSH_OPTS \
+            deploy-package/nutriai-images.tar.gz \
+            deploy-package/docker-compose.prod.yml \
+            "$REMOTE":/tmp/nutriai-deploy/
+          echo "✅ 上传完成"
 
       - name: 🚀 在云服务器启动Docker服务
         uses: appleboy/ssh-action@v1.2.0
@@ -87,6 +87,10 @@ jobs:
             sudo docker compose --env-file .env -f docker-compose.prod.yml up -d
             sudo docker compose --env-file .env -f docker-compose.prod.yml ps
             sudo rm -rf /tmp/nutriai-deploy
+
+      - name: 🧹 清理SSH密钥
+        if: always()
+        run: rm -f ~/.ssh/deploy_key
 
       - name: 📈 部署结果摘要
         run: |
