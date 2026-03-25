@@ -26,6 +26,10 @@ jobs:
       # ==================== 2. 生成镜像标签 ====================
       - name: 🏷️ 生成镜像标签
         run: |
+          echo "==> 当前构建信息:"
+          echo "    Commit SHA: ${GITHUB_SHA}"
+          echo "    Ref: ${GITHUB_REF}"
+          echo "    最新提交: $(git log --oneline -1)"
           if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
             echo "IMAGE_TAG=${GITHUB_REF_NAME}" >> "$GITHUB_ENV"
           else
@@ -40,7 +44,7 @@ jobs:
       - name: 🔐 登录腾讯云容器镜像服务
         uses: docker/login-action@v4
         with:
-          registry: sgccr.ccs.tencentyun.com
+          registry: hkccr.ccs.tencentyun.com
           username: ${{ secrets.TCR_USERNAME }}
           password: ${{ secrets.TCR_PASSWORD }}
 
@@ -53,8 +57,8 @@ jobs:
           platforms: linux/amd64
           no-cache: true
           tags: |
-            sgccr.ccs.tencentyun.com/${{ secrets.TCR_NAMESPACE }}/nutriai-backend:${{ env.IMAGE_TAG }}
-            sgccr.ccs.tencentyun.com/${{ secrets.TCR_NAMESPACE }}/nutriai-backend:latest
+            hkccr.ccs.tencentyun.com/${{ secrets.TCR_NAMESPACE }}/nutriai-backend:${{ env.IMAGE_TAG }}
+            hkccr.ccs.tencentyun.com/${{ secrets.TCR_NAMESPACE }}/nutriai-backend:latest
 
       # ==================== 6. 构建并推送前端镜像 ====================
       - name: 🐳 构建并推送前端镜像
@@ -65,8 +69,8 @@ jobs:
           platforms: linux/amd64
           no-cache: true
           tags: |
-            sgccr.ccs.tencentyun.com/${{ secrets.TCR_NAMESPACE }}/nutriai-frontend:${{ env.IMAGE_TAG }}
-            sgccr.ccs.tencentyun.com/${{ secrets.TCR_NAMESPACE }}/nutriai-frontend:latest
+            hkccr.ccs.tencentyun.com/${{ secrets.TCR_NAMESPACE }}/nutriai-frontend:${{ env.IMAGE_TAG }}
+            hkccr.ccs.tencentyun.com/${{ secrets.TCR_NAMESPACE }}/nutriai-frontend:latest
 
       # ==================== 7. 上传docker-compose到服务器 ====================
       - name: 📤 上传docker-compose到服务器
@@ -113,7 +117,7 @@ jobs:
 
             # 登录腾讯云 CCR
             echo "==> 登录腾讯云 CCR..."
-            echo "${TCR_PASSWORD}" | docker login sgccr.ccs.tencentyun.com -u "${TCR_USERNAME}" --password-stdin
+            echo "${TCR_PASSWORD}" | docker login hkccr.ccs.tencentyun.com -u "${TCR_USERNAME}" --password-stdin
             if [ $? -ne 0 ]; then
               echo "ERROR: 登录 CCR 失败" && exit 1
             fi
@@ -141,12 +145,12 @@ jobs:
 
             # 清理旧镜像
             echo "==> 清理旧镜像..."
-            docker rmi "sgccr.ccs.tencentyun.com/${TCR_NAMESPACE}/nutriai-backend:latest" 2>/dev/null || true
-            docker rmi "sgccr.ccs.tencentyun.com/${TCR_NAMESPACE}/nutriai-frontend:latest" 2>/dev/null || true
+            docker rmi "hkccr.ccs.tencentyun.com/${TCR_NAMESPACE}/nutriai-backend:latest" 2>/dev/null || true
+            docker rmi "hkccr.ccs.tencentyun.com/${TCR_NAMESPACE}/nutriai-frontend:latest" 2>/dev/null || true
 
             # 拉取后端镜像（重试3次）
             echo "==> 拉取后端镜像..."
-            BACKEND_IMG="sgccr.ccs.tencentyun.com/${TCR_NAMESPACE}/nutriai-backend:latest"
+            BACKEND_IMG="hkccr.ccs.tencentyun.com/${TCR_NAMESPACE}/nutriai-backend:latest"
             PULL_OK=false
             ATTEMPT=0
             while [ "$ATTEMPT" -lt 3 ]; do
@@ -161,7 +165,7 @@ jobs:
 
             # 拉取前端镜像（重试3次）
             echo "==> 拉取前端镜像..."
-            FRONTEND_IMG="sgccr.ccs.tencentyun.com/${TCR_NAMESPACE}/nutriai-frontend:latest"
+            FRONTEND_IMG="hkccr.ccs.tencentyun.com/${TCR_NAMESPACE}/nutriai-frontend:latest"
             PULL_OK=false
             ATTEMPT=0
             while [ "$ATTEMPT" -lt 3 ]; do
@@ -187,7 +191,7 @@ jobs:
             echo "==> 容器状态:"
             $COMPOSE_CMD -f docker-compose.prod.yml ps
 
-            docker logout sgccr.ccs.tencentyun.com 2>/dev/null || true
+            docker logout hkccr.ccs.tencentyun.com 2>/dev/null || true
 
             echo ""
             echo "============================================"
@@ -218,6 +222,6 @@ jobs:
             echo "## ❌ 部署失败" >> "$GITHUB_STEP_SUMMARY"
           fi
           echo "- 镜像标签: ${{ env.IMAGE_TAG }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "- 镜像仓库: sgccr.ccs.tencentyun.com/${{ secrets.TCR_NAMESPACE }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- 镜像仓库: hkccr.ccs.tencentyun.com/${{ secrets.TCR_NAMESPACE }}" >> "$GITHUB_STEP_SUMMARY"
           echo "- 服务器: ${{ secrets.SERVER_HOST }}" >> "$GITHUB_STEP_SUMMARY"
           echo "- 部署时间: $(date '+%Y-%m-%d %H:%M:%S')" >> "$GITHUB_STEP_SUMMARY"
