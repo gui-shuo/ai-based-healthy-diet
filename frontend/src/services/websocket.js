@@ -9,8 +9,15 @@
 import { ref } from 'vue'
 import { ElMessage } from 'element-plus'
 
-// WebSocket URL配置
-const WS_BASE_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:8080/api/ws/ai/chat'
+// WebSocket URL配置——动态构建，支持 http/https 自动切换 ws/wss
+function getWsBaseUrl() {
+  const env = import.meta.env.VITE_WS_BASE_URL || import.meta.env.VITE_WS_URL
+  if (env) return env
+  const loc = window.location
+  const protocol = loc.protocol === 'https:' ? 'wss:' : 'ws:'
+  return `${protocol}//${loc.host}/api/ws/ai/chat`
+}
+const WS_BASE_URL = getWsBaseUrl()
 
 // 消息类型
 export const MessageType = {

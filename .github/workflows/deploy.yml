@@ -64,9 +64,6 @@ jobs:
           push: true
           platforms: linux/amd64
           no-cache: true
-          build-args: |
-            VITE_API_BASE_URL=${{ secrets.PROD_API_BASE_URL }}
-            VITE_WS_BASE_URL=${{ secrets.PROD_WS_BASE_URL }}
           tags: |
             sgccr.ccs.tencentyun.com/${{ secrets.TCR_NAMESPACE }}/nutriai-frontend:${{ env.IMAGE_TAG }}
             sgccr.ccs.tencentyun.com/${{ secrets.TCR_NAMESPACE }}/nutriai-frontend:latest

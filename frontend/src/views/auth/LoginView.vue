@@ -94,7 +94,6 @@
           <router-link to="/register" class="link"> 立即注册 </router-link>
         </div>
       </el-form>
-
     </div>
   </div>
 </template>
