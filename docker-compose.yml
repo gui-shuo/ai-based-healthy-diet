@@ -16,7 +16,7 @@ services:
       - "3306:3306"
     volumes:
       - ./data/mysql:/var/lib/mysql
-      - ./database/V1__init_schema.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./backend/src/main/resources/db/migration/alldata.sql:/docker-entrypoint-initdb.d/init.sql:ro
     command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     networks:
       - nutriai-network
@@ -51,8 +51,10 @@ services:
       SPRING_REDIS_PASSWORD: ${REDIS_PASSWORD:-redis123}
       JWT_SECRET: ${JWT_SECRET}
       TONGYI_API_KEY: ${TONGYI_API_KEY}
-      ALIYUN_OSS_ACCESS_KEY_ID: ${ALIYUN_OSS_ACCESS_KEY_ID}
-      ALIYUN_OSS_ACCESS_KEY_SECRET: ${ALIYUN_OSS_ACCESS_KEY_SECRET}
+      COS_SECRET_ID: ${COS_SECRET_ID}
+      COS_SECRET_KEY: ${COS_SECRET_KEY}
+      COS_REGION: ${COS_REGION}
+      COS_BUCKET: ${COS_BUCKET}
     ports:
       - "8080:8080"
     volumes:

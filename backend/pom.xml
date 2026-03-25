@@ -71,12 +71,6 @@
             <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
         
-        <!-- Spring Boot WebSocket -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-websocket</artifactId>
-        </dependency>
-        
         <!-- MySQL Driver -->
         <dependency>
             <groupId>com.mysql</groupId>
@@ -182,14 +176,12 @@
             <version>7.2.5</version>
         </dependency>
         
-        <!-- 阿里云图像识别SDK（已停用） -->
-        <!--
+        <!-- 腾讯云COS对象存储SDK -->
         <dependency>
-            <groupId>com.aliyun</groupId>
-            <artifactId>imagerecog20190930</artifactId>
-            <version>2.0.1</version>
+            <groupId>com.qcloud</groupId>
+            <artifactId>cos_api</artifactId>
+            <version>5.6.227</version>
         </dependency>
-        -->
         
         <!-- 百度AI SDK -->
         <dependency>

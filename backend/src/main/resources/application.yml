@@ -3,7 +3,7 @@ spring:
     name: nutriai-backend
   
   profiles:
-    active: dev
+    active: ${SPRING_PROFILES_ACTIVE:prod}
   
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -31,7 +31,7 @@ spring:
     open-in-view: false
   
   flyway:
-    enabled: true
+    enabled: false
     locations: classpath:db/migration
     baseline-on-migrate: true
     validate-on-migrate: false
@@ -73,30 +73,30 @@ jwt:
 
 # 通义千问API配置
 tongyi:
-  api-key: ${TONGYI_API_KEY:sk-3b56c30253714a34988ca12176481809}
+  api-key: ${TONGYI_API_KEY:}
   model: qwen3.5-flash
   max-tokens: 2000
   temperature: 0.7
   top-p: 0.9
   timeout: 180  # 超时时间（秒），默认180秒（3分钟）
 
-# 阿里云OSS配置
-aliyun:
-  oss:
-    endpoint: ${OSS_ENDPOINT:oss-cn-hangzhou.aliyuncs.com}
-    access-key-id: ${OSS_ACCESS_KEY_ID:}
-    access-key-secret: ${OSS_ACCESS_KEY_SECRET:}
-    bucket-name: ${OSS_BUCKET:nutriai-assets}
+# 腾讯云COS对象存储配置
+tencent:
+  cos:
+    secret-id: ${COS_SECRET_ID:}
+    secret-key: ${COS_SECRET_KEY:}
+    region: ${COS_REGION:ap-beijing}
+    bucket: ${COS_BUCKET:nutriai-assets}
 
 # 日志配置
 logging:
   level:
     root: INFO
     com.nutriai: DEBUG
-    org.springframework.web: DEBUG
-    org.springframework.web.socket: DEBUG
-    org.springframework.messaging: DEBUG
-    org.springframework.security: DEBUG
+    org.springframework.web: INFO
+    org.springframework.web.socket: INFO
+    org.springframework.messaging: INFO
+    org.springframework.security: INFO
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
   pattern:
@@ -128,7 +128,7 @@ nutriai:
   upload:
     max-size: 10485760  # 10MB
     allowed-types: jpg,jpeg,png,gif,pdf,txt
-    local-path: d:/ProgrammingLanguage/Java/Projects/ai-based-healthy-diet/backend/uploads
+    local-path: ${UPLOAD_PATH:./uploads}
     base-url: http://localhost  # 文件访问基础URL
 
 # 阿里云配置（已停用）

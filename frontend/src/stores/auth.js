@@ -9,7 +9,18 @@ export const useAuthStore = defineStore('auth', () => {
   const user = ref(null)
 
   // Getters
-  const isLoggedIn = computed(() => !!token.value && !!user.value)
+  const isTokenExpired = computed(() => {
+    if (!token.value) return true
+    try {
+      const payload = JSON.parse(atob(token.value.split('.')[1]))
+      // 提前60秒认为过期，避免边界情况
+      return payload.exp * 1000 < Date.now() - 60000
+    } catch {
+      return true
+    }
+  })
+
+  const isLoggedIn = computed(() => !!token.value && !!user.value && !isTokenExpired.value)
   const userRole = computed(() => user.value?.role || '')
   const isAdmin = computed(() => ['ADMIN', 'SUPER_ADMIN'].includes(userRole.value))
   const userName = computed(() => user.value?.nickname || user.value?.username || '')
@@ -139,6 +150,7 @@ export const useAuthStore = defineStore('auth', () => {
     user,
     // Getters
     isLoggedIn,
+    isTokenExpired,
     userRole,
     isAdmin,
     userName,

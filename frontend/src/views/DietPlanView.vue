@@ -956,25 +956,6 @@ onMounted(async () => {
 // 组件卸载前清理
 onBeforeUnmount(() => {
   console.log('DietPlanView 组件卸载，开始清理...')
-  
-  // 清理可能残留的 MessageBox
-  setTimeout(() => {
-    const messageBoxes = document.querySelectorAll('.el-message-box__wrapper')
-    messageBoxes.forEach(box => {
-      console.log('DietPlanView 卸载时清理 MessageBox')
-      box.remove()
-    })
-    
-    const overlays = document.querySelectorAll('body > .el-overlay')
-    overlays.forEach(overlay => {
-      const hasActiveModal = document.querySelector('.el-message-box__wrapper, .el-dialog__wrapper, .el-drawer__wrapper')
-      if (!hasActiveModal) {
-        console.log('DietPlanView 卸载时清理遮罩层')
-        overlay.remove()
-      }
-    })
-  }, 50)
-  
   console.log('DietPlanView 清理完成')
 })
 </script>
@@ -1315,10 +1296,5 @@ onBeforeUnmount(() => {
 .custom-message-box .el-message-box__btns {
   padding: 10px 20px 20px !important;
   text-align: center !important;
-}
-
-/* 确保遮罩层正确显示 */
-.el-overlay {
-  background-color: rgba(0, 0, 0, 0.5) !important;
 }
 </style>

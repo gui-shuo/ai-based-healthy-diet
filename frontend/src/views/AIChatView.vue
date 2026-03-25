@@ -1284,23 +1284,11 @@ onUnmounted(() => {
   }
 }
 
-// 确保遮罩层正确显示
-.el-overlay {
-  background-color: rgba(0, 0, 0, 0.5) !important;
-  z-index: 2000 !important;
-}
-
-// 确保对话框正确显示
-.el-dialog {
-  z-index: 2001 !important;
-}
-
 // 确保MessageBox居中显示
 .el-overlay .el-message-box {
   position: fixed !important;
   top: 50% !important;
   left: 50% !important;
   transform: translate(-50%, -50%) !important;
-  z-index: 2001 !important;
 }
 </style>

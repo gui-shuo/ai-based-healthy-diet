@@ -43,9 +43,15 @@ api.interceptors.response.use(
   },
   async (error) => {
     const config = error.config
+    const status = error.response?.status
 
-    // 401错误，token过期
-    if (error.response?.status === 401) {
+    // 401/403 认证失败，尝试刷新token
+    if (status === 401 || status === 403) {
+      // 避免刷新token的请求本身再次触发刷新
+      if (config.url?.includes('/auth/refresh') || config.url?.includes('/auth/login')) {
+        return Promise.reject(error)
+      }
+
       if (!isRefreshing) {
         isRefreshing = true
         const authStore = useAuthStore()
@@ -53,18 +59,30 @@ api.interceptors.response.use(
         try {
           const refreshed = await authStore.refreshAccessToken()
           if (refreshed) {
+            // 刷新成功，重试所有排队的请求
             requests.forEach(cb => cb(authStore.token))
             requests = []
+            // 重试当前请求
+            config.headers['Authorization'] = `Bearer ${authStore.token}`
             return api.request(config)
+          } else {
+            // 刷新失败，清除状态并跳转登录
+            requests = []
+            authStore.logout()
+            router.push({ path: '/login', query: { redirect: window.location.pathname } })
+            return Promise.reject(error)
           }
         } catch (e) {
+          requests = []
           authStore.logout()
-          router.push('/login')
+          router.push({ path: '/login', query: { redirect: window.location.pathname } })
+          return Promise.reject(error)
         } finally {
           isRefreshing = false
         }
       }
 
+      // 正在刷新中，排队等待
       return new Promise(resolve => {
         requests.push(token => {
           config.headers['Authorization'] = `Bearer ${token}`

@@ -463,11 +463,6 @@ onBeforeUnmount(() => {
   }
 }
 
-// 确保遮罩层正确显示
-.el-overlay {
-  background-color: rgba(0, 0, 0, 0.5) !important;
-}
-
 // 确保MessageBox居中显示
 .el-overlay .el-message-box {
   position: fixed !important;

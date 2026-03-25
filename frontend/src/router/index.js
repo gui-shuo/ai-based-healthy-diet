@@ -125,7 +125,7 @@ const router = createRouter({
 })
 
 // 全局前置守卫
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore()
 
   // 设置页面标题
@@ -140,6 +140,25 @@ router.beforeEach((to, from, next) => {
 
   // 检查是否需要登录
   if (to.meta.requiresAuth) {
+    // 有token但已过期，尝试静默刷新
+    if (authStore.token && authStore.isTokenExpired && authStore.refreshToken) {
+      try {
+        const refreshed = await authStore.refreshAccessToken()
+        if (refreshed) {
+          // 刷新成功，继续导航
+          if (to.meta.requiresAdmin && !authStore.isAdmin) {
+            ElMessage.error('您没有访问权限')
+            next({ name: 'Home' })
+            return
+          }
+          next()
+          return
+        }
+      } catch (e) {
+        // 刷新失败，走下面的未登录逻辑
+      }
+    }
+
     if (!authStore.isLoggedIn) {
       ElMessage.warning('请先登录')
       next({
@@ -162,31 +181,7 @@ router.beforeEach((to, from, next) => {
 
 // 全局后置钩子
 router.afterEach((to, from) => {
-  // 可以在这里添加页面访问统计等逻辑
   console.log(`路由跳转: ${from.path} -> ${to.path}`)
-  
-  // 更保守的清理策略：只在路由切换时清理真正孤立的遮罩层
-  setTimeout(() => {
-    // 检查是否有活动的对话框
-    const hasActiveDialog = document.querySelector('.el-dialog')
-    const hasActiveMessageBox = document.querySelector('.el-message-box')
-    const hasActiveDrawer = document.querySelector('.el-drawer')
-    
-    // 如果有任何活动的弹窗，不清理
-    if (hasActiveDialog || hasActiveMessageBox || hasActiveDrawer) {
-      return
-    }
-    
-    // 只清理真正孤立的遮罩层（没有内容的）
-    const overlays = document.querySelectorAll('body > .el-overlay')
-    overlays.forEach(overlay => {
-      const hasContent = overlay.querySelector('.el-dialog, .el-message-box, .el-drawer')
-      if (!hasContent && overlay.children.length === 0) {
-        console.log('路由切换后清理空遮罩层')
-        overlay.remove()
-      }
-    })
-  }, 300)
 })
 
 // 捕获并忽略导航错误

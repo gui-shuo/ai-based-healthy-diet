@@ -1,6 +1,7 @@
 package com.nutriai.filter;
 
 import com.nutriai.util.JwtUtil;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -35,32 +36,33 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             // 从请求头获取Token
             String token = getTokenFromRequest(request);
             
-            // 如果Token存在且有效
-            if (token != null && jwtUtil.validateToken(token)) {
-                // 从Token中提取用户ID和角色
-                Long userId = jwtUtil.getUserIdFromToken(token);
-                String role = jwtUtil.getRoleFromToken(token);
-                
-                // 创建认证对象
-                UsernamePasswordAuthenticationToken authentication = 
-                    new UsernamePasswordAuthenticationToken(
-                        userId,
-                        null,
-                        Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role))
-                    );
-                
-                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                
-                // 设置到Security上下文
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-                
-                // 将userId设置到request attribute中，供Controller使用
-                request.setAttribute("userId", userId);
-                
-                log.debug("JWT认证成功: userId={}, role={}", userId, role);
+            if (token != null) {
+                if (jwtUtil.validateToken(token)) {
+                    // Token有效，设置认证信息
+                    Long userId = jwtUtil.getUserIdFromToken(token);
+                    String role = jwtUtil.getRoleFromToken(token);
+                    
+                    UsernamePasswordAuthenticationToken authentication = 
+                        new UsernamePasswordAuthenticationToken(
+                            userId,
+                            null,
+                            Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role))
+                        );
+                    
+                    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                    request.setAttribute("userId", userId);
+                    
+                    log.debug("JWT认证成功: userId={}, role={}", userId, role);
+                } else {
+                    // Token无效或过期，标记到request attribute供EntryPoint区分
+                    request.setAttribute("jwt-error", "invalid");
+                    log.debug("JWT令牌无效: {}", request.getRequestURI());
+                }
             }
         } catch (Exception e) {
-            log.error("JWT认证失败", e);
+            log.error("JWT认证过程异常: {}", e.getMessage());
+            request.setAttribute("jwt-error", "error");
         }
         
         filterChain.doFilter(request, response);

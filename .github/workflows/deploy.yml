@@ -43,20 +43,6 @@ jobs:
           mkdir -p deploy-package
           docker save nutriai-backend:${{ env.IMAGE_TAG }} nutriai-frontend:${{ env.IMAGE_TAG }} | gzip > deploy-package/nutriai-images.tar.gz
           cp docker-compose.prod.yml deploy-package/docker-compose.prod.yml
-          cat > deploy-package/.env <<EOF
-          IMAGE_TAG=${{ env.IMAGE_TAG }}
-          MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}
-          MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}
-          REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}
-          JWT_SECRET=${{ secrets.JWT_SECRET }}
-          TONGYI_API_KEY=${{ secrets.TONGYI_API_KEY }}
-          ALIYUN_OSS_ACCESS_KEY_ID=${{ secrets.ALIYUN_OSS_ACCESS_KEY_ID }}
-          ALIYUN_OSS_ACCESS_KEY_SECRET=${{ secrets.ALIYUN_OSS_ACCESS_KEY_SECRET }}
-          BAIDU_AI_APP_ID=${{ secrets.BAIDU_AI_APP_ID }}
-          BAIDU_AI_API_KEY=${{ secrets.BAIDU_AI_API_KEY }}
-          BAIDU_AI_SECRET_KEY=${{ secrets.BAIDU_AI_SECRET_KEY }}
-          EOF
-          chmod 600 deploy-package/.env
 
       - name: 🔐 准备服务器临时目录权限
         uses: appleboy/ssh-action@v1.2.0
@@ -75,7 +61,7 @@ jobs:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
-          source: "deploy-package/nutriai-images.tar.gz,deploy-package/docker-compose.prod.yml,deploy-package/.env"
+          source: "deploy-package/nutriai-images.tar.gz,deploy-package/docker-compose.prod.yml"
           target: "/tmp/nutriai-deploy"
           strip_components: 1
 
@@ -87,13 +73,16 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
             set -e
-            sudo mkdir -p /opt/nutriai
-            sudo cp -f /tmp/nutriai-deploy/nutriai-images.tar.gz /opt/nutriai/
-            sudo cp -f /tmp/nutriai-deploy/docker-compose.prod.yml /opt/nutriai/
-            sudo cp -f /tmp/nutriai-deploy/.env /opt/nutriai/
-            cd /opt/nutriai
+            sudo mkdir -p /www/wwwroot/nutriai
+            sudo cp -f /tmp/nutriai-deploy/nutriai-images.tar.gz /www/wwwroot/nutriai/
+            sudo cp -f /tmp/nutriai-deploy/docker-compose.prod.yml /www/wwwroot/nutriai/
+            cd /www/wwwroot/nutriai
+            # 更新 .env 中的镜像标签（.env 由管理员手动维护，此处仅更新 IMAGE_TAG）
+            if [ ! -f .env ]; then
+              echo "ERROR: /www/wwwroot/nutriai/.env 不存在，请先手动创建（参考 .env.example）" && exit 1
+            fi
+            sudo sed -i "s/^IMAGE_TAG=.*/IMAGE_TAG=${{ env.IMAGE_TAG }}/" .env
             sudo chmod 600 .env
-            sudo test "$(stat -c '%a' .env)" = "600" || (echo "ERROR: .env permissions are not 600" && exit 1)
             sudo docker load -i nutriai-images.tar.gz
             sudo docker compose --env-file .env -f docker-compose.prod.yml up -d
             sudo docker compose --env-file .env -f docker-compose.prod.yml ps

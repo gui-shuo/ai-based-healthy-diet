@@ -1,6 +1,7 @@
 package com.nutriai.config;
 
 import com.nutriai.filter.JwtAuthenticationFilter;
+import com.nutriai.security.JwtAuthenticationEntryPoint;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -24,6 +25,7 @@ import static org.springframework.security.config.Customizer.withDefaults;
 public class SecurityConfig {
     
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
@@ -56,7 +58,6 @@ public class SecurityConfig {
                                 "/doc",
                                 "/doc/**",
                                 "/error",
-                                "/uploads/**",
                                 "/ws/**",  // WebSocket端点（WebSocket自己会验证token）
                                 "/announcements/**",  // 公告接口（公开访问）
                                 "/public/**"  // 公开配置接口
@@ -64,6 +65,18 @@ public class SecurityConfig {
                         
                         // 其他所有请求都需要认证
                         .anyRequest().authenticated()
+                )
+                
+                // 异常处理：未认证返回401 JSON
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(jwtAuthenticationEntryPoint)
+                )
+                
+                // 安全响应头
+                .headers(headers -> headers
+                        .contentTypeOptions(withDefaults())
+                        .frameOptions(frame -> frame.deny())
+                        .cacheControl(withDefaults())
                 )
                 
                 // 添加JWT认证过滤器

@@ -543,34 +543,6 @@ onBeforeUnmount(() => {
     delete expandedHistory[key]
   })
   
-  // 强制关闭所有可能打开的 MessageBox
-  const messageBoxes = document.querySelectorAll('.el-message-box__wrapper')
-  messageBoxes.forEach(box => {
-    console.log('强制关闭 MessageBox')
-    box.remove()
-  })
-  
-  // 强制清理可能残留的 DOM 元素
-  setTimeout(() => {
-    const uploadElements = document.querySelectorAll('.el-upload, .el-upload-dragger')
-    uploadElements.forEach(el => {
-      if (!document.body.contains(el.closest('.food-recognition-view'))) {
-        console.log('清理残留的 upload 元素')
-        el.remove()
-      }
-    })
-    
-    // 清理所有残留的遮罩层
-    const overlays = document.querySelectorAll('body > .el-overlay')
-    overlays.forEach(overlay => {
-      const hasActiveModal = document.querySelector('.el-message-box__wrapper, .el-dialog__wrapper, .el-drawer__wrapper')
-      if (!hasActiveModal) {
-        console.log('清理残留的遮罩层')
-        overlay.remove()
-      }
-    })
-  }, 100)
-  
   console.log('FoodRecognitionView 清理完成')
 })
 </script>

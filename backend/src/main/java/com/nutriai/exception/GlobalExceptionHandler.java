@@ -80,9 +80,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ApiResponse<Void> handleException(Exception e) {
-        log.error("❌ 系统异常: {}", e.getMessage(), e);
-        log.error("异常类型: {}", e.getClass().getName());
-        log.error("异常堆栈: ", e);
-        return ApiResponse.error(500, "系统繁忙，请稍后再试: " + e.getMessage());
+        log.error("系统异常: [{}] {}", e.getClass().getSimpleName(), e.getMessage(), e);
+        // 不向客户端暴露内部异常详情
+        return ApiResponse.error(500, "系统繁忙，请稍后再试");
     }
 }
