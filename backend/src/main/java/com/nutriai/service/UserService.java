@@ -188,18 +188,25 @@ public class UserService {
     }
 
     /**
-     * 修改手机号（使用邮箱验证码）
+     * 修改手机号（支持邮箱验证码和短信验证码）
      */
     @Transactional
     public void changePhone(Long userId, ChangePhoneRequest request) {
-        // 验证邮箱验证码
-        String redisKey = PHONE_CHANGE_EMAIL_CODE_PREFIX + userId;
-        String storedCode = (String) redisTemplate.opsForValue().get(redisKey);
-        if (storedCode == null) {
-            throw new BusinessException(40114, "验证码已过期，请重新获取");
-        }
-        if (!storedCode.equalsIgnoreCase(request.getEmailCode())) {
-            throw new BusinessException(40115, "验证码错误，请重新输入");
+        // 优先使用邮箱验证码（新版），否则回退短信验证码（旧版兼容）
+        if (request.getEmailCode() != null && !request.getEmailCode().isBlank()) {
+            String redisKey = PHONE_CHANGE_EMAIL_CODE_PREFIX + userId;
+            String storedCode = (String) redisTemplate.opsForValue().get(redisKey);
+            if (storedCode == null) {
+                throw new BusinessException(40114, "验证码已过期，请重新获取");
+            }
+            if (!storedCode.equalsIgnoreCase(request.getEmailCode())) {
+                throw new BusinessException(40115, "验证码错误，请重新输入");
+            }
+            redisTemplate.delete(redisKey);
+        } else if (request.getSmsKey() != null && request.getSmsCode() != null) {
+            validateSmsCode(request.getSmsKey(), request.getSmsCode());
+        } else {
+            throw new BusinessException("请提供验证码");
         }
 
         // 检查新手机号是否已被使用
@@ -212,9 +219,6 @@ public class UserService {
 
         user.setPhone(request.getNewPhone());
         userRepository.save(user);
-
-        // 删除已使用的验证码
-        redisTemplate.delete(redisKey);
 
         log.info("用户手机号修改成功: userId={}, newPhone={}", userId, request.getNewPhone());
     }

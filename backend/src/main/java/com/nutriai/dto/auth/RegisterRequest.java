@@ -39,6 +39,9 @@ public class RegisterRequest {
     
     @NotBlank(message = "验证码Key不能为空")
     private String captchaKey;
+
+    /** 邀请码（可选），注册时关联邀请人 */
+    private String invitationCode;
     
     /**
      * 验证两次密码是否一致

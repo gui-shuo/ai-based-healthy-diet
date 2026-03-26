@@ -28,6 +28,14 @@ public class AlipayService {
     private final AlipayConfig alipayConfig;
 
     /**
+     * 检查支付宝是否已配置
+     */
+    public boolean isConfigured() {
+        return alipayConfig.getAppId() != null && !alipayConfig.getAppId().isBlank()
+                && alipayConfig.getPrivateKey() != null && !alipayConfig.getPrivateKey().isBlank();
+    }
+
+    /**
      * 创建PC端支付宝支付表单/跳转URL
      *
      * @param orderNo   业务订单号

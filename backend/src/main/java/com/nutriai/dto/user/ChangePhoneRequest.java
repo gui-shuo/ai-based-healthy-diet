@@ -20,6 +20,12 @@ public class ChangePhoneRequest {
     @Pattern(regexp = "^1[3-9]\\d{9}$", message = "手机号格式不正确")
     private String newPhone;
 
-    @NotBlank(message = "邮箱验证码不能为空")
+    /** 新版邮箱验证码 */
     private String emailCode;
+
+    /** 旧版短信验证码（向后兼容） */
+    private String smsCode;
+
+    /** 旧版短信验证码Key（向后兼容） */
+    private String smsKey;
 }

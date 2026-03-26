@@ -161,7 +161,11 @@ const props = defineProps({
 const { copy } = useClipboard()
 const loading = ref(false)
 const invitationCode = computed(() => props.memberInfo?.invitationCode || '')
-const invitationLink = computed(() => props.memberInfo?.invitationLink || '')
+const invitationLink = computed(() => {
+  const code = props.memberInfo?.invitationCode
+  if (!code) return ''
+  return `${window.location.origin}/register?code=${code}`
+})
 const records = ref([])
 const showAllDialog = ref(false)
 const allLoading = ref(false)

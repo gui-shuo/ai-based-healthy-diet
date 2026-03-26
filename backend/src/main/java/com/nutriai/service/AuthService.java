@@ -8,6 +8,8 @@ import com.nutriai.util.CaptchaUtil;
 import com.nutriai.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -31,6 +33,10 @@ public class AuthService {
     private final RedisTemplate<String, Object> redisTemplate;
     private final BCryptPasswordEncoder passwordEncoder;
     private final EmailService emailService;
+
+    @Lazy
+    @Autowired
+    private MemberService memberService;
     
     private static final String CAPTCHA_PREFIX = "captcha:";
     private static final String LOGIN_FAIL_PREFIX = "login:fail:";
@@ -83,7 +89,16 @@ public class AuthService {
                 .build();
         
         userRepository.save(user);
-        
+
+        // 处理邀请码（失败不影响注册）
+        if (request.getInvitationCode() != null && !request.getInvitationCode().isBlank()) {
+            try {
+                memberService.processInvitation(request.getInvitationCode(), user.getId());
+            } catch (Exception e) {
+                log.warn("邀请码处理失败，不影响注册: code={}, error={}", request.getInvitationCode(), e.getMessage());
+            }
+        }
+
         log.info("用户注册成功: {}", user.getUsername());
     }
     

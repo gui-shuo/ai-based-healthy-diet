@@ -87,6 +87,12 @@ public class VipService {
                 .build();
         order = vipOrderRepository.save(order);
 
+        // 调用支付宝生成支付表单（未配置时返回友好提示）
+        if (!alipayService.isConfigured()) {
+            log.warn("支付宝未配置，orderNo={}", orderNo);
+            throw new BusinessException("支付功能暂未开通，请联系管理员配置支付宝参数");
+        }
+
         // 调用支付宝生成支付表单
         String payForm = alipayService.createPagePayForm(
                 orderNo,

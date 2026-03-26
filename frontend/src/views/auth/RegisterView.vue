@@ -161,13 +161,14 @@
 
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { Loading } from '@element-plus/icons-vue'
 import PasswordStrength from '@/components/PasswordStrength.vue'
 import api from '@/services/api'
 import message from '@/utils/message'
 
 const router = useRouter()
+const route = useRoute()
 
 // 表单引用
 const registerFormRef = ref()
@@ -182,7 +183,8 @@ const registerForm = reactive({
   nickname: '',
   captcha: '',
   captchaKey: '',
-  agree: false
+  agree: false,
+  invitationCode: route.query.code || ''
 })
 
 // 自定义验证规则
@@ -347,7 +349,8 @@ const handleRegister = async () => {
       phone: registerForm.phone || undefined,
       nickname: registerForm.nickname || undefined,
       captcha: registerForm.captcha,
-      captchaKey: registerForm.captchaKey
+      captchaKey: registerForm.captchaKey,
+      invitationCode: registerForm.invitationCode || undefined
     })
 
     if (response.data.code === 200) {
