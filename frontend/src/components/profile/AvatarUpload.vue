@@ -10,7 +10,7 @@
     >
       <!-- 已上传的头像 -->
       <div v-if="avatarUrl" class="avatar-preview">
-        <el-image :src="avatarUrl" fit="cover" class="avatar-image" />
+        <el-image :key="avatarUrl" :src="avatarUrl" fit="cover" class="avatar-image" />
         <div class="avatar-mask">
           <el-icon class="icon-camera">
             <Camera />

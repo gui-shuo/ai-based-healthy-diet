@@ -1,6 +1,7 @@
 <template>
   <div class="announcements-page">
     <div class="page-header">
+      <el-button :icon="ArrowLeft" @click="router.push('/')">返回首页</el-button>
       <h1>系统公告</h1>
       <p class="subtitle">查看最新的系统通知和公告信息</p>
     </div>
@@ -62,9 +63,12 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { Clock } from '@element-plus/icons-vue'
+import { Clock, ArrowLeft } from '@element-plus/icons-vue'
 import api from '@/services/api'
+
+const router = useRouter()
 
 const loading = ref(false)
 const announcements = ref([])

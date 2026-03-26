@@ -206,7 +206,7 @@ const validatePassword = (rule, value, callback) => {
   if (value.length < 6 || value.length > 20) {
     return callback(new Error('密码长度为6-20个字符'))
   }
-  if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d@$!%*?&]+$/.test(value)) {
+  if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(value)) {
     return callback(new Error('密码必须包含大小写字母和数字'))
   }
   callback()

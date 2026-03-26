@@ -58,6 +58,15 @@ public class MemberController {
     }
 
     /**
+     * 获取本月签到日期列表（日期列表，如 [1, 5, 8, ...]）
+     */
+    @GetMapping("/sign-in/calendar")
+    public ApiResponse<java.util.List<Integer>> getSignInCalendar(HttpServletRequest httpRequest) {
+        Long userId = getUserId(httpRequest);
+        return ApiResponse.success(memberService.getMonthSignInDays(userId));
+    }
+
+    /**
      * 生成邀请链接
      */
     @GetMapping("/invitation/generate")

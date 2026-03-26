@@ -58,6 +58,15 @@
     <!-- 修改手机号对话框 -->
     <el-dialog v-model="showPhoneDialog" title="修改手机号" width="460px" destroy-on-close>
       <el-form ref="phoneFormRef" :model="phoneForm" :rules="phoneRules" label-width="100px">
+        <el-form-item>
+          <el-alert
+            title="验证码将发送至您的注册邮箱，请注意查收"
+            type="info"
+            :closable="false"
+            show-icon
+          />
+        </el-form-item>
+
         <el-form-item label="新手机号" prop="newPhone">
           <el-input
             v-model="phoneForm.newPhone"
@@ -71,19 +80,19 @@
           </el-input>
         </el-form-item>
 
-        <el-form-item label="验证码" prop="smsCode">
+        <el-form-item label="邮箱验证码" prop="emailCode">
           <div class="sms-input">
             <el-input
-              v-model="phoneForm.smsCode"
-              placeholder="请输入验证码"
+              v-model="phoneForm.emailCode"
+              placeholder="请输入邮箱验证码"
               maxlength="6"
               clearable
             />
             <el-button
               type="primary"
-              :disabled="smsCooldown > 0 || !phoneForm.newPhone"
+              :disabled="smsCooldown > 0"
               :loading="smsSending"
-              @click="handleSendSms"
+              @click="handleSendEmailCode"
             >
               {{ smsCooldown > 0 ? `${smsCooldown}s后重试` : '发送验证码' }}
             </el-button>
@@ -139,8 +148,7 @@ const smsCooldown = ref(0)
 let cooldownTimer = null
 const phoneForm = reactive({
   newPhone: '',
-  smsCode: '',
-  smsKey: ''
+  emailCode: ''
 })
 
 const rules = {
@@ -159,7 +167,7 @@ const phoneRules = {
     { required: true, message: '请输入手机号', trigger: 'blur' },
     { pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号', trigger: 'blur' }
   ],
-  smsCode: [
+  emailCode: [
     { required: true, message: '请输入验证码', trigger: 'blur' },
     { len: 6, message: '验证码为6位数字', trigger: 'blur' }
   ]
@@ -215,24 +223,13 @@ const handleSave = async () => {
   }
 }
 
-// 发送短信验证码
-const handleSendSms = async () => {
-  // 先验证手机号
-  try {
-    await phoneFormRef.value?.validateField('newPhone')
-  } catch {
-    return
-  }
-
+// 发送邮箱验证码（修改手机号）
+const handleSendEmailCode = async () => {
   smsSending.value = true
   try {
-    const response = await api.post('/user/sms/send', {
-      phone: phoneForm.newPhone
-    })
-
+    const response = await api.post('/user/email-code/send')
     if (response.data.code === 200) {
-      phoneForm.smsKey = response.data.data.smsKey
-      message.success('验证码已发送')
+      message.success(response.data.message || '验证码已发送到您的注册邮箱')
       startCooldown()
     } else {
       message.error(response.data.message || '发送失败')
@@ -264,17 +261,11 @@ const handleChangePhone = async () => {
     const valid = await phoneFormRef.value.validate()
     if (!valid) return
 
-    if (!phoneForm.smsKey) {
-      message.warning('请先获取验证码')
-      return
-    }
-
     phoneLoading.value = true
 
     const response = await api.put('/user/phone', {
       newPhone: phoneForm.newPhone,
-      smsCode: phoneForm.smsCode,
-      smsKey: phoneForm.smsKey
+      emailCode: phoneForm.emailCode
     })
 
     if (response.data.code === 200) {
@@ -284,8 +275,7 @@ const handleChangePhone = async () => {
       showPhoneDialog.value = false
       // 重置表单
       phoneForm.newPhone = ''
-      phoneForm.smsCode = ''
-      phoneForm.smsKey = ''
+      phoneForm.emailCode = ''
     } else {
       message.error(response.data.message || '修改失败')
     }

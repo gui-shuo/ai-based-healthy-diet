@@ -3,7 +3,7 @@
     <!-- 用户头像和基本信息 -->
     <div class="user-card">
       <div class="avatar-wrapper">
-        <el-avatar :size="80" :src="userInfo?.avatar" class="avatar">
+        <el-avatar :key="userInfo?.avatar" :size="80" :src="userInfo?.avatar" class="avatar">
           <img src="https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png" />
         </el-avatar>
         <el-button class="avatar-btn" size="small" circle @click="emit('change', 'edit')">

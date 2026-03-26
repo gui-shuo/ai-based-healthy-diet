@@ -29,10 +29,14 @@ public class UserService {
     private final BCryptPasswordEncoder passwordEncoder;
     private final RedisTemplate<String, Object> redisTemplate;
     private final SmsProvider smsProvider;
-    
+    private final EmailService emailService;
+
     private static final String SMS_CODE_PREFIX = "sms:code:";
     private static final int SMS_CODE_EXPIRE_MINUTES = 5;
     private static final int SMS_CODE_LENGTH = 6;
+
+    private static final String PHONE_CHANGE_EMAIL_CODE_PREFIX = "phone_change:email:code:";
+    private static final int PHONE_CHANGE_CODE_EXPIRE_MINUTES = 5;
     
     /**
      * 获取用户资料
@@ -157,53 +161,86 @@ public class UserService {
     }
     
     /**
-     * 修改手机号
+     * 发送邮箱验证码（用于修改手机号）
+     */
+    public void sendEmailCodeForPhoneChange(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> BusinessException.User.userNotFound());
+
+        String email = user.getEmail();
+        if (email == null || email.isBlank()) {
+            throw new BusinessException(40113, "该账号未绑定邮箱，请先绑定邮箱后再修改手机号");
+        }
+
+        // 防刷限制：60秒内不重复发送
+        String rateLimitKey = "phone_change:email:rate:" + userId;
+        if (Boolean.TRUE.equals(redisTemplate.hasKey(rateLimitKey))) {
+            throw new BusinessException(40111, "验证码发送过于频繁，请60秒后再试");
+        }
+
+        String code = generateSmsCode();
+        String redisKey = PHONE_CHANGE_EMAIL_CODE_PREFIX + userId;
+        redisTemplate.opsForValue().set(redisKey, code, PHONE_CHANGE_CODE_EXPIRE_MINUTES, TimeUnit.MINUTES);
+        redisTemplate.opsForValue().set(rateLimitKey, "1", 60, TimeUnit.SECONDS);
+
+        emailService.sendPhoneChangeCode(email, user.getUsername(), code);
+        log.info("手机号修改邮箱验证码已发送: userId={}, email={}", userId, email);
+    }
+
+    /**
+     * 修改手机号（使用邮箱验证码）
      */
     @Transactional
     public void changePhone(Long userId, ChangePhoneRequest request) {
-        // 验证短信验证码
-        validateSmsCode(request.getSmsKey(), request.getSmsCode());
-        
+        // 验证邮箱验证码
+        String redisKey = PHONE_CHANGE_EMAIL_CODE_PREFIX + userId;
+        String storedCode = (String) redisTemplate.opsForValue().get(redisKey);
+        if (storedCode == null) {
+            throw new BusinessException(40114, "验证码已过期，请重新获取");
+        }
+        if (!storedCode.equalsIgnoreCase(request.getEmailCode())) {
+            throw new BusinessException(40115, "验证码错误，请重新输入");
+        }
+
         // 检查新手机号是否已被使用
         if (userRepository.existsByPhone(request.getNewPhone())) {
             throw BusinessException.User.phoneAlreadyExists();
         }
-        
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> BusinessException.User.userNotFound());
-        
+
         user.setPhone(request.getNewPhone());
         userRepository.save(user);
-        
+
         // 删除已使用的验证码
-        String redisKey = SMS_CODE_PREFIX + request.getSmsKey();
         redisTemplate.delete(redisKey);
-        
+
         log.info("用户手机号修改成功: userId={}, newPhone={}", userId, request.getNewPhone());
     }
-    
+
     /**
-     * 验证短信验证码
+     * 验证短信验证码（保留，供其他场景使用）
      */
     private void validateSmsCode(String key, String code) {
         if (key == null || code == null) {
             throw BusinessException.User.smsCodeInvalid();
         }
-        
+
         String redisKey = SMS_CODE_PREFIX + key;
         String storedCode = (String) redisTemplate.opsForValue().get(redisKey);
-        
+
         if (storedCode == null) {
             throw BusinessException.User.smsCodeExpired();
         }
-        
+
         if (!storedCode.equalsIgnoreCase(code)) {
             throw BusinessException.User.smsCodeInvalid();
         }
     }
-    
+
     /**
-     * 生成短信验证码（使用安全随机数）
+     * 生成验证码（使用安全随机数）
      */
     private String generateSmsCode() {
         SecureRandom random = new SecureRandom();

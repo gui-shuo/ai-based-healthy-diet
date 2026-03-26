@@ -279,21 +279,74 @@ public class FoodRecognitionServiceV2 {
                 .build();
                 
         } catch (Exception e) {
-            log.error("AI估算失败", e);
-            // 返回默认值
+            log.error("AI估算失败，食物: {}，原因: {}（请检查 TONGYI_API_KEY 是否已配置）", foodName, e.getMessage());
+            double[] fallback = getFallbackNutrition(foodName);
             return FoodItem.builder()
                 .name(foodName)
-                .confidence(0.5)
+                .confidence(0.3)
                 .nutrition(FoodItem.NutritionInfo.builder()
-                    .energy(100.0)
-                    .protein(5.0)
-                    .carbohydrate(15.0)
-                    .fat(2.0)
-                    .fiber(1.0)
+                    .energy(fallback[0])
+                    .protein(fallback[1])
+                    .carbohydrate(fallback[2])
+                    .fat(fallback[3])
+                    .fiber(fallback[4])
                     .source("default")
                     .build())
                 .build();
         }
+    }
+
+    /**
+     * 根据食物名称关键词提供分类兜底营养数据（每100g）
+     * 仅在数据库和AI均无法提供数据时使用
+     */
+    private double[] getFallbackNutrition(String name) {
+        if (name == null) return new double[]{150, 8.0, 20.0, 5.0, 1.5};
+        // 肉类/蛋类：高蛋白
+        if (name.contains("肉") || name.contains("鸡") || name.contains("鱼") ||
+                name.contains("牛") || name.contains("猪") || name.contains("羊") ||
+                name.contains("虾") || name.contains("蛋") || name.contains("鸭") ||
+                name.contains("腿") || name.contains("翅") || name.contains("排")) {
+            return new double[]{180, 20.0, 2.0, 10.0, 0.0};
+        }
+        // 蔬菜类：低热低脂高纤
+        if (name.contains("菜") || name.contains("瓜") || name.contains("茄") ||
+                name.contains("萝卜") || name.contains("韭") || name.contains("菠") ||
+                name.contains("芹") || name.contains("葱") || name.contains("蒜") ||
+                name.contains("椒") || name.contains("笋") || name.contains("花椰")) {
+            return new double[]{25, 2.0, 4.0, 0.3, 2.0};
+        }
+        // 豆制品：高蛋白高纤
+        if (name.contains("豆") || name.contains("腐") || name.contains("浆")) {
+            return new double[]{80, 8.0, 4.0, 4.0, 1.5};
+        }
+        // 水果类
+        if (name.contains("果") || name.contains("莓") || name.contains("桃") ||
+                name.contains("橙") || name.contains("柚") || name.contains("梨") ||
+                name.contains("苹") || name.contains("香蕉") || name.contains("葡萄") ||
+                name.contains("芒果") || name.contains("菠萝") || name.contains("柠檬")) {
+            return new double[]{60, 0.8, 15.0, 0.2, 1.5};
+        }
+        // 主食/淀粉类：高碳水
+        if (name.contains("饭") || name.contains("面") || name.contains("包") ||
+                name.contains("糕") || name.contains("粥") || name.contains("米") ||
+                name.contains("饺") || name.contains("馒") || name.contains("饼") ||
+                name.contains("面条") || name.contains("粉")) {
+            return new double[]{200, 5.0, 40.0, 1.5, 0.5};
+        }
+        // 乳制品
+        if (name.contains("奶") || name.contains("乳") || name.contains("酸奶") ||
+                name.contains("芝士") || name.contains("奶酪")) {
+            return new double[]{65, 3.5, 5.0, 3.0, 0.0};
+        }
+        // 油脂/坚果类：高脂
+        if (name.contains("油") || name.contains("坚果") || name.contains("花生") ||
+                name.contains("核桃") || name.contains("腰果") || name.contains("杏仁") ||
+                name.contains("芝麻")) {
+            return new double[]{580, 15.0, 15.0, 55.0, 3.0};
+        }
+        // 通用兜底
+        return new double[]{150, 8.0, 20.0, 5.0, 1.5};
     }
     
     /**

@@ -9,6 +9,7 @@
           @mousemove="onDrag"
           @mouseup="endDrag"
           @mouseleave="endDrag"
+          @wheel.prevent="onWheel"
         />
       </div>
 
@@ -216,6 +217,13 @@ const onDrag = e => {
 // 拖拽结束
 const endDrag = () => {
   isDragging.value = false
+}
+
+// 鼠标滚轮缩放
+const onWheel = e => {
+  const delta = e.deltaY > 0 ? -0.1 : 0.1
+  scale.value = Math.min(3, Math.max(0.5, scale.value + delta))
+  updateCanvas()
 }
 
 // 确认裁剪

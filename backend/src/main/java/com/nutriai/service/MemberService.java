@@ -165,6 +165,23 @@ public class MemberService {
     }
 
     /**
+     * 获取当月签到日期列表（日 number 列表）
+     */
+    public java.util.List<Integer> getMonthSignInDays(Long userId) {
+        java.time.LocalDate today = java.time.LocalDate.now();
+        LocalDateTime monthStart = today.withDayOfMonth(1).atStartOfDay();
+        LocalDateTime monthEnd   = today.plusMonths(1).withDayOfMonth(1).atStartOfDay();
+
+        return growthRecordRepository.findByUserIdAndDateRange(userId, monthStart, monthEnd)
+                .stream()
+                .filter(r -> "SIGN_IN".equals(r.getGrowthType()))
+                .map(r -> r.getCreatedAt().getDayOfMonth())
+                .distinct()
+                .sorted()
+                .collect(Collectors.toList());
+    }
+
+    /**
      * 每日签到
      *
      * @return 成长值（0表示今日已签到）

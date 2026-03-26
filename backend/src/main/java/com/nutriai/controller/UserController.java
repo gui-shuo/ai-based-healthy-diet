@@ -63,16 +63,19 @@ public class UserController {
     }
     
     /**
-     * 发送短信验证码
+     * 发送邮箱验证码（用于修改手机号，验证码发往当前绑定邮箱）
      */
-    @PostMapping("/sms/send")
-    public ApiResponse<SmsCodeResponse> sendSmsCode(@Valid @RequestBody SendSmsRequest request) {
-        SmsCodeResponse response = userService.sendSmsCode(request.getPhone());
-        return ApiResponse.success(response);
+    @PostMapping("/email-code/send")
+    public ApiResponse<Void> sendEmailCodeForPhoneChange(HttpServletRequest httpRequest) {
+        Long userId = getUserIdFromToken(httpRequest);
+        userService.sendEmailCodeForPhoneChange(userId);
+        ApiResponse<Void> response = ApiResponse.success();
+        response.setMessage("验证码已发送到您的注册邮箱，5分钟内有效");
+        return response;
     }
-    
+
     /**
-     * 修改手机号
+     * 修改手机号（使用邮箱验证码）
      */
     @PutMapping("/phone")
     public ApiResponse<Void> changePhone(

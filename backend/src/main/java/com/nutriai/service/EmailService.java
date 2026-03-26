@@ -27,6 +27,15 @@ public class EmailService {
     private String nickname;
     
     /**
+     * 发送手机号修改验证码
+     */
+    public void sendPhoneChangeCode(String toEmail, String username, String code) {
+        String subject = "【NutriAI】手机号修改验证码";
+        String content = buildPhoneChangeCodeHtml(username, code);
+        sendHtmlMail(toEmail, subject, content);
+    }
+
+    /**
      * 发送密码重置验证码
      */
     public void sendResetCode(String toEmail, String username, String code) {
@@ -79,6 +88,40 @@ public class EmailService {
                   <p style="color:#999;font-size:13px;line-height:1.6;">
                     ⏰ 验证码有效期为 <strong>15分钟</strong>，请尽快使用。<br>
                     🔒 如果您没有进行此操作，请忽略此邮件，您的账号仍然安全。
+                  </p>
+                </div>
+                <div style="background:#f8f9fa;padding:16px;text-align:center;border-top:1px solid #eee;">
+                  <p style="color:#aaa;font-size:12px;margin:0;">此邮件由系统自动发送，请勿直接回复</p>
+                </div>
+              </div>
+            </body>
+            </html>
+            """.formatted(username, code);
+    }
+
+    /**
+     * 构建手机号修改验证码邮件HTML
+     */
+    private String buildPhoneChangeCodeHtml(String username, String code) {
+        return """
+            <!DOCTYPE html>
+            <html>
+            <head><meta charset="UTF-8"></head>
+            <body style="margin:0;padding:0;background-color:#f4f4f4;font-family:'Microsoft YaHei',Arial,sans-serif;">
+              <div style="max-width:600px;margin:40px auto;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.1);">
+                <div style="background:linear-gradient(135deg,#667eea 0%%,#764ba2 100%%);padding:30px;text-align:center;">
+                  <h1 style="color:#ffffff;margin:0;font-size:28px;">🥗 NutriAI</h1>
+                  <p style="color:rgba(255,255,255,0.85);margin:8px 0 0;font-size:14px;">AI健康饮食规划助手</p>
+                </div>
+                <div style="padding:32px;">
+                  <p style="color:#333;font-size:16px;">您好，<strong>%s</strong>：</p>
+                  <p style="color:#555;font-size:14px;line-height:1.8;">您正在修改绑定的手机号，请使用以下验证码完成身份验证：</p>
+                  <div style="text-align:center;margin:28px 0;">
+                    <span style="display:inline-block;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;font-size:32px;font-weight:bold;letter-spacing:8px;padding:16px 40px;border-radius:8px;">%s</span>
+                  </div>
+                  <p style="color:#999;font-size:13px;line-height:1.6;">
+                    ⏰ 验证码有效期为 <strong>5分钟</strong>，请尽快使用。<br>
+                    🔒 如果您没有发起此操作，请忽略此邮件并注意账号安全。
                   </p>
                 </div>
                 <div style="background:#f8f9fa;padding:16px;text-align:center;border-top:1px solid #eee;">

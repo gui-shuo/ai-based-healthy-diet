@@ -179,31 +179,38 @@ public class FoodRecordController {
         log.info("上传食物照片并识别: userId={}, filename={}, size={}", 
                  userId, file.getOriginalFilename(), file.getSize());
         
+        // 1. 先上传照片，单独处理，确保 photoUrl 始终可用
+        String photoUrl;
         try {
-            // 1. 上传照片到OSS
-            String photoUrl = ossService.uploadFoodPhoto(file);
-            
-            // 2. 调用图像识别服务
+            photoUrl = ossService.uploadFoodPhoto(file);
+        } catch (Exception e) {
+            log.error("食物照片上传失败", e);
+            return ApiResponse.error("照片上传失败，请检查存储服务配置");
+        }
+
+        // 2. 尝试 AI 识别，识别失败不影响照片 URL 的返回
+        try {
             FoodRecognitionResult result = foodRecognitionService.recognizeByImage(userId, file);
-            
-            // 3. 将上传后的URL设置到结果中
             result.setImageUrl(photoUrl);
-            
             return ApiResponse.success("识别成功", result);
         } catch (UnsupportedOperationException e) {
-            log.warn("图片识别功能未配置，仅返回上传结果: {}", e.getMessage());
-            // 即使识别未配置，也返回上传成功的URL
-            String photoUrl = ossService.uploadFoodPhoto(file);
-            FoodRecognitionResult result = FoodRecognitionResult.builder()
-                    .foods(java.util.List.of())
-                    .totalCount(0)
-                    .recognitionTime(0L)
-                    .imageUrl(photoUrl)
-                    .build();
-            return ApiResponse.success("照片上传成功，图片识别功能未启用", result);
+            log.warn("图片识别功能未配置: {}", e.getMessage());
+            return ApiResponse.success("照片已上传，图片识别功能未启用",
+                    FoodRecognitionResult.builder()
+                            .foods(java.util.List.of())
+                            .totalCount(0)
+                            .recognitionTime(0L)
+                            .imageUrl(photoUrl)
+                            .build());
         } catch (Exception e) {
-            log.error("上传并识别失败", e);
-            return ApiResponse.error("识别失败，请稍后重试");
+            log.error("图片识别失败，照片已保存: url={}", photoUrl, e);
+            return ApiResponse.success("照片已上传，AI识别失败，请手动填写营养信息",
+                    FoodRecognitionResult.builder()
+                            .foods(java.util.List.of())
+                            .totalCount(0)
+                            .recognitionTime(0L)
+                            .imageUrl(photoUrl)
+                            .build());
         }
     }
     

@@ -30,6 +30,7 @@
                   <el-dropdown-item command="food-recognition"> AI食物识别 </el-dropdown-item>
                   <el-dropdown-item command="food-records"> 饮食记录 </el-dropdown-item>
                   <el-dropdown-item command="membership"> 会员中心 </el-dropdown-item>
+                  <el-dropdown-item v-if="isAdmin" command="admin"> 管理后台 </el-dropdown-item>
                   <el-dropdown-item divided command="logout"> 退出登录 </el-dropdown-item>
                 </el-dropdown-menu>
               </template>
@@ -165,6 +166,7 @@ const siteName = computed(() => getConfig('system.site_name', 'AI健康饮食规
 
 const isLoggedIn = computed(() => authStore.isLoggedIn)
 const userName = computed(() => authStore.user?.username || '用户')
+const isAdmin = computed(() => authStore.isAdmin)
 
 // 页面加载时获取配置
 let stopAutoRefresh = null
@@ -215,6 +217,8 @@ const handleLogout = () => {
 const handleCommand = command => {
   if (command === 'logout') {
     handleLogout()
+  } else if (command === 'profile') {
+    if (route.path !== '/profile') router.push('/profile')
   } else if (command === 'ai-chat') {
     if (route.path !== '/ai-chat') router.push('/ai-chat')
   } else if (command === 'diet-plan') {
@@ -225,6 +229,8 @@ const handleCommand = command => {
     if (route.path !== '/food-records') router.push('/food-records')
   } else if (command === 'membership') {
     if (route.path !== '/membership') router.push('/membership')
+  } else if (command === 'admin') {
+    router.push('/admin/dashboard')
   }
 }
 

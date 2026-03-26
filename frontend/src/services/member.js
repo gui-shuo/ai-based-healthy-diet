@@ -13,6 +13,11 @@ export const getMemberInfo = () => api.get('/member/info')
 export const dailySignIn = () => api.post('/member/sign-in')
 
 /**
+ * 获取本月签到日期列表（日数字数组，如 [1,5,8]）
+ */
+export const getSignInCalendar = () => api.get('/member/sign-in/calendar')
+
+/**
  * 获取成长值记录（分页）
  * @param {number} page
  * @param {number} size

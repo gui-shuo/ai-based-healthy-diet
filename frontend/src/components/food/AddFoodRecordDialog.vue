@@ -186,6 +186,12 @@ const mealTypeList = getMealTypeList()
 const nutritionAutoFilled = ref(false)
 const recognitionSource = ref('')
 
+// 生成本地时区的日期时间字符串（避免 toISOString 返回 UTC 时间）
+const localNow = () => {
+  const now = new Date()
+  return new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 19)
+}
+
 const formData = reactive({
   mealType: 'BREAKFAST',
   foodName: '',
@@ -196,7 +202,7 @@ const formData = reactive({
   carbohydrates: null,
   fat: null,
   fiber: null,
-  recordTime: new Date().toISOString().slice(0, 19),
+  recordTime: localNow(),
   notes: ''
 })
 
@@ -326,7 +332,7 @@ const handleClose = () => {
     carbohydrates: null,
     fat: null,
     fiber: null,
-    recordTime: new Date().toISOString().slice(0, 19),
+    recordTime: localNow(),
     notes: ''
   })
   nutritionAutoFilled.value = false
