@@ -65,6 +65,14 @@
 
     <!-- 支付按钮 -->
     <div class="pay-action">
+      <div class="pay-type-select">
+        <span class="pay-type-label">支付方式：</span>
+        <el-radio-group v-model="payType" size="small">
+          <el-radio-button value="alipay">支付宝</el-radio-button>
+          <el-radio-button value="wxpay">微信支付</el-radio-button>
+          <el-radio-button value="qqpay">QQ钱包</el-radio-button>
+        </el-radio-group>
+      </div>
       <el-button
         type="primary"
         size="large"
@@ -74,11 +82,11 @@
         @click="handlePay"
       >
         <el-icon><CreditCard /></el-icon>
-        立即开通 · 支付宝支付
+        立即开通
       </el-button>
       <div class="pay-tip">
         <el-icon><Lock /></el-icon>
-        安全加密 · 支持退款 · 自动续期到期提醒
+        安全加密 · 支持多种支付方式
       </div>
     </div>
 
@@ -120,10 +128,10 @@
       </template>
     </el-dialog>
 
-    <!-- 支付确认 Dialog（包含支付宝跳转 HTML） -->
+    <!-- 支付确认 Dialog -->
     <el-dialog
       v-model="payDialogVisible"
-      title="支付宝支付"
+      title="完成支付"
       width="500px"
       :close-on-click-modal="false"
       @closed="handlePayDialogClose"
@@ -144,16 +152,16 @@
         <div class="pay-expired" v-else>订单已超时，请重新下单</div>
 
         <div class="pay-buttons">
-          <el-button type="primary" size="large" :disabled="countdown <= 0" @click="openAlipayPage">
+          <el-button type="primary" size="large" :disabled="countdown <= 0" @click="openPayPage">
             <el-icon><CreditCard /></el-icon>
-            跳转支付宝完成支付
+            打开支付页面
           </el-button>
           <el-button type="success" size="large" :loading="queryLoading" @click="manualQueryStatus">
             <el-icon><Refresh /></el-icon>
             我已完成支付
           </el-button>
         </div>
-        <p class="pay-hint">点击"跳转支付宝"后，在新标签完成支付，返回此处点击"我已完成支付"</p>
+        <p class="pay-hint">点击"打开支付页面"后，在新标签完成支付，返回此处点击"我已完成支付"</p>
       </div>
     </el-dialog>
   </el-card>
@@ -181,7 +189,8 @@ const vipStatus = ref(null)
 const payLoading = ref(false)
 const payDialogVisible = ref(false)
 const pendingOrder = ref(null)
-const pendingPayForm = ref('') // 支付宝 HTML form
+const pendingPayUrl = ref('') // 支付跳转 URL
+const payType = ref('alipay') // 支付方式
 
 // 倒计时
 const countdown = ref(0)
@@ -242,10 +251,10 @@ async function handlePay() {
   if (!selectedPlanId.value) return
   payLoading.value = true
   try {
-    const res = await createVipOrder(selectedPlanId.value)
+    const res = await createVipOrder(selectedPlanId.value, payType.value)
     if (res.data.code === 200) {
       pendingOrder.value = res.data.data
-      pendingPayForm.value = res.data.data.payUrl
+      pendingPayUrl.value = res.data.data.payUrl
       payDialogVisible.value = true
       startCountdown()
       startPolling()
@@ -260,14 +269,10 @@ async function handlePay() {
   }
 }
 
-function openAlipayPage() {
-  if (!pendingPayForm.value) return
-  // 使用 Blob URL 安全打开支付宝表单，避免 document.write XSS 风险
-  const blob = new Blob([pendingPayForm.value], { type: 'text/html; charset=utf-8' })
-  const url = URL.createObjectURL(blob)
-  window.open(url, '_blank')
-  // 延迟释放 URL 确保页面加载完成
-  setTimeout(() => URL.revokeObjectURL(url), 5000)
+function openPayPage() {
+  if (!pendingPayUrl.value) return
+  // 直接打开支付跳转URL
+  window.open(pendingPayUrl.value, '_blank')
 }
 
 async function manualQueryStatus() {
@@ -304,7 +309,7 @@ function handlePaySuccess() {
 function handlePayDialogClose() {
   clearTimers()
   pendingOrder.value = null
-  pendingPayForm.value = ''
+  pendingPayUrl.value = ''
 }
 
 function startCountdown() {

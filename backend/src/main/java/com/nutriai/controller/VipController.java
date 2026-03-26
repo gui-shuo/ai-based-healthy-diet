@@ -35,14 +35,14 @@ public class VipController {
     }
 
     /**
-     * 创建充值订单（返回支付宝支付表单HTML）
+     * 创建充值订单（返回支付跳转URL）
      */
     @PostMapping("/orders")
     public ApiResponse<VipOrderResponse> createOrder(
             @Valid @RequestBody VipOrderRequest request,
             HttpServletRequest httpRequest) {
         Long userId = getUserId(httpRequest);
-        VipOrderResponse resp = vipService.createOrder(userId, request.getPlanId());
+        VipOrderResponse resp = vipService.createOrder(userId, request.getPlanId(), request.getPayType());
         return ApiResponse.success(resp);
     }
 
@@ -79,15 +79,36 @@ public class VipController {
     }
 
     /**
-     * 支付宝异步回调通知（无需登录，由支付宝服务器主动调用）
+     * 易支付异步回调通知（无需登录，由支付平台服务器主动调用）
      * URL 须配置在 SecurityConfig 白名单中
      */
-    @PostMapping("/alipay/notify")
-    public String alipayNotify(HttpServletRequest request) {
+    @PostMapping("/epay/notify")
+    public String ePayNotify(HttpServletRequest request) {
         Map<String, String> params = extractRequestParams(request);
-        log.info("收到支付宝回调, tradeStatus={}, orderNo={}",
+        log.info("收到易支付回调, tradeStatus={}, orderNo={}",
                 params.get("trade_status"), params.get("out_trade_no"));
-        return vipService.handleAlipayNotify(params);
+        return vipService.handleEPayNotify(params);
+    }
+
+    /**
+     * 易支付同步跳转（用户支付完成后浏览器回跳）
+     * 不做业务处理，仅验签后重定向到前端
+     */
+    @GetMapping("/epay/return")
+    public void ePayReturn(HttpServletRequest request, jakarta.servlet.http.HttpServletResponse response) throws Exception {
+        Map<String, String> params = extractRequestParams(request);
+        log.info("收到易支付同步回跳, orderNo={}", params.get("out_trade_no"));
+        // 重定向到前端会员页面
+        String orderNo = params.get("out_trade_no");
+        String frontendUrl = System.getenv("CORS_ALLOWED_ORIGINS");
+        if (frontendUrl == null || frontendUrl.isBlank()) {
+            frontendUrl = "http://localhost:5173";
+        }
+        // 取第一个origin（可能是逗号分隔列表）
+        if (frontendUrl.contains(",")) {
+            frontendUrl = frontendUrl.split(",")[0].trim();
+        }
+        response.sendRedirect(frontendUrl + "/membership?orderNo=" + (orderNo != null ? orderNo : ""));
     }
 
     // ---- 私有工具方法 ----

@@ -119,14 +119,16 @@ sms:
     sign-name: ${SMS_SIGN_NAME:NutriAI}
     template-id: ${SMS_TEMPLATE_ID:}
 
-# 支付宝支付配置（sandbox=true时使用沙箱环境，需填入沙箱凭证）
-alipay:
-  sandbox: ${ALIPAY_SANDBOX:true}
-  app-id: ${ALIPAY_APP_ID:}
-  private-key: ${ALIPAY_PRIVATE_KEY:}
-  alipay-public-key: ${ALIPAY_PUBLIC_KEY:}
-  notify-url: ${ALIPAY_NOTIFY_URL:http://localhost:8080/api/vip/alipay/notify}
-  return-url: ${ALIPAY_RETURN_URL:http://localhost:3000/vip/payment-result}
+# 易支付（EPay）第三方聚合支付配置
+epay:
+  merchant-id: ${EPAY_MERCHANT_ID:}
+  merchant-key: ${EPAY_MERCHANT_KEY:}
+  api-url: ${EPAY_API_URL:}
+  submit-url: ${EPAY_SUBMIT_URL:}
+  mapi-url: ${EPAY_MAPI_URL:}
+  notify-url: ${EPAY_NOTIFY_URL:http://localhost:8080/api/vip/epay/notify}
+  return-url: ${EPAY_RETURN_URL:http://localhost:8080/api/vip/epay/return}
+  default-type: alipay
 
 # 日志配置
 logging:

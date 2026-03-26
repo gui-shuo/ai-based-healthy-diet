@@ -1,6 +1,5 @@
 package com.nutriai.service;
 
-import com.alipay.api.response.AlipayTradeQueryResponse;
 import com.nutriai.dto.vip.*;
 import com.nutriai.entity.VipOrder;
 import com.nutriai.entity.VipPlan;
@@ -35,7 +34,7 @@ public class VipService {
 
     private final VipPlanRepository vipPlanRepository;
     private final VipOrderRepository vipOrderRepository;
-    private final AlipayService alipayService;
+    private final EPayService ePayService;
     private final MemberService memberService;
 
     private static final int ORDER_TIMEOUT_MINUTES = 30;
@@ -55,10 +54,19 @@ public class VipService {
     // ========== 订单相关 ==========
 
     /**
-     * 创建充值订单并生成支付宝支付表单
+     * 创建充值订单并生成支付跳转URL
      */
     @Transactional
     public VipOrderResponse createOrder(Long userId, Long planId) {
+        return createOrder(userId, planId, null);
+    }
+
+    /**
+     * 创建充值订单并生成支付跳转URL（支持选择支付方式）
+     * @param payType 支付方式：alipay/wxpay/qqpay，默认alipay
+     */
+    @Transactional
+    public VipOrderResponse createOrder(Long userId, Long planId, String payType) {
         VipPlan plan = vipPlanRepository.findById(planId)
                 .orElseThrow(() -> new BusinessException("套餐不存在"));
 
@@ -69,11 +77,10 @@ public class VipService {
         // 生成唯一订单号
         String orderNo = generateOrderNo();
 
-        // 检查是否有未支付的同套餐订单（防止重复下单）
-        // 此处简化处理：直接创建新订单，旧 PENDING 订单自动超时后取消
-
         // 计算订单有效期（30分钟内完成支付）
         LocalDateTime expireTime = LocalDateTime.now().plusMinutes(ORDER_TIMEOUT_MINUTES);
+
+        String method = resolvePaymentMethod(payType);
 
         VipOrder order = VipOrder.builder()
                 .orderNo(orderNo)
@@ -81,37 +88,37 @@ public class VipService {
                 .planId(planId)
                 .planName(plan.getPlanName())
                 .amount(plan.getDiscountPrice())
-                .paymentMethod("ALIPAY")
+                .paymentMethod(method)
                 .paymentStatus("PENDING")
                 .expireTime(expireTime)
                 .build();
         order = vipOrderRepository.save(order);
 
-        // 调用支付宝生成支付表单（未配置时返回友好提示）
-        if (!alipayService.isConfigured()) {
-            log.warn("支付宝未配置，orderNo={}", orderNo);
-            throw new BusinessException("支付功能暂未开通，请联系管理员配置支付宝参数");
+        // 调用易支付生成支付跳转URL（未配置时返回友好提示）
+        if (!ePayService.isConfigured()) {
+            log.warn("易支付未配置，orderNo={}", orderNo);
+            throw new BusinessException("支付功能暂未开通，请联系管理员配置支付参数");
         }
 
-        // 调用支付宝生成支付表单
-        String payForm = alipayService.createPagePayForm(
+        // 构建支付跳转URL
+        String payUrl = ePayService.buildPayUrl(
                 orderNo,
                 plan.getDiscountPrice(),
                 "NutriAI " + plan.getPlanName(),
-                ORDER_TIMEOUT_MINUTES
+                payType
         );
 
-        log.info("VIP订单创建成功, userId={}, orderNo={}, plan={}", userId, orderNo, plan.getPlanName());
+        log.info("VIP订单创建成功, userId={}, orderNo={}, plan={}, payType={}", userId, orderNo, plan.getPlanName(), method);
 
         return VipOrderResponse.builder()
                 .id(order.getId())
                 .orderNo(orderNo)
                 .planName(plan.getPlanName())
                 .amount(plan.getDiscountPrice())
-                .paymentMethod("ALIPAY")
+                .paymentMethod(method)
                 .paymentStatus("PENDING")
                 .paymentStatusName("待支付")
-                .payUrl(payForm)   // 完整 HTML form，前端嵌入页面后自动跳转支付宝
+                .payUrl(payUrl)   // 支付跳转URL，前端直接 window.open
                 .expireTime(expireTime)
                 .createdAt(order.getCreatedAt())
                 .build();
@@ -141,19 +148,16 @@ public class VipService {
             return buildOrderResponse(order);
         }
 
-        // 向支付宝主动查询
+        // 向易支付主动查询订单状态
         try {
-            AlipayTradeQueryResponse resp = alipayService.queryTrade(orderNo);
-            if (resp.isSuccess()) {
-                String tradeStatus = resp.getTradeStatus();
-                if ("TRADE_SUCCESS".equals(tradeStatus) || "TRADE_FINISHED".equals(tradeStatus)) {
-                    if (!"PAID".equals(order.getPaymentStatus())) {
-                        handlePaySuccess(order, resp.getTradeNo(), null);
-                    }
+            String tradeStatus = ePayService.queryTradeStatus(orderNo);
+            if ("1".equals(tradeStatus) || "TRADE_SUCCESS".equals(tradeStatus)) {
+                if (!"PAID".equals(order.getPaymentStatus())) {
+                    handlePaySuccess(order, orderNo, null);
                 }
             }
         } catch (Exception e) {
-            log.warn("查询支付宝状态异常, orderNo={}: {}", orderNo, e.getMessage());
+            log.warn("查询易支付状态异常, orderNo={}: {}", orderNo, e.getMessage());
         }
 
         // 重新加载
@@ -162,15 +166,16 @@ public class VipService {
     }
 
     /**
-     * 处理支付宝异步回调通知
+     * 处理易支付异步回调通知
      *
-     * @param params 支付宝 POST 的所有参数（Map<String,String>）
+     * @param params 易支付 GET/POST 的所有参数
      */
     @Transactional
-    public String handleAlipayNotify(Map<String, String> params) {
+    public String handleEPayNotify(Map<String, String> params) {
         // 1. 验签
-        if (!alipayService.verifyNotify(params)) {
-            log.warn("支付宝回调验签失败, params={}", params);
+        String sign = params.get("sign");
+        if (!ePayService.verifyNotifySign(params, sign)) {
+            log.warn("易支付回调验签失败, params={}", params);
             return "fail";
         }
 
@@ -178,32 +183,45 @@ public class VipService {
         String outTradeNo  = params.get("out_trade_no");
         String tradeNo     = params.get("trade_no");
 
-        if (outTradeNo == null || tradeNo == null) {
-            log.warn("支付宝回调缺少必要参数");
+        if (outTradeNo == null) {
+            log.warn("易支付回调缺少必要参数 out_trade_no");
             return "fail";
         }
 
         VipOrder order = vipOrderRepository.findByOrderNo(outTradeNo).orElse(null);
         if (order == null) {
-            log.warn("支付宝回调找不到订单, orderNo={}", outTradeNo);
+            log.warn("易支付回调找不到订单, orderNo={}", outTradeNo);
             return "fail";
         }
 
-        // 2. 幂等：已处理则直接返回success
+        // 2. 校验金额（防篡改）
+        String money = params.get("money");
+        if (money != null) {
+            try {
+                BigDecimal notifyAmount = new BigDecimal(money);
+                if (notifyAmount.compareTo(order.getAmount()) != 0) {
+                    log.warn("易支付回调金额不匹配, orderNo={}, expected={}, actual={}", outTradeNo, order.getAmount(), notifyAmount);
+                    return "fail";
+                }
+            } catch (NumberFormatException e) {
+                log.warn("易支付回调金额格式错误: {}", money);
+            }
+        }
+
+        // 3. 幂等：已处理则直接返回success
         if ("PAID".equals(order.getPaymentStatus())) {
             log.info("订单已处理过，忽略重复回调, orderNo={}", outTradeNo);
             return "success";
         }
 
-        // 3. 处理支付成功
-        if ("TRADE_SUCCESS".equals(tradeStatus) || "TRADE_FINISHED".equals(tradeStatus)) {
-            // 裁剪notify_data防止超长
+        // 4. 处理支付成功
+        if ("TRADE_SUCCESS".equals(tradeStatus)) {
             String notifyData = params.toString();
             if (notifyData.length() > 2000) {
                 notifyData = notifyData.substring(0, 2000);
             }
-            handlePaySuccess(order, tradeNo, notifyData);
-            log.info("支付宝支付成功处理完成, orderNo={}", outTradeNo);
+            handlePaySuccess(order, tradeNo != null ? tradeNo : outTradeNo, notifyData);
+            log.info("易支付支付成功处理完成, orderNo={}", outTradeNo);
         }
 
         return "success";
@@ -302,6 +320,18 @@ public class VipService {
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
         String random = UUID.randomUUID().toString().replace("-", "").substring(0, 6).toUpperCase();
         return "VIP" + timestamp + random;
+    }
+
+    /**
+     * 将前端传入的支付类型映射为存储的支付方式名称
+     */
+    private String resolvePaymentMethod(String payType) {
+        if (payType == null || payType.isBlank()) return "EPAY_ALIPAY";
+        return switch (payType.toLowerCase()) {
+            case "wxpay" -> "EPAY_WXPAY";
+            case "qqpay" -> "EPAY_QQPAY";
+            default -> "EPAY_ALIPAY";
+        };
     }
 
     private boolean isTerminalStatus(String status) {

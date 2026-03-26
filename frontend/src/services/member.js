@@ -47,9 +47,11 @@ export const getVipPlans = () => api.get('/vip/plans')
 /**
  * 创建充值订单
  * @param {number} planId 套餐ID
+ * @param {string} payType 支付方式：alipay/wxpay/qqpay
  * @returns {{ orderNo, payUrl, expireTime, ... }}
  */
-export const createVipOrder = planId => api.post('/vip/orders', { planId, paymentMethod: 'ALIPAY' })
+export const createVipOrder = (planId, payType = 'alipay') =>
+  api.post('/vip/orders', { planId, payType })
 
 /**
  * 查询订单支付状态（前端轮询）

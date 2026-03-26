@@ -9,6 +9,6 @@ public class VipOrderRequest {
     @NotNull(message = "套餐ID不能为空")
     private Long planId;
 
-    /** 支付方式，目前仅支持 ALIPAY */
-    private String paymentMethod = "ALIPAY";
+    /** 支付方式：alipay/wxpay/qqpay（易支付聚合支付） */
+    private String payType = "alipay";
 }

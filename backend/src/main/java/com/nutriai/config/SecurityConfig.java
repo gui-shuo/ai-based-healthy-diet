@@ -56,7 +56,8 @@ public class SecurityConfig {
                                 "/announcements/**",  // 公告接口（公开访问）
                                 "/public/**",  // 公开配置接口
                                 "/vip/plans",  // VIP套餐列表（未登录可查看）
-                                "/vip/alipay/notify"  // 支付宝回调（服务端无Token）
+                                "/vip/epay/notify",  // 易支付异步回调（服务端无Token）
+                                "/vip/epay/return"   // 易支付同步跳转（浏览器重定向）
                         ).permitAll()
                         
                         // 其他所有请求都需要认证
