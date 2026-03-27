@@ -13,7 +13,7 @@ export const getNutritionists = () => api.get('/consultation/nutritionists')
 export const getOnlineNutritionists = () => api.get('/consultation/nutritionists/online')
 
 /** 获取营养师详情 */
-export const getNutritionistDetail = (id) => api.get(`/consultation/nutritionists/${id}`)
+export const getNutritionistDetail = id => api.get(`/consultation/nutritionists/${id}`)
 
 // === 咨询订单 ===
 
@@ -27,7 +27,7 @@ export const createConsultation = (nutritionistId, description, consultationType
   api.post('/consultation/orders', { nutritionistId, description, consultationType })
 
 /** 模拟支付咨询订单 */
-export const simulatePayConsultation = (orderNo) =>
+export const simulatePayConsultation = orderNo =>
   api.post(`/consultation/orders/${orderNo}/simulate-pay`)
 
 /** 发送咨询消息 */
@@ -35,7 +35,7 @@ export const sendConsultationMessage = (orderNo, content) =>
   api.post(`/consultation/orders/${orderNo}/messages`, { content, role: 'user' })
 
 /** 模拟营养师回复 */
-export const simulateNutritionistReply = (orderNo) =>
+export const simulateNutritionistReply = orderNo =>
   api.post(`/consultation/orders/${orderNo}/reply`)
 
 /**
@@ -48,7 +48,7 @@ export const completeConsultation = (orderNo, rating, review) =>
   api.post(`/consultation/orders/${orderNo}/complete`, { rating, review })
 
 /** 模拟退款 */
-export const simulateRefundConsultation = (orderNo) =>
+export const simulateRefundConsultation = orderNo =>
   api.post(`/consultation/orders/${orderNo}/simulate-refund`)
 
 /** 获取咨询订单历史 */

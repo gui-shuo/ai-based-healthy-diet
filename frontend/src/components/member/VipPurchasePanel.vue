@@ -163,23 +163,22 @@
         </div>
         <div class="pay-expired" v-else>订单已超时，请重新下单</div>
 
-        <el-alert
-          type="info"
-          :closable="false"
-          show-icon
-          style="margin: 16px 0"
-        >
+        <el-alert type="info" :closable="false" show-icon style="margin: 16px 0">
           <template #title>当前为模拟支付模式，点击下方按钮即可模拟支付成功</template>
         </el-alert>
 
         <div class="pay-buttons">
-          <el-button type="primary" size="large" :loading="queryLoading" :disabled="countdown <= 0" @click="confirmSimulatePayment">
+          <el-button
+            type="primary"
+            size="large"
+            :loading="queryLoading"
+            :disabled="countdown <= 0"
+            @click="confirmSimulatePayment"
+          >
             <el-icon><CreditCard /></el-icon>
             确认支付（模拟）
           </el-button>
-          <el-button size="large" @click="payDialogVisible = false">
-            取消
-          </el-button>
+          <el-button size="large" @click="payDialogVisible = false"> 取消 </el-button>
         </div>
         <p class="pay-hint">模拟支付模式：点击"确认支付"将自动完成支付流程，无需真实付款</p>
       </div>

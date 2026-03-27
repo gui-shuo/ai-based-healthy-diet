@@ -68,7 +68,9 @@
           >
             <div class="product-img">
               <img :src="p.imageUrl || defaultImg" :alt="p.name" />
-              <el-tag v-if="p.isRecommended" type="danger" size="small" class="rec-tag">推荐</el-tag>
+              <el-tag v-if="p.isRecommended" type="danger" size="small" class="rec-tag"
+                >推荐</el-tag
+              >
             </div>
             <div class="product-body">
               <h4 class="product-name">{{ p.name }}</h4>
@@ -79,7 +81,9 @@
               </div>
               <div class="product-price">
                 <span class="sale-price">¥{{ p.salePrice }}</span>
-                <span v-if="p.originalPrice > p.salePrice" class="orig-price">¥{{ p.originalPrice }}</span>
+                <span v-if="p.originalPrice > p.salePrice" class="orig-price"
+                  >¥{{ p.originalPrice }}</span
+                >
               </div>
               <div class="product-actions" @click.stop>
                 <el-button type="primary" size="small" @click.stop="addToCart(p)">
@@ -109,7 +113,9 @@
             </div>
             <div class="detail-price">
               <span class="sale-price">¥{{ detailProduct.salePrice }}</span>
-              <span v-if="detailProduct.originalPrice > detailProduct.salePrice" class="orig-price">¥{{ detailProduct.originalPrice }}</span>
+              <span v-if="detailProduct.originalPrice > detailProduct.salePrice" class="orig-price"
+                >¥{{ detailProduct.originalPrice }}</span
+              >
             </div>
             <div class="detail-stock">
               <el-tag :type="detailProduct.stock > 0 ? 'success' : 'danger'" size="small">
@@ -117,13 +123,30 @@
               </el-tag>
             </div>
             <div class="detail-tags" v-if="detailProduct.tags?.length">
-              <el-tag v-for="(t, i) in detailProduct.tags" :key="i" size="small" effect="plain" type="info">{{ t }}</el-tag>
+              <el-tag
+                v-for="(t, i) in detailProduct.tags"
+                :key="i"
+                size="small"
+                effect="plain"
+                type="info"
+                >{{ t }}</el-tag
+              >
             </div>
             <div class="detail-qty">
               <span>数量：</span>
-              <el-input-number v-model="detailQty" :min="1" :max="Math.min(detailProduct.stock, 10)" size="default" />
+              <el-input-number
+                v-model="detailQty"
+                :min="1"
+                :max="Math.min(detailProduct.stock, 10)"
+                size="default"
+              />
             </div>
-            <el-button type="primary" :disabled="detailProduct.stock <= 0" @click="addToCartFromDetail" style="margin-top: 16px; width: 100%">
+            <el-button
+              type="primary"
+              :disabled="detailProduct.stock <= 0"
+              @click="addToCartFromDetail"
+              style="margin-top: 16px; width: 100%"
+            >
               加入购物车
             </el-button>
           </div>
@@ -132,10 +155,17 @@
           <h3>产品介绍</h3>
           <p>{{ detailProduct.description }}</p>
         </div>
-        <div v-if="detailProduct.specifications && Object.keys(detailProduct.specifications).length" class="detail-specs">
+        <div
+          v-if="detailProduct.specifications && Object.keys(detailProduct.specifications).length"
+          class="detail-specs"
+        >
           <h3>规格参数</h3>
           <el-descriptions :column="2" border>
-            <el-descriptions-item v-for="(v, k) in detailProduct.specifications" :key="k" :label="k">
+            <el-descriptions-item
+              v-for="(v, k) in detailProduct.specifications"
+              :key="k"
+              :label="k"
+            >
               {{ v }}
             </el-descriptions-item>
           </el-descriptions>
@@ -153,7 +183,13 @@
             <div class="cart-info">
               <h4>{{ item.name }}</h4>
               <span class="cart-price">¥{{ item.salePrice }}</span>
-              <el-input-number v-model="item.quantity" :min="1" :max="10" size="small" @change="updateCartTotal" />
+              <el-input-number
+                v-model="item.quantity"
+                :min="1"
+                :max="10"
+                size="small"
+                @change="updateCartTotal"
+              />
             </div>
             <el-button type="danger" text size="small" @click="removeFromCart(idx)">
               <el-icon><Delete /></el-icon>
@@ -176,13 +212,27 @@
     <el-dialog v-model="checkoutVisible" title="确认订单" width="560px">
       <el-form label-position="top" :model="checkoutForm">
         <el-form-item label="收货人">
-          <el-input v-model="checkoutForm.receiverName" placeholder="请输入收货人姓名" maxlength="20" />
+          <el-input
+            v-model="checkoutForm.receiverName"
+            placeholder="请输入收货人姓名"
+            maxlength="20"
+          />
         </el-form-item>
         <el-form-item label="联系电话">
-          <el-input v-model="checkoutForm.receiverPhone" placeholder="请输入手机号" maxlength="11" />
+          <el-input
+            v-model="checkoutForm.receiverPhone"
+            placeholder="请输入手机号"
+            maxlength="11"
+          />
         </el-form-item>
         <el-form-item label="收货地址">
-          <el-input v-model="checkoutForm.receiverAddress" type="textarea" :rows="2" placeholder="请输入详细收货地址" maxlength="200" />
+          <el-input
+            v-model="checkoutForm.receiverAddress"
+            type="textarea"
+            :rows="2"
+            placeholder="请输入详细收货地址"
+            maxlength="200"
+          />
         </el-form-item>
         <el-form-item label="备注">
           <el-input v-model="checkoutForm.remark" placeholder="选填" maxlength="200" />
@@ -218,7 +268,11 @@
           <el-table-column label="订单号" prop="orderNo" min-width="150" />
           <el-table-column label="商品" min-width="150">
             <template #default="{ row }">
-              <div v-for="(item, i) in (row.items || []).slice(0, 2)" :key="i" class="order-item-name">
+              <div
+                v-for="(item, i) in (row.items || []).slice(0, 2)"
+                :key="i"
+                class="order-item-name"
+              >
                 {{ item.productName }} × {{ item.quantity }}
               </div>
               <span v-if="(row.items || []).length > 2">等{{ row.items.length }}件商品</span>
@@ -229,12 +283,16 @@
           </el-table-column>
           <el-table-column label="支付状态" width="90" align="center">
             <template #default="{ row }">
-              <el-tag :type="payStatusType(row.paymentStatus)" size="small">{{ payStatusText(row.paymentStatus) }}</el-tag>
+              <el-tag :type="payStatusType(row.paymentStatus)" size="small">{{
+                payStatusText(row.paymentStatus)
+              }}</el-tag>
             </template>
           </el-table-column>
           <el-table-column label="订单状态" width="90" align="center">
             <template #default="{ row }">
-              <el-tag :type="orderStatusType(row.orderStatus)" size="small">{{ orderStatusText(row.orderStatus) }}</el-tag>
+              <el-tag :type="orderStatusType(row.orderStatus)" size="small">{{
+                orderStatusText(row.orderStatus)
+              }}</el-tag>
             </template>
           </el-table-column>
           <el-table-column label="快递单号" width="120">
@@ -261,7 +319,7 @@
                 确认收货
               </el-button>
               <el-button
-                v-if="['PAID','SHIPPED','DELIVERED'].includes(row.orderStatus)"
+                v-if="['PAID', 'SHIPPED', 'DELIVERED'].includes(row.orderStatus)"
                 type="danger"
                 size="small"
                 text
@@ -297,7 +355,8 @@ import {
 } from '@/services/product'
 import message from '@/utils/message'
 
-const defaultImg = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iI2VlZSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjOTk5IiBmb250LXNpemU9IjE0Ij7ml6Dlm77niYc8L3RleHQ+PC9zdmc+'
+const defaultImg =
+  'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iI2VlZSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjOTk5IiBmb250LXNpemU9IjE0Ij7ml6Dlm77niYc8L3RleHQ+PC9zdmc+'
 
 // --- 状态 ---
 const productsLoading = ref(false)
@@ -452,7 +511,13 @@ async function handleCheckout() {
   try {
     const items = cart.value.map(c => ({ productId: c.productId, quantity: c.quantity }))
     // 1. 创建订单
-    const res = await createProductOrder({ items, receiverName, receiverPhone, receiverAddress, remark })
+    const res = await createProductOrder({
+      items,
+      receiverName,
+      receiverPhone,
+      receiverAddress,
+      remark
+    })
     if (res.data.code !== 200) {
       message.error(res.data.message || '创建订单失败')
       return
@@ -543,16 +608,30 @@ function payStatusText(s) {
   return { PAID: '已支付', PENDING: '待支付', REFUNDED: '已退款', EXPIRED: '已超时' }[s] || s
 }
 function orderStatusType(s) {
-  return {
-    PENDING_PAYMENT: 'warning', PAID: 'success', SHIPPED: '', DELIVERED: 'success',
-    COMPLETED: '', CANCELLED: 'info', REFUNDED: 'danger'
-  }[s] || 'info'
+  return (
+    {
+      PENDING_PAYMENT: 'warning',
+      PAID: 'success',
+      SHIPPED: '',
+      DELIVERED: 'success',
+      COMPLETED: '',
+      CANCELLED: 'info',
+      REFUNDED: 'danger'
+    }[s] || 'info'
+  )
 }
 function orderStatusText(s) {
-  return {
-    PENDING_PAYMENT: '待支付', PAID: '已支付', SHIPPED: '已发货', DELIVERED: '已送达',
-    COMPLETED: '已完成', CANCELLED: '已取消', REFUNDED: '已退款'
-  }[s] || s
+  return (
+    {
+      PENDING_PAYMENT: '待支付',
+      PAID: '已支付',
+      SHIPPED: '已发货',
+      DELIVERED: '已送达',
+      COMPLETED: '已完成',
+      CANCELLED: '已取消',
+      REFUNDED: '已退款'
+    }[s] || s
+  )
 }
 </script>
 
@@ -564,7 +643,7 @@ function orderStatusText(s) {
 
 .top-nav {
   background: #fff;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   position: sticky;
   top: 0;
   z-index: 100;
@@ -632,9 +711,15 @@ function orderStatusText(s) {
   grid-template-columns: repeat(4, 1fr);
   gap: 20px;
 
-  @media (max-width: 1100px) { grid-template-columns: repeat(3, 1fr); }
-  @media (max-width: 768px) { grid-template-columns: repeat(2, 1fr); }
-  @media (max-width: 480px) { grid-template-columns: 1fr; }
+  @media (max-width: 1100px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
+  }
 }
 
 .product-card {
@@ -643,9 +728,13 @@ function orderStatusText(s) {
   transition: transform 0.2s;
   overflow: hidden;
 
-  &:hover { transform: translateY(-4px); }
+  &:hover {
+    transform: translateY(-4px);
+  }
 
-  :deep(.el-card__body) { padding: 0; }
+  :deep(.el-card__body) {
+    padding: 0;
+  }
 
   .product-img {
     position: relative;
@@ -695,13 +784,25 @@ function orderStatusText(s) {
       gap: 8px;
       margin-bottom: 8px;
 
-      .sales { font-size: 12px; color: #9ca3af; }
+      .sales {
+        font-size: 12px;
+        color: #9ca3af;
+      }
     }
 
     .product-price {
       margin-bottom: 10px;
-      .sale-price { font-size: 20px; font-weight: 700; color: #f56c6c; }
-      .orig-price { font-size: 13px; color: #c0c4cc; text-decoration: line-through; margin-left: 8px; }
+      .sale-price {
+        font-size: 20px;
+        font-weight: 700;
+        color: #f56c6c;
+      }
+      .orig-price {
+        font-size: 13px;
+        color: #c0c4cc;
+        text-decoration: line-through;
+        margin-left: 8px;
+      }
     }
 
     .product-actions {
@@ -715,7 +816,9 @@ function orderStatusText(s) {
   display: flex;
   gap: 24px;
 
-  @media (max-width: 640px) { flex-direction: column; }
+  @media (max-width: 640px) {
+    flex-direction: column;
+  }
 
   .detail-img {
     width: 260px;
@@ -724,31 +827,81 @@ function orderStatusText(s) {
     overflow: hidden;
     background: #f9fafb;
 
-    img { width: 100%; aspect-ratio: 1; object-fit: cover; }
+    img {
+      width: 100%;
+      aspect-ratio: 1;
+      object-fit: cover;
+    }
   }
 
   .detail-info {
     flex: 1;
 
-    h2 { margin: 0 0 8px; font-size: 20px; }
-    .detail-brief { color: #6b7280; font-size: 14px; margin: 8px 0 12px; line-height: 1.5; }
-    .detail-rating { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; color: #9ca3af; font-size: 13px; }
+    h2 {
+      margin: 0 0 8px;
+      font-size: 20px;
+    }
+    .detail-brief {
+      color: #6b7280;
+      font-size: 14px;
+      margin: 8px 0 12px;
+      line-height: 1.5;
+    }
+    .detail-rating {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+      color: #9ca3af;
+      font-size: 13px;
+    }
     .detail-price {
       margin-bottom: 12px;
-      .sale-price { font-size: 28px; font-weight: 700; color: #f56c6c; }
-      .orig-price { font-size: 15px; color: #c0c4cc; text-decoration: line-through; margin-left: 8px; }
+      .sale-price {
+        font-size: 28px;
+        font-weight: 700;
+        color: #f56c6c;
+      }
+      .orig-price {
+        font-size: 15px;
+        color: #c0c4cc;
+        text-decoration: line-through;
+        margin-left: 8px;
+      }
     }
-    .detail-stock { margin-bottom: 12px; }
-    .detail-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 12px; }
-    .detail-qty { display: flex; align-items: center; gap: 8px; color: #6b7280; }
+    .detail-stock {
+      margin-bottom: 12px;
+    }
+    .detail-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-bottom: 12px;
+    }
+    .detail-qty {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #6b7280;
+    }
   }
 }
 
-.detail-desc, .detail-specs {
+.detail-desc,
+.detail-specs {
   margin-top: 24px;
 
-  h3 { font-size: 16px; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid #f3f4f6; }
-  p { color: #4b5563; line-height: 1.7; white-space: pre-wrap; }
+  h3 {
+    font-size: 16px;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #f3f4f6;
+  }
+  p {
+    color: #4b5563;
+    line-height: 1.7;
+    white-space: pre-wrap;
+  }
 }
 
 // === 购物车 ===
@@ -770,8 +923,16 @@ function orderStatusText(s) {
 
     .cart-info {
       flex: 1;
-      h4 { margin: 0 0 4px; font-size: 14px; }
-      .cart-price { color: #f56c6c; font-weight: 600; display: block; margin-bottom: 4px; }
+      h4 {
+        margin: 0 0 4px;
+        font-size: 14px;
+      }
+      .cart-price {
+        color: #f56c6c;
+        font-weight: 600;
+        display: block;
+        margin-bottom: 4px;
+      }
     }
   }
 }
@@ -802,7 +963,10 @@ function orderStatusText(s) {
   border-radius: 8px;
   margin-top: 16px;
 
-  h4 { margin: 0 0 8px; font-size: 14px; }
+  h4 {
+    margin: 0 0 8px;
+    font-size: 14px;
+  }
 
   .checkout-item {
     display: flex;

@@ -23,7 +23,7 @@ export const searchProducts = (keyword, page = 0, size = 12) =>
 export const getRecommendedProducts = () => api.get('/products/recommended')
 
 /** 获取产品详情 */
-export const getProductDetail = (id) => api.get(`/products/${id}`)
+export const getProductDetail = id => api.get(`/products/${id}`)
 
 /** 获取产品分类 */
 export const getProductCategories = () => api.get('/products/categories')
@@ -42,19 +42,17 @@ export const createProductOrder = (items, receiverName, receiverPhone, receiverA
   api.post('/products/orders', { items, receiverName, receiverPhone, receiverAddress, remark })
 
 /** 模拟支付 */
-export const simulatePayProduct = (orderNo) =>
-  api.post(`/products/orders/${orderNo}/simulate-pay`)
+export const simulatePayProduct = orderNo => api.post(`/products/orders/${orderNo}/simulate-pay`)
 
 /** 模拟发货 */
-export const simulateShipProduct = (orderNo) =>
-  api.post(`/products/orders/${orderNo}/simulate-ship`)
+export const simulateShipProduct = orderNo => api.post(`/products/orders/${orderNo}/simulate-ship`)
 
 /** 确认收货 */
-export const confirmReceiveProduct = (orderNo) =>
+export const confirmReceiveProduct = orderNo =>
   api.post(`/products/orders/${orderNo}/confirm-receive`)
 
 /** 模拟退款 */
-export const simulateRefundProduct = (orderNo) =>
+export const simulateRefundProduct = orderNo =>
   api.post(`/products/orders/${orderNo}/simulate-refund`)
 
 /** 获取订单历史 */

@@ -76,7 +76,12 @@
             />
             <div class="input-actions">
               <span class="input-tip">Ctrl+Enter 发送</span>
-              <el-button type="primary" :loading="sendLoading" :disabled="!chatInput.trim()" @click="sendChatMessage">
+              <el-button
+                type="primary"
+                :loading="sendLoading"
+                :disabled="!chatInput.trim()"
+                @click="sendChatMessage"
+              >
                 发送
               </el-button>
             </div>
@@ -105,7 +110,9 @@
                   {{ n.name?.charAt(0) }}
                 </el-avatar>
                 <el-tag
-                  :type="n.status === 'ONLINE' ? 'success' : (n.status === 'BUSY' ? 'warning' : 'info')"
+                  :type="
+                    n.status === 'ONLINE' ? 'success' : n.status === 'BUSY' ? 'warning' : 'info'
+                  "
                   size="small"
                   class="status-tag"
                 >
@@ -203,16 +210,27 @@
     <el-dialog v-model="completeDialogVisible" title="结束咨询 & 评价" width="480px">
       <el-form label-position="top">
         <el-form-item label="服务评分">
-          <el-rate v-model="completeForm.rating" :colors="['#99A9BF', '#F7BA2A', '#FF9900']" show-text
-            :texts="['很差', '较差', '一般', '满意', '非常满意']" />
+          <el-rate
+            v-model="completeForm.rating"
+            :colors="['#99A9BF', '#F7BA2A', '#FF9900']"
+            show-text
+            :texts="['很差', '较差', '一般', '满意', '非常满意']"
+          />
         </el-form-item>
         <el-form-item label="评价内容">
-          <el-input v-model="completeForm.review" type="textarea" :rows="3" placeholder="请对本次咨询进行评价..." />
+          <el-input
+            v-model="completeForm.review"
+            type="textarea"
+            :rows="3"
+            placeholder="请对本次咨询进行评价..."
+          />
         </el-form-item>
       </el-form>
       <template #footer>
         <el-button @click="completeDialogVisible = false">取消</el-button>
-        <el-button type="primary" :loading="completeLoading" @click="submitComplete">提交评价</el-button>
+        <el-button type="primary" :loading="completeLoading" @click="submitComplete"
+          >提交评价</el-button
+        >
       </template>
     </el-dialog>
 
@@ -397,7 +415,7 @@ async function sendChatMessage() {
       replyLoading.value = true
       await nextTick()
       scrollToBottom()
-      
+
       setTimeout(async () => {
         try {
           const replyRes = await simulateNutritionistReply(activeConsultation.value.orderNo)
@@ -491,24 +509,46 @@ function statusText(s) {
 }
 
 function payStatusType(s) {
-  return { PAID: 'success', PENDING: 'warning', REFUNDED: 'danger', EXPIRED: 'info', CANCELLED: 'info' }[s] || 'info'
+  return (
+    { PAID: 'success', PENDING: 'warning', REFUNDED: 'danger', EXPIRED: 'info', CANCELLED: 'info' }[
+      s
+    ] || 'info'
+  )
 }
 
 function payStatusText(s) {
-  return { PAID: '已支付', PENDING: '待支付', REFUNDED: '已退款', EXPIRED: '已超时', CANCELLED: '已取消' }[s] || s
+  return (
+    {
+      PAID: '已支付',
+      PENDING: '待支付',
+      REFUNDED: '已退款',
+      EXPIRED: '已超时',
+      CANCELLED: '已取消'
+    }[s] || s
+  )
 }
 
 function consultStatusType(s) {
-  return { IN_PROGRESS: 'success', WAITING: 'warning', COMPLETED: '', CANCELLED: 'info' }[s] || 'info'
+  return (
+    { IN_PROGRESS: 'success', WAITING: 'warning', COMPLETED: '', CANCELLED: 'info' }[s] || 'info'
+  )
 }
 
 function consultStatusText(s) {
-  return { IN_PROGRESS: '进行中', WAITING: '等待中', COMPLETED: '已完成', CANCELLED: '已取消' }[s] || s
+  return (
+    { IN_PROGRESS: '进行中', WAITING: '等待中', COMPLETED: '已完成', CANCELLED: '已取消' }[s] || s
+  )
 }
 
 function formatDate(dt) {
   if (!dt) return '-'
-  return new Date(dt).toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })
+  return new Date(dt).toLocaleString('zh-CN', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit'
+  })
 }
 
 function formatMsgTime(ts) {
@@ -525,7 +565,7 @@ function formatMsgTime(ts) {
 
 .top-nav {
   background: #fff;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   position: sticky;
   top: 0;
   z-index: 100;
@@ -652,8 +692,20 @@ function formatMsgTime(ts) {
 
     .stat {
       text-align: center;
-      .stat-value { font-size: 15px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 2px; }
-      .stat-label { font-size: 12px; color: #9ca3af; display: block; margin-top: 2px; }
+      .stat-value {
+        font-size: 15px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 2px;
+      }
+      .stat-label {
+        font-size: 12px;
+        color: #9ca3af;
+        display: block;
+        margin-top: 2px;
+      }
     }
   }
 
@@ -662,8 +714,15 @@ function formatMsgTime(ts) {
     justify-content: space-between;
     align-items: center;
 
-    .fee-label { font-size: 12px; color: #9ca3af; }
-    .fee-value { font-size: 20px; font-weight: 700; color: #f56c6c; }
+    .fee-label {
+      font-size: 12px;
+      color: #9ca3af;
+    }
+    .fee-value {
+      font-size: 20px;
+      font-weight: 700;
+      color: #f56c6c;
+    }
   }
 }
 
@@ -681,7 +740,10 @@ function formatMsgTime(ts) {
       align-items: center;
       gap: 12px;
 
-      h3 { margin: 0; font-size: 16px; }
+      h3 {
+        margin: 0;
+        font-size: 16px;
+      }
     }
   }
 }
@@ -709,7 +771,9 @@ function formatMsgTime(ts) {
         background: #667eea;
         color: #fff;
         border-radius: 16px 16px 4px 16px;
-        .msg-time { color: rgba(255,255,255,0.7); }
+        .msg-time {
+          color: rgba(255, 255, 255, 0.7);
+        }
       }
     }
 
@@ -720,7 +784,9 @@ function formatMsgTime(ts) {
         color: #1f2937;
         border-radius: 16px 16px 16px 4px;
         border: 1px solid #e5e7eb;
-        .msg-time { color: #9ca3af; }
+        .msg-time {
+          color: #9ca3af;
+        }
       }
     }
 
@@ -755,14 +821,26 @@ function formatMsgTime(ts) {
     background: #9ca3af;
     animation: typing 1.2s infinite;
 
-    &:nth-child(2) { animation-delay: 0.2s; }
-    &:nth-child(3) { animation-delay: 0.4s; }
+    &:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+    &:nth-child(3) {
+      animation-delay: 0.4s;
+    }
   }
 }
 
 @keyframes typing {
-  0%, 60%, 100% { opacity: 0.3; transform: translateY(0); }
-  30% { opacity: 1; transform: translateY(-4px); }
+  0%,
+  60%,
+  100% {
+    opacity: 0.3;
+    transform: translateY(0);
+  }
+  30% {
+    opacity: 1;
+    transform: translateY(-4px);
+  }
 }
 
 .chat-input-area {
@@ -790,8 +868,15 @@ function formatMsgTime(ts) {
     border-radius: 8px;
     margin-bottom: 20px;
 
-    h4 { margin: 0; font-size: 16px; }
-    p { margin: 0; color: #6b7280; font-size: 13px; }
+    h4 {
+      margin: 0;
+      font-size: 16px;
+    }
+    p {
+      margin: 0;
+      color: #6b7280;
+      font-size: 13px;
+    }
     .consult-fee {
       margin-left: auto;
       font-size: 22px;
