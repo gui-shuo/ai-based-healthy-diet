@@ -189,14 +189,13 @@
 
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
-import { CircleCheck, Present, CreditCard, Lock, Refresh } from '@element-plus/icons-vue'
+import { CircleCheck, Present, CreditCard, Lock } from '@element-plus/icons-vue'
 import {
   getVipPlans,
   getVipStatus,
   createVipOrder,
   simulateVipPayment,
   simulateVipRefund,
-  queryVipOrderStatus,
   getVipOrderHistory
 } from '@/services/member'
 import message from '@/utils/message'

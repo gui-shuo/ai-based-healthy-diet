@@ -281,7 +281,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { ArrowLeft, Document, ShoppingCart, Search, Delete } from '@element-plus/icons-vue'
 import {
   getProducts,
@@ -293,8 +293,7 @@ import {
   confirmReceiveProduct,
   simulateRefundProduct,
   getProductOrderHistory,
-  ProductCategories,
-  getRecommendedProducts
+  ProductCategories
 } from '@/services/product'
 import message from '@/utils/message'
 
