@@ -186,7 +186,7 @@ async function recognizePhoto(filePath: string) {
   try {
     const res = await foodApi.photoRecognize(filePath)
     if (res.code === 200 && res.data) {
-      result.value = res.data
+      result.value = parseFoodResult(res.data)
     } else {
       errorMsg.value = res.message || '无法识别该食物，请重试'
     }
@@ -209,7 +209,7 @@ async function searchByName() {
   try {
     const res = await foodApi.recognizeByName(name)
     if (res.code === 200 && res.data) {
-      result.value = res.data
+      result.value = parseFoodResult(res.data)
     } else {
       errorMsg.value = res.message || `未找到"${name}"的营养信息`
     }
@@ -218,6 +218,37 @@ async function searchByName() {
   } finally {
     recognizing.value = false
   }
+}
+
+// Parse backend FoodRecognitionResult into flat RecognitionResult
+function parseFoodResult(data: any): RecognitionResult | null {
+  // Backend returns { foods: [{ name, confidence, nutrition: { energy, protein, carbohydrate, fat, fiber } }] }
+  if (data.foods && Array.isArray(data.foods) && data.foods.length > 0) {
+    const top = data.foods[0]
+    const n = top.nutrition || {}
+    return {
+      name: top.name || '未知食物',
+      calories: n.energy || n.calories || 0,
+      protein: n.protein || 0,
+      fat: n.fat || 0,
+      carbs: n.carbohydrate || n.carbs || 0,
+      fiber: n.fiber || 0,
+      portion: '每100g'
+    }
+  }
+  // Fallback: if backend returns flat format
+  if (data.name) {
+    return {
+      name: data.name,
+      calories: data.calories || data.energy || 0,
+      protein: data.protein || 0,
+      fat: data.fat || 0,
+      carbs: data.carbs || data.carbohydrate || 0,
+      fiber: data.fiber || 0,
+      portion: data.portion || '每100g'
+    }
+  }
+  return null
 }
 
 function goToRecord() {

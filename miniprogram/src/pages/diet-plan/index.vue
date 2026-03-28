@@ -262,7 +262,7 @@ const form = ref({
 
 const planResult = ref<PlanResult | null>(null)
 const historyList = ref<PlanResult[]>([])
-const historyPage = ref(1)
+const historyPage = ref(0)
 const historyHasMore = ref(false)
 
 onLoad(() => {
@@ -339,10 +339,10 @@ async function generatePlan() {
 
 async function loadHistory() {
   try {
-    const res = await dietPlanApi.getPlans({ page: historyPage.value, pageSize: 10 })
+    const res = await dietPlanApi.getPlans({ page: historyPage.value, size: 10 })
     if (res.code === 200) {
       const list = res.data?.content || res.data?.records || res.data?.list || res.data || []
-      if (historyPage.value === 1) {
+      if (historyPage.value === 0) {
         historyList.value = list
       } else {
         historyList.value.push(...list)

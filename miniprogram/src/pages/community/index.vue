@@ -102,7 +102,7 @@ import { checkLogin, formatTime, defaultAvatar, truncate } from '@/utils/common'
 const posts = ref<any[]>([])
 const loading = ref(false)
 const noMore = ref(false)
-const page = ref(1)
+const page = ref(0)
 const pageSize = 10
 const currentCategory = ref('')
 
@@ -143,7 +143,7 @@ async function loadPosts(isRefresh = false) {
 }
 
 function refreshData() {
-  page.value = 1
+  page.value = 0
   noMore.value = false
   loadPosts(true)
 }
@@ -162,7 +162,7 @@ onShow(() => {
 })
 
 onPullDownRefresh(() => {
-  page.value = 1
+  page.value = 0
   noMore.value = false
   loadPosts(true).then(() => uni.stopPullDownRefresh())
 })

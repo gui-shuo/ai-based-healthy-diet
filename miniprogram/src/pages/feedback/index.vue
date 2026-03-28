@@ -169,7 +169,7 @@ async function submitFeedback() {
 async function loadFeedbacks() {
   loading.value = true
   try {
-    const res = await feedbackApi.getMyFeedbacks({ page: 1, size: 20 })
+    const res = await feedbackApi.getMyFeedbacks({ page: 0, size: 20 })
     if (res.code === 200) {
       feedbacks.value = res.data?.content || res.data?.records || res.data?.list || res.data || []
     }

@@ -34,9 +34,9 @@ export const foodApi = {
 
 // ============ AI Diet Plan ============
 export const dietPlanApi = {
-  generate: (data: any) => request({ url: '/diet/plan/generate', method: 'POST', data, showLoading: true, loadingText: 'AI生成中...' }),
-  getPlans: (params?: any) => request({ url: '/diet/plan', data: params }),
-  getPlan: (id: number) => request({ url: `/diet/plan/${id}` })
+  generate: (data: any) => request({ url: '/diet-plan/generate', method: 'POST', data, showLoading: true, loadingText: 'AI生成中...' }),
+  getPlans: (params?: any) => request({ url: '/diet-plan/history', data: params }),
+  getPlan: (id: number) => request({ url: `/diet-plan/${id}` })
 }
 
 // ============ Consultation ============
