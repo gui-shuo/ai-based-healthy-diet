@@ -204,22 +204,29 @@ function onGenderChange(e: any) {
 }
 
 async function changeAvatar() {
-  try {
-    const [err, res] = await uni.chooseImage({ count: 1, sizeType: ['compressed'], sourceType: ['album', 'camera'] }) as any
-    if (err || !res?.tempFilePaths?.length) return
-    uni.showLoading({ title: '上传中...' })
-    const uploadRes = await userApi.uploadAvatar(res.tempFilePaths[0])
-    uni.hideLoading()
-    if (uploadRes.code === 200) {
-      uni.showToast({ title: '头像已更新', icon: 'success' })
-      userStore.fetchUserInfo()
-    } else {
-      uni.showToast({ title: uploadRes.message || '上传失败', icon: 'none' })
-    }
-  } catch {
-    uni.hideLoading()
-    uni.showToast({ title: '上传失败', icon: 'none' })
-  }
+  uni.chooseImage({
+    count: 1,
+    sizeType: ['compressed'],
+    sourceType: ['album', 'camera'],
+    success: async (res) => {
+      if (!res.tempFilePaths?.length) return
+      uni.showLoading({ title: '上传中...' })
+      try {
+        const uploadRes = await userApi.uploadAvatar(res.tempFilePaths[0])
+        uni.hideLoading()
+        if (uploadRes.code === 200) {
+          uni.showToast({ title: '头像已更新', icon: 'success' })
+          userStore.fetchUserInfo()
+        } else {
+          uni.showToast({ title: uploadRes.message || '上传失败', icon: 'none' })
+        }
+      } catch (e: any) {
+        uni.hideLoading()
+        uni.showToast({ title: e?.message || '上传失败', icon: 'none' })
+      }
+    },
+    fail: () => {}
+  })
 }
 
 async function saveProfile() {

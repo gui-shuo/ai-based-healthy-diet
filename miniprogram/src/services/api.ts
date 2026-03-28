@@ -112,7 +112,7 @@ export const feedbackApi = {
 
 // ============ Announcements ============
 export const announcementApi = {
-  getList: (params?: any) => request({ url: '/public/announcements', data: params })
+  getList: (params?: any) => request({ url: '/announcements', data: params })
 }
 
 // ============ Constants ============
