@@ -87,7 +87,7 @@ interface ChatMessage {
   content: string
 }
 
-const WS_URL = 'wss://nutriai.itshuo.me/ws/ai'
+const WS_URL = 'wss://nutriai.itshuo.me/api/ws/ai'
 
 const messages = ref<ChatMessage[]>([])
 const inputText = ref('')
@@ -140,7 +140,11 @@ function connectWebSocket() {
   const token = getToken()
   if (!token) return
 
-  closeWebSocket()
+  // Only close if already connected
+  if (socketTask && connected.value) {
+    closeWebSocket()
+  }
+  socketTask = null
 
   socketTask = uni.connectSocket({
     url: WS_URL,
@@ -263,10 +267,10 @@ function clearReconnectTimer() {
 }
 
 function closeWebSocket() {
-  if (socketTask) {
+  if (socketTask && connected.value) {
     try { socketTask.close({}) } catch {}
-    socketTask = null
   }
+  socketTask = null
   connected.value = false
 }
 

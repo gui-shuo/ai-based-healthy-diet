@@ -74,7 +74,7 @@ export const useUserStore = defineStore('user', () => {
   // 刷新用户信息
   async function fetchUserInfo() {
     try {
-      const res = await request<UserInfo>({ url: '/auth/me', showError: false })
+      const res = await request<UserInfo>({ url: '/user/profile', showError: false })
       if (res.code === 200) {
         userInfo.value = res.data
         uni.setStorageSync('userInfo', res.data)

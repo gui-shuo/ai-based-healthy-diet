@@ -2,7 +2,12 @@
 export function checkLogin(): boolean {
   const token = uni.getStorageSync('accessToken')
   if (!token) {
-    uni.navigateTo({ url: '/pages/auth/login' })
+    uni.navigateTo({
+      url: '/pages/auth/login',
+      fail: () => {
+        uni.reLaunch({ url: '/pages/auth/login' })
+      }
+    })
     return false
   }
   return true
