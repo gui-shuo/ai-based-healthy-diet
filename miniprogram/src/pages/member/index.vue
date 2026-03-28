@@ -246,9 +246,11 @@ async function loadVipPlans() {
     if (res.code === 200 && res.data) {
       const plans = (res.data as any[]).map((p: any) => ({
         ...p,
-        recommended: p.type === 'QUARTERLY',
-        dailyCost: (p.price / (p.type === 'MONTHLY' ? 30 : p.type === 'QUARTERLY' ? 90 : 365)).toFixed(2),
-        features: p.features || []
+        name: p.planName,
+        price: p.discountPrice || p.originalPrice,
+        recommended: p.planCode === 'QUARTERLY',
+        dailyCost: p.pricePerDay || ((p.discountPrice || p.originalPrice) / (p.durationDays || 30)).toFixed(2),
+        features: (p.benefits && p.benefits.features) || p.features || []
       }))
       vipPlans.value = plans
       selectedPlan.value = plans.find((p: any) => p.recommended) || plans[0]

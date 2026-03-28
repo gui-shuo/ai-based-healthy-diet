@@ -87,7 +87,7 @@ interface ChatMessage {
   content: string
 }
 
-const WS_URL = 'wss://nutriai.itshuo.me/api/ws/ai'
+const WS_URL = 'wss://nutriai.itshuo.me/api/ws/ai/chat'
 
 const messages = ref<ChatMessage[]>([])
 const inputText = ref('')

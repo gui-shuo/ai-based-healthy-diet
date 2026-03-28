@@ -47,7 +47,8 @@ export function truncate(text: string, maxLen: number): string {
 
 // 默认头像
 export function defaultAvatar(avatar?: string): string {
-  return avatar || '/static/images/default-avatar.png'
+  if (avatar && avatar.trim().length > 0) return avatar
+  return '/static/images/default-avatar.png'
 }
 
 // rpx 转 px
