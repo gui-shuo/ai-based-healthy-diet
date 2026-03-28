@@ -104,6 +104,9 @@ let connected = ref(false)
 let reconnectTimer: ReturnType<typeof setTimeout> | null = null
 let reconnectAttempts = 0
 const MAX_RECONNECT = 5
+let isConnecting = false
+let pageVisible = true
+let heartbeatTimer: ReturnType<typeof setInterval> | null = null
 
 onLoad(() => {
   if (!checkLogin()) return
@@ -112,7 +115,6 @@ onLoad(() => {
   navHeight.value = statusBarHeight.value + 44
   inputAreaHeight.value = 100 + (sysInfo.safeAreaInsets?.bottom || 0)
 
-  // Welcome message
   messages.value.push({
     role: 'assistant',
     content: '你好！我是AI营养师，有什么营养健康问题可以问我哦～'
@@ -122,43 +124,55 @@ onLoad(() => {
 })
 
 onShow(() => {
-  if (!connected.value && getToken()) {
+  pageVisible = true
+  if (!connected.value && !isConnecting && getToken()) {
     connectWebSocket()
   }
 })
 
 onHide(() => {
+  pageVisible = false
   clearReconnectTimer()
 })
 
 onUnmounted(() => {
+  pageVisible = false
   closeWebSocket()
   clearReconnectTimer()
 })
 
 function connectWebSocket() {
   const token = getToken()
-  if (!token) return
+  if (!token || isConnecting) return
 
-  // Only close if already connected
-  if (socketTask && connected.value) {
-    closeWebSocket()
+  // Close existing connection without triggering reconnect
+  if (socketTask) {
+    const oldTask = socketTask
+    socketTask = null
+    connected.value = false
+    try { oldTask.close({}) } catch {}
   }
-  socketTask = null
 
+  isConnecting = true
   const wsUrl = `${WS_URL}?token=${encodeURIComponent(token)}`
   socketTask = uni.connectSocket({
     url: wsUrl,
     success: () => {},
     fail: (err) => {
       console.error('WebSocket connect fail:', err)
+      isConnecting = false
       scheduleReconnect()
     }
   })
 
+  const currentTask = socketTask
+
   socketTask.onOpen(() => {
+    if (currentTask !== socketTask) return
     connected.value = true
+    isConnecting = false
     reconnectAttempts = 0
+    startHeartbeat()
     if (pendingMessage) {
       const msg = pendingMessage
       pendingMessage = ''
@@ -167,6 +181,7 @@ function connectWebSocket() {
   })
 
   socketTask.onMessage((res) => {
+    if (currentTask !== socketTask) return
     try {
       const data = JSON.parse(res.data as string)
       handleMessage(data)
@@ -176,21 +191,31 @@ function connectWebSocket() {
   })
 
   socketTask.onError(() => {
+    if (currentTask !== socketTask) return
     connected.value = false
+    isConnecting = false
     scheduleReconnect()
   })
 
   socketTask.onClose(() => {
+    if (currentTask !== socketTask) return
     connected.value = false
-    if (!isSending.value) {
+    isConnecting = false
+    if (pageVisible && !isSending.value) {
       scheduleReconnect()
     }
   })
 }
 
-function handleMessage(data: { type: string; content?: string; message?: string }) {
-  if (data.type === 'token') {
-    // Streaming token
+function handleMessage(data: { type: string; content?: string; message?: string; status?: string }) {
+  if (data.type === 'connection') {
+    // Backend confirms connection established — ignore
+    return
+  } else if (data.type === 'start') {
+    // Backend says "AI正在思考中" — ensure typing indicator shows
+    if (!isTyping.value) isTyping.value = true
+  } else if (data.type === 'token' || data.type === 'chunk') {
+    // Streaming token/chunk
     const lastMsg = messages.value[messages.value.length - 1]
     if (lastMsg && lastMsg.role === 'assistant' && isTyping.value) {
       lastMsg.content += data.content || ''
@@ -198,7 +223,7 @@ function handleMessage(data: { type: string; content?: string; message?: string 
       messages.value.push({ role: 'assistant', content: data.content || '' })
     }
     scrollToBottom()
-  } else if (data.type === 'done') {
+  } else if (data.type === 'done' || data.type === 'complete') {
     isTyping.value = false
     isSending.value = false
     scrollToBottom()
@@ -206,6 +231,8 @@ function handleMessage(data: { type: string; content?: string; message?: string 
     isTyping.value = false
     isSending.value = false
     uni.showToast({ title: data.message || 'AI响应出错', icon: 'none' })
+  } else if (data.type === 'pong') {
+    // Heartbeat response — ignore
   }
 }
 
@@ -272,11 +299,33 @@ function clearReconnectTimer() {
 }
 
 function closeWebSocket() {
-  if (socketTask && connected.value) {
-    try { socketTask.close({}) } catch {}
-  }
+  stopHeartbeat()
+  const task = socketTask
   socketTask = null
   connected.value = false
+  isConnecting = false
+  if (task) {
+    try { task.close({}) } catch {}
+  }
+}
+
+function startHeartbeat() {
+  stopHeartbeat()
+  heartbeatTimer = setInterval(() => {
+    if (connected.value && socketTask) {
+      socketTask.send({
+        data: JSON.stringify({ type: 'ping' }),
+        fail: () => {}
+      })
+    }
+  }, 25000)
+}
+
+function stopHeartbeat() {
+  if (heartbeatTimer) {
+    clearInterval(heartbeatTimer)
+    heartbeatTimer = null
+  }
 }
 
 function goBack() {
