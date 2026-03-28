@@ -258,7 +258,7 @@ async function loadNutritionists() {
     const res = onlineFilter.value === 'online'
       ? await consultationApi.getOnlineNutritionists()
       : await consultationApi.getNutritionists()
-    nutritionists.value = res.data?.records || res.data?.list || res.data || []
+    nutritionists.value = res.data?.content || res.data?.records || res.data?.list || res.data || []
   } catch {
     uni.showToast({ title: '加载失败', icon: 'none' })
   } finally {
@@ -270,7 +270,7 @@ async function loadOrders() {
   ordersLoading.value = true
   try {
     const res = await consultationApi.getOrders()
-    orders.value = res.data?.records || res.data?.list || res.data || []
+    orders.value = res.data?.content || res.data?.records || res.data?.list || res.data || []
   } catch {
     uni.showToast({ title: '加载失败', icon: 'none' })
   } finally {

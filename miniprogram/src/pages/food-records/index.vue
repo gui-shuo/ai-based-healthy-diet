@@ -267,7 +267,7 @@ async function loadData() {
       foodApi.getStats(currentDate.value)
     ])
     if (recordsRes.code === 200) {
-      const list = recordsRes.data?.records || recordsRes.data?.list || recordsRes.data || []
+      const list = recordsRes.data?.content || recordsRes.data?.records || recordsRes.data?.list || recordsRes.data || []
       records.value = list.map((r: any) => ({ ...r, _offsetX: 0, _startX: 0 }))
     }
     if (statsRes.code === 200 && statsRes.data) {

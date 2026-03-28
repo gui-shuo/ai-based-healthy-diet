@@ -47,7 +47,7 @@
         >
           <image class="recommend-img" :src="item.imageUrl || item.image" mode="aspectFill" />
           <text class="recommend-name">{{ item.name }}</text>
-          <text class="recommend-price">¥{{ formatPrice(item.price) }}</text>
+          <text class="recommend-price">¥{{ formatPrice(item.salePrice || item.price) }}</text>
         </view>
       </scroll-view>
     </view>
@@ -64,8 +64,8 @@
         <view class="product-info">
           <text class="product-name">{{ item.name }}</text>
           <view class="price-row">
-            <text class="current-price">¥{{ formatPrice(item.price) }}</text>
-            <text class="original-price" v-if="item.originalPrice && item.originalPrice > item.price">
+            <text class="current-price">¥{{ formatPrice(item.salePrice || item.price) }}</text>
+            <text class="original-price" v-if="item.originalPrice && item.originalPrice > (item.salePrice || item.price)">
               ¥{{ formatPrice(item.originalPrice) }}
             </text>
           </view>
@@ -102,8 +102,17 @@ const products = ref<any[]>([])
 const recommended = ref<any[]>([])
 const loading = ref(false)
 const noMore = ref(false)
-const page = ref(1)
+const page = ref(0)
 const pageSize = 10
+
+const categoryNameMap: Record<string, string> = {
+  EQUIPMENT: '健身器材',
+  HEALTH_FOOD: '健康食品',
+  ORGANIC: '有机食品',
+  PROTEIN: '蛋白质',
+  SUPPLEMENT: '营养补剂',
+  VITAMIN: '维生素'
+}
 
 function formatPrice(val: number | undefined): string {
   return (val || 0).toFixed(2)
@@ -112,14 +121,20 @@ function formatPrice(val: number | undefined): string {
 async function loadCategories() {
   try {
     const res = await productApi.getCategories()
-    categories.value = res.data || []
+    const raw = res.data || []
+    categories.value = raw.map((c: any) => {
+      if (typeof c === 'string') {
+        return { id: c, name: categoryNameMap[c] || c }
+      }
+      return c
+    })
   } catch {}
 }
 
 async function loadRecommended() {
   try {
     const res = await productApi.getRecommended()
-    recommended.value = res.data?.records || res.data?.list || res.data || []
+    recommended.value = res.data?.content || res.data?.records || res.data?.list || res.data || []
   } catch {}
 }
 
@@ -135,7 +150,7 @@ async function loadProducts(isRefresh = false) {
       ? await productApi.search(keyword.value.trim())
       : await productApi.getProducts(params)
 
-    const list = res.data?.records || res.data?.list || res.data || []
+    const list = res.data?.content || res.data?.content || res.data?.records || res.data?.list || res.data || []
     if (isRefresh) {
       products.value = list
     } else {
@@ -167,7 +182,7 @@ function clearSearch() {
 }
 
 function refreshData() {
-  page.value = 1
+  page.value = 0
   noMore.value = false
   loadProducts(true)
 }
@@ -183,7 +198,7 @@ onShow(() => {
 })
 
 onPullDownRefresh(() => {
-  page.value = 1
+  page.value = 0
   noMore.value = false
   Promise.all([loadProducts(true), loadRecommended()])
     .then(() => uni.stopPullDownRefresh())

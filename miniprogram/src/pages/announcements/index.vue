@@ -98,7 +98,7 @@ async function loadAnnouncements(isRefresh = false) {
   try {
     const res = await announcementApi.getList({ page: page.value, size: pageSize })
     if (res.code === 200) {
-      const list = res.data?.records || res.data?.list || res.data || []
+      const list = res.data?.content || res.data?.records || res.data?.list || res.data || []
       if (isRefresh) {
         announcements.value = list
       } else {

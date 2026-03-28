@@ -128,7 +128,7 @@ async function loadPosts(isRefresh = false) {
     const params: any = { page: page.value, size: pageSize }
     if (currentCategory.value) params.category = currentCategory.value
     const res = await communityApi.getFeed(params)
-    const list = res.data?.records || res.data?.list || res.data || []
+    const list = res.data?.content || res.data?.records || res.data?.list || res.data || []
     if (isRefresh) {
       posts.value = list
     } else {

@@ -341,7 +341,7 @@ async function loadHistory() {
   try {
     const res = await dietPlanApi.getPlans({ page: historyPage.value, pageSize: 10 })
     if (res.code === 200) {
-      const list = res.data?.records || res.data?.list || res.data || []
+      const list = res.data?.content || res.data?.records || res.data?.list || res.data || []
       if (historyPage.value === 1) {
         historyList.value = list
       } else {

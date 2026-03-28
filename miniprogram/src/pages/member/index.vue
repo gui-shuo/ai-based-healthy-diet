@@ -261,7 +261,7 @@ async function loadVipPlans() {
 async function loadGrowthRecords() {
   try {
     const res = await memberApi.getGrowthRecords({ page: 1, size: 10 })
-    if (res.code === 200) growthRecords.value = res.data?.records || res.data?.list || res.data || []
+    if (res.code === 200) growthRecords.value = res.data?.content || res.data?.records || res.data?.list || res.data || []
   } catch {}
 }
 
@@ -308,7 +308,7 @@ async function generateCode() {
   try {
     const res = await memberApi.generateInvitation()
     if (res.code === 200) {
-      invitationCode.value = res.data?.code || res.data
+      invitationCode.value = res.data?.invitationCode || res.data?.code || ''
       uni.showToast({ title: '生成成功', icon: 'success' })
     }
   } catch {}
@@ -325,7 +325,7 @@ function copyCode() {
 async function loadInvitationRecords() {
   try {
     const res = await memberApi.getInvitationRecords({ page: 1, size: 10 })
-    if (res.code === 200) invitationRecords.value = res.data?.records || res.data?.list || res.data || []
+    if (res.code === 200) invitationRecords.value = res.data?.content || res.data?.records || res.data?.list || res.data || []
   } catch {}
 }
 

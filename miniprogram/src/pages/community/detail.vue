@@ -193,7 +193,7 @@ async function loadComments() {
       page: commentPage.value,
       size: 15
     })
-    const list = res.data?.records || res.data?.list || res.data || []
+    const list = res.data?.content || res.data?.records || res.data?.list || res.data || []
     comments.value = [...comments.value, ...list]
     commentNoMore.value = list.length < 15
     commentPage.value++

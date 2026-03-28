@@ -171,7 +171,7 @@ async function loadFeedbacks() {
   try {
     const res = await feedbackApi.getMyFeedbacks({ page: 1, size: 20 })
     if (res.code === 200) {
-      feedbacks.value = res.data?.records || res.data?.list || res.data || []
+      feedbacks.value = res.data?.content || res.data?.records || res.data?.list || res.data || []
     }
   } catch {} finally {
     loading.value = false

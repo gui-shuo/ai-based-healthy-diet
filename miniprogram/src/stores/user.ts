@@ -15,8 +15,17 @@ interface UserInfo {
 
 export const useUserStore = defineStore('user', () => {
   const userInfo = ref<UserInfo | null>(null)
-  const isLoggedIn = computed(() => !!getToken() && !!userInfo.value)
+  const token = ref(getToken())
+  const isLoggedIn = computed(() => !!token.value && !!userInfo.value)
   const isAdmin = computed(() => userInfo.value?.role === 'ADMIN')
+
+  function _saveLogin(data: any) {
+    setToken(data.accessToken)
+    setRefreshToken(data.refreshToken)
+    token.value = data.accessToken
+    userInfo.value = data.userInfo
+    uni.setStorageSync('userInfo', data.userInfo)
+  }
 
   // 账号密码登录
   async function login(username: string, password: string, captchaKey?: string, captchaCode?: string) {
@@ -25,12 +34,7 @@ export const useUserStore = defineStore('user', () => {
       method: 'POST',
       data: { username, password, captchaKey, captchaCode }
     })
-    if (res.code === 200) {
-      setToken(res.data.accessToken)
-      setRefreshToken(res.data.refreshToken)
-      userInfo.value = res.data.userInfo
-      uni.setStorageSync('userInfo', res.data.userInfo)
-    }
+    if (res.code === 200) _saveLogin(res.data)
     return res
   }
 
@@ -41,12 +45,7 @@ export const useUserStore = defineStore('user', () => {
       method: 'POST',
       data: { code }
     })
-    if (res.code === 200) {
-      setToken(res.data.accessToken)
-      setRefreshToken(res.data.refreshToken)
-      userInfo.value = res.data.userInfo
-      uni.setStorageSync('userInfo', res.data.userInfo)
-    }
+    if (res.code === 200) _saveLogin(res.data)
     return res
   }
 
@@ -58,6 +57,7 @@ export const useUserStore = defineStore('user', () => {
   // 登出
   function logout() {
     clearTokens()
+    token.value = ''
     userInfo.value = null
     uni.removeStorageSync('userInfo')
     uni.reLaunch({ url: '/pages/auth/login' })
@@ -65,9 +65,14 @@ export const useUserStore = defineStore('user', () => {
 
   // 从缓存恢复状态
   function restore() {
+    const t = getToken()
     const cached = uni.getStorageSync('userInfo')
-    if (cached && getToken()) {
+    if (cached && t) {
+      token.value = t
       userInfo.value = cached
+    } else {
+      token.value = ''
+      userInfo.value = null
     }
   }
 

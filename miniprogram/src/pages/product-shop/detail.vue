@@ -222,7 +222,11 @@ async function loadProduct(id: number) {
   pageLoading.value = true
   try {
     const res = await productApi.getProduct(id)
-    product.value = res.data
+    const p = res.data
+    if (p && !p.price && p.salePrice) {
+      p.price = p.salePrice
+    }
+    product.value = p
   } catch {
     uni.showToast({ title: '商品加载失败', icon: 'none' })
   } finally {

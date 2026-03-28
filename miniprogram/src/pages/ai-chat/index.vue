@@ -146,8 +146,9 @@ function connectWebSocket() {
   }
   socketTask = null
 
+  const wsUrl = `${WS_URL}?token=${encodeURIComponent(token)}`
   socketTask = uni.connectSocket({
-    url: WS_URL,
+    url: wsUrl,
     success: () => {},
     fail: (err) => {
       console.error('WebSocket connect fail:', err)
