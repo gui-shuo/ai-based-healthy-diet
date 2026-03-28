@@ -32,6 +32,8 @@
                   <el-dropdown-item command="consultation"> 营养师咨询 </el-dropdown-item>
                   <el-dropdown-item command="product-shop"> 营养产品商城 </el-dropdown-item>
                   <el-dropdown-item command="membership"> 会员中心 </el-dropdown-item>
+                  <el-dropdown-item command="community"> 营养圈 </el-dropdown-item>
+                  <el-dropdown-item command="feedback"> 意见反馈 </el-dropdown-item>
                   <el-dropdown-item v-if="isAdmin" command="admin"> 管理后台 </el-dropdown-item>
                   <el-dropdown-item divided command="logout"> 退出登录 </el-dropdown-item>
                 </el-dropdown-menu>
@@ -118,6 +120,13 @@
               <h3>会员服务</h3>
               <p>专属功能，更多权益</p>
             </div>
+            <div class="feature-card" @click="goToFeature('community')">
+              <el-icon :size="48" color="#22c55e">
+                <chatDotRound />
+              </el-icon>
+              <h3>营养圈</h3>
+              <p>分享饮食心得，交流营养知识</p>
+            </div>
           </div>
         </div>
       </div>
@@ -144,6 +153,10 @@
               <el-icon><Phone /></el-icon>
               {{ getConfig('system.support_phone') }}
             </p>
+            <p class="feedback-link" @click="goToFeature('feedback')">
+              <el-icon><ChatLineSquare /></el-icon>
+              意见反馈
+            </p>
           </div>
         </div>
       </div>
@@ -168,7 +181,8 @@ import {
   Message,
   Phone,
   Service,
-  Goods
+  Goods,
+  ChatLineSquare
 } from '@element-plus/icons-vue'
 import { usePublicConfig } from '@/composables/usePublicConfig'
 
@@ -251,6 +265,10 @@ const handleCommand = command => {
     if (route.path !== '/product-shop') router.push('/product-shop')
   } else if (command === 'membership') {
     if (route.path !== '/membership') router.push('/membership')
+  } else if (command === 'community') {
+    if (route.path !== '/community') router.push('/community')
+  } else if (command === 'feedback') {
+    if (route.path !== '/feedback') router.push('/feedback')
   } else if (command === 'admin') {
     router.push('/admin/dashboard')
   }
@@ -442,6 +460,13 @@ const goToFeature = feature => {
   margin: 4px 0;
   justify-content: flex-end;
 }
+
+.feedback-link {
+  cursor: pointer;
+  color: #22c55e;
+  transition: color .2s;
+}
+.feedback-link:hover { color: #16a34a; text-decoration: underline; }
 
 /* 响应式 */
 @media (max-width: 768px) {

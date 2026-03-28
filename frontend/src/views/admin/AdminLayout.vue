@@ -27,6 +27,22 @@
             <el-icon><Bell /></el-icon>
             <span>公告管理</span>
           </el-menu-item>
+          <el-menu-item index="/admin/feedbacks">
+            <el-icon><ChatLineSquare /></el-icon>
+            <span>反馈管理</span>
+          </el-menu-item>
+          <el-menu-item index="/admin/nutritionists">
+            <el-icon><UserFilled /></el-icon>
+            <span>营养师管理</span>
+          </el-menu-item>
+          <el-menu-item index="/admin/products">
+            <el-icon><ShoppingCart /></el-icon>
+            <span>产品管理</span>
+          </el-menu-item>
+          <el-menu-item index="/admin/community">
+            <el-icon><ChatDotRound /></el-icon>
+            <span>社区管理</span>
+          </el-menu-item>
         </el-menu>
       </el-aside>
 
@@ -68,7 +84,10 @@ import {
   ChatDotRound,
   Setting,
   Bell,
-  SwitchButton
+  SwitchButton,
+  ChatLineSquare,
+  UserFilled,
+  ShoppingCart
 } from '@element-plus/icons-vue'
 import AlertNotification from '@/components/admin/AlertNotification.vue'
 import { useAuthStore } from '@/stores/auth'
@@ -89,7 +108,11 @@ const breadcrumbTitle = computed(() => {
     '/admin/users': '用户管理',
     '/admin/ai-logs': 'AI日志',
     '/admin/config': '系统配置',
-    '/admin/announcements': '公告管理'
+    '/admin/announcements': '公告管理',
+    '/admin/feedbacks': '反馈管理',
+    '/admin/nutritionists': '营养师管理',
+    '/admin/products': '产品管理',
+    '/admin/community': '社区管理'
   }
   return titles[route.path] || '管理后台'
 })

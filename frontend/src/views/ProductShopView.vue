@@ -363,7 +363,14 @@ const productsLoading = ref(false)
 const products = ref([])
 const searchKeyword = ref('')
 const activeCategory = ref('')
-const categories = ref(ProductCategories)
+const categories = ref([])
+
+const initCategories = () => {
+  categories.value = Object.entries(ProductCategories).map(([, v]) => ({
+    value: v.code,
+    label: `${v.icon} ${v.name}`
+  }))
+}
 
 const detailVisible = ref(false)
 const detailProduct = ref(null)
@@ -383,15 +390,14 @@ const orders = ref([])
 
 // --- 初始化 ---
 onMounted(() => {
+  initCategories()
   fetchProducts()
 })
 
 async function fetchProducts() {
   productsLoading.value = true
   try {
-    const params = {}
-    if (activeCategory.value) params.category = activeCategory.value
-    const res = await getProducts(params)
+    const res = await getProducts(activeCategory.value || undefined)
     if (res.data.code === 200) {
       products.value = res.data.data?.content || res.data.data || []
     }

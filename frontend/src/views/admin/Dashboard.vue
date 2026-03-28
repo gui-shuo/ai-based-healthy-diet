@@ -191,9 +191,7 @@ const stats = ref({
   },
   memberStats: {
     free: 0,
-    bronze: 0,
-    silver: 0,
-    gold: 0
+    vip: 0
   }
 })
 
@@ -532,19 +530,9 @@ const initMemberChart = () => {
             itemStyle: { color: '#91cc75' }
           },
           {
-            value: stats.value.memberStats.bronze,
-            name: '青铜会员',
-            itemStyle: { color: '#fac858' }
-          },
-          {
-            value: stats.value.memberStats.silver,
-            name: '白银会员',
-            itemStyle: { color: '#73c0de' }
-          },
-          {
-            value: stats.value.memberStats.gold,
-            name: '黄金会员',
-            itemStyle: { color: '#ee6666' }
+            value: stats.value.memberStats.vip,
+            name: '营养卡用户',
+            itemStyle: { color: '#667eea' }
           }
         ]
       }

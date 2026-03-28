@@ -149,8 +149,16 @@ const getBenefitDescription = feature => {
 
 <style scoped lang="scss">
 .benefits-list {
-  border-radius: 12px;
+  border-radius: 10px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+
+  :deep(.el-card__header) {
+    padding: 12px 16px;
+  }
+
+  :deep(.el-card__body) {
+    padding: 14px 16px;
+  }
 
   .card-header {
     display: flex;
@@ -158,7 +166,7 @@ const getBenefitDescription = feature => {
     align-items: center;
 
     .title {
-      font-size: 18px;
+      font-size: 15px;
       font-weight: 600;
       color: #1f2937;
     }
@@ -169,9 +177,9 @@ const getBenefitDescription = feature => {
       .benefit-item {
         display: flex;
         align-items: center;
-        gap: 16px;
-        padding: 16px;
-        border-radius: 8px;
+        gap: 10px;
+        padding: 10px;
+        border-radius: 6px;
         transition: all 0.3s;
 
         &:hover {
@@ -184,9 +192,9 @@ const getBenefitDescription = feature => {
         }
 
         .benefit-icon {
-          width: 48px;
-          height: 48px;
-          border-radius: 12px;
+          width: 36px;
+          height: 36px;
+          border-radius: 10px;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -198,46 +206,46 @@ const getBenefitDescription = feature => {
           flex: 1;
 
           .benefit-title {
-            font-size: 15px;
+            font-size: 13px;
             font-weight: 600;
             color: #1f2937;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
           }
 
           .benefit-desc {
-            font-size: 13px;
+            font-size: 12px;
             color: #6b7280;
           }
         }
 
         .benefit-badge {
           flex-shrink: 0;
-          font-size: 20px;
+          font-size: 16px;
         }
       }
     }
 
     .benefit-stats {
-      margin-top: 16px;
-      padding: 16px;
+      margin-top: 10px;
+      padding: 10px;
       background: linear-gradient(135deg, #667eea20 0%, #764ba220 100%);
-      border-radius: 8px;
+      border-radius: 6px;
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 16px;
+      gap: 10px;
 
       .stat-item {
         display: flex;
         flex-direction: column;
-        gap: 8px;
+        gap: 4px;
 
         .stat-label {
-          font-size: 13px;
+          font-size: 12px;
           color: #6b7280;
         }
 
         .stat-value {
-          font-size: 20px;
+          font-size: 16px;
           font-weight: 600;
           color: #667eea;
         }

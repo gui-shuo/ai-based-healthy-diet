@@ -19,7 +19,7 @@
             <el-option label="禁用" value="DISABLED" />
           </el-select>
         </el-form-item>
-        <el-form-item label="会员等级">
+        <el-form-item label="会员类型">
           <el-select
             v-model="searchForm.memberLevel"
             placeholder="全部"
@@ -27,9 +27,7 @@
             style="width: 140px"
           >
             <el-option label="免费用户" value="FREE" />
-            <el-option label="青铜会员" value="BRONZE" />
-            <el-option label="白银会员" value="SILVER" />
-            <el-option label="黄金会员" value="GOLD" />
+            <el-option label="营养卡用户" value="VIP" />
           </el-select>
         </el-form-item>
         <el-form-item>
@@ -67,11 +65,11 @@
             <el-tag v-else type="info"> 普通用户 </el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="会员等级" width="120">
+        <el-table-column label="会员类型" width="120">
           <template #default="{ row }">
-            <el-tag v-if="row.memberLevel === 'GOLD'" type="warning"> 黄金 </el-tag>
-            <el-tag v-else-if="row.memberLevel === 'SILVER'" type="info"> 白银 </el-tag>
-            <el-tag v-else-if="row.memberLevel === 'BRONZE'" type="success"> 青铜 </el-tag>
+            <el-tag v-if="row.memberLevel && row.memberLevel !== 'FREE'" type="warning">
+              营养卡
+            </el-tag>
             <el-tag v-else> 免费 </el-tag>
           </template>
         </el-table-column>
@@ -133,11 +131,8 @@
         <el-descriptions-item label="角色">
           {{ currentUser.role }}
         </el-descriptions-item>
-        <el-descriptions-item label="会员等级">
-          {{ currentUser.memberLevel }}
-        </el-descriptions-item>
-        <el-descriptions-item label="成长值">
-          {{ currentUser.growthValue }}
+        <el-descriptions-item label="会员类型">
+          {{ currentUser.memberLevel === 'FREE' ? '免费用户' : '营养卡用户' }}
         </el-descriptions-item>
         <el-descriptions-item label="总对话数">
           {{ currentUser.totalChats }}
@@ -164,14 +159,6 @@
           <el-select v-model="editForm.status">
             <el-option label="正常" value="ACTIVE" />
             <el-option label="禁用" value="DISABLED" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="会员等级">
-          <el-select v-model="editForm.memberLevel">
-            <el-option label="免费用户" value="FREE" />
-            <el-option label="青铜会员" value="BRONZE" />
-            <el-option label="白银会员" value="SILVER" />
-            <el-option label="黄金会员" value="GOLD" />
           </el-select>
         </el-form-item>
         <el-form-item label="角色">
@@ -293,9 +280,6 @@ const handleSaveEdit = async () => {
 
     if (editForm.status !== currentUser.value.status) {
       promises.push(updateUserStatus(userId, editForm.status))
-    }
-    if (editForm.memberLevel !== currentUser.value.memberLevel) {
-      promises.push(updateUserMemberLevel(userId, editForm.memberLevel))
     }
     if (editForm.role !== currentUser.value.role) {
       promises.push(updateUserRole(userId, editForm.role))

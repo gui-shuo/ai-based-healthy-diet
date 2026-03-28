@@ -1,12 +1,5 @@
 package com.nutriai.service;
 
-import com.alibaba.dashscope.aigc.generation.Generation;
-import com.alibaba.dashscope.aigc.generation.GenerationParam;
-import com.alibaba.dashscope.aigc.generation.GenerationResult;
-import com.alibaba.dashscope.common.Message;
-import com.alibaba.dashscope.common.Role;
-import com.alibaba.dashscope.exception.ApiException;
-import com.alibaba.dashscope.exception.NoApiKeyException;
 import com.nutriai.dto.DietPlanRequest;
 import com.nutriai.dto.DietPlanResponse;
 import com.nutriai.entity.FoodNutrition;
@@ -33,13 +26,13 @@ public class DietPlanService {
     private final ChatLanguageModel chatLanguageModel;
     private final FoodNutritionRepository foodNutritionRepository;
     
-    @Value("${tongyi.api-key}")
+    @Value("${ai.api-key:}")
     private String apiKey;
     
-    @Value("${tongyi.model:qwen-max}")
+    @Value("${ai.model-name:qwen-turbo}")
     private String modelName;
     
-    @Value("${tongyi.timeout:180}")
+    @Value("${ai.timeout:180}")
     private Integer timeout;
     
     /**
@@ -603,26 +596,13 @@ public class DietPlanService {
     }
     
     /**
-     * 使用DashScope SDK直接调用，配置自定义超时
+     * 使用LangChain4j ChatLanguageModel调用AI
      */
     private String callDashScopeWithTimeout(String prompt) {
         try {
-            // 构建Generation参数（不使用反射修改全局httpClient，避免线程安全问题）
-            GenerationParam param = GenerationParam.builder()
-                    .apiKey(apiKey)
-                    .model(modelName)
-                    .prompt(prompt)
-                    .build();
-            
-            // 调用API
-            Generation gen = new Generation();
-            GenerationResult result = gen.call(param);
-            
-            // 提取响应内容
-            return result.getOutput().getText();
-            
-        } catch (ApiException | NoApiKeyException | com.alibaba.dashscope.exception.InputRequiredException e) {
-            log.error("DashScope API调用失败: {}", e.getMessage());
+            return chatLanguageModel.generate(prompt);
+        } catch (Exception e) {
+            log.error("AI调用失败: {}", e.getMessage());
             throw new RuntimeException("AI调用失败: " + e.getMessage(), e);
         }
     }

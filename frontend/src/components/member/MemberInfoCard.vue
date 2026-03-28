@@ -6,7 +6,7 @@
         <div class="card-header" :style="{ background: levelGradient }">
           <div class="level-badge">
             <div class="badge-icon" :style="{ background: levelColor }">
-              <el-icon :size="32">
+              <el-icon :size="24">
                 <Trophy />
               </el-icon>
             </div>
@@ -29,7 +29,7 @@
           </div>
           <el-progress
             :percentage="memberInfo.upgradeProgress"
-            :stroke-width="12"
+            :stroke-width="8"
             :color="progressColors"
             striped
             striped-flow
@@ -133,23 +133,26 @@ const progressColors = [
 
 <style scoped lang="scss">
 .member-info-card {
-  border-radius: 16px;
+  border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
 
   .card-content {
     .card-header {
-      padding: 32px;
+      padding: 20px 24px;
       position: relative;
       overflow: hidden;
+      display: flex;
+      align-items: center;
+      gap: 20px;
 
       &::before {
         content: '';
         position: absolute;
         top: -50%;
-        right: -20%;
-        width: 300px;
-        height: 300px;
+        right: -15%;
+        width: 200px;
+        height: 200px;
         border-radius: 50%;
         background: rgba(255, 255, 255, 0.1);
       }
@@ -157,48 +160,51 @@ const progressColors = [
       .level-badge {
         display: flex;
         align-items: center;
-        gap: 16px;
-        margin-bottom: 24px;
+        gap: 12px;
+        flex-shrink: 0;
 
         .badge-icon {
-          width: 64px;
-          height: 64px;
+          width: 48px;
+          height: 48px;
           border-radius: 50%;
           display: flex;
           align-items: center;
           justify-content: center;
           color: white;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
         }
 
         .badge-text {
           display: flex;
           flex-direction: column;
-          gap: 4px;
+          gap: 2px;
 
           .level-name {
-            font-size: 24px;
+            font-size: 18px;
             font-weight: 600;
             color: #1f2937;
           }
 
           .member-days {
-            font-size: 14px;
+            font-size: 12px;
             color: #6b7280;
           }
         }
       }
 
       .user-info {
+        margin-left: auto;
+        text-align: right;
+
         h2 {
-          font-size: 28px;
+          font-size: 18px;
           font-weight: 600;
           color: #1f2937;
-          margin: 0 0 8px 0;
+          margin: 0 0 2px 0;
         }
 
         p {
-          font-size: 14px;
+          font-size: 12px;
           color: #6b7280;
           margin: 0;
         }
@@ -206,7 +212,7 @@ const progressColors = [
     }
 
     .growth-section {
-      padding: 24px 32px;
+      padding: 14px 24px;
       background: #f9fafb;
       border-top: 1px solid #e5e7eb;
       border-bottom: 1px solid #e5e7eb;
@@ -214,16 +220,16 @@ const progressColors = [
       .growth-header {
         display: flex;
         justify-content: space-between;
-        margin-bottom: 12px;
+        margin-bottom: 8px;
 
         .growth-title {
-          font-size: 16px;
+          font-size: 13px;
           font-weight: 600;
           color: #1f2937;
         }
 
         .growth-value {
-          font-size: 14px;
+          font-size: 12px;
           font-weight: 500;
           color: #6b7280;
         }
@@ -232,47 +238,47 @@ const progressColors = [
       .growth-footer {
         display: flex;
         justify-content: space-between;
-        margin-top: 12px;
-        font-size: 13px;
+        margin-top: 8px;
+        font-size: 12px;
         color: #6b7280;
       }
     }
 
     .stats-section {
-      padding: 24px 32px;
+      padding: 14px 24px;
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 24px;
+      gap: 16px;
 
       .stat-item {
         display: flex;
         align-items: center;
-        gap: 16px;
+        gap: 10px;
 
         .stat-icon {
-          width: 48px;
-          height: 48px;
-          border-radius: 12px;
+          width: 36px;
+          height: 36px;
+          border-radius: 8px;
           display: flex;
           align-items: center;
           justify-content: center;
           color: white;
-          font-size: 24px;
+          font-size: 18px;
         }
 
         .stat-content {
           display: flex;
           flex-direction: column;
-          gap: 4px;
+          gap: 1px;
 
           .stat-value {
-            font-size: 24px;
+            font-size: 18px;
             font-weight: 600;
             color: #1f2937;
           }
 
           .stat-label {
-            font-size: 13px;
+            font-size: 11px;
             color: #6b7280;
           }
         }

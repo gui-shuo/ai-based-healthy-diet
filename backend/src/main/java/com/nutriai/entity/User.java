@@ -65,6 +65,9 @@ public class User {
     @Column(name = "last_login_ip", length = 50)
     private String lastLoginIp;
     
+    @Column(name = "wx_open_id", unique = true, length = 100)
+    private String wxOpenId;
+    
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
     

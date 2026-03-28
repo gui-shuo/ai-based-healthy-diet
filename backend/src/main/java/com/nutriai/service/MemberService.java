@@ -344,6 +344,67 @@ public class MemberService {
                 .build();
     }
 
+    /**
+     * 扣减成长值（退款等场景使用）
+     */
+    @Transactional
+    public void subtractGrowth(Long userId, Integer growthValue, String growthType, String description) {
+        Member member = memberRepository.findByUserId(userId).orElse(null);
+        if (member == null) {
+            log.warn("subtractGrowth: 用户 {} 无会员记录，跳过", userId);
+            return;
+        }
+
+        GrowthRecord record = GrowthRecord.builder()
+                .memberId(member.getId())
+                .userId(userId)
+                .growthValue(-growthValue)
+                .growthType(growthType)
+                .description(description)
+                .build();
+        growthRecordRepository.save(record);
+
+        member.setTotalGrowth(Math.max(member.getTotalGrowth() - growthValue, 0));
+        member.setCurrentGrowth(Math.max(member.getCurrentGrowth() - growthValue, 0));
+        memberRepository.save(member);
+
+        // 检查是否需要降级
+        checkAndDowngradeLevel(member);
+        log.info("用户 {} 扣减成长值 {}, 类型: {}, 原因: {}", userId, growthValue, growthType, description);
+    }
+
+    /**
+     * 检查并降级等级（成长值扣减后调用）
+     */
+    @Transactional
+    public void checkAndDowngradeLevel(Member member) {
+        MemberLevel currentLevel = memberLevelRepository.findById(member.getLevelId())
+                .orElseThrow(() -> new RuntimeException("会员等级不存在"));
+
+        MemberLevel targetLevel = memberLevelRepository
+                .findFirstByGrowthRequiredLessThanEqualOrderByGrowthRequiredDesc(member.getTotalGrowth())
+                .orElse(currentLevel);
+
+        if (targetLevel.getLevelOrder() < currentLevel.getLevelOrder()) {
+            int innerProgress = member.getTotalGrowth() - targetLevel.getGrowthRequired();
+            member.setLevelId(targetLevel.getId());
+            member.setCurrentGrowth(Math.max(innerProgress, 0));
+            memberRepository.save(member);
+
+            log.info("用户 {} 降级到 {}（totalGrowth={}）",
+                    member.getUserId(), targetLevel.getLevelName(), member.getTotalGrowth());
+
+            GrowthRecord downgradeRecord = GrowthRecord.builder()
+                    .memberId(member.getId())
+                    .userId(member.getUserId())
+                    .growthValue(0)
+                    .growthType("LEVEL_DOWN")
+                    .description("降级至" + targetLevel.getLevelName())
+                    .build();
+            growthRecordRepository.save(downgradeRecord);
+        }
+    }
+
     private String getGrowthTypeName(String type) {
         Map<String, String> typeNames = Map.of(
                 "SIGN_IN",       "每日签到",

@@ -246,8 +246,16 @@ onBeforeUnmount(() => {
 
 <style scoped lang="scss">
 .growth-chart-card {
-  border-radius: 12px;
+  border-radius: 10px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+
+  :deep(.el-card__header) {
+    padding: 12px 16px;
+  }
+
+  :deep(.el-card__body) {
+    padding: 14px 16px;
+  }
 
   .card-header {
     display: flex;
@@ -255,37 +263,37 @@ onBeforeUnmount(() => {
     align-items: center;
 
     .title {
-      font-size: 18px;
+      font-size: 15px;
       font-weight: 600;
       color: #1f2937;
     }
   }
 
   .chart-container {
-    margin-bottom: 24px;
+    margin-bottom: 12px;
   }
 
   .growth-stats {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 16px;
-    padding: 20px;
+    gap: 10px;
+    padding: 12px;
     background: #f9fafb;
-    border-radius: 8px;
+    border-radius: 6px;
 
     .stat-item {
       text-align: center;
 
       .stat-label {
         display: block;
-        font-size: 13px;
+        font-size: 12px;
         color: #6b7280;
-        margin-bottom: 8px;
+        margin-bottom: 4px;
       }
 
       .stat-value {
         display: block;
-        font-size: 24px;
+        font-size: 18px;
         font-weight: 600;
       }
     }

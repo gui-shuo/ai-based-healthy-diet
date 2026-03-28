@@ -73,11 +73,11 @@ public class AdminDashboardService {
                 .build();
         
         // 会员统计
+        long totalUsers = userRepository.count();
+        long freeUsers = userRepository.countByMemberLevel("FREE");
         DashboardStatsDTO.MemberStats memberStats = DashboardStatsDTO.MemberStats.builder()
-                .free(userRepository.countByMemberLevel("FREE"))
-                .bronze(userRepository.countByMemberLevel("BRONZE"))
-                .silver(userRepository.countByMemberLevel("SILVER"))
-                .gold(userRepository.countByMemberLevel("GOLD"))
+                .free(freeUsers)
+                .vip(totalUsers - freeUsers)
                 .build();
         
         return DashboardStatsDTO.builder()

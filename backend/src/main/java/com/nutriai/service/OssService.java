@@ -3,6 +3,7 @@ package com.nutriai.service;
 import com.nutriai.config.CosConfig;
 import com.nutriai.exception.BusinessException;
 import com.qcloud.cos.COSClient;
+import com.qcloud.cos.model.CannedAccessControlList;
 import com.qcloud.cos.model.ObjectMetadata;
 import com.qcloud.cos.model.PutObjectRequest;
 import lombok.RequiredArgsConstructor;
@@ -56,6 +57,32 @@ public class OssService {
         return uploadToCos(file, key);
     }
 
+    private static final List<String> ALLOWED_VIDEO_TYPES = Arrays.asList(
+        "video/mp4", "video/quicktime", "video/webm"
+    );
+
+    /**
+     * 上传社区媒体（图片或视频）
+     */
+    public String uploadCommunityMedia(MultipartFile file) {
+        if (file == null || file.isEmpty()) {
+            throw new BusinessException("文件不能为空");
+        }
+        if (file.getSize() > 50 * 1024 * 1024) {
+            throw new BusinessException("文件大小不能超过50MB");
+        }
+        String contentType = file.getContentType();
+        boolean isImage = contentType != null && ALLOWED_IMAGE_TYPES.contains(contentType.toLowerCase());
+        boolean isVideo = contentType != null && ALLOWED_VIDEO_TYPES.contains(contentType.toLowerCase());
+        if (!isImage && !isVideo) {
+            throw new BusinessException("仅支持 jpg/png/gif 图片和 mp4/webm 视频");
+        }
+        String extension = getFileExtension(file.getOriginalFilename());
+        String prefix = isVideo ? "community/videos/vid_" : "community/images/img_";
+        String key = prefix + UUID.randomUUID() + "." + extension;
+        return uploadToCos(file, key);
+    }
+
     /**
      * 上传文件到腾讯云COS
      */
@@ -68,6 +95,7 @@ public class OssService {
             PutObjectRequest putRequest = new PutObjectRequest(
                 cosConfig.getBucket(), key, file.getInputStream(), metadata
             );
+            putRequest.setCannedAcl(CannedAccessControlList.PublicRead);
             cosClient.putObject(putRequest);
 
             String fileUrl = cosConfig.getCosBaseUrl() + "/" + key;

@@ -87,4 +87,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
      * 根据会员等级统计用户数
      */
     long countByMemberLevel(String memberLevel);
+    
+    /**
+     * 根据微信OpenID查找用户
+     */
+    Optional<User> findByWxOpenId(String wxOpenId);
 }

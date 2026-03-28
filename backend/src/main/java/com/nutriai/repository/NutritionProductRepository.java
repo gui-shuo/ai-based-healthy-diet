@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -23,4 +24,12 @@ public interface NutritionProductRepository extends JpaRepository<NutritionProdu
 
     @Query("SELECT p FROM NutritionProduct p WHERE p.status = 'ACTIVE' AND (p.name LIKE %:keyword% OR p.brief LIKE %:keyword%) ORDER BY p.sortOrder ASC")
     Page<NutritionProduct> searchByKeyword(String keyword, Pageable pageable);
+
+    // Admin queries
+    Page<NutritionProduct> findAllByOrderBySortOrderAsc(Pageable pageable);
+
+    Page<NutritionProduct> findByCategoryOrderBySortOrderAsc(String category, Pageable pageable);
+
+    @Query("SELECT p FROM NutritionProduct p WHERE p.name LIKE %:keyword% OR p.brief LIKE %:keyword% ORDER BY p.sortOrder ASC")
+    Page<NutritionProduct> adminSearchByKeyword(@Param("keyword") String keyword, Pageable pageable);
 }

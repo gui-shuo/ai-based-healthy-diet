@@ -91,10 +91,10 @@
             <version>${langchain4j.version}</version>
         </dependency>
         
-        <!-- LangChain4j Tongyi (阿里云通义千问) -->
+        <!-- LangChain4j OpenAI-compatible (支持任意兼容 OpenAI 协议的大模型) -->
         <dependency>
             <groupId>dev.langchain4j</groupId>
-            <artifactId>langchain4j-dashscope</artifactId>
+            <artifactId>langchain4j-open-ai</artifactId>
             <version>${langchain4j.version}</version>
         </dependency>
         

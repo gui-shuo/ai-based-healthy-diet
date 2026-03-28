@@ -34,7 +34,6 @@ public class VipService {
 
     private final VipPlanRepository vipPlanRepository;
     private final VipOrderRepository vipOrderRepository;
-    private final MemberService memberService;
 
     private static final int ORDER_TIMEOUT_MINUTES = 30;
 
@@ -138,7 +137,7 @@ public class VipService {
     }
 
     /**
-     * 模拟退款（前端调用，模拟订单退款）
+     * 模拟退款（前端调用，模拟订单退款 + 回收VIP权限与成长值）
      */
     @Transactional
     public VipOrderResponse simulateRefund(Long userId, String orderNo) {
@@ -153,11 +152,36 @@ public class VipService {
             throw new BusinessException("仅已支付的订单可以退款");
         }
 
+        VipPlan plan = vipPlanRepository.findById(order.getPlanId()).orElse(null);
+
+        // 1. 回收VIP时长：从该订单的vipExpireAt减去套餐天数
+        if (plan != null && order.getVipExpireAt() != null) {
+            // 查找该用户所有活跃的VIP订单（排除当前退款订单）
+            List<VipOrder> activeOrders = vipOrderRepository.findActiveVipOrders(userId, LocalDateTime.now());
+            for (VipOrder active : activeOrders) {
+                if (active.getId().equals(order.getId())) {
+                    // 当前退款订单：清除VIP到期时间
+                    active.setVipExpireAt(null);
+                } else {
+                    // 其他叠加订单：回退叠加的天数
+                    if (active.getVipExpireAt() != null && active.getPaidAt() != null
+                            && order.getPaidAt() != null
+                            && active.getPaidAt().isAfter(order.getPaidAt())) {
+                        // 只回退在退款订单之后购买的叠加订单的到期时间
+                        active.setVipExpireAt(active.getVipExpireAt().minusDays(plan.getDurationDays()));
+                    }
+                }
+                vipOrderRepository.save(active);
+            }
+        }
+
+        // 2. 标记订单为已退款
         order.setPaymentStatus("REFUNDED");
-        order.setRemark("模拟退款 - " + LocalDateTime.now());
+        order.setRemark("模拟退款 - " + LocalDateTime.now() + " - VIP时长及成长值已回收");
         vipOrderRepository.save(order);
 
-        log.info("模拟退款成功, userId={}, orderNo={}", userId, orderNo);
+        log.info("模拟退款成功(权限已回收), userId={}, orderNo={}, plan={}", userId, orderNo, 
+                 plan != null ? plan.getPlanName() : order.getPlanName());
         return buildOrderResponse(order);
     }
 
@@ -271,18 +295,6 @@ public class VipService {
             order.setNotifyData(notifyData);
         }
         vipOrderRepository.save(order);
-
-        // 赠送成长值（幂等）
-        if (!order.getBonusGrowthGranted() && plan.getBonusGrowth() > 0) {
-            memberService.addGrowth(
-                    order.getUserId(),
-                    plan.getBonusGrowth(),
-                    "SYSTEM_REWARD",
-                    "购买" + plan.getPlanName() + "赠送成长值"
-            );
-            order.setBonusGrowthGranted(true);
-            vipOrderRepository.save(order);
-        }
 
         log.info("VIP支付成功: userId={}, plan={}, vipExpireAt={}", 
                  order.getUserId(), plan.getPlanName(), vipExpireAt);

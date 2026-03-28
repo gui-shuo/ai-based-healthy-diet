@@ -17,7 +17,7 @@ public class RegisterRequest {
     @NotBlank(message = "密码不能为空")
     @Size(min = 6, max = 20, message = "密码长度必须在6-20个字符之间")
     @Pattern(
-        regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d@$!%*?&]+$",
+        regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d@$!%*?&.#^~_+=\\-]+$",
         message = "密码必须包含大小写字母和数字"
     )
     private String password;
@@ -39,6 +39,11 @@ public class RegisterRequest {
     
     @NotBlank(message = "验证码Key不能为空")
     private String captchaKey;
+
+    /** 邮箱验证码（注册时必填） */
+    @NotBlank(message = "邮箱验证码不能为空")
+    @Pattern(regexp = "^\\d{6}$", message = "邮箱验证码为6位数字")
+    private String emailCode;
 
     /** 邀请码（可选），注册时关联邀请人 */
     private String invitationCode;

@@ -83,19 +83,10 @@ export const getVipOrderHistory = (page = 0, size = 10) =>
 
 // ========== 常量 ==========
 
-export const MemberLevels = {
-  ROOKIE: { code: 'ROOKIE', name: '新手会员', color: '#95a5a6', order: 1 },
-  BRONZE: { code: 'BRONZE', name: '青铜会员', color: '#cd7f32', order: 2 },
-  SILVER: { code: 'SILVER', name: '白银会员', color: '#c0c0c0', order: 3 },
-  GOLD: { code: 'GOLD', name: '黄金会员', color: '#ffd700', order: 4 },
-  PLATINUM: { code: 'PLATINUM', name: '铂金会员', color: '#e5e4e2', order: 5 }
-}
-
-export const GrowthTypes = {
-  SIGN_IN: { name: '每日签到', color: '#67c23a' },
-  FOOD_RECORD: { name: '记录饮食', color: '#409eff' },
-  AI_CHAT: { name: 'AI咨询', color: '#e6a23c' },
-  INVITATION: { name: '邀请好友', color: '#f56c6c' },
-  LEVEL_UP: { name: '等级提升', color: '#909399' },
-  SYSTEM_REWARD: { name: '系统奖励', color: '#ff69b4' }
+export const VipPlanBadges = {
+  TRIAL: { name: '体验卡', color: '#67c23a' },
+  MONTHLY: { name: '月卡', color: '#409eff' },
+  QUARTERLY: { name: '季卡', color: '#e6a23c' },
+  YEARLY: { name: '年卡', color: '#f56c6c' },
+  LIFETIME: { name: '终身卡', color: '#764ba2' }
 }

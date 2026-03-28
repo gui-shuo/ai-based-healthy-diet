@@ -93,6 +93,21 @@ public class AuthController {
     }
     
     /**
+     * 发送注册邮箱验证码
+     */
+    @PostMapping("/send-email-code")
+    public ApiResponse<Void> sendEmailCode(@RequestBody java.util.Map<String, String> body) {
+        String email = body.get("email");
+        if (email == null || email.isBlank()) {
+            return ApiResponse.error(400, "邮箱不能为空");
+        }
+        authService.sendRegisterEmailCode(email);
+        ApiResponse<Void> response = ApiResponse.success();
+        response.setMessage("验证码已发送到您的邮箱，5分钟内有效");
+        return response;
+    }
+    
+    /**
      * 忘记密码 - 发送重置验证码到邮箱
      */
     @PostMapping("/forgot-password")
@@ -112,6 +127,19 @@ public class AuthController {
         ApiResponse<Void> response = ApiResponse.success();
         response.setMessage("密码重置成功，请使用新密码登录");
         return response;
+    }
+    
+    /**
+     * 微信小程序登录
+     */
+    @PostMapping("/wx-login")
+    public ApiResponse<LoginResponse> wxLogin(
+            @Valid @RequestBody WxLoginRequest request,
+            HttpServletRequest httpRequest
+    ) {
+        String ipAddress = getClientIp(httpRequest);
+        LoginResponse response = authService.wxLogin(request.getCode(), ipAddress);
+        return ApiResponse.success("微信登录成功", response);
     }
     
     /**

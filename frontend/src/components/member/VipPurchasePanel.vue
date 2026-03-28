@@ -46,17 +46,14 @@
             原价 ¥{{ plan.originalPrice }}
           </div>
           <div class="plan-per-day">约¥{{ plan.pricePerDay }}/天</div>
-          <div v-if="plan.bonusGrowth" class="plan-bonus">
-            <el-icon><Present /></el-icon>
-            赠 {{ plan.bonusGrowth }} 成长值
-          </div>
           <!-- 权益预览 -->
           <ul class="plan-features" v-if="plan.benefits?.features">
             <li v-for="(f, i) in plan.benefits.features.slice(0, 3)" :key="i">
               <el-icon color="#67c23a"><CircleCheck /></el-icon> {{ f }}
             </li>
-            <li v-if="plan.benefits.features.length > 3" class="more-features">
-              +{{ plan.benefits.features.length - 3 }} 项更多权益
+            <li v-if="plan.benefits.features.length > 3" class="more-features"
+                @click.stop="showBenefitsDetail(plan)">
+              查看全部 {{ plan.benefits.features.length }} 项权益 →
             </li>
           </ul>
         </div>
@@ -183,6 +180,30 @@
         <p class="pay-hint">模拟支付模式：点击"确认支付"将自动完成支付流程，无需真实付款</p>
       </div>
     </el-dialog>
+    <!-- 权益详情 Dialog -->
+    <el-dialog
+      v-model="benefitsDialogVisible"
+      :title="benefitsDialogPlan?.planName + ' · 全部权益'"
+      width="420px"
+    >
+      <ul v-if="benefitsDialogPlan?.benefits?.features" class="benefits-full-list">
+        <li v-for="(f, i) in benefitsDialogPlan.benefits.features" :key="i">
+          <el-icon color="#67c23a"><CircleCheck /></el-icon>
+          <span>{{ f }}</span>
+        </li>
+      </ul>
+      <div class="benefits-quota" v-if="benefitsDialogPlan?.benefits">
+        <p v-if="benefitsDialogPlan.benefits.ai_daily_quota === -1">✨ AI咨询：无限次/天</p>
+        <p v-else>🤖 AI咨询：{{ benefitsDialogPlan.benefits.ai_daily_quota }}次/天</p>
+        <p v-if="benefitsDialogPlan.benefits.food_recognition === -1">📸 食物识别：不限次数</p>
+        <p v-else>📸 食物识别：{{ benefitsDialogPlan.benefits.food_recognition }}次/天</p>
+      </div>
+      <template #footer>
+        <el-button type="primary" @click="benefitsDialogVisible = false; selectedPlanId = benefitsDialogPlan?.id">
+          选择此套餐
+        </el-button>
+      </template>
+    </el-dialog>
   </el-card>
 </template>
 
@@ -203,6 +224,10 @@ const emit = defineEmits(['vip-activated'])
 
 const plansLoading = ref(false)
 const plans = ref([])
+
+// 权益详情
+const benefitsDialogVisible = ref(false)
+const benefitsDialogPlan = ref(null)
 const selectedPlanId = ref(null)
 const vipStatus = ref(null)
 
@@ -352,15 +377,21 @@ async function handleRefund(row) {
   try {
     const res = await simulateVipRefund(row.orderNo)
     if (res.data.code === 200) {
-      message.success('模拟退款成功')
+      message.success('退款成功，VIP权益已回收')
       showOrderHistory()
       fetchVipStatus()
+      emit('vip-activated') // 通知父组件刷新权限
     } else {
       message.error(res.data.message || '退款失败')
     }
   } catch (e) {
     message.error('退款操作失败')
   }
+}
+
+function showBenefitsDetail(plan) {
+  benefitsDialogPlan.value = plan
+  benefitsDialogVisible.value = true
 }
 
 // ------ 工具函数 ------
@@ -397,8 +428,16 @@ function statusTagType(status) {
 
 <style scoped lang="scss">
 .vip-purchase-panel {
-  border-radius: 12px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+
+  :deep(.el-card__header) {
+    padding: 12px 16px;
+  }
+
+  :deep(.el-card__body) {
+    padding: 14px 16px;
+  }
 
   .card-header {
     display: flex;
@@ -408,10 +447,10 @@ function statusTagType(status) {
     .title-group {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
 
       .title {
-        font-size: 18px;
+        font-size: 15px;
         font-weight: 600;
         color: #1f2937;
       }
@@ -421,11 +460,14 @@ function statusTagType(status) {
 
 .plans-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-  margin-bottom: 24px;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 10px;
+  margin-bottom: 16px;
 
   @media (max-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  @media (max-width: 480px) {
     grid-template-columns: 1fr;
   }
 }
@@ -433,22 +475,22 @@ function statusTagType(status) {
 .plan-card {
   position: relative;
   border: 2px solid #e5e7eb;
-  border-radius: 12px;
-  padding: 20px 16px;
+  border-radius: 10px;
+  padding: 14px 12px;
   cursor: pointer;
   transition: all 0.25s;
   background: #fff;
 
   &:hover {
     border-color: #667eea;
-    box-shadow: 0 4px 16px rgba(102, 126, 234, 0.15);
-    transform: translateY(-2px);
+    box-shadow: 0 2px 10px rgba(102, 126, 234, 0.12);
+    transform: translateY(-1px);
   }
 
   &.plan-selected {
     border-color: #667eea;
     background: linear-gradient(135deg, #f0f4ff 0%, #f8f0ff 100%);
-    box-shadow: 0 4px 20px rgba(102, 126, 234, 0.2);
+    box-shadow: 0 2px 12px rgba(102, 126, 234, 0.15);
   }
 
   &.plan-recommended {
@@ -462,10 +504,10 @@ function statusTagType(status) {
   .plan-badge {
     position: absolute;
     top: -1px;
-    right: 12px;
-    padding: 2px 10px;
-    border-radius: 0 0 8px 8px;
-    font-size: 12px;
+    right: 10px;
+    padding: 1px 8px;
+    border-radius: 0 0 6px 6px;
+    font-size: 11px;
     font-weight: 600;
     color: #fff;
 
@@ -481,59 +523,59 @@ function statusTagType(status) {
   }
 
   .plan-name {
-    font-size: 17px;
+    font-size: 14px;
     font-weight: 700;
     color: #1f2937;
-    margin-bottom: 4px;
+    margin-bottom: 2px;
   }
 
   .plan-duration {
-    font-size: 13px;
+    font-size: 12px;
     color: #9ca3af;
-    margin-bottom: 12px;
+    margin-bottom: 8px;
   }
 
   .plan-price {
     display: flex;
     align-items: baseline;
-    gap: 6px;
+    gap: 4px;
     margin-bottom: 2px;
 
     .price-current {
-      font-size: 28px;
+      font-size: 22px;
       font-weight: 700;
       color: #667eea;
     }
 
     .price-discount {
-      font-size: 13px;
+      font-size: 11px;
       color: #f56c6c;
       background: #fef0f0;
-      padding: 2px 6px;
-      border-radius: 4px;
+      padding: 1px 4px;
+      border-radius: 3px;
     }
   }
 
   .plan-original {
-    font-size: 12px;
+    font-size: 11px;
     color: #9ca3af;
     text-decoration: line-through;
-    margin-bottom: 4px;
+    margin-bottom: 2px;
   }
 
   .plan-per-day {
-    font-size: 12px;
+    font-size: 11px;
     color: #6b7280;
-    margin-bottom: 10px;
+    margin-bottom: 6px;
   }
 
   .plan-bonus {
     display: flex;
     align-items: center;
-    gap: 4px;
-    font-size: 12px;
+    gap: 3px;
+    font-size: 11px;
     color: #e6a23c;
-    margin-bottom: 12px;
+    margin-bottom: 8px;
   }
 
   .plan-features {
@@ -544,34 +586,69 @@ function statusTagType(status) {
     li {
       display: flex;
       align-items: center;
-      gap: 6px;
-      font-size: 13px;
+      gap: 4px;
+      font-size: 12px;
       color: #4b5563;
-      padding: 3px 0;
+      padding: 2px 0;
     }
 
     .more-features {
-      color: #9ca3af;
-      font-size: 12px;
+      color: #667eea;
+      font-size: 11px;
+      cursor: pointer;
+      &:hover { text-decoration: underline; }
     }
   }
+}
+
+// 权益详情弹窗
+.benefits-full-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 0;
+    font-size: 14px;
+    color: #374151;
+    border-bottom: 1px solid #f3f4f6;
+    &:last-child { border-bottom: none; }
+  }
+}
+.benefits-quota {
+  margin-top: 12px;
+  padding: 12px;
+  background: #f0f4ff;
+  border-radius: 8px;
+  p { margin: 4px 0; font-size: 13px; color: #4b5563; }
 }
 
 .pay-action {
   text-align: center;
 
+  .pay-type-select {
+    margin-bottom: 10px;
+
+    .pay-type-label {
+      font-size: 13px;
+      color: #6b7280;
+    }
+  }
+
   .pay-btn {
-    min-width: 260px;
-    height: 48px;
-    font-size: 16px;
-    border-radius: 24px;
+    min-width: 220px;
+    height: 40px;
+    font-size: 14px;
+    border-radius: 20px;
     background: linear-gradient(135deg, #1677ff 0%, #0958d9 100%);
     border: none;
-    box-shadow: 0 4px 16px rgba(22, 119, 255, 0.3);
+    box-shadow: 0 3px 10px rgba(22, 119, 255, 0.25);
 
     &:hover {
       transform: translateY(-1px);
-      box-shadow: 0 6px 20px rgba(22, 119, 255, 0.4);
+      box-shadow: 0 4px 14px rgba(22, 119, 255, 0.35);
     }
   }
 
@@ -580,8 +657,8 @@ function statusTagType(status) {
     align-items: center;
     justify-content: center;
     gap: 4px;
-    margin-top: 10px;
-    font-size: 12px;
+    margin-top: 8px;
+    font-size: 11px;
     color: #9ca3af;
   }
 }
@@ -590,12 +667,12 @@ function statusTagType(status) {
 .pay-dialog-content {
   .pay-countdown {
     text-align: center;
-    font-size: 15px;
+    font-size: 14px;
     color: #6b7280;
-    margin: 16px 0;
+    margin: 12px 0;
 
     .countdown-num {
-      font-size: 20px;
+      font-size: 18px;
       font-weight: 700;
       color: #e6a23c;
       font-family: monospace;
@@ -604,23 +681,23 @@ function statusTagType(status) {
 
   .pay-expired {
     text-align: center;
-    font-size: 15px;
+    font-size: 14px;
     color: #f56c6c;
-    margin: 16px 0;
+    margin: 12px 0;
   }
 
   .pay-buttons {
     display: flex;
-    gap: 12px;
+    gap: 10px;
     justify-content: center;
-    margin-top: 20px;
+    margin-top: 16px;
   }
 
   .pay-hint {
     text-align: center;
-    font-size: 12px;
+    font-size: 11px;
     color: #9ca3af;
-    margin-top: 12px;
+    margin-top: 10px;
   }
 }
 </style>

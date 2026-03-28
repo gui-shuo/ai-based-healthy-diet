@@ -1,0 +1,465 @@
+<template>
+  <view class="chat-page">
+    <!-- Custom Navigation Bar -->
+    <view class="nav-bar" :style="{ paddingTop: statusBarHeight + 'px' }">
+      <view class="nav-bar-inner flex-between">
+        <view class="nav-back" @tap="goBack">
+          <text class="icon-back">‹</text>
+        </view>
+        <text class="nav-title">AI 营养师</text>
+        <view class="nav-placeholder" />
+      </view>
+    </view>
+
+    <!-- Message List -->
+    <scroll-view
+      class="message-list"
+      scroll-y
+      :scroll-top="scrollTop"
+      :scroll-into-view="scrollIntoView"
+      :style="{ top: navHeight + 'px', bottom: inputAreaHeight + 'px' }"
+      @scrolltoupper="onScrollToUpper"
+    >
+      <view class="message-wrapper" v-for="(msg, idx) in messages" :key="idx" :id="'msg-' + idx">
+        <!-- AI Message -->
+        <view v-if="msg.role === 'assistant'" class="message-row assistant">
+          <view class="avatar avatar-ai">🤖</view>
+          <view class="bubble bubble-ai">
+            <text class="bubble-text">{{ msg.content }}</text>
+          </view>
+        </view>
+        <!-- User Message -->
+        <view v-else class="message-row user">
+          <view class="bubble bubble-user">
+            <text class="bubble-text">{{ msg.content }}</text>
+          </view>
+          <view class="avatar avatar-user">😊</view>
+        </view>
+      </view>
+
+      <!-- Typing Indicator -->
+      <view v-if="isTyping" class="message-row assistant" id="typing-indicator">
+        <view class="avatar avatar-ai">🤖</view>
+        <view class="bubble bubble-ai typing-bubble">
+          <view class="typing-dots">
+            <view class="dot" />
+            <view class="dot" />
+            <view class="dot" />
+          </view>
+        </view>
+      </view>
+
+      <view class="scroll-bottom-anchor" :id="'msg-' + messages.length" />
+    </scroll-view>
+
+    <!-- Bottom Input Area -->
+    <view class="input-area" :id="'input-area'">
+      <view class="input-row flex">
+        <input
+          class="chat-input flex-1"
+          v-model="inputText"
+          placeholder="输入你的营养健康问题..."
+          :disabled="isSending"
+          confirm-type="send"
+          @confirm="sendMessage"
+          :adjust-position="true"
+        />
+        <view
+          class="send-btn"
+          :class="{ 'send-btn-active': inputText.trim() && !isSending }"
+          @tap="sendMessage"
+        >
+          <text>发送</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="ts">
+import { ref, nextTick, onMounted, onUnmounted, computed } from 'vue'
+import { onLoad, onShow, onHide } from '@dcloudio/uni-app'
+import { checkLogin } from '@/utils/common'
+import { getToken } from '@/utils/request'
+
+interface ChatMessage {
+  role: 'user' | 'assistant'
+  content: string
+}
+
+const WS_URL = 'wss://nutriai.itshuo.me/ws/ai'
+
+const messages = ref<ChatMessage[]>([])
+const inputText = ref('')
+const isTyping = ref(false)
+const isSending = ref(false)
+const scrollTop = ref(0)
+const scrollIntoView = ref('')
+const statusBarHeight = ref(0)
+const navHeight = ref(0)
+const inputAreaHeight = ref(100)
+
+let socketTask: UniApp.SocketTask | null = null
+let connected = ref(false)
+let reconnectTimer: ReturnType<typeof setTimeout> | null = null
+let reconnectAttempts = 0
+const MAX_RECONNECT = 5
+
+onLoad(() => {
+  if (!checkLogin()) return
+  const sysInfo = uni.getSystemInfoSync()
+  statusBarHeight.value = sysInfo.statusBarHeight || 44
+  navHeight.value = statusBarHeight.value + 44
+  inputAreaHeight.value = 100 + (sysInfo.safeAreaInsets?.bottom || 0)
+
+  // Welcome message
+  messages.value.push({
+    role: 'assistant',
+    content: '你好！我是AI营养师，有什么营养健康问题可以问我哦～'
+  })
+
+  connectWebSocket()
+})
+
+onShow(() => {
+  if (!connected.value && getToken()) {
+    connectWebSocket()
+  }
+})
+
+onHide(() => {
+  clearReconnectTimer()
+})
+
+onUnmounted(() => {
+  closeWebSocket()
+  clearReconnectTimer()
+})
+
+function connectWebSocket() {
+  const token = getToken()
+  if (!token) return
+
+  closeWebSocket()
+
+  socketTask = uni.connectSocket({
+    url: WS_URL,
+    success: () => {},
+    fail: (err) => {
+      console.error('WebSocket connect fail:', err)
+      scheduleReconnect()
+    }
+  })
+
+  socketTask.onOpen(() => {
+    connected.value = true
+    reconnectAttempts = 0
+    // Send auth
+    socketTask?.send({
+      data: JSON.stringify({ type: 'auth', token }),
+      success: () => {},
+      fail: () => {}
+    })
+  })
+
+  socketTask.onMessage((res) => {
+    try {
+      const data = JSON.parse(res.data as string)
+      handleMessage(data)
+    } catch (e) {
+      console.error('Parse message error:', e)
+    }
+  })
+
+  socketTask.onError(() => {
+    connected.value = false
+    scheduleReconnect()
+  })
+
+  socketTask.onClose(() => {
+    connected.value = false
+    if (!isSending.value) {
+      scheduleReconnect()
+    }
+  })
+}
+
+function handleMessage(data: { type: string; content?: string; message?: string }) {
+  if (data.type === 'token') {
+    // Streaming token
+    const lastMsg = messages.value[messages.value.length - 1]
+    if (lastMsg && lastMsg.role === 'assistant' && isTyping.value) {
+      lastMsg.content += data.content || ''
+    } else {
+      messages.value.push({ role: 'assistant', content: data.content || '' })
+    }
+    scrollToBottom()
+  } else if (data.type === 'done') {
+    isTyping.value = false
+    isSending.value = false
+    scrollToBottom()
+  } else if (data.type === 'error') {
+    isTyping.value = false
+    isSending.value = false
+    uni.showToast({ title: data.message || 'AI响应出错', icon: 'none' })
+  }
+}
+
+function sendMessage() {
+  const text = inputText.value.trim()
+  if (!text || isSending.value) return
+
+  if (!connected.value) {
+    uni.showToast({ title: '连接中，请稍候...', icon: 'none' })
+    connectWebSocket()
+    return
+  }
+
+  messages.value.push({ role: 'user', content: text })
+  inputText.value = ''
+  isSending.value = true
+  isTyping.value = true
+
+  socketTask?.send({
+    data: JSON.stringify({ type: 'chat', message: text }),
+    success: () => {},
+    fail: () => {
+      isSending.value = false
+      isTyping.value = false
+      uni.showToast({ title: '发送失败，请重试', icon: 'none' })
+    }
+  })
+
+  scrollToBottom()
+}
+
+function scrollToBottom() {
+  nextTick(() => {
+    scrollIntoView.value = ''
+    setTimeout(() => {
+      scrollIntoView.value = 'msg-' + messages.value.length
+    }, 50)
+  })
+}
+
+function scheduleReconnect() {
+  clearReconnectTimer()
+  if (reconnectAttempts >= MAX_RECONNECT) {
+    uni.showToast({ title: '连接失败，请重新进入', icon: 'none' })
+    return
+  }
+  const delay = Math.min(1000 * Math.pow(2, reconnectAttempts), 10000)
+  reconnectAttempts++
+  reconnectTimer = setTimeout(() => {
+    if (!connected.value) connectWebSocket()
+  }, delay)
+}
+
+function clearReconnectTimer() {
+  if (reconnectTimer) {
+    clearTimeout(reconnectTimer)
+    reconnectTimer = null
+  }
+}
+
+function closeWebSocket() {
+  if (socketTask) {
+    try { socketTask.close({}) } catch {}
+    socketTask = null
+  }
+  connected.value = false
+}
+
+function goBack() {
+  uni.navigateBack({ fail: () => uni.switchTab({ url: '/pages/index/index' }) })
+}
+</script>
+
+<style scoped>
+.chat-page {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #f0f2f5;
+}
+
+/* Navigation Bar */
+.nav-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: linear-gradient(135deg, #07c160, #06ad56);
+}
+.nav-bar-inner {
+  height: 88rpx;
+  padding: 0 20rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.nav-back {
+  width: 80rpx;
+  height: 80rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.icon-back {
+  font-size: 48rpx;
+  color: #fff;
+  font-weight: bold;
+}
+.nav-title {
+  font-size: 34rpx;
+  font-weight: 600;
+  color: #fff;
+}
+.nav-placeholder {
+  width: 80rpx;
+}
+
+/* Message List */
+.message-list {
+  position: fixed;
+  left: 0;
+  right: 0;
+  overflow-y: auto;
+  padding: 20rpx 24rpx;
+}
+
+.message-wrapper {
+  margin-bottom: 24rpx;
+}
+
+.message-row {
+  display: flex;
+  align-items: flex-start;
+}
+.message-row.user {
+  justify-content: flex-end;
+}
+.message-row.assistant {
+  justify-content: flex-start;
+}
+
+.avatar {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36rpx;
+  flex-shrink: 0;
+}
+.avatar-ai {
+  background: #fff;
+  margin-right: 16rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.08);
+}
+.avatar-user {
+  background: #07c160;
+  margin-left: 16rpx;
+}
+
+.bubble {
+  max-width: 70%;
+  padding: 20rpx 28rpx;
+  border-radius: 20rpx;
+  word-break: break-all;
+}
+.bubble-ai {
+  background: #fff;
+  border-top-left-radius: 4rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.06);
+}
+.bubble-user {
+  background: #07c160;
+  border-top-right-radius: 4rpx;
+  box-shadow: 0 2rpx 8rpx rgba(7,193,96,0.3);
+}
+.bubble-user .bubble-text {
+  color: #fff;
+}
+.bubble-text {
+  font-size: 30rpx;
+  line-height: 1.6;
+  color: #333;
+}
+
+/* Typing Indicator */
+.typing-bubble {
+  padding: 24rpx 32rpx;
+}
+.typing-dots {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+.dot {
+  width: 14rpx;
+  height: 14rpx;
+  background: #999;
+  border-radius: 50%;
+  animation: bounce 1.4s infinite ease-in-out;
+}
+.dot:nth-child(1) { animation-delay: 0s; }
+.dot:nth-child(2) { animation-delay: 0.2s; }
+.dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes bounce {
+  0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+  40% { transform: scale(1); opacity: 1; }
+}
+
+.scroll-bottom-anchor {
+  height: 2rpx;
+}
+
+/* Input Area */
+.input-area {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #fff;
+  padding: 16rpx 24rpx;
+  padding-bottom: calc(16rpx + env(safe-area-inset-bottom));
+  border-top: 1rpx solid #eee;
+  z-index: 100;
+}
+.input-row {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+.chat-input {
+  flex: 1;
+  height: 72rpx;
+  background: #f5f6f7;
+  border-radius: 36rpx;
+  padding: 0 28rpx;
+  font-size: 28rpx;
+  color: #333;
+}
+.send-btn {
+  width: 120rpx;
+  height: 72rpx;
+  border-radius: 36rpx;
+  background: #ccc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+.send-btn text {
+  font-size: 28rpx;
+  color: #fff;
+  font-weight: 500;
+}
+.send-btn-active {
+  background: linear-gradient(135deg, #07c160, #06ad56);
+}
+</style>

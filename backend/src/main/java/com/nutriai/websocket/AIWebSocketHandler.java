@@ -131,7 +131,11 @@ public class AIWebSocketHandler extends TextWebSocketHandler {
         String sessionId = session.getId();
         Long userId = sessionManager.getUserIdBySessionId(sessionId);
         
-        log.error("❌ WebSocket传输错误: sessionId={}, userId={}", sessionId, userId, exception);
+        if (exception instanceof java.io.EOFException || exception instanceof java.io.IOException) {
+            log.debug("WebSocket连接断开(客户端关闭): sessionId={}, userId={}", sessionId, userId);
+        } else {
+            log.warn("WebSocket传输错误: sessionId={}, userId={}, error={}", sessionId, userId, exception.getMessage());
+        }
         
         if (userId != null) {
             sessionManager.removeSession(userId);

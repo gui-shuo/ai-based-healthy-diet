@@ -65,7 +65,8 @@ public class SecurityConfig {
                                 "/products/search",  // 产品搜索（公开）
                                 "/products/recommended",  // 推荐产品（公开）
                                 "/products/categories",  // 产品分类（公开）
-                                "/products/*"  // 产品详情（公开）
+                                "/products/*",  // 产品详情（公开）
+                                "/community/feed"  // 社区动态列表（公开浏览）
                         ).permitAll()
                         
                         // 其他所有请求都需要认证

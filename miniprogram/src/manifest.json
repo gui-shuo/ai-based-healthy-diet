@@ -1,0 +1,28 @@
+{
+    "name": "NutriAI",
+    "appid": "__UNI__NUTRIAI",
+    "description": "AI智能健康饮食助手",
+    "versionName": "1.0.0",
+    "versionCode": "100",
+    "transformPx": false,
+    "mp-weixin": {
+        "appid": "wxcf557b14e389275f",
+        "setting": {
+            "urlCheck": false,
+            "es6": true,
+            "postcss": true,
+            "minified": true
+        },
+        "usingComponents": true,
+        "permission": {
+            "scope.userLocation": {
+                "desc": "获取位置信息用于推荐附近营养师"
+            }
+        },
+        "requiredPrivateInfos": ["chooseImage", "chooseVideo"]
+    },
+    "uniStatistics": {
+        "enable": false
+    },
+    "vueVersion": "3"
+}

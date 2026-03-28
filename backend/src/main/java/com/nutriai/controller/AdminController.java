@@ -196,7 +196,7 @@ public class AdminController {
      * 更新用户角色
      */
     @PutMapping("/users/{id}/role")
-    @PreAuthorize("hasRole('SUPER_ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
     public ResponseEntity<ApiResponse<String>> updateUserRole(
             @PathVariable Long id,
             @RequestBody Map<String, String> request) {
@@ -297,7 +297,7 @@ public class AdminController {
      * 更新配置
      */
     @PutMapping("/config/{key}")
-    @PreAuthorize("hasRole('SUPER_ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
     public ResponseEntity<ApiResponse<String>> updateConfig(
             @PathVariable String key,
             @RequestBody Map<String, String> request) {
@@ -316,7 +316,7 @@ public class AdminController {
      * 创建配置
      */
     @PostMapping("/config")
-    @PreAuthorize("hasRole('SUPER_ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
     public ResponseEntity<ApiResponse<SystemConfigDTO>> createConfig(
             @RequestBody SystemConfigDTO dto) {
         try {
@@ -333,7 +333,7 @@ public class AdminController {
      * 删除配置
      */
     @DeleteMapping("/config/{key}")
-    @PreAuthorize("hasRole('SUPER_ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
     public ResponseEntity<ApiResponse<String>> deleteConfig(@PathVariable String key) {
         try {
             configService.deleteConfig(key);

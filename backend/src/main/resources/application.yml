@@ -91,12 +91,11 @@ jwt:
   expiration: 86400000  # 24小时（毫秒）
   refresh-expiration: 604800000  # 7天（毫秒）
 
-# 通义千问API配置
-tongyi:
-  api-key: ${TONGYI_API_KEY:}
-  api-url: ${TONGYI_API_URL:}
-  model-name: ${TONGYI_MODEL_NAME:qwen-turbo}
-  model: ${TONGYI_MODEL_NAME:qwen-turbo}
+# AI大模型配置（OpenAI兼容协议，支持任意供应商）
+ai:
+  api-key: ${AI_API_KEY:}
+  base-url: ${AI_BASE_URL:}
+  model-name: ${AI_MODEL_NAME:qwen-turbo}
   max-tokens: 2000
   temperature: 0.7
   top-p: 0.9
@@ -151,11 +150,9 @@ logging:
 
 # 系统配置
 nutriai:
-  # AI配额配置
+  # AI配额配置（未订阅营养卡用户的每日免费额度，VIP用户额度从套餐benefits中读取）
   ai-quota:
-    free: 3         # 普通会员每日AI咨询次数
-    silver: 10      # 白银会员每日AI咨询次数
-    gold: 20        # 黄金会员每日AI咨询次数
+    free: 3         # 免费用户每日AI咨询次数
   
   # 会员成长值配置
   growth-points:

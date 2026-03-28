@@ -1,11 +1,9 @@
 package com.nutriai.service;
 
-import com.nutriai.entity.Member;
-import com.nutriai.entity.MemberLevel;
 import com.nutriai.entity.VipOrder;
-import com.nutriai.repository.MemberLevelRepository;
-import com.nutriai.repository.MemberRepository;
+import com.nutriai.entity.VipPlan;
 import com.nutriai.repository.VipOrderRepository;
+import com.nutriai.repository.VipPlanRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,88 +18,80 @@ import java.util.Map;
 
 /**
  * 会员权限服务
- * 根据会员等级和VIP状态管理功能权限与AI配额
+ * 基于 NutriAI 营养卡套餐管理功能权限与AI配额
  */
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class MemberPermissionService {
 
-    private final MemberRepository memberRepository;
-    private final MemberLevelRepository memberLevelRepository;
     private final VipOrderRepository vipOrderRepository;
+    private final VipPlanRepository vipPlanRepository;
     private final StringRedisTemplate redisTemplate;
 
     @Value("${nutriai.ai-quota.free:3}")
     private int freeQuota;
 
-    @Value("${nutriai.ai-quota.silver:10}")
-    private int silverQuota;
-
-    @Value("${nutriai.ai-quota.gold:20}")
-    private int goldQuota;
-
     private static final String QUOTA_KEY_PREFIX = "ai:quota:daily:";
 
     /**
-     * 获取用户的有效会员等级代码
-     * 综合会员等级和VIP状态，返回最高权限
+     * 获取用户的有效会员等级（营养卡套餐代码）
+     * 返回当前活跃VIP订单对应的套餐代码，无VIP则返回 FREE
      */
     public String getEffectiveTier(Long userId) {
-        // 检查VIP状态
-        boolean isVip = isVipActive(userId);
-        if (isVip) {
-            return "GOLD"; // VIP用户享受黄金等级权限
-        }
+        VipOrder activeOrder = getActiveOrder(userId);
+        if (activeOrder == null) return "FREE";
+        VipPlan plan = vipPlanRepository.findById(activeOrder.getPlanId()).orElse(null);
+        if (plan == null) return "FREE";
+        return plan.getPlanCode();
+    }
 
-        // 检查会员等级
-        Member member = memberRepository.findByUserId(userId).orElse(null);
-        if (member == null) {
-            return "FREE";
-        }
-
-        MemberLevel level = memberLevelRepository.findById(member.getLevelId()).orElse(null);
-        if (level == null) {
-            return "FREE";
-        }
-
-        String code = level.getLevelCode().toUpperCase();
-        // GOLD/PLATINUM -> GOLD, SILVER -> SILVER, else FREE
-        if ("GOLD".equals(code) || "PLATINUM".equals(code)) {
-            return "GOLD";
-        } else if ("SILVER".equals(code)) {
-            return "SILVER";
-        }
-        return "FREE";
+    /**
+     * 获取用户当前活跃的VIP订单（最新一笔）
+     */
+    private VipOrder getActiveOrder(Long userId) {
+        List<VipOrder> activeOrders = vipOrderRepository.findActiveVipOrders(userId, LocalDateTime.now());
+        return activeOrders.isEmpty() ? null : activeOrders.get(0);
     }
 
     /**
      * 检查用户VIP是否有效
      */
     public boolean isVipActive(Long userId) {
-        List<VipOrder> activeOrders = vipOrderRepository.findActiveVipOrders(userId, LocalDateTime.now());
-        return !activeOrders.isEmpty();
+        return getActiveOrder(userId) != null;
     }
 
     /**
      * 获取VIP到期时间（无VIP返回null）
      */
     public LocalDateTime getVipExpireAt(Long userId) {
-        List<VipOrder> activeOrders = vipOrderRepository.findActiveVipOrders(userId, LocalDateTime.now());
-        if (activeOrders.isEmpty()) return null;
-        return activeOrders.get(0).getVipExpireAt();
+        VipOrder order = getActiveOrder(userId);
+        return order != null ? order.getVipExpireAt() : null;
     }
 
     /**
      * 获取用户每日AI配额上限
+     * 从营养卡套餐的 benefits JSON 中读取 ai_daily_quota，-1表示无限
      */
     public int getDailyQuota(Long userId) {
-        String tier = getEffectiveTier(userId);
-        return switch (tier) {
-            case "GOLD" -> goldQuota;
-            case "SILVER" -> silverQuota;
-            default -> freeQuota;
-        };
+        VipOrder activeOrder = getActiveOrder(userId);
+        if (activeOrder == null) return freeQuota;
+
+        VipPlan plan = vipPlanRepository.findById(activeOrder.getPlanId()).orElse(null);
+        if (plan == null) return freeQuota;
+
+        // 从 benefits JSON 读取 ai_daily_quota
+        if (plan.getBenefits() instanceof Map) {
+            @SuppressWarnings("unchecked")
+            Map<String, Object> benefits = (Map<String, Object>) plan.getBenefits();
+            Object quota = benefits.get("ai_daily_quota");
+            if (quota instanceof Number) {
+                int q = ((Number) quota).intValue();
+                if (q == -1) return Integer.MAX_VALUE; // 无限
+                return q;
+            }
+        }
+        return freeQuota;
     }
 
     /**
@@ -115,10 +105,10 @@ public class MemberPermissionService {
 
     /**
      * 检查用户是否还有AI额度
-     * @return true=可以使用
      */
     public boolean checkAiQuota(Long userId) {
         int quota = getDailyQuota(userId);
+        if (quota == Integer.MAX_VALUE) return true;
         int used = getTodayUsage(userId);
         return used < quota;
     }
@@ -130,7 +120,6 @@ public class MemberPermissionService {
         String key = QUOTA_KEY_PREFIX + LocalDate.now() + ":" + userId;
         Long newVal = redisTemplate.opsForValue().increment(key);
         if (newVal != null && newVal == 1) {
-            // 首次设置时添加过期时间（次日零点后自动清除）
             redisTemplate.expire(key, Duration.ofHours(25));
         }
     }
@@ -145,54 +134,37 @@ public class MemberPermissionService {
         int used = getTodayUsage(userId);
         LocalDateTime vipExpireAt = getVipExpireAt(userId);
 
-        // 获取会员等级名称
-        String levelName = "普通用户";
-        Member member = memberRepository.findByUserId(userId).orElse(null);
-        if (member != null) {
-            MemberLevel level = memberLevelRepository.findById(member.getLevelId()).orElse(null);
-            if (level != null) {
-                levelName = level.getLevelName();
-            }
+        String planName = "免费用户";
+        if (isVip) {
+            VipOrder order = getActiveOrder(userId);
+            if (order != null) planName = order.getPlanName();
         }
 
         return Map.of(
                 "tier", tier,
                 "isVip", isVip,
-                "memberLevel", levelName,
-                "aiQuotaTotal", quota,
+                "planName", planName,
+                "aiQuotaTotal", quota == Integer.MAX_VALUE ? -1 : quota,
                 "aiQuotaUsed", used,
-                "aiQuotaRemain", Math.max(quota - used, 0),
+                "aiQuotaRemain", quota == Integer.MAX_VALUE ? -1 : Math.max(quota - used, 0),
                 "vipExpireAt", vipExpireAt != null ? vipExpireAt.toString() : "",
-                "features", getFeaturesByTier(tier)
+                "features", getFeaturesByPlan(tier)
         );
     }
 
     /**
-     * 根据等级获取可用功能列表
+     * 根据套餐获取可用功能
      */
-    private Map<String, Boolean> getFeaturesByTier(String tier) {
-        return switch (tier) {
-            case "GOLD" -> Map.of(
-                    "aiChat", true,
-                    "foodRecognition", true,
-                    "dietPlan", true,
-                    "imageRecognition", true,
-                    "unlimitedRecords", true
-            );
-            case "SILVER" -> Map.of(
-                    "aiChat", true,
-                    "foodRecognition", true,
-                    "dietPlan", true,
-                    "imageRecognition", true,
-                    "unlimitedRecords", false
-            );
-            default -> Map.of(
-                    "aiChat", true,
-                    "foodRecognition", true,
-                    "dietPlan", false,
-                    "imageRecognition", true,
-                    "unlimitedRecords", false
-            );
-        };
+    private Map<String, Boolean> getFeaturesByPlan(String planCode) {
+        boolean isVip = !"FREE".equals(planCode);
+        boolean isPremium = List.of("QUARTERLY", "YEARLY", "LIFETIME").contains(planCode);
+        return Map.of(
+                "aiChat", true,
+                "foodRecognition", true,
+                "dietPlan", isVip,
+                "imageRecognition", true,
+                "unlimitedRecords", isPremium,
+                "prioritySupport", isPremium
+        );
     }
 }

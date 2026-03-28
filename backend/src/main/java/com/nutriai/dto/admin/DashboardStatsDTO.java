@@ -58,8 +58,6 @@ public class DashboardStatsDTO {
     @AllArgsConstructor
     public static class MemberStats {
         private Long free;              // 免费用户数
-        private Long bronze;            // 青铜会员数
-        private Long silver;            // 白银会员数
-        private Long gold;              // 黄金会员数
+        private Long vip;               // VIP会员数（所有营养卡用户）
     }
 }

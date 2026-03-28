@@ -9,13 +9,17 @@ import com.nutriai.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -38,14 +42,23 @@ public class AuthService {
     @Autowired
     private MemberService memberService;
     
+    @Value("${wechat.miniapp.appid:}")
+    private String wxAppId;
+    
+    @Value("${wechat.miniapp.secret:}")
+    private String wxAppSecret;
+    
     private static final String CAPTCHA_PREFIX = "captcha:";
     private static final String LOGIN_FAIL_PREFIX = "login:fail:";
     private static final String RESET_CODE_PREFIX = "reset:code:";
+    private static final String EMAIL_CODE_PREFIX = "register:email:";
+    private static final String EMAIL_RATE_PREFIX = "register:rate:";
     private static final int MAX_LOGIN_FAIL = 3;
     private static final int CAPTCHA_EXPIRE_MINUTES = 5;
     private static final int LOGIN_FAIL_EXPIRE_MINUTES = 30;
     private static final int RESET_CODE_EXPIRE_MINUTES = 15;
     private static final int RESET_CODE_LENGTH = 6;
+    private static final int EMAIL_CODE_EXPIRE_MINUTES = 5;
     
     /**
      * 用户注册
@@ -60,24 +73,27 @@ public class AuthService {
         // 2. 验证码校验
         validateCaptcha(request.getCaptchaKey(), request.getCaptcha());
         
-        // 3. 检查用户名是否已存在
+        // 3. 邮箱验证码校验
+        validateEmailCode(request.getEmail(), request.getEmailCode());
+        
+        // 4. 检查用户名是否已存在
         if (userRepository.existsByUsername(request.getUsername())) {
             throw BusinessException.Auth.usernameExists();
         }
         
-        // 4. 检查邮箱是否已存在
+        // 5. 检查邮箱是否已存在
         if (userRepository.existsByEmail(request.getEmail())) {
             throw BusinessException.Auth.emailExists();
         }
         
-        // 5. 检查手机号是否已存在（如果提供）
+        // 6. 检查手机号是否已存在（如果提供）
         if (request.getPhone() != null && !request.getPhone().isEmpty()) {
             if (userRepository.existsByPhone(request.getPhone())) {
                 throw BusinessException.Auth.phoneExists();
             }
         }
         
-        // 6. 创建用户
+        // 7. 创建用户
         User user = User.builder()
                 .username(request.getUsername())
                 .password(passwordEncoder.encode(request.getPassword()))
@@ -280,6 +296,63 @@ public class AuthService {
     }
     
     /**
+     * 发送注册邮箱验证码
+     */
+    public void sendRegisterEmailCode(String email) {
+        // 检查邮箱是否已注册
+        if (userRepository.existsByEmail(email)) {
+            throw BusinessException.Auth.emailExists();
+        }
+        
+        // 频率限制：1分钟内只能发一次
+        String rateLimitKey = EMAIL_RATE_PREFIX + email;
+        if (Boolean.TRUE.equals(redisTemplate.hasKey(rateLimitKey))) {
+            throw new BusinessException(429, "发送过于频繁，请1分钟后重试");
+        }
+        
+        // 生成6位数字验证码
+        StringBuilder code = new StringBuilder();
+        for (int i = 0; i < 6; i++) {
+            code.append((int) (Math.random() * 10));
+        }
+        String emailCode = code.toString();
+        
+        // 存储到Redis
+        String redisKey = EMAIL_CODE_PREFIX + email;
+        redisTemplate.opsForValue().set(redisKey, emailCode, EMAIL_CODE_EXPIRE_MINUTES, TimeUnit.MINUTES);
+        redisTemplate.opsForValue().set(rateLimitKey, "1", 1, TimeUnit.MINUTES);
+        
+        // 发送邮件
+        try {
+            emailService.sendRegisterCode(email, emailCode);
+            log.info("注册邮箱验证码已发送: email={}", email);
+        } catch (Exception e) {
+            log.error("发送注册邮箱验证码失败: email={}", email, e);
+            redisTemplate.delete(redisKey);
+            throw BusinessException.Auth.emailSendFailed();
+        }
+    }
+    
+    /**
+     * 验证邮箱验证码
+     */
+    private void validateEmailCode(String email, String code) {
+        if (email == null || code == null) {
+            throw new BusinessException(40005, "邮箱验证码错误");
+        }
+        
+        String redisKey = EMAIL_CODE_PREFIX + email;
+        String storedCode = (String) redisTemplate.opsForValue().get(redisKey);
+        
+        if (storedCode == null || !storedCode.equals(code)) {
+            throw new BusinessException(40005, "邮箱验证码错误或已过期");
+        }
+        
+        // 验证通过后删除
+        redisTemplate.delete(redisKey);
+    }
+    
+    /**
      * 检查用户名是否可用
      */
     public boolean checkUsernameAvailable(String username) {
@@ -413,5 +486,81 @@ public class AuthService {
         clearLoginFailCount(user.getUsername());
         
         log.info("用户密码重置成功: email={}", email);
+    }
+    
+    /**
+     * 微信小程序登录
+     */
+    @Transactional
+    @SuppressWarnings("unchecked")
+    public LoginResponse wxLogin(String code, String ipAddress) {
+        if (wxAppId == null || wxAppId.isBlank() || wxAppSecret == null || wxAppSecret.isBlank()) {
+            throw new BusinessException(500, "微信小程序配置未完成");
+        }
+        
+        // 1. 使用code向微信服务器换取openid
+        String url = String.format(
+            "https://api.weixin.qq.com/sns/jscode2session?appid=%s&secret=%s&js_code=%s&grant_type=authorization_code",
+            wxAppId, wxAppSecret, code
+        );
+        
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<Map> response = restTemplate.getForEntity(url, Map.class);
+        Map<String, Object> body = response.getBody();
+        
+        if (body == null || body.containsKey("errcode") && !Integer.valueOf(0).equals(body.get("errcode"))) {
+            String errMsg = body != null ? String.valueOf(body.get("errmsg")) : "unknown";
+            log.error("微信登录失败: errcode={}, errmsg={}", body != null ? body.get("errcode") : "null", errMsg);
+            throw new BusinessException(500, "微信登录失败: " + errMsg);
+        }
+        
+        String openId = (String) body.get("openid");
+        if (openId == null || openId.isBlank()) {
+            throw new BusinessException(500, "微信登录失败: 无法获取openid");
+        }
+        
+        // 2. 查找或创建用户
+        User user = userRepository.findByWxOpenId(openId).orElse(null);
+        
+        if (user == null) {
+            // 自动注册新用户
+            String autoUsername = "wx_" + openId.substring(0, Math.min(openId.length(), 16));
+            String autoNickname = "微信用户" + openId.substring(openId.length() - 4);
+            
+            user = User.builder()
+                    .username(autoUsername)
+                    .password(passwordEncoder.encode(UUID.randomUUID().toString()))
+                    .wxOpenId(openId)
+                    .nickname(autoNickname)
+                    .role("USER")
+                    .status("ACTIVE")
+                    .build();
+            userRepository.save(user);
+            log.info("微信用户自动注册: openId={}, username={}", openId, autoUsername);
+        }
+        
+        // 3. 检查账号状态
+        if ("BANNED".equalsIgnoreCase(user.getStatus())) {
+            throw BusinessException.Auth.accountBanned();
+        }
+        
+        // 4. 更新登录信息
+        user.setLastLoginTime(LocalDateTime.now());
+        user.setLastLoginIp(ipAddress);
+        userRepository.save(user);
+        
+        // 5. 生成JWT
+        String accessToken = jwtUtil.generateAccessToken(user.getId(), user.getUsername(), user.getRole());
+        String refreshToken = jwtUtil.generateRefreshToken(user.getId(), user.getUsername());
+        
+        log.info("微信用户登录成功: openId={}, userId={}", openId, user.getId());
+        
+        return LoginResponse.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .tokenType("Bearer")
+                .expiresIn(jwtUtil.getExpiration() / 1000)
+                .userInfo(LoginResponse.UserInfo.fromUser(user))
+                .build();
     }
 }

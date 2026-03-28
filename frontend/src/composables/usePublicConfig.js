@@ -1,17 +1,22 @@
 import { ref } from 'vue'
 import api from '@/services/api'
 
+const CACHE_KEY = 'nutriai_public_config'
+
 /**
  * 公开配置组合式函数
- * 用于在用户前端获取和使用系统配置
+ * 使用 localStorage 缓存消除首次渲染闪烁
  */
 export function usePublicConfig() {
-  const config = ref({})
+  // 优先从缓存读取，避免页面闪烁
+  let cached = {}
+  try { cached = JSON.parse(localStorage.getItem(CACHE_KEY) || '{}') } catch { cached = {} }
+  const config = ref(cached)
   const loading = ref(false)
   const error = ref(null)
 
   /**
-   * 加载所有公开配置
+   * 加载所有公开配置（先用缓存渲染，再异步更新）
    */
   const loadConfig = async () => {
     loading.value = true
@@ -22,6 +27,8 @@ export function usePublicConfig() {
 
       if (data.code === 200) {
         config.value = data.data
+        // 写入缓存供下次立即使用
+        try { localStorage.setItem(CACHE_KEY, JSON.stringify(data.data)) } catch {}
         return config.value
       } else {
         error.value = data.message

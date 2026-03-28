@@ -34,6 +34,7 @@ public class FoodRecognitionServiceV2 {
     private final FoodRecognitionHistoryRepository recognitionHistoryRepository;
     private final ChatLanguageModel chatLanguageModel;
     private final ObjectMapper objectMapper;
+    private final OssService ossService;
     
     @Autowired(required = false)
     private AipImageClassify aipImageClassify;
@@ -123,6 +124,15 @@ public class FoodRecognitionServiceV2 {
                     "图片识别功能需要配置百度AI，请联系管理员配置 BAIDU_APP_ID / BAIDU_API_KEY / BAIDU_SECRET_KEY");
         }
 
+        // Upload image to COS for history display
+        String uploadedImageUrl = null;
+        try {
+            uploadedImageUrl = ossService.uploadFoodPhoto(image);
+            log.info("识别图片已上传至COS: {}", uploadedImageUrl);
+        } catch (Exception e) {
+            log.warn("识别图片上传COS失败，将不保存图片URL: {}", e.getMessage());
+        }
+
         long startTime = System.currentTimeMillis();
 
         try {
@@ -192,7 +202,7 @@ public class FoodRecognitionServiceV2 {
                     .foods(foods)
                     .totalCount(foods.size())
                     .recognitionTime(endTime - startTime)
-                    .imageUrl(null)
+                    .imageUrl(uploadedImageUrl)
                     .build();
 
             saveRecognitionHistory(userId, "IMAGE", null, result);
@@ -315,7 +325,7 @@ public class FoodRecognitionServiceV2 {
                 .build();
                 
         } catch (Exception e) {
-            log.error("AI估算失败，食物: {}，原因: {}（请检查 TONGYI_API_KEY 是否已配置）", foodName, e.getMessage());
+            log.error("AI估算失败，食物: {}，原因: {}（请检查 AI_API_KEY 是否已配置）", foodName, e.getMessage());
             double[] fallback = getFallbackNutrition(foodName);
             return FoodItem.builder()
                 .name(foodName)

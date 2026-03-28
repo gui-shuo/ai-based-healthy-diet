@@ -63,10 +63,14 @@
       <el-form label-width="120px">
         <el-form-item label="AI模型">
           <el-select v-model="settings.model" style="width: 100%">
-            <el-option label="Qwen3.5-Flash（推荐）" value="qwen3.5-flash" />
-            <el-option label="通义千问Max" value="qwen-max" />
-            <el-option label="通义千问Plus" value="qwen-plus" />
-            <el-option label="通义千问Turbo" value="qwen-turbo" />
+            <el-option label="Kimi K2.5（推荐）" value="kimi-k2.5" />
+            <el-option label="DeepSeek V3.2" value="deepseek-v3.2" />
+            <el-option label="GLM 4.7" value="glm-4.7" />
+            <el-option label="MiniMax M2.5" value="minimax-m2.5" />
+            <el-option label="豆包 Seed 2.0 Pro" value="doubao-seed-2.0-pro" />
+            <el-option label="豆包 Seed 2.0 Lite" value="doubao-seed-2.0-lite" />
+            <el-option label="豆包 Seed Code" value="doubao-seed-code" />
+            <el-option label="豆包 Seed 2.0 Code" value="doubao-seed-2.0-code" />
           </el-select>
         </el-form-item>
         <el-form-item label="温度参数">
@@ -195,7 +199,7 @@ const saveTimer = ref(null)
 
 // 设置
 const settings = reactive({
-  model: 'qwen3.5-flash',
+  model: 'kimi-k2.5',
   temperature: 0.7,
   maxTokens: 2000,
   keepContext: true,

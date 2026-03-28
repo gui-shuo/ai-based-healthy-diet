@@ -252,6 +252,14 @@
                   </div>
                 </div>
 
+                <!-- 图片识别时显示原始图片 -->
+                <div v-if="item.recognitionType === 'IMAGE' && item.imageUrl" class="history-image-section">
+                  <h5>识别图片:</h5>
+                  <div class="history-image-wrapper">
+                    <img :src="item.imageUrl" alt="识别图片" class="history-image" />
+                  </div>
+                </div>
+
                 <!-- 识别结果详情 -->
                 <div v-if="item.recognitionResult" class="result-detail">
                   <h5>识别结果:</h5>
@@ -267,10 +275,14 @@
                       </el-tag>
                     </div>
                     <div class="nutrition-mini-grid">
-                      <span>热量: {{ food.nutrition.energy.toFixed(1) }}kcal</span>
-                      <span>蛋白质: {{ food.nutrition.protein.toFixed(1) }}g</span>
-                      <span>碳水: {{ food.nutrition.carbohydrate.toFixed(1) }}g</span>
-                      <span>脂肪: {{ food.nutrition.fat.toFixed(1) }}g</span>
+                      <span>热量: {{ safeFixed(food.nutrition?.energy) }}kcal</span>
+                      <span>蛋白质: {{ safeFixed(food.nutrition?.protein) }}g</span>
+                      <span>碳水: {{ safeFixed(food.nutrition?.carbohydrate) }}g</span>
+                      <span>脂肪: {{ safeFixed(food.nutrition?.fat) }}g</span>
+                    </div>
+                    <div v-if="food.nutrition?.source" class="data-source-mini">
+                      <el-icon><InfoFilled /></el-icon>
+                      {{ getSourceText(food.nutrition.source) }}
                     </div>
                   </div>
                 </div>
@@ -513,6 +525,11 @@ const getSourceText = source => {
     'baidu-calorie-only': '百度识别（仅卡路里）'
   }
   return map[source] || source
+}
+
+const safeFixed = (val, digits = 1) => {
+  if (val == null || isNaN(val)) return '—'
+  return Number(val).toFixed(digits)
 }
 
 const formatTime = time => {
@@ -982,6 +999,40 @@ onBeforeUnmount(() => {
   padding: 4px 8px;
   background: #f5f7fa;
   border-radius: 4px;
+}
+
+.data-source-mini {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: #909399;
+  margin-top: 6px;
+}
+
+.history-image-section {
+  margin-bottom: 12px;
+
+  h5 {
+    margin: 0 0 8px 0;
+    font-size: 14px;
+    color: #303133;
+    font-weight: 600;
+  }
+}
+
+.history-image-wrapper {
+  text-align: center;
+  background: white;
+  border-radius: 8px;
+  padding: 8px;
+}
+
+.history-image {
+  max-width: 100%;
+  max-height: 200px;
+  border-radius: 6px;
+  object-fit: contain;
 }
 
 @media (max-width: 768px) {

@@ -23,15 +23,20 @@ public class ConfigOptionsService {
         options.add(ConfigOptionDTO.builder()
                 .key("ai.model")
                 .name("AI模型")
-                .description("使用的AI模型名称")
+                .description("使用的AI模型名称（火山引擎Coding套餐）")
                 .category("AI")
                 .valueType("select")
                 .options(Arrays.asList(
-                        ConfigOptionDTO.OptionValue.builder().label("通义千问Max").value("qwen-max").build(),
-                        ConfigOptionDTO.OptionValue.builder().label("通义千问Plus").value("qwen-plus").build(),
-                        ConfigOptionDTO.OptionValue.builder().label("通义千问Turbo").value("qwen-turbo").build()
+                        ConfigOptionDTO.OptionValue.builder().label("Kimi K2.5（推荐）").value("kimi-k2.5").build(),
+                        ConfigOptionDTO.OptionValue.builder().label("DeepSeek V3.2").value("deepseek-v3.2").build(),
+                        ConfigOptionDTO.OptionValue.builder().label("GLM 4.7").value("glm-4.7").build(),
+                        ConfigOptionDTO.OptionValue.builder().label("MiniMax M2.5").value("minimax-m2.5").build(),
+                        ConfigOptionDTO.OptionValue.builder().label("豆包 Seed 2.0 Pro").value("doubao-seed-2.0-pro").build(),
+                        ConfigOptionDTO.OptionValue.builder().label("豆包 Seed 2.0 Lite").value("doubao-seed-2.0-lite").build(),
+                        ConfigOptionDTO.OptionValue.builder().label("豆包 Seed Code").value("doubao-seed-code").build(),
+                        ConfigOptionDTO.OptionValue.builder().label("豆包 Seed 2.0 Code").value("doubao-seed-2.0-code").build()
                 ))
-                .defaultValue("qwen-max")
+                .defaultValue("kimi-k2.5")
                 .required(true)
                 .build());
         
@@ -156,18 +161,12 @@ public class ConfigOptionsService {
         
         // 用户配置
         options.add(ConfigOptionDTO.builder()
-                .key("user.default_member_level")
-                .name("默认会员等级")
-                .description("新用户注册时的默认会员等级")
+                .key("user.free_ai_quota")
+                .name("免费用户AI配额")
+                .description("免费用户每日AI咨询次数（VIP用户配额由套餐定义）")
                 .category("用户")
-                .valueType("select")
-                .options(Arrays.asList(
-                        ConfigOptionDTO.OptionValue.builder().label("免费会员").value("FREE").build(),
-                        ConfigOptionDTO.OptionValue.builder().label("青铜会员").value("BRONZE").build(),
-                        ConfigOptionDTO.OptionValue.builder().label("白银会员").value("SILVER").build(),
-                        ConfigOptionDTO.OptionValue.builder().label("黄金会员").value("GOLD").build()
-                ))
-                .defaultValue("FREE")
+                .valueType("number")
+                .defaultValue("3")
                 .required(true)
                 .build());
         

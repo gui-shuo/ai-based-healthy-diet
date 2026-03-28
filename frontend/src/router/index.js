@@ -55,7 +55,7 @@ const routes = [
     path: '/diet-plan',
     name: 'DietPlan',
     component: () => import('@/views/DietPlanView.vue'),
-    meta: { requiresAuth: true, requiresMember: 'SILVER', title: 'AI饮食计划' }
+    meta: { requiresAuth: true, requiresVip: true, title: 'AI饮食计划' }
   },
   {
     path: '/food-recognition',
@@ -74,6 +74,18 @@ const routes = [
     name: 'ProductShop',
     component: () => import('@/views/ProductShopView.vue'),
     meta: { requiresAuth: true, title: '营养产品商城' }
+  },
+  {
+    path: '/community',
+    name: 'Community',
+    component: () => import('@/views/CommunityView.vue'),
+    meta: { requiresAuth: true, title: '营养圈' }
+  },
+  {
+    path: '/feedback',
+    name: 'Feedback',
+    component: () => import('@/views/FeedbackView.vue'),
+    meta: { requiresAuth: true, title: '意见反馈' }
   },
   {
     path: '/announcements',
@@ -119,6 +131,30 @@ const routes = [
         name: 'AdminAnnouncements',
         component: () => import('@/views/admin/AnnouncementManagement.vue'),
         meta: { title: '公告管理' }
+      },
+      {
+        path: 'feedbacks',
+        name: 'AdminFeedbacks',
+        component: () => import('@/views/admin/FeedbackManagement.vue'),
+        meta: { title: '反馈管理' }
+      },
+      {
+        path: 'nutritionists',
+        name: 'AdminNutritionists',
+        component: () => import('@/views/admin/NutritionistManagement.vue'),
+        meta: { title: '营养师管理' }
+      },
+      {
+        path: 'products',
+        name: 'AdminProducts',
+        component: () => import('@/views/admin/ProductManagement.vue'),
+        meta: { title: '产品管理' }
+      },
+      {
+        path: 'community',
+        name: 'AdminCommunity',
+        component: () => import('@/views/admin/CommunityManagement.vue'),
+        meta: { title: '社区管理' }
       }
     ]
   },
@@ -204,13 +240,10 @@ router.beforeEach(async (to, from, next) => {
       return
     }
 
-    // 检查是否需要特定会员等级
-    if (to.meta.requiresMember) {
-      const tierOrder = { FREE: 0, SILVER: 1, GOLD: 2 }
-      const required = tierOrder[to.meta.requiresMember] || 0
-      const current = tierOrder[authStore.memberTier] || 0
-      if (current < required) {
-        ElMessage.warning('该功能需要白银及以上会员等级，请升级会员或开通VIP')
+    // 检查是否需要VIP会员
+    if (to.meta.requiresVip) {
+      if (!authStore.isVip) {
+        ElMessage.warning('该功能需要开通 NutriAI 营养卡')
         next({ name: 'Membership' })
         return
       }

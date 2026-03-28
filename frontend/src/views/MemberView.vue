@@ -1,88 +1,95 @@
 <template>
-  <div class="member-container">
-    <div class="member-layout">
-      <!-- 返回首页 -->
-      <div class="back-home">
-        <el-button :icon="ArrowLeft" @click="router.push('/')">返回首页</el-button>
-      </div>
-
-      <!-- 会员信息卡片（顶部全宽） -->
-      <div class="member-header">
-        <MemberInfoCard :member-info="memberInfo" :loading="loading" />
-      </div>
-
-      <!-- 主要内容区 -->
-      <div class="member-content">
-        <!-- 左侧：成长值图表 + 签到日历 -->
-        <div class="left-section">
-          <GrowthChart :user-id="userId" />
-          <SignInCalendar @signed="fetchMemberInfo" />
-        </div>
-
-        <!-- 右侧：VIP充值 + 权益列表 -->
-        <div class="right-section">
-          <VipPurchasePanel @vip-activated="fetchMemberInfo" />
-          <BenefitsList
-            :benefits="currentBenefits"
-            :level-name="memberInfo?.currentLevel?.levelName"
-          />
+  <div class="member-view">
+    <!-- 顶部导航栏 -->
+    <nav class="top-nav">
+      <div class="nav-inner">
+        <div class="nav-left">
+          <el-button text @click="router.push('/')">
+            <el-icon><ArrowLeft /></el-icon>
+            返回首页
+          </el-button>
+          <h2 class="page-title">🍃 NutriAI 营养卡</h2>
         </div>
       </div>
+    </nav>
 
-      <!-- 底部：邀请好友（全宽） -->
-      <div class="bottom-section">
+    <main class="main-area">
+      <!-- VIP 状态卡片 -->
+      <div class="vip-status-banner" :class="{ 'is-vip': permissions?.isVip }">
+        <div class="banner-content">
+          <div class="banner-left">
+            <div class="vip-icon">{{ permissions?.isVip ? '💎' : '🌱' }}</div>
+            <div class="vip-info">
+              <h3>{{ permissions?.planName || '免费用户' }}</h3>
+              <p v-if="permissions?.isVip && permissions?.vipExpireAt">
+                有效期至 {{ formatDate(permissions.vipExpireAt) }}
+              </p>
+              <p v-else-if="!permissions?.isVip">开通营养卡，解锁全部AI营养功能</p>
+            </div>
+          </div>
+          <div class="banner-right">
+            <div class="quota-display">
+              <span class="quota-label">今日AI配额</span>
+              <span class="quota-value">
+                <template v-if="permissions?.aiQuotaTotal === -1">∞</template>
+                <template v-else>{{ permissions?.aiQuotaRemain ?? 0 }} / {{ permissions?.aiQuotaTotal ?? 3 }}</template>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 营养卡套餐 -->
+      <VipPurchasePanel @vip-activated="refreshAll" />
+
+      <!-- 底部两列：签到 + 邀请 -->
+      <div class="engagement-grid">
+        <SignInCalendar @signed="refreshAll" />
         <InvitationPanel :member-info="memberInfo" />
       </div>
-    </div>
+    </main>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, computed, onBeforeUnmount } from 'vue'
+import { ref, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
 import { ArrowLeft } from '@element-plus/icons-vue'
-import { getMemberInfo } from '@/services/member'
-import MemberInfoCard from '@/components/member/MemberInfoCard.vue'
-import GrowthChart from '@/components/member/GrowthChart.vue'
-import InvitationPanel from '@/components/member/InvitationPanel.vue'
-import BenefitsList from '@/components/member/BenefitsList.vue'
+import { getMemberInfo, getMemberPermissions } from '@/services/member'
 import SignInCalendar from '@/components/member/SignInCalendar.vue'
+import InvitationPanel from '@/components/member/InvitationPanel.vue'
 import VipPurchasePanel from '@/components/member/VipPurchasePanel.vue'
 import message from '@/utils/message'
 import { useAuthStore } from '@/stores/auth'
 
 const authStore = useAuthStore()
 const router = useRouter()
-const userId = computed(() => authStore.user?.id)
 
-const loading = ref(false)
 const memberInfo = ref(null)
+const permissions = ref(null)
 
-const currentBenefits = computed(() => memberInfo.value?.currentLevel?.benefits || {})
-
-const fetchMemberInfo = async () => {
-  loading.value = true
+const refreshAll = async () => {
   try {
-    const res = await getMemberInfo()
-    if (res.data.code === 200) {
-      memberInfo.value = res.data.data
-    } else {
-      message.error(res.data.message || '获取会员信息失败')
-    }
+    const [memberRes, permRes] = await Promise.all([
+      getMemberInfo().catch(() => null),
+      getMemberPermissions().catch(() => null)
+    ])
+    if (memberRes?.data?.code === 200) memberInfo.value = memberRes.data.data
+    if (permRes?.data?.code === 200) permissions.value = permRes.data.data
+    authStore.fetchPermissions()
   } catch (err) {
-    console.error('获取会员信息失败:', err)
-    message.error('获取会员信息失败')
-  } finally {
-    loading.value = false
+    console.error('刷新会员信息失败:', err)
   }
 }
 
-onMounted(() => {
-  fetchMemberInfo()
-})
+const formatDate = (dt) => {
+  if (!dt) return ''
+  return new Date(dt).toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' })
+}
+
+onMounted(() => refreshAll())
 
 onBeforeUnmount(() => {
-  // 清理可能残留的 Element Plus 弹层
   setTimeout(() => {
     document.querySelectorAll('body > .el-overlay').forEach(el => el.remove())
   }, 50)
@@ -90,44 +97,135 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped lang="scss">
-.member-container {
+.member-view {
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 40px 20px;
+  background: #f5f7fa;
 }
 
-.member-layout {
-  max-width: 1400px;
+.top-nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.nav-inner {
+  max-width: 1100px;
   margin: 0 auto;
+  padding: 0 20px;
+  height: 52px;
+  display: flex;
+  align-items: center;
 }
 
-.back-home {
+.nav-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.page-title {
+  font-size: 17px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+}
+
+.main-area {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.vip-status-banner {
+  background: linear-gradient(135deg, #e8f5e9 0%, #f1f8e9 100%);
+  border: 1px solid #c8e6c9;
+  border-radius: 12px;
+  padding: 16px 20px;
   margin-bottom: 16px;
-}
 
-.member-header {
-  margin-bottom: 24px;
-}
+  &.is-vip {
+    background: linear-gradient(135deg, #e8eaf6 0%, #f3e5f5 100%);
+    border-color: #c5cae9;
+  }
 
-.member-content {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 24px;
-  margin-bottom: 24px;
+  .banner-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
 
-  @media (max-width: 1024px) {
-    grid-template-columns: 1fr;
+  .banner-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .vip-icon {
+    font-size: 32px;
+  }
+
+  .vip-info {
+    h3 {
+      font-size: 16px;
+      font-weight: 600;
+      color: #1f2937;
+      margin: 0 0 2px;
+    }
+    p {
+      font-size: 12px;
+      color: #6b7280;
+      margin: 0;
+    }
+  }
+
+  .banner-right {
+    text-align: right;
+  }
+
+  .quota-display {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+
+    .quota-label {
+      font-size: 11px;
+      color: #9ca3af;
+    }
+    .quota-value {
+      font-size: 20px;
+      font-weight: 700;
+      color: #667eea;
+    }
   }
 }
 
-.left-section,
-.right-section {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
+.engagement-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 16px;
 }
 
-.bottom-section {
-  width: 100%;
+@media (max-width: 768px) {
+  .main-area {
+    padding: 12px;
+  }
+  .engagement-grid {
+    grid-template-columns: 1fr;
+  }
+  .vip-status-banner .banner-content {
+    flex-direction: column;
+    gap: 10px;
+    text-align: center;
+  }
+  .banner-right {
+    text-align: center !important;
+  }
+  .quota-display {
+    align-items: center !important;
+  }
 }
 </style>

@@ -49,7 +49,7 @@
       <div class="sign-action">
         <el-button
           type="warning"
-          size="large"
+          size="default"
           :loading="loading"
           :disabled="todaySigned"
           round
@@ -151,8 +151,16 @@ onMounted(() => {
 
 <style scoped lang="scss">
 .sign-in-calendar {
-  border-radius: 12px;
+  border-radius: 10px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+
+  :deep(.el-card__header) {
+    padding: 10px 14px;
+  }
+
+  :deep(.el-card__body) {
+    padding: 10px 14px;
+  }
 
   .card-header {
     display: flex;
@@ -160,13 +168,13 @@ onMounted(() => {
     align-items: center;
 
     .title {
-      font-size: 18px;
+      font-size: 14px;
       font-weight: 600;
       color: #1f2937;
     }
 
     .month-label {
-      font-size: 14px;
+      font-size: 11px;
       color: #6b7280;
     }
   }
@@ -176,31 +184,31 @@ onMounted(() => {
       display: flex;
       align-items: center;
       justify-content: space-around;
-      padding: 12px 0 20px;
+      padding: 6px 0 8px;
       border-bottom: 1px solid #f3f4f6;
-      margin-bottom: 16px;
+      margin-bottom: 8px;
 
       .stat-item {
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 4px;
+        gap: 1px;
 
         .stat-num {
-          font-size: 24px;
+          font-size: 16px;
           font-weight: 700;
           color: #f59e0b;
         }
 
         .stat-label {
-          font-size: 12px;
+          font-size: 10px;
           color: #9ca3af;
         }
       }
 
       .stat-divider {
         width: 1px;
-        height: 36px;
+        height: 20px;
         background: #e5e7eb;
       }
     }
@@ -208,14 +216,14 @@ onMounted(() => {
     .calendar-grid {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
-      gap: 4px;
-      margin-bottom: 20px;
+      gap: 2px;
+      margin-bottom: 8px;
 
       .week-label {
         text-align: center;
-        font-size: 12px;
+        font-size: 10px;
         color: #9ca3af;
-        padding: 4px 0;
+        padding: 1px 0;
         font-weight: 500;
       }
 
@@ -225,8 +233,8 @@ onMounted(() => {
         display: flex;
         align-items: center;
         justify-content: center;
-        border-radius: 8px;
-        font-size: 13px;
+        border-radius: 4px;
+        font-size: 11px;
         color: #374151;
         background: #f9fafb;
         transition: all 0.2s;
@@ -241,15 +249,15 @@ onMounted(() => {
 
           .check-icon {
             position: absolute;
-            bottom: 2px;
-            right: 2px;
-            font-size: 10px;
+            bottom: 0;
+            right: 0;
+            font-size: 8px;
             color: white;
           }
         }
 
         &.today:not(.signed) {
-          border: 2px solid #f59e0b;
+          border: 1.5px solid #f59e0b;
           color: #f59e0b;
           font-weight: 700;
           background: #fffbeb;
@@ -261,7 +269,7 @@ onMounted(() => {
         }
 
         .day-num {
-          font-size: 13px;
+          font-size: 11px;
           line-height: 1;
         }
       }
@@ -269,11 +277,11 @@ onMounted(() => {
 
     .sign-action {
       text-align: center;
-      margin-bottom: 12px;
+      margin-bottom: 6px;
 
       .sign-btn {
-        width: 80%;
-        font-size: 15px;
+        width: 70%;
+        font-size: 12px;
         font-weight: 600;
       }
     }
@@ -282,8 +290,8 @@ onMounted(() => {
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 6px;
-      font-size: 12px;
+      gap: 4px;
+      font-size: 10px;
       color: #9ca3af;
     }
   }

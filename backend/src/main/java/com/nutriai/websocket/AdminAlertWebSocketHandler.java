@@ -85,7 +85,11 @@ public class AdminAlertWebSocketHandler extends TextWebSocketHandler {
     
     @Override
     public void handleTransportError(WebSocketSession session, Throwable exception) throws Exception {
-        log.error("管理员WebSocket传输错误: sessionId={}", session.getId(), exception);
+        if (exception instanceof java.io.EOFException || exception instanceof java.io.IOException) {
+            log.debug("管理员WebSocket连接断开(客户端关闭): sessionId={}", session.getId());
+        } else {
+            log.warn("管理员WebSocket传输错误: sessionId={}, error={}", session.getId(), exception.getMessage());
+        }
         adminSessions.values().remove(session);
     }
     

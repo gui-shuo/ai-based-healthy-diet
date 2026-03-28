@@ -206,7 +206,6 @@ const editDialogVisible = ref(false)
 const isCreate = ref(false)
 const formRef = ref(null)
 const authStore = useAuthStore()
-const isSuperAdmin = computed(() => authStore.user?.role === 'SUPER_ADMIN')
 
 const editForm = reactive({
   configKey: '',
@@ -280,10 +279,6 @@ const handleCategoryChange = () => {
 
 // 创建配置
 const handleCreate = () => {
-  if (!isSuperAdmin.value) {
-    ElMessage.warning('仅超级管理员可以创建配置')
-    return
-  }
   isCreate.value = true
   Object.assign(editForm, {
     configKey: '',
@@ -298,10 +293,6 @@ const handleCreate = () => {
 
 // 编辑配置
 const handleEdit = row => {
-  if (!isSuperAdmin.value) {
-    ElMessage.warning('仅超级管理员可以编辑配置')
-    return
-  }
   isCreate.value = false
   Object.assign(editForm, {
     ...row,
@@ -344,10 +335,6 @@ const handleSave = async () => {
 
 // 删除配置
 const handleDelete = async row => {
-  if (!isSuperAdmin.value) {
-    ElMessage.warning('仅超级管理员可以删除配置')
-    return
-  }
   try {
     await ElMessageBox.confirm(`确定要删除配置 "${row.configKey}" 吗？`, '确认删除', {
       confirmButtonText: '确定',

@@ -75,6 +75,29 @@
           </span>
         </el-form-item>
 
+        <!-- 邮箱验证码 -->
+        <el-form-item label="邮箱验证码" prop="emailCode">
+          <div class="email-code-wrapper">
+            <el-input
+              v-model="registerForm.emailCode"
+              placeholder="请输入6位验证码"
+              size="large"
+              maxlength="6"
+              class="email-code-input"
+            />
+            <el-button
+              type="primary"
+              size="large"
+              :disabled="emailCodeCountdown > 0 || !registerForm.email || emailAvailable === false"
+              :loading="emailCodeSending"
+              class="send-code-btn"
+              @click="sendEmailCode"
+            >
+              {{ emailCodeCountdown > 0 ? `${emailCodeCountdown}s` : '发送验证码' }}
+            </el-button>
+          </div>
+        </el-form-item>
+
         <!-- 手机号（可选） -->
         <el-form-item label="手机号（可选）" prop="phone">
           <el-input
@@ -179,6 +202,7 @@ const registerForm = reactive({
   password: '',
   confirmPassword: '',
   email: '',
+  emailCode: '',
   phone: '',
   nickname: '',
   captcha: '',
@@ -247,6 +271,10 @@ const registerRules = {
     { required: true, message: '请输入邮箱', trigger: 'blur' },
     { type: 'email', message: '请输入正确的邮箱格式', trigger: 'blur' }
   ],
+  emailCode: [
+    { required: true, message: '请输入邮箱验证码', trigger: 'blur' },
+    { len: 6, message: '验证码为6位数字', trigger: 'blur' }
+  ],
   phone: [{ validator: validatePhone, trigger: 'blur' }],
   captcha: [
     { required: true, message: '请输入验证码', trigger: 'blur' },
@@ -260,6 +288,9 @@ const loading = ref(false)
 const captchaImage = ref('')
 const usernameAvailable = ref(null)
 const emailAvailable = ref(null)
+const emailCodeSending = ref(false)
+const emailCodeCountdown = ref(0)
+let countdownTimer = null
 
 // 获取验证码
 const getCaptcha = async () => {
@@ -326,6 +357,36 @@ const checkEmail = async () => {
   }
 }
 
+// 发送邮箱验证码
+const sendEmailCode = async () => {
+  if (!registerForm.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(registerForm.email)) {
+    message.warning('请先输入正确的邮箱地址')
+    return
+  }
+  emailCodeSending.value = true
+  try {
+    const response = await api.post('/auth/send-email-code', { email: registerForm.email })
+    if (response.data.code === 200) {
+      message.success('验证码已发送到您的邮箱')
+      emailCodeCountdown.value = 60
+      countdownTimer = setInterval(() => {
+        emailCodeCountdown.value--
+        if (emailCodeCountdown.value <= 0) {
+          clearInterval(countdownTimer)
+          countdownTimer = null
+        }
+      }, 1000)
+    } else {
+      message.error(response.data.message || '发送失败')
+    }
+  } catch (error) {
+    const msg = error.response?.data?.message || '发送失败，请稍后重试'
+    message.error(msg)
+  } finally {
+    emailCodeSending.value = false
+  }
+}
+
 // 处理注册
 const handleRegister = async () => {
   if (!registerFormRef.value) return
@@ -346,6 +407,7 @@ const handleRegister = async () => {
       password: registerForm.password,
       confirmPassword: registerForm.confirmPassword,
       email: registerForm.email,
+      emailCode: registerForm.emailCode,
       phone: registerForm.phone || undefined,
       nickname: registerForm.nickname || undefined,
       captcha: registerForm.captcha,
@@ -496,6 +558,21 @@ onMounted(() => {
       font-size: 12px;
       color: #909399;
       gap: 4px;
+    }
+  }
+
+  .email-code-wrapper {
+    display: flex;
+    gap: 12px;
+    width: 100%;
+
+    .email-code-input {
+      flex: 1;
+    }
+
+    .send-code-btn {
+      width: 120px;
+      flex-shrink: 0;
     }
   }
 

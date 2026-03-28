@@ -23,7 +23,7 @@
       <!-- 邀请链接 -->
       <div class="invitation-link-section">
         <div class="link-label">邀请链接</div>
-        <el-input v-model="invitationLink" readonly size="large">
+        <el-input v-model="invitationLink" readonly size="default">
           <template #append>
             <el-button @click="copyInvitationLink">
               <el-icon><Link /></el-icon>
@@ -274,8 +274,16 @@ onMounted(() => {
 
 <style scoped lang="scss">
 .invitation-panel {
-  border-radius: 12px;
+  border-radius: 10px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+
+  :deep(.el-card__header) {
+    padding: 10px 14px;
+  }
+
+  :deep(.el-card__body) {
+    padding: 10px 14px;
+  }
 
   .card-header {
     display: flex;
@@ -283,7 +291,7 @@ onMounted(() => {
     align-items: center;
 
     .title {
-      font-size: 18px;
+      font-size: 14px;
       font-weight: 600;
       color: #1f2937;
     }
@@ -291,82 +299,83 @@ onMounted(() => {
 
   .invitation-content {
     .invitation-code-section {
-      margin-bottom: 24px;
+      margin-bottom: 10px;
 
       .code-label {
-        font-size: 14px;
+        font-size: 11px;
         color: #6b7280;
-        margin-bottom: 12px;
+        margin-bottom: 4px;
       }
 
       .code-display {
         display: flex;
         align-items: center;
-        gap: 12px;
-        padding: 16px;
+        gap: 6px;
+        padding: 8px;
         background: linear-gradient(135deg, #667eea20 0%, #764ba220 100%);
-        border-radius: 8px;
-        border: 2px dashed #667eea;
+        border-radius: 6px;
+        border: 1.5px dashed #667eea;
 
         .code {
           flex: 1;
-          font-size: 20px;
+          font-size: 14px;
           font-weight: 600;
           color: #667eea;
-          letter-spacing: 2px;
+          letter-spacing: 1.5px;
           font-family: 'Courier New', monospace;
         }
       }
     }
 
     .invitation-link-section {
-      margin-bottom: 24px;
+      margin-bottom: 10px;
 
       .link-label {
-        font-size: 14px;
+        font-size: 11px;
         color: #6b7280;
-        margin-bottom: 12px;
+        margin-bottom: 4px;
       }
     }
 
     .invitation-stats {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 16px;
-      margin-bottom: 24px;
+      gap: 8px;
+      margin-bottom: 10px;
 
       .stat-box {
         display: flex;
         align-items: center;
-        gap: 16px;
-        padding: 16px;
+        gap: 8px;
+        padding: 8px;
         background: #f9fafb;
-        border-radius: 8px;
+        border-radius: 6px;
 
         .stat-icon {
-          width: 48px;
-          height: 48px;
-          border-radius: 12px;
+          width: 30px;
+          height: 30px;
+          border-radius: 8px;
           display: flex;
           align-items: center;
           justify-content: center;
           color: white;
-          font-size: 24px;
+          font-size: 14px;
+          flex-shrink: 0;
         }
 
         .stat-info {
           display: flex;
           flex-direction: column;
-          gap: 4px;
+          gap: 1px;
 
           .stat-value {
-            font-size: 24px;
+            font-size: 16px;
             font-weight: 600;
             color: #1f2937;
           }
 
           .stat-label {
-            font-size: 13px;
+            font-size: 10px;
             color: #6b7280;
           }
         }
@@ -378,8 +387,8 @@ onMounted(() => {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 16px;
-        font-size: 16px;
+        margin-bottom: 6px;
+        font-size: 13px;
         font-weight: 600;
         color: #1f2937;
       }
@@ -388,9 +397,9 @@ onMounted(() => {
         .record-item {
           display: flex;
           align-items: center;
-          gap: 12px;
-          padding: 12px;
-          border-radius: 8px;
+          gap: 8px;
+          padding: 6px;
+          border-radius: 6px;
           transition: all 0.3s;
 
           &:hover {
@@ -403,22 +412,28 @@ onMounted(() => {
 
           .record-avatar {
             flex-shrink: 0;
+
+            :deep(.el-avatar) {
+              width: 32px !important;
+              height: 32px !important;
+              font-size: 13px !important;
+            }
           }
 
           .record-info {
             flex: 1;
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            gap: 1px;
 
             .record-name {
-              font-size: 14px;
+              font-size: 12px;
               font-weight: 500;
               color: #1f2937;
             }
 
             .record-time {
-              font-size: 12px;
+              font-size: 10px;
               color: #9ca3af;
             }
           }
@@ -439,9 +454,9 @@ onMounted(() => {
 
   .all-record-item {
     display: flex;
-    gap: 16px;
-    padding: 16px;
-    border-radius: 8px;
+    gap: 12px;
+    padding: 12px;
+    border-radius: 6px;
     transition: all 0.3s;
 
     &:hover {
@@ -460,15 +475,15 @@ onMounted(() => {
       flex: 1;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 6px;
 
       .record-header {
         display: flex;
         align-items: center;
-        gap: 12px;
+        gap: 10px;
 
         .record-name {
-          font-size: 16px;
+          font-size: 14px;
           font-weight: 600;
           color: #1f2937;
         }
@@ -477,17 +492,17 @@ onMounted(() => {
       .record-meta {
         display: flex;
         flex-direction: column;
-        gap: 6px;
+        gap: 4px;
 
         .meta-item {
           display: flex;
           align-items: center;
-          gap: 6px;
-          font-size: 13px;
+          gap: 4px;
+          font-size: 12px;
           color: #6b7280;
 
           .el-icon {
-            font-size: 14px;
+            font-size: 13px;
           }
         }
       }
@@ -495,9 +510,9 @@ onMounted(() => {
       .record-status {
         .status-badge {
           display: inline-block;
-          padding: 2px 8px;
+          padding: 2px 6px;
           border-radius: 4px;
-          font-size: 12px;
+          font-size: 11px;
           font-weight: 500;
 
           &.pending {
