@@ -33,7 +33,7 @@
           <view class="bubble bubble-user">
             <text class="bubble-text">{{ msg.content }}</text>
           </view>
-          <view class="avatar avatar-user">😊</view>
+          <image class="avatar avatar-user" :src="userAvatar" mode="aspectFill" />
         </view>
       </view>
 
@@ -79,8 +79,9 @@
 <script setup lang="ts">
 import { ref, nextTick, onMounted, onUnmounted, computed } from 'vue'
 import { onLoad, onShow, onHide } from '@dcloudio/uni-app'
-import { checkLogin } from '@/utils/common'
+import { checkLogin, defaultAvatar } from '@/utils/common'
 import { getToken } from '@/utils/request'
+import { useUserStore } from '@/stores/user'
 
 interface ChatMessage {
   role: 'user' | 'assistant'
@@ -88,6 +89,9 @@ interface ChatMessage {
 }
 
 const WS_URL = 'wss://nutriai.itshuo.me/api/ws/ai/chat'
+
+const userStore = useUserStore()
+const userAvatar = computed(() => defaultAvatar(userStore.userInfo?.avatarUrl))
 
 const messages = ref<ChatMessage[]>([])
 const inputText = ref('')
@@ -394,6 +398,7 @@ function goBack() {
 .message-row {
   display: flex;
   align-items: flex-start;
+  padding: 0 8rpx;
 }
 .message-row.user {
   justify-content: flex-end;
@@ -405,12 +410,14 @@ function goBack() {
 .avatar {
   width: 72rpx;
   height: 72rpx;
+  min-width: 72rpx;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 36rpx;
   flex-shrink: 0;
+  overflow: hidden;
 }
 .avatar-ai {
   background: #fff;
@@ -418,12 +425,12 @@ function goBack() {
   box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.08);
 }
 .avatar-user {
-  background: #07c160;
   margin-left: 16rpx;
+  background: #eee;
 }
 
 .bubble {
-  max-width: 70%;
+  max-width: 65%;
   padding: 20rpx 28rpx;
   border-radius: 20rpx;
   word-break: break-all;

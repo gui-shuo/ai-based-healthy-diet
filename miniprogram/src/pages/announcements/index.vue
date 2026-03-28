@@ -71,7 +71,7 @@ import { formatTime } from '@/utils/common'
 const announcements = ref<any[]>([])
 const loading = ref(false)
 const loadingMore = ref(false)
-const page = ref(0)
+const page = ref(1)
 const pageSize = 10
 const hasMore = ref(true)
 const expandedId = ref<number | null>(null)
@@ -87,13 +87,13 @@ function toggleExpand(id: number) {
 
 async function loadAnnouncements(isRefresh = false) {
   if (isRefresh) {
-    page.value = 0
+    page.value = 1
     hasMore.value = true
   }
   if (!hasMore.value && !isRefresh) return
 
-  loading.value = page.value === 0
-  loadingMore.value = page.value > 0
+  loading.value = page.value === 1
+  loadingMore.value = page.value > 1
 
   try {
     const res = await announcementApi.getList({ page: page.value, size: pageSize })

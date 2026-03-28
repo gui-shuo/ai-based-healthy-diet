@@ -18,9 +18,9 @@
       <view class="post-card" v-for="post in posts" :key="post.id" @tap="goDetail(post.id)">
         <!-- Author Info -->
         <view class="post-header">
-          <image class="avatar" :src="defaultAvatar(post.authorAvatar)" mode="aspectFill" />
+          <image class="avatar" :src="defaultAvatar(post.avatarUrl)" mode="aspectFill" />
           <view class="author-info">
-            <text class="nickname">{{ post.authorNickname || post.authorUsername }}</text>
+            <text class="nickname">{{ post.username }}</text>
             <text class="time">{{ formatTime(post.createdAt) }}</text>
           </view>
           <view class="category-tag" v-if="post.category">{{ post.category }}</view>

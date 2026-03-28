@@ -154,26 +154,35 @@ async function handleLogin() {
 
 async function handleWxLogin() {
   wxLoading.value = true
-  try {
-    const [err, loginRes] = await uni.login({ provider: 'weixin' }) as any
-    if (err || !loginRes?.code) {
+  uni.login({
+    provider: 'weixin',
+    success: async (loginRes) => {
+      if (!loginRes?.code) {
+        uni.showToast({ title: '获取微信code失败', icon: 'none' })
+        wxLoading.value = false
+        return
+      }
+      try {
+        const res = await userStore.wxLogin(loginRes.code)
+        if (res.code === 200) {
+          uni.showToast({ title: '登录成功', icon: 'success' })
+          setTimeout(() => {
+            uni.reLaunch({ url: '/pages/index/index' })
+          }, 500)
+        } else {
+          uni.showToast({ title: res.message || '微信登录失败', icon: 'none' })
+        }
+      } catch {
+        uni.showToast({ title: '微信登录失败', icon: 'none' })
+      } finally {
+        wxLoading.value = false
+      }
+    },
+    fail: () => {
       uni.showToast({ title: '微信登录取消', icon: 'none' })
-      return
+      wxLoading.value = false
     }
-    const res = await userStore.wxLogin(loginRes.code)
-    if (res.code === 200) {
-      uni.showToast({ title: '登录成功', icon: 'success' })
-      setTimeout(() => {
-        uni.reLaunch({ url: '/pages/index/index' })
-      }, 500)
-    } else {
-      uni.showToast({ title: res.message || '微信登录失败', icon: 'none' })
-    }
-  } catch {
-    uni.showToast({ title: '微信登录失败', icon: 'none' })
-  } finally {
-    wxLoading.value = false
-  }
+  })
 }
 
 function goTo(url: string) {
