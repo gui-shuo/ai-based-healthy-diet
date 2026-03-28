@@ -6,6 +6,7 @@ import com.nutriai.exception.BusinessException;
 import com.nutriai.repository.UserRepository;
 import com.nutriai.util.CaptchaUtil;
 import com.nutriai.util.JwtUtil;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -505,10 +506,18 @@ public class AuthService {
         );
         
         RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<Map> response = restTemplate.getForEntity(url, Map.class);
-        Map<String, Object> body = response.getBody();
+        String responseBody = restTemplate.getForObject(url, String.class);
         
-        if (body == null || body.containsKey("errcode") && !Integer.valueOf(0).equals(body.get("errcode"))) {
+        Map<String, Object> body;
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            body = mapper.readValue(responseBody, Map.class);
+        } catch (Exception e) {
+            log.error("微信登录响应解析失败: {}", responseBody);
+            throw new BusinessException(500, "微信登录失败: 响应解析错误");
+        }
+        
+        if (body == null || (body.containsKey("errcode") && !Integer.valueOf(0).equals(body.get("errcode")))) {
             String errMsg = body != null ? String.valueOf(body.get("errmsg")) : "unknown";
             log.error("微信登录失败: errcode={}, errmsg={}", body != null ? body.get("errcode") : "null", errMsg);
             throw new BusinessException(500, "微信登录失败: " + errMsg);

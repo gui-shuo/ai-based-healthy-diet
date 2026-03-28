@@ -138,8 +138,8 @@ async function handleLogin() {
     if (res.code === 200) {
       uni.showToast({ title: '登录成功', icon: 'success' })
       setTimeout(() => {
-        uni.reLaunch({ url: '/pages/index/index' })
-      }, 500)
+        uni.switchTab({ url: '/pages/index/index' })
+      }, 800)
     } else {
       uni.showToast({ title: res.message || '登录失败', icon: 'none' })
       loadCaptcha()
@@ -167,8 +167,8 @@ async function handleWxLogin() {
         if (res.code === 200) {
           uni.showToast({ title: '登录成功', icon: 'success' })
           setTimeout(() => {
-            uni.reLaunch({ url: '/pages/index/index' })
-          }, 500)
+            uni.switchTab({ url: '/pages/index/index' })
+          }, 800)
         } else {
           uni.showToast({ title: res.message || '微信登录失败', icon: 'none' })
         }
