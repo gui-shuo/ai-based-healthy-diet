@@ -1,5 +1,6 @@
 package com.nutriai.config;
 
+import dev.langchain4j.model.Tokenizer;
 import dev.langchain4j.model.chat.ChatLanguageModel;
 import dev.langchain4j.model.chat.StreamingChatLanguageModel;
 import dev.langchain4j.model.openai.OpenAiChatModel;
@@ -101,6 +102,7 @@ public class AIConfig {
                 .topP(topP)
                 .maxTokens(tokens)
                 .timeout(Duration.ofSeconds(timeout))
+                .tokenizer(new SimpleEstimateTokenizer())
                 .build();
     }
 
@@ -112,6 +114,7 @@ public class AIConfig {
                 .temperature(temp)
                 .topP(topP)
                 .timeout(Duration.ofSeconds(timeout))
+                .tokenizer(new SimpleEstimateTokenizer())
                 .build();
     }
 
@@ -128,5 +131,41 @@ public class AIConfig {
             return apiUrl;
         }
         return "https://dashscope.aliyuncs.com/compatible-mode/v1";
+    }
+
+    /**
+     * 简单token估算器，避免jtokkit不识别非OpenAI模型名称
+     * 按字符数粗略估算（中文约1.5 token/字，英文约0.25 token/字）
+     */
+    private static class SimpleEstimateTokenizer implements Tokenizer {
+        @Override
+        public int estimateTokenCountInText(String text) {
+            if (text == null || text.isEmpty()) return 0;
+            return (int) (text.length() * 0.6);
+        }
+
+        @Override
+        public int estimateTokenCountInMessage(dev.langchain4j.data.message.ChatMessage message) {
+            return estimateTokenCountInText(message.text()) + 4;
+        }
+
+        @Override
+        public int estimateTokenCountInMessages(Iterable<dev.langchain4j.data.message.ChatMessage> messages) {
+            int total = 3;
+            for (dev.langchain4j.data.message.ChatMessage msg : messages) {
+                total += estimateTokenCountInMessage(msg);
+            }
+            return total;
+        }
+
+        @Override
+        public int estimateTokenCountInToolExecutionRequests(Iterable<dev.langchain4j.agent.tool.ToolExecutionRequest> requests) {
+            return 0;
+        }
+
+        @Override
+        public int estimateTokenCountInToolSpecifications(Iterable<dev.langchain4j.agent.tool.ToolSpecification> specs) {
+            return 0;
+        }
     }
 }

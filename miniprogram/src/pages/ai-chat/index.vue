@@ -159,6 +159,11 @@ function connectWebSocket() {
   socketTask.onOpen(() => {
     connected.value = true
     reconnectAttempts = 0
+    if (pendingMessage) {
+      const msg = pendingMessage
+      pendingMessage = ''
+      doSend(msg)
+    }
   })
 
   socketTask.onMessage((res) => {
@@ -204,21 +209,28 @@ function handleMessage(data: { type: string; content?: string; message?: string 
   }
 }
 
+let pendingMessage = ''
+
 function sendMessage() {
   const text = inputText.value.trim()
   if (!text || isSending.value) return
-
-  if (!connected.value) {
-    uni.showToast({ title: '连接中，请稍候...', icon: 'none' })
-    connectWebSocket()
-    return
-  }
 
   messages.value.push({ role: 'user', content: text })
   inputText.value = ''
   isSending.value = true
   isTyping.value = true
+  scrollToBottom()
 
+  if (!connected.value) {
+    pendingMessage = text
+    connectWebSocket()
+    return
+  }
+
+  doSend(text)
+}
+
+function doSend(text: string) {
   socketTask?.send({
     data: JSON.stringify({ type: 'chat', message: text }),
     success: () => {},
@@ -228,8 +240,6 @@ function sendMessage() {
       uni.showToast({ title: '发送失败，请重试', icon: 'none' })
     }
   })
-
-  scrollToBottom()
 }
 
 function scrollToBottom() {
