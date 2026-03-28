@@ -159,12 +159,6 @@ function connectWebSocket() {
   socketTask.onOpen(() => {
     connected.value = true
     reconnectAttempts = 0
-    // Send auth
-    socketTask?.send({
-      data: JSON.stringify({ type: 'auth', token }),
-      success: () => {},
-      fail: () => {}
-    })
   })
 
   socketTask.onMessage((res) => {
