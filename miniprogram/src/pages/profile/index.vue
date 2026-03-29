@@ -61,7 +61,7 @@
         <text class="menu-text">我的饮食计划</text>
         <text class="menu-arrow">›</text>
       </view>
-      <view class="menu-item" @tap="navigateTo('/pages/community/index')">
+      <view class="menu-item" @tap="goToCommunity">
         <text class="menu-icon">📝</text>
         <text class="menu-text">我的帖子</text>
         <text class="menu-arrow">›</text>
@@ -295,6 +295,10 @@ async function changePassword() {
 
 function navigateTo(url: string) {
   uni.navigateTo({ url })
+}
+
+function goToCommunity() {
+  uni.switchTab({ url: '/pages/community/index' })
 }
 
 function handleLogout() {
