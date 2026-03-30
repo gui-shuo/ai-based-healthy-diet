@@ -94,15 +94,13 @@ const loadData = async () => {
 const downloadVersion = async (version) => {
   downloading.value = true
   try {
-    const res = await appVersionApi.getDownloadUrl(version.id)
-    const url = res.data?.data
-    if (url) {
-      window.open(url, '_blank')
-      // Refresh counts
-      setTimeout(loadData, 1000)
-    }
+    // 直接打开流式下载端点（后端通过COS SDK流式传输APK文件）
+    const baseUrl = import.meta.env.VITE_API_BASE_URL || '/api'
+    window.open(`${baseUrl}/app-versions/download/${version.id}`, '_blank')
+    // Refresh counts
+    setTimeout(loadData, 1000)
   } catch (e) {
-    ElMessage.error('获取下载链接失败')
+    ElMessage.error('下载失败')
   } finally {
     downloading.value = false
   }

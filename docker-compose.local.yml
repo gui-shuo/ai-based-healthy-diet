@@ -70,6 +70,8 @@ services:
       JAVA_OPTS: -Xms384m -Xmx512m -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:+UseStringDeduplication -XX:+OptimizeStringConcat -XX:MetaspaceSize=96m -XX:MaxMetaspaceSize=192m -Djava.security.egd=file:/dev/./urandom
     mem_limit: 768m
     memswap_limit: 768m
+    volumes:
+      - ./releases:/app/releases
     ports:
       - "8080:8080"
     networks:
