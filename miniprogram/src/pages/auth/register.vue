@@ -2,7 +2,7 @@
   <view class="page">
     <view class="header">
       <text class="title">创建账号</text>
-      <text class="subtitle">加入 NutriAI，开启健康饮食之旅</text>
+      <text class="subtitle">加入 NutriAI，开启智能饮食之旅</text>
     </view>
 
     <view class="form-section">

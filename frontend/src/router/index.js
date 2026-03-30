@@ -219,7 +219,7 @@ router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore()
 
   // 设置页面标题
-  document.title = to.meta.title ? `${to.meta.title} - AI健康饮食规划助手` : 'AI健康饮食规划助手'
+  document.title = to.meta.title ? `${to.meta.title} - NutriAI饮食规划助手` : 'NutriAI饮食规划助手'
 
   // 如果已登录，不允许访问登录/注册页面
   if (to.meta.hideForAuth && authStore.isLoggedIn) {

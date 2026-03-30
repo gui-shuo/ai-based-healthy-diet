@@ -14,7 +14,7 @@ interface AppConfig {
 export const useAppStore = defineStore('app', () => {
   const config = ref<AppConfig>({
     siteName: 'NutriAI 智能营养助手',
-    siteDescription: 'AI驱动的个性化健康饮食规划平台',
+    siteDescription: 'AI驱动的个性化饮食规划平台',
     contactEmail: '',
     contactPhone: '',
     copyright: '',

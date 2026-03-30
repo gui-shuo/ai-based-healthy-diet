@@ -20,7 +20,7 @@
     <main class="main-area">
       <el-alert type="info" :closable="true" show-icon style="margin-bottom: 16px">
         <template #title>
-          本平台咨询服务仅供健康参考，不构成医疗诊断或治疗方案。如有疾病请及时就医。
+          本平台咨询服务仅供参考，不构成医疗诊断或治疗方案。如有疾病请及时就医。
           <router-link to="/legal/disclaimer" style="color:#409eff">详细声明</router-link>
         </template>
       </el-alert>
@@ -194,7 +194,7 @@
               v-model="consultForm.description"
               type="textarea"
               :rows="4"
-              placeholder="请简要描述您的营养需求或健康问题..."
+              placeholder="请简要描述您的营养需求或饮食问题..."
               maxlength="500"
               show-word-limit
             />

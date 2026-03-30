@@ -32,7 +32,7 @@
         <textarea
           class="content-textarea"
           v-model="content"
-          placeholder="分享你的健康饮食心得..."
+          placeholder="分享你的营养饮食心得..."
           :maxlength="2000"
           auto-height
           :style="{ minHeight: '300rpx' }"

@@ -1,7 +1,7 @@
 <template>
   <div class="health-record">
     <div class="record-header">
-      <h2 class="title">健康档案</h2>
+      <h2 class="title">体质档案</h2>
       <el-button type="primary" :loading="saving" @click="handleSave">
         <el-icon v-if="!saving"><Select /></el-icon>
         保存档案
@@ -10,7 +10,7 @@
 
     <el-alert type="info" :closable="true" show-icon style="margin-bottom: 16px">
       <template #title>
-        健康档案数据仅供个人记录参考，不具有医学诊断价值。您的数据已加密保护，不会泄露给第三方。
+        体质档案数据仅供个人记录参考，不具有医学诊断价值。您的数据已加密保护，不会泄露给第三方。
       </template>
     </el-alert>
 
@@ -128,11 +128,11 @@
           </el-col>
         </el-row>
 
-        <!-- 健康信息 -->
-        <h3 class="section-title">健康信息</h3>
+        <!-- 身体信息 -->
+        <h3 class="section-title">身体信息</h3>
         <el-row :gutter="20">
           <el-col :span="12">
-            <el-form-item label="健康目标">
+            <el-form-item label="饮食目标">
               <el-select
                 v-model="formData.healthGoals"
                 multiple
@@ -190,7 +190,7 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="健康状况">
+            <el-form-item label="身体状况">
               <el-select
                 v-model="formData.medicalConditions"
                 multiple
@@ -384,7 +384,7 @@ const calculateBMI = () => {
     tagType = 'info'
     advice = {
       title: '体重偏低，需要增加营养',
-      description: '建议增加优质蛋白质和健康脂肪的摄入，配合适当的力量训练，逐步增加体重。'
+      description: '建议增加优质蛋白质和优质脂肪的摄入，配合适当的力量训练，逐步增加体重。'
     }
   } else if (bmi < 24) {
     status = '正常'
@@ -414,7 +414,7 @@ const calculateBMI = () => {
   bmiResult.value = { value: bmi, status, level, tagType, advice }
 }
 
-// 从后端加载健康档案
+// 从后端加载体质档案
 const fetchHealthProfile = async () => {
   loading.value = true
   try {
@@ -438,18 +438,18 @@ const fetchHealthProfile = async () => {
       formData.notes = d.notes || ''
       calculateBMI()
     } else {
-      // 用户尚未创建健康档案，显示空表单
+      // 用户尚未创建体质档案，显示空表单
       savedProfile.value = null
     }
   } catch (error) {
-    console.error('获取健康档案失败:', error)
-    message.error('获取健康档案失败，请稍后重试')
+    console.error('获取体质档案失败:', error)
+    message.error('获取体质档案失败，请稍后重试')
   } finally {
     loading.value = false
   }
 }
 
-// 保存健康档案到后端
+// 保存体质档案到后端
 const handleSave = async () => {
   if (formRef.value) {
     try {
@@ -481,7 +481,7 @@ const handleSave = async () => {
 
     if (res.data.code === 200) {
       savedProfile.value = res.data.data
-      message.success('健康档案保存成功')
+      message.success('体质档案保存成功')
       calculateBMI()
     } else {
       message.error(res.data.message || '保存失败')

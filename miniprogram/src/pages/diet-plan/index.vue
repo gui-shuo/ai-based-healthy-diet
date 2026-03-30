@@ -253,7 +253,7 @@ const showActivityPicker = ref(false)
 const showGoalPicker = ref(false)
 
 const activityLevels = ['久坐', '轻度活动', '中度活动', '重度活动']
-const goals = ['减脂', '增肌', '维持体重', '健康饮食']
+const goals = ['减脂', '增肌', '维持体重', '营养饮食']
 
 const form = ref({
   height: '',

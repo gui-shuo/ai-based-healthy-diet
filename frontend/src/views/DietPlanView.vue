@@ -61,7 +61,7 @@
               <el-select v-model="formData.goal" placeholder="请选择目标" style="width: 100%">
                 <el-option label="🔥 减脂塑形" value="lose_weight" />
                 <el-option label="💪 增肌强体" value="gain_muscle" />
-                <el-option label="❤️ 维持健康" value="maintain" />
+                <el-option label="❤️ 均衡饮食" value="maintain" />
               </el-select>
             </el-form-item>
 
@@ -568,7 +568,7 @@ const getGoalText = goal => {
   const goalMap = {
     lose_weight: '减脂塑形',
     gain_muscle: '增肌强壮',
-    maintain: '健康维持'
+    maintain: '均衡饮食'
   }
   return goalMap[goal] || goal
 }

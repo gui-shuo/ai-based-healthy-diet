@@ -51,7 +51,7 @@
           {{ siteName }}
         </h1>
         <p class="hero-subtitle">
-          {{ getConfig('system.site_description', '智能营养分析 · 个性化饮食方案 · 健康管理') }}
+          {{ getConfig('system.site_description', '智能营养分析 · 个性化饮食方案 · 饮食管理') }}
         </p>
         <div class="hero-buttons">
           <el-button type="primary" size="large" @click="getStarted"> 立即开始 </el-button>
@@ -76,7 +76,7 @@
                 <user />
               </el-icon>
               <h3>个人中心</h3>
-              <p>管理个人资料，记录健康数据</p>
+              <p>管理个人资料，记录身体数据</p>
             </div>
             <div class="feature-card" @click="goToFeature('ai-chat')">
               <el-icon :size="48" color="#22c55e">
@@ -118,7 +118,7 @@
                 <goods />
               </el-icon>
               <h3>营养产品商城</h3>
-              <p>优质营养产品，健康生活从此开始</p>
+              <p>优质营养产品，品质生活从此开始</p>
             </div>
             <div class="feature-card" @click="goToFeature('membership')">
               <el-icon :size="48" color="#22c55e">
@@ -212,7 +212,7 @@ const authStore = useAuthStore()
 const { loadConfig, getConfig, applyConfig } = usePublicConfig()
 
 // 网站名称（从配置获取，带默认值）
-const siteName = computed(() => getConfig('system.site_name', 'AI健康饮食规划助手'))
+const siteName = computed(() => getConfig('system.site_name', 'NutriAI饮食规划助手'))
 
 const isLoggedIn = computed(() => authStore.isLoggedIn)
 const userName = computed(() => authStore.user?.username || '用户')

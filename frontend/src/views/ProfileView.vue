@@ -19,7 +19,7 @@
         <!-- 修改密码 -->
         <PasswordChange v-if="activeMenu === 'password'" />
 
-        <!-- 健康档案 -->
+        <!-- 体质档案 -->
         <HealthRecord v-if="activeMenu === 'health'" />
 
         <!-- 收货地址 -->

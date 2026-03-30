@@ -75,11 +75,11 @@
           </div>
         </div>
 
-        <!-- 健康建议 -->
+        <!-- 营养建议 -->
         <div class="action-section">
           <h4 class="section-title">
             <el-icon><MagicStick /></el-icon>
-            健康建议
+            营养建议
           </h4>
           <div class="action-buttons">
             <el-button
@@ -133,8 +133,8 @@ const expanded = ref(props.defaultExpanded)
 const commonQuestions = [
   { id: 1, icon: '👋', label: '你能帮我做什么？', content: '你能帮我做什么？' },
   { id: 2, icon: '📊', label: '如何查看营养数据？', content: '如何查看我的营养摄入数据？' },
-  { id: 3, icon: '🎯', label: '如何设置健康目标？', content: '如何设置我的健康目标？' },
-  { id: 4, icon: '💡', label: '健康饮食建议', content: '给我一些健康饮食的建议' }
+  { id: 3, icon: '🎯', label: '如何设置饮食目标？', content: '如何设置我的饮食目标？' },
+  { id: 4, icon: '💡', label: '营养饮食建议', content: '给我一些营养饮食的建议' }
 ]
 
 // 食物分析
@@ -148,12 +148,12 @@ const foodAnalysis = [
 // 饮食计划
 const dietPlans = [
   { id: 1, icon: '📅', label: '今日饮食', content: '帮我制定今天的饮食计划' },
-  { id: 2, icon: '🗓️', label: '一周计划', content: '帮我制定一周的健康饮食计划' },
+  { id: 2, icon: '🗓️', label: '一周计划', content: '帮我制定一周的营养饮食计划' },
   { id: 3, icon: '💪', label: '增肌计划', content: '帮我制定增肌饮食计划' },
   { id: 4, icon: '⚖️', label: '减脂计划', content: '帮我制定减脂饮食计划' }
 ]
 
-// 健康建议
+// 营养建议
 const healthAdvice = [
   { id: 1, icon: '🏃', label: '运动建议', content: '给我一些适合的运动建议' },
   { id: 2, icon: '💧', label: '饮水提醒', content: '每天应该喝多少水？' },

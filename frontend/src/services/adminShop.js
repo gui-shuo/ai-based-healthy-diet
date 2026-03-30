@@ -56,8 +56,8 @@ export const ProductCategories = {
   PROTEIN: '蛋白质产品',
   VITAMIN: '维生素矿物质',
   ORGANIC: '有机食品',
-  HEALTH_FOOD: '健康食品',
-  EQUIPMENT: '健康设备'
+  HEALTH_FOOD: '营养食品',
+  EQUIPMENT: '营养设备'
 }
 
 // 产品状态

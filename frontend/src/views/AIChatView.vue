@@ -25,7 +25,7 @@
     <!-- 主体内容 -->
     <div class="chat-body">
       <div class="disclaimer-bar">
-        ⚕️ AI营养师提供的建议仅供参考，不构成医疗建议。如有健康问题请咨询专业医生。
+        ⚕️ AI营养师提供的建议仅供参考，不构成医疗建议。如有身体不适请咨询专业医生。
         <router-link to="/legal/disclaimer">详细声明</router-link>
       </div>
       <!-- 消息列表 -->

@@ -12,7 +12,7 @@
       <ul class="feature-list">
         <li>📊 分析食物营养成分</li>
         <li>🍽️ 制定个性化饮食计划</li>
-        <li>💪 提供健康饮食建议</li>
+        <li>💪 提供营养饮食建议</li>
         <li>🥗 推荐适合的食谱</li>
       </ul>
       <p class="start-tip">点击下方快捷按钮或直接输入问题开始吧！</p>

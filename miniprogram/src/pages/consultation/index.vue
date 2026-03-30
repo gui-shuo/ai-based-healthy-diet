@@ -2,7 +2,7 @@
   <view class="consultation-page">
     <!-- Disclaimer -->
     <view class="disclaimer-tip" v-if="showDisclaimer">
-      <text>🩺 咨询服务仅供健康参考，不构成医疗诊断或治疗方案。如有疾病请及时就医。</text>
+      <text>🩺 咨询服务仅供参考，不构成医疗诊断或治疗方案。如有疾病请及时就医。</text>
       <text class="dismiss" @tap="showDisclaimer = false">✕</text>
     </view>
 

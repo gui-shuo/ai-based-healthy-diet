@@ -133,8 +133,8 @@
           <text class="about-name">NutriAI 智能营养助手</text>
           <text class="about-version text-sm text-secondary">Version 1.0.0</text>
           <text class="about-desc text-sm text-secondary mt-20">
-            NutriAI 是一款基于人工智能的健康饮食管理小程序，为您提供个性化的饮食计划、
-            智能食物识别、营养师咨询等专业服务，助您实现健康生活目标。
+            NutriAI 是一款基于人工智能的智能饮食管理小程序，为您提供个性化的饮食计划、
+            智能食物识别、营养师咨询等专业服务，助您实现生活目标。
           </text>
         </view>
         <button class="btn-dialog-confirm full-btn" @tap="showAboutDialog = false">知道了</button>

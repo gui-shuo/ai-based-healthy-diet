@@ -13,7 +13,7 @@
         <input
           class="search-input"
           v-model="keyword"
-          placeholder="搜索健康食品..."
+          placeholder="搜索营养食品..."
           confirm-type="search"
           @confirm="handleSearch"
         />
@@ -114,7 +114,7 @@ const pageSize = 10
 
 const categoryNameMap: Record<string, string> = {
   EQUIPMENT: '健身器材',
-  HEALTH_FOOD: '健康食品',
+  HEALTH_FOOD: '营养食品',
   ORGANIC: '有机食品',
   PROTEIN: '蛋白质',
   SUPPLEMENT: '营养补剂',

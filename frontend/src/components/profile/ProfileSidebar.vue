@@ -43,7 +43,7 @@
 
       <el-menu-item index="health">
         <el-icon><TrendCharts /></el-icon>
-        <span>健康档案</span>
+        <span>体质档案</span>
       </el-menu-item>
 
       <el-menu-item index="address">

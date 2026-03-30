@@ -61,6 +61,6 @@ export const ProductCategories = {
   PROTEIN: { code: 'PROTEIN', name: '蛋白粉', icon: '🥤' },
   VITAMIN: { code: 'VITAMIN', name: '维生素', icon: '🌞' },
   ORGANIC: { code: 'ORGANIC', name: '有机食品', icon: '🌿' },
-  HEALTH_FOOD: { code: 'HEALTH_FOOD', name: '健康食品', icon: '🥗' },
-  EQUIPMENT: { code: 'EQUIPMENT', name: '健康器材', icon: '⚖️' }
+  HEALTH_FOOD: { code: 'HEALTH_FOOD', name: '营养食品', icon: '🥗' },
+  EQUIPMENT: { code: 'EQUIPMENT', name: '营养器材', icon: '⚖️' }
 }

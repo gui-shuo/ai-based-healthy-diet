@@ -4,7 +4,7 @@
       <!-- Logo和标题 -->
       <div class="login-header">
         <h1 class="logo">🥗 NutriAI</h1>
-        <p class="subtitle">AI健康饮食规划助手</p>
+        <p class="subtitle">NutriAI饮食规划助手</p>
       </div>
 
       <!-- 登录表单 -->

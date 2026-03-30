@@ -4,7 +4,7 @@
       <!-- Logo和标题 -->
       <div class="register-header">
         <h1 class="logo">🥗 NutriAI</h1>
-        <p class="subtitle">创建您的账号，开启健康饮食之旅</p>
+        <p class="subtitle">创建您的账号，开启智能饮食之旅</p>
       </div>
 
       <!-- 注册表单 -->

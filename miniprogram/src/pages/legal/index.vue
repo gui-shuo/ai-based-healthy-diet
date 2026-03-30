@@ -8,7 +8,7 @@
       <view v-if="type === 'terms'">
         <view class="section">
           <view class="section-title">一、总则</view>
-          <view class="section-text">欢迎使用 NutriAI 智能健康饮食助手（以下简称"本应用"）。本应用由开发者个人运营，旨在为用户提供AI辅助的饮食参考信息。使用本应用即表示您同意接受本协议的约束。</view>
+          <view class="section-text">欢迎使用 NutriAI饮食规划助手（以下简称"本应用"）。本应用由开发者个人运营，旨在为用户提供AI辅助的饮食参考信息。使用本应用即表示您同意接受本协议的约束。</view>
         </view>
         <view class="section">
           <view class="section-title">二、服务说明</view>
@@ -24,7 +24,7 @@
         <view class="section">
           <view class="section-title">四、免责声明</view>
           <view class="section-text highlight">1. AI营养建议、饮食计划、食物识别结果等均为算法生成，仅供参考，不能替代专业医生、营养师的建议。
-2. 如您有任何健康问题，请务必咨询有资质的专业医疗人员。
+2. 如您有任何身体不适，请务必咨询有资质的专业医疗人员。
 3. 本应用不对因使用AI生成内容而造成的任何损失承担责任。
 4. 社区中用户发布的内容不代表本应用立场。
 5. 商城中展示的产品信息来源于第三方，本应用不对产品质量做任何担保。</view>
@@ -49,7 +49,7 @@
           <view class="section-title">一、信息收集</view>
           <view class="section-text">为提供服务，我们可能收集以下信息：
 1. 注册信息：用户名、邮箱地址、手机号码（选填）。
-2. 健康档案信息：身高、体重、年龄等（用户自愿填写）。
+2. 体质档案信息：身高、体重、年龄等（用户自愿填写）。
 3. 饮食记录：用户主动记录的每日饮食信息。
 4. 设备信息：设备型号、操作系统版本。
 5. 使用数据：功能使用频率、页面访问记录。</view>
@@ -109,10 +109,10 @@
 3. 不同品牌、产地、烹饪方式的食物营养成分可能差异较大。</view>
         </view>
         <view class="section">
-          <view class="section-title">三、健康与医疗声明</view>
+          <view class="section-title">三、医疗相关声明</view>
           <view class="section-text highlight">本应用不是医疗器械或医疗服务平台，不具备任何医疗资质。
 1. 不能用于疾病的预防、诊断、治疗或监测。
-2. 如出现健康问题，请立即就医。
+2. 如出现身体不适，请立即就医。
 3. 孕妇、哺乳期女性、儿童、老年人及慢性疾病患者调整饮食前应咨询专业医疗人员。</view>
         </view>
         <view class="section">

@@ -133,7 +133,7 @@ const levelData = [
     color: '#ffd700',
     growthRequired: 2000,
     maxAiQueries: -1,
-    keyBenefits: ['所有白银权益', 'AI咨询无限', '个性化食谱', '健康顾问', '数据导出']
+    keyBenefits: ['所有白银权益', 'AI咨询无限', '个性化食谱', '营养顾问', '数据导出']
   },
   {
     levelCode: 'PLATINUM',

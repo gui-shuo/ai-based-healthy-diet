@@ -13,7 +13,7 @@
 
     <!-- Disclaimer -->
     <view class="disclaimer-bar" v-if="showDisclaimer" :style="{ top: navHeight + 'px' }">
-      <text>⚕️ AI建议仅供参考，不构成医疗建议。如有健康问题请咨询专业医生。</text>
+      <text>⚕️ AI建议仅供参考，不构成医疗建议。如有身体不适请咨询专业医生。</text>
       <text class="dismiss" @tap="showDisclaimer = false">✕</text>
     </view>
 
@@ -64,7 +64,7 @@
         <input
           class="chat-input flex-1"
           v-model="inputText"
-          placeholder="输入你的营养健康问题..."
+          placeholder="输入你的营养饮食问题..."
           :disabled="isSending"
           confirm-type="send"
           @confirm="sendMessage"
@@ -128,7 +128,7 @@ onLoad(() => {
 
   messages.value.push({
     role: 'assistant',
-    content: '你好！我是AI营养师，有什么营养健康问题可以问我哦～'
+    content: '你好！我是AI营养师，有什么营养饮食问题可以问我哦～'
   })
 
   connectWebSocket()
