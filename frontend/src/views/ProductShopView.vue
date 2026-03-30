@@ -210,7 +210,38 @@
 
     <!-- 结算 Dialog -->
     <el-dialog v-model="checkoutVisible" title="确认订单" width="560px">
-      <el-form label-position="top" :model="checkoutForm">
+      <!-- 已保存的地址选择 -->
+      <div v-if="savedAddresses.length" class="saved-addresses">
+        <div class="addr-header">
+          <span class="addr-title">📍 我的地址</span>
+          <el-button text type="primary" size="small" @click="$router.push('/profile')">管理地址</el-button>
+        </div>
+        <el-radio-group v-model="selectedAddressId" class="addr-radio-group" @change="onAddressSelect">
+          <el-radio
+            v-for="addr in savedAddresses"
+            :key="addr.id"
+            :value="addr.id"
+            class="addr-radio"
+          >
+            <span class="addr-name">{{ addr.receiverName }}</span>
+            <span class="addr-phone">{{ addr.receiverPhone }}</span>
+            <el-tag v-if="addr.isDefault" type="success" size="small">默认</el-tag>
+            <br />
+            <span class="addr-detail">{{ addr.province }}{{ addr.city }}{{ addr.district }}{{ addr.detailAddress }}</span>
+          </el-radio>
+          <el-radio :value="0" class="addr-radio">
+            <span class="addr-name">✏️ 手动填写新地址</span>
+          </el-radio>
+        </el-radio-group>
+      </div>
+
+      <!-- 手动填写地址 (无保存地址 或 选择了手动填写) -->
+      <el-form
+        v-if="!savedAddresses.length || selectedAddressId === 0"
+        label-position="top"
+        :model="checkoutForm"
+        style="margin-top: 12px"
+      >
         <el-form-item label="收货人">
           <el-input
             v-model="checkoutForm.receiverName"
@@ -234,6 +265,12 @@
             maxlength="200"
           />
         </el-form-item>
+        <el-form-item label="备注">
+          <el-input v-model="checkoutForm.remark" placeholder="选填" maxlength="200" />
+        </el-form-item>
+      </el-form>
+      <!-- 仅备注（选择了已保存地址时显示） -->
+      <el-form v-else label-position="top" style="margin-top: 12px">
         <el-form-item label="备注">
           <el-input v-model="checkoutForm.remark" placeholder="选填" maxlength="200" />
         </el-form-item>
@@ -353,6 +390,7 @@ import {
   getProductOrderHistory,
   ProductCategories
 } from '@/services/product'
+import { getAddresses } from '@/services/address'
 import message from '@/utils/message'
 
 const defaultImg =
@@ -383,6 +421,8 @@ const cartTotal = ref(0)
 const checkoutVisible = ref(false)
 const checkoutLoading = ref(false)
 const checkoutForm = ref({ receiverName: '', receiverPhone: '', receiverAddress: '', remark: '' })
+const savedAddresses = ref([])
+const selectedAddressId = ref(0)
 
 const ordersDialogVisible = ref(false)
 const ordersLoading = ref(false)
@@ -499,15 +539,51 @@ function showCartDrawer() {
 }
 
 // --- 结算 ---
-function openCheckout() {
+async function openCheckout() {
   if (!cart.value.length) return
   cartVisible.value = false
   checkoutForm.value = { receiverName: '', receiverPhone: '', receiverAddress: '', remark: '' }
+  selectedAddressId.value = 0
   checkoutVisible.value = true
+  // 加载已保存地址
+  try {
+    const res = await getAddresses()
+    if (res.data.code === 200) {
+      savedAddresses.value = res.data.data || []
+      // 自动选中默认地址
+      const def = savedAddresses.value.find(a => a.isDefault)
+      if (def) selectedAddressId.value = def.id
+    }
+  } catch {
+    savedAddresses.value = []
+  }
+}
+
+function onAddressSelect(id) {
+  if (id === 0) {
+    checkoutForm.value = { ...checkoutForm.value, receiverName: '', receiverPhone: '', receiverAddress: '' }
+  }
 }
 
 async function handleCheckout() {
-  const { receiverName, receiverPhone, receiverAddress, remark } = checkoutForm.value
+  let receiverName, receiverPhone, receiverAddress
+  const { remark } = checkoutForm.value
+
+  if (selectedAddressId.value && selectedAddressId.value !== 0) {
+    const addr = savedAddresses.value.find(a => a.id === selectedAddressId.value)
+    if (!addr) {
+      message.warning('请选择收货地址')
+      return
+    }
+    receiverName = addr.receiverName
+    receiverPhone = addr.receiverPhone
+    receiverAddress = `${addr.province || ''}${addr.city || ''}${addr.district || ''}${addr.detailAddress || ''}`
+  } else {
+    receiverName = checkoutForm.value.receiverName
+    receiverPhone = checkoutForm.value.receiverPhone
+    receiverAddress = checkoutForm.value.receiverAddress
+  }
+
   if (!receiverName || !receiverPhone || !receiverAddress) {
     message.warning('请填写完整的收货信息')
     return
@@ -990,6 +1066,59 @@ function orderStatusText(s) {
   gap: 8px;
   margin-top: 12px;
   font-size: 15px;
+}
+
+// === 已保存地址 ===
+.saved-addresses {
+  .addr-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+
+    .addr-title {
+      font-weight: 600;
+      font-size: 15px;
+    }
+  }
+
+  .addr-radio-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+
+    .addr-radio {
+      display: flex;
+      align-items: flex-start;
+      padding: 10px 12px;
+      border: 1px solid #eee;
+      border-radius: 8px;
+      margin: 0;
+      height: auto;
+      width: 100%;
+
+      &:hover {
+        border-color: #409eff;
+      }
+
+      .addr-name {
+        font-weight: 600;
+        margin-right: 8px;
+      }
+
+      .addr-phone {
+        color: #666;
+        font-size: 13px;
+        margin-right: 6px;
+      }
+
+      .addr-detail {
+        color: #888;
+        font-size: 13px;
+      }
+    }
+  }
 }
 
 // === 订单 ===

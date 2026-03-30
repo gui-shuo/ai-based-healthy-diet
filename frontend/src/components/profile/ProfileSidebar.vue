@@ -45,6 +45,11 @@
         <el-icon><TrendCharts /></el-icon>
         <span>健康档案</span>
       </el-menu-item>
+
+      <el-menu-item index="address">
+        <el-icon><Location /></el-icon>
+        <span>收货地址</span>
+      </el-menu-item>
     </el-menu>
 
     <!-- 返回首页按钮 -->
@@ -60,7 +65,7 @@
 <script setup>
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { Edit, User, Lock, TrendCharts, HomeFilled } from '@element-plus/icons-vue'
+import { Edit, User, Lock, TrendCharts, HomeFilled, Location } from '@element-plus/icons-vue'
 import { useAuthStore } from '@/stores/auth'
 
 defineProps({

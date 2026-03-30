@@ -79,7 +79,23 @@ public class ProductController {
             @RequestBody Map<String, Object> body,
             HttpServletRequest request) {
         Long userId = getUserId(request);
-        List<Map<String, Object>> items = (List<Map<String, Object>>) body.get("items");
+        List<Map<String, Object>> items;
+        Object itemsObj = body.get("items");
+        if (itemsObj instanceof List) {
+            items = (List<Map<String, Object>>) itemsObj;
+        } else if (itemsObj instanceof Map) {
+            // single item sent as object instead of array
+            items = List.of((Map<String, Object>) itemsObj);
+        } else {
+            // mini program flat format: { productId, quantity, ... }
+            Object pid = body.get("productId");
+            Object qty = body.get("quantity");
+            if (pid != null) {
+                items = List.of(Map.of("productId", pid, "quantity", qty != null ? qty : 1));
+            } else {
+                return ApiResponse.error(400, "缺少商品信息");
+            }
+        }
         String receiverName = body.get("receiverName") != null ? body.get("receiverName").toString() : "";
         String receiverPhone = body.get("receiverPhone") != null ? body.get("receiverPhone").toString() : "";
         String receiverAddress = body.get("receiverAddress") != null ? body.get("receiverAddress").toString() : "";

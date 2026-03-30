@@ -21,6 +21,9 @@
 
         <!-- 健康档案 -->
         <HealthRecord v-if="activeMenu === 'health'" />
+
+        <!-- 收货地址 -->
+        <AddressManager v-if="activeMenu === 'address'" />
       </div>
     </div>
   </div>
@@ -33,6 +36,7 @@ import ProfileInfo from '@/components/profile/ProfileInfo.vue'
 import ProfileEdit from '@/components/profile/ProfileEdit.vue'
 import PasswordChange from '@/components/profile/PasswordChange.vue'
 import HealthRecord from '@/components/profile/HealthRecord.vue'
+import AddressManager from '@/components/profile/AddressManager.vue'
 
 // 当前激活的菜单
 const activeMenu = ref('info')

@@ -32,14 +32,9 @@ export const getProductCategories = () => api.get('/products/categories')
 
 /**
  * 创建产品订单
- * @param {Array} items [{productId, quantity}]
- * @param {string} receiverName
- * @param {string} receiverPhone
- * @param {string} receiverAddress
- * @param {string} remark
+ * @param {Object} data - { items, receiverName, receiverPhone, receiverAddress, remark }
  */
-export const createProductOrder = (items, receiverName, receiverPhone, receiverAddress, remark) =>
-  api.post('/products/orders', { items, receiverName, receiverPhone, receiverAddress, remark })
+export const createProductOrder = data => api.post('/products/orders', data)
 
 /** 模拟支付 */
 export const simulatePayProduct = orderNo => api.post(`/products/orders/${orderNo}/simulate-pay`)
