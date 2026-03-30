@@ -1,6 +1,6 @@
 {
     "name" : "NutriAI",
-    "appid" : "__UNI__NUTRIAI",
+    "appid" : "__UNI__1ADA413",
     "description" : "AI智能健康饮食助手",
     "versionName" : "1.0.0",
     "versionCode" : 1,
@@ -60,6 +60,9 @@
             },
             "splashscreen" : {
                 "androidStyle" : "common"
+            },
+            "ios" : {
+                "dSYMs" : false
             }
         },
         "modules" : {},
