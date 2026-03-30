@@ -75,6 +75,25 @@
         <text>和</text>
         <text class="legal-link" @tap="goTo('/pages/legal/index?type=privacy')">《隐私政策》</text>
       </view>
+
+      <!-- Social Login Divider -->
+      <view class="divider-row">
+        <view class="divider-line" />
+        <text class="divider-text">其他登录方式</text>
+        <view class="divider-line" />
+      </view>
+
+      <!-- Social Login Buttons -->
+      <view class="social-row">
+        <view class="social-btn wechat-btn" @tap="handleSocialLogin('wechat')">
+          <text class="social-icon">💬</text>
+          <text class="social-label">微信登录</text>
+        </view>
+        <view class="social-btn qq-btn" @tap="handleSocialLogin('qq')">
+          <text class="social-icon">🐧</text>
+          <text class="social-label">QQ登录</text>
+        </view>
+      </view>
     </view>
   </view>
 </template>
@@ -83,7 +102,7 @@
 import { ref, reactive } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import { useUserStore } from '@/stores/user'
-import { authApi } from '@/services/api'
+import { authApi, socialAuthApi } from '@/services/api'
 
 const userStore = useUserStore()
 
@@ -146,6 +165,35 @@ async function handleLogin() {
     loadCaptcha()
   } finally {
     loginLoading.value = false
+  }
+}
+
+async function handleSocialLogin(provider: 'wechat' | 'qq') {
+  try {
+    uni.showLoading({ title: '正在跳转...', mask: true })
+    const res = provider === 'wechat'
+      ? await socialAuthApi.getWechatAuthUrl('h5_login') as any
+      : await socialAuthApi.getQqAuthUrl('h5_login') as any
+    uni.hideLoading()
+
+    if (res.code === 200 && res.data) {
+      const authUrl = res.data
+      // #ifdef H5
+      window.location.href = authUrl
+      // #endif
+      // #ifdef APP-PLUS
+      plus.runtime.openURL(authUrl)
+      uni.showToast({ title: '请在浏览器中完成授权', icon: 'none', duration: 3000 })
+      // #endif
+      // #ifdef MP-WEIXIN
+      uni.showToast({ title: '小程序端暂不支持此登录方式', icon: 'none' })
+      // #endif
+    } else {
+      uni.showToast({ title: res.message || '获取授权地址失败', icon: 'none' })
+    }
+  } catch (e: any) {
+    uni.hideLoading()
+    uni.showToast({ title: '网络错误，请稍后重试', icon: 'none' })
   }
 }
 
@@ -290,5 +338,54 @@ function goTo(url: string) {
 }
 .legal-link {
   color: #07c160;
+}
+
+/* Social Login */
+.divider-row {
+  display: flex;
+  align-items: center;
+  margin: 48rpx 0 32rpx;
+  gap: 16rpx;
+}
+.divider-line {
+  flex: 1;
+  height: 1rpx;
+  background: #e5e5e5;
+}
+.divider-text {
+  font-size: 24rpx;
+  color: #999;
+  white-space: nowrap;
+}
+.social-row {
+  display: flex;
+  justify-content: center;
+  gap: 60rpx;
+}
+.social-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12rpx;
+  padding: 20rpx 32rpx;
+  border-radius: 16rpx;
+  background: #f7f7f7;
+  min-width: 160rpx;
+}
+.social-btn:active {
+  opacity: 0.7;
+}
+.social-icon {
+  font-size: 48rpx;
+}
+.social-label {
+  font-size: 22rpx;
+  color: #666;
+}
+.wechat-btn {
+  background: #f0faf3;
+}
+.qq-btn {
+  background: #f0f4ff;
 }
 </style>

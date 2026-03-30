@@ -119,6 +119,19 @@ export const addressApi = {
   setDefault: (id: number) => request({ url: `/addresses/${id}/default`, method: 'PUT' })
 }
 
+// ============ Social Auth ============
+export const socialAuthApi = {
+  getWechatAuthUrl: (state = 'login') => request({ url: `/auth/social/wechat/auth-url?state=${state}` }),
+  getQqAuthUrl: (state = 'login') => request({ url: `/auth/social/qq/auth-url?state=${state}` }),
+  wechatLogin: (code: string) => request({ url: '/auth/social/wechat/login', method: 'POST', data: { code, provider: 'wechat' } }),
+  qqLogin: (code: string) => request({ url: '/auth/social/qq/login', method: 'POST', data: { code, provider: 'qq' } }),
+  getBindInfo: () => request({ url: '/auth/social/bindinfo' }),
+  bindWechat: (code: string) => request({ url: '/auth/social/bind/wechat', method: 'POST', data: { code } }),
+  bindQq: (code: string) => request({ url: '/auth/social/bind/qq', method: 'POST', data: { code } }),
+  unbindWechat: () => request({ url: '/auth/social/unbind/wechat', method: 'DELETE' }),
+  unbindQq: () => request({ url: '/auth/social/unbind/qq', method: 'DELETE' })
+}
+
 // ============ Announcements ============
 export const announcementApi = {
   getList: (params?: any) => request({ url: '/announcements', data: params })

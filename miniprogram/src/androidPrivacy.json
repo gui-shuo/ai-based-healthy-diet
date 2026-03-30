@@ -18,11 +18,12 @@
       "color": "#333333"
     },
     "buttonAccept": {
-      "color": "#ffffff",
-      "backgroundColor": "#4CAF50"
+      "color": "#07c160",
+      "borderRadius": "24px"
     },
     "buttonRefuse": {
-      "color": "#999999"
+      "color": "#666666",
+      "borderRadius": "24px"
     }
   }
 }

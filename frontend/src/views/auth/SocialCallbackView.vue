@@ -55,13 +55,27 @@ onMounted(async () => {
 
     if (response.data.code === 200) {
       const loginData = response.data.data
+      const stateStr = String(state || '')
+
+      // H5/APP redirect: pass token back to H5 app
+      if (stateStr.startsWith('h5_')) {
+        const h5Base = window.location.origin + '/h5/'
+        const params = new URLSearchParams({
+          token: loginData.accessToken,
+          refreshToken: loginData.refreshToken || ''
+        })
+        window.location.href = `${h5Base}#/pages/auth/social-callback?${params.toString()}`
+        return
+      }
+
+      // Web frontend: normal flow
       authStore.setToken(loginData.accessToken)
       authStore.setRefreshToken(loginData.refreshToken)
       authStore.setUser(loginData.userInfo)
 
       ElMessage.success('登录成功！')
 
-      if (state === 'bind') {
+      if (stateStr === 'bind') {
         router.push('/profile')
       } else {
         router.push('/')

@@ -17,14 +17,23 @@
       <text class="dismiss" @tap="showDisclaimer = false">✕</text>
     </view>
 
+    <!-- Connection Status -->
+    <view class="conn-bar" v-if="!connected && !isConnecting" :style="{ top: (navHeight + (showDisclaimer ? 32 : 0)) + 'px' }">
+      <text class="conn-text">⚠️ 连接已断开</text>
+      <text class="conn-retry" @tap="retryConnect">点击重连</text>
+    </view>
+    <view class="conn-bar connecting" v-else-if="isConnecting" :style="{ top: (navHeight + (showDisclaimer ? 32 : 0)) + 'px' }">
+      <text class="conn-text">🔄 正在连接...</text>
+    </view>
+
     <!-- Message List -->
     <scroll-view
       class="message-list"
       scroll-y
       :scroll-top="scrollTop"
       :scroll-into-view="scrollIntoView"
-      :style="{ top: (navHeight + (showDisclaimer ? 32 : 0)) + 'px', bottom: inputAreaHeight + 'px' }"
-      @scrolltoupper="onScrollToUpper"
+      :style="{ top: (navHeight + (showDisclaimer ? 32 : 0) + (!connected ? 32 : 0)) + 'px', bottom: inputAreaHeight + 'px' }"
+      @scrolltoupper=""
     >
       <view class="message-wrapper" v-for="(msg, idx) in messages" :key="idx" :id="'msg-' + idx">
         <!-- AI Message -->
@@ -97,7 +106,7 @@ interface ChatMessage {
 const WS_URL = 'wss://nutriai.itshuo.me/api/ws/ai/chat'
 
 const userStore = useUserStore()
-const userAvatar = computed(() => defaultAvatar(userStore.userInfo?.avatarUrl))
+const userAvatar = computed(() => defaultAvatar(userStore.userInfo?.avatar))
 
 const messages = ref<ChatMessage[]>([])
 const inputText = ref('')
@@ -115,7 +124,7 @@ let connected = ref(false)
 let reconnectTimer: ReturnType<typeof setTimeout> | null = null
 let reconnectAttempts = 0
 const MAX_RECONNECT = 5
-let isConnecting = false
+let isConnecting = ref(false)
 let pageVisible = true
 let heartbeatTimer: ReturnType<typeof setInterval> | null = null
 
@@ -136,7 +145,7 @@ onLoad(() => {
 
 onShow(() => {
   pageVisible = true
-  if (!connected.value && !isConnecting && getToken()) {
+  if (!connected.value && !isConnecting.value && getToken()) {
     connectWebSocket()
   }
 })
@@ -152,9 +161,14 @@ onUnmounted(() => {
   clearReconnectTimer()
 })
 
+function retryConnect() {
+  reconnectAttempts = 0
+  connectWebSocket()
+}
+
 function connectWebSocket() {
   const token = getToken()
-  if (!token || isConnecting) return
+  if (!token || isConnecting.value) return
 
   // Close existing connection without triggering reconnect
   if (socketTask) {
@@ -164,14 +178,14 @@ function connectWebSocket() {
     try { oldTask.close({}) } catch {}
   }
 
-  isConnecting = true
+  isConnecting.value = true
   const wsUrl = `${WS_URL}?token=${encodeURIComponent(token)}`
   socketTask = uni.connectSocket({
     url: wsUrl,
     success: () => {},
     fail: (err) => {
       console.error('WebSocket connect fail:', err)
-      isConnecting = false
+      isConnecting.value = false
       scheduleReconnect()
     }
   })
@@ -181,7 +195,7 @@ function connectWebSocket() {
   socketTask.onOpen(() => {
     if (currentTask !== socketTask) return
     connected.value = true
-    isConnecting = false
+    isConnecting.value = false
     reconnectAttempts = 0
     startHeartbeat()
     if (pendingMessage) {
@@ -204,14 +218,14 @@ function connectWebSocket() {
   socketTask.onError(() => {
     if (currentTask !== socketTask) return
     connected.value = false
-    isConnecting = false
+    isConnecting.value = false
     scheduleReconnect()
   })
 
   socketTask.onClose(() => {
     if (currentTask !== socketTask) return
     connected.value = false
-    isConnecting = false
+    isConnecting.value = false
     if (pageVisible && !isSending.value) {
       scheduleReconnect()
     }
@@ -314,7 +328,7 @@ function closeWebSocket() {
   const task = socketTask
   socketTask = null
   connected.value = false
-  isConnecting = false
+  isConnecting.value = false
   if (task) {
     try { task.close({}) } catch {}
   }
@@ -552,5 +566,33 @@ function goBack() {
   right: 16rpx;
   font-size: 28rpx;
   color: #999;
+}
+
+/* Connection Status Bar */
+.conn-bar {
+  position: fixed;
+  left: 0; right: 0;
+  z-index: 89;
+  background: #fff0f0;
+  color: #d32f2f;
+  font-size: 22rpx;
+  padding: 6rpx 24rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16rpx;
+}
+.conn-bar.connecting {
+  background: #fff8e1;
+  color: #f57c00;
+}
+.conn-text {
+  font-size: 22rpx;
+}
+.conn-retry {
+  font-size: 22rpx;
+  color: #07c160;
+  font-weight: 600;
+  text-decoration: underline;
 }
 </style>

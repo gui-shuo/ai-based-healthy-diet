@@ -8,6 +8,7 @@
     { "path": "pages/auth/login", "style": { "navigationBarTitleText": "登录" } },
     { "path": "pages/auth/register", "style": { "navigationBarTitleText": "注册" } },
     { "path": "pages/auth/forgot-password", "style": { "navigationBarTitleText": "找回密码" } },
+    { "path": "pages/auth/social-callback", "style": { "navigationBarTitleText": "登录中" } },
     { "path": "pages/diet-plan/index", "style": { "navigationBarTitleText": "AI饮食计划" } },
     { "path": "pages/food-recognition/index", "style": { "navigationBarTitleText": "AI食物识别" } },
     { "path": "pages/food-records/index", "style": { "navigationBarTitleText": "饮食记录" } },
