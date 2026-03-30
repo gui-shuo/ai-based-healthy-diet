@@ -376,7 +376,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { ArrowLeft, Document, ShoppingCart, Search, Delete } from '@element-plus/icons-vue'
 import {
   getProducts,
@@ -414,9 +414,22 @@ const detailVisible = ref(false)
 const detailProduct = ref(null)
 const detailQty = ref(1)
 
-const cart = ref([])
+const CART_STORAGE_KEY = 'nutriai_cart'
+
+function loadCart() {
+  try {
+    const raw = localStorage.getItem(CART_STORAGE_KEY)
+    return raw ? JSON.parse(raw) : []
+  } catch { return [] }
+}
+
+const cart = ref(loadCart())
 const cartVisible = ref(false)
 const cartTotal = ref(0)
+
+watch(cart, val => {
+  try { localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(val)) } catch {}
+}, { deep: true })
 
 const checkoutVisible = ref(false)
 const checkoutLoading = ref(false)
@@ -432,6 +445,7 @@ const orders = ref([])
 onMounted(() => {
   initCategories()
   fetchProducts()
+  updateCartTotal()
 })
 
 async function fetchProducts() {
