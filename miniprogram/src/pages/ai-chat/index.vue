@@ -25,6 +25,9 @@
     <view class="conn-bar connecting" v-else-if="isConnecting" :style="{ top: (navHeight + (showDisclaimer ? 32 : 0)) + 'px' }">
       <text class="conn-text">🔄 正在连接...</text>
     </view>
+    <view class="conn-bar connected" v-else-if="showConnected" :style="{ top: (navHeight + (showDisclaimer ? 32 : 0)) + 'px' }">
+      <text class="conn-text">✅ 已连接</text>
+    </view>
 
     <!-- Message List -->
     <scroll-view
@@ -32,7 +35,7 @@
       scroll-y
       :scroll-top="scrollTop"
       :scroll-into-view="scrollIntoView"
-      :style="{ top: (navHeight + (showDisclaimer ? 32 : 0) + (!connected ? 32 : 0)) + 'px', bottom: inputAreaHeight + 'px' }"
+      :style="{ top: (navHeight + (showDisclaimer ? 32 : 0) + (!connected || showConnected ? 32 : 0)) + 'px', bottom: inputAreaHeight + 'px' }"
     >
       <view class="message-wrapper" v-for="(msg, idx) in messages" :key="idx" :id="'msg-' + idx">
         <!-- AI Message -->
@@ -117,6 +120,8 @@ const statusBarHeight = ref(0)
 const navHeight = ref(0)
 const inputAreaHeight = ref(100)
 const showDisclaimer = ref(true)
+const showConnected = ref(false)
+let connectedTimer: ReturnType<typeof setTimeout> | null = null
 
 let socketTask: UniApp.SocketTask | null = null
 const connected = ref(false)
@@ -132,7 +137,9 @@ onLoad(() => {
   const sysInfo = uni.getSystemInfoSync()
   statusBarHeight.value = sysInfo.statusBarHeight || 44
   navHeight.value = statusBarHeight.value + 44
-  inputAreaHeight.value = 100 + (sysInfo.safeAreaInsets?.bottom || 0)
+  // Account for tabBar height (windowBottom) + safe area
+  const tabBarHeight = sysInfo.windowBottom || 50
+  inputAreaHeight.value = 100 + tabBarHeight + (sysInfo.safeAreaInsets?.bottom || 0)
 
   messages.value.push({
     role: 'assistant',
@@ -197,6 +204,10 @@ function connectWebSocket() {
     isConnecting.value = false
     reconnectAttempts = 0
     startHeartbeat()
+    // Show "已连接" indicator for 2 seconds
+    showConnected.value = true
+    if (connectedTimer) clearTimeout(connectedTimer)
+    connectedTimer = setTimeout(() => { showConnected.value = false }, 2000)
     if (pendingMessage) {
       const msg = pendingMessage
       pendingMessage = ''
@@ -506,7 +517,7 @@ function goBack() {
 /* Input Area */
 .input-area {
   position: fixed;
-  bottom: 0;
+  bottom: var(--window-bottom, 0);
   left: 0;
   right: 0;
   background: #fff;
@@ -584,6 +595,10 @@ function goBack() {
 .conn-bar.connecting {
   background: #fff8e1;
   color: #f57c00;
+}
+.conn-bar.connected {
+  background: #e8f5e9;
+  color: #2e7d32;
 }
 .conn-text {
   font-size: 22rpx;
