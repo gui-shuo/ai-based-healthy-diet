@@ -144,6 +144,17 @@ public class ConsultationController {
         return ApiResponse.success(consultationService.getActiveConsultations(userId));
     }
 
+    /**
+     * 获取单个咨询订单详情
+     */
+    @GetMapping("/orders/{orderNo}")
+    public ApiResponse<ConsultationOrder> getOrderDetail(
+            @PathVariable String orderNo,
+            HttpServletRequest request) {
+        Long userId = getUserId(request);
+        return ApiResponse.success(consultationService.getConsultationDetail(userId, orderNo));
+    }
+
     private Long getUserId(HttpServletRequest request) {
         return (Long) request.getAttribute("userId");
     }

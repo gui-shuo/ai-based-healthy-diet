@@ -293,6 +293,92 @@ public class ConsultationService {
         }
     }
 
+    /**
+     * 获取营养师的咨询订单列表
+     */
+    public Page<ConsultationOrder> getNutritionistConsultations(Long nutritionistId, int page, int size, String status) {
+        if (status != null && !status.isEmpty()) {
+            return consultationOrderRepository.findByNutritionistIdAndStatusOrderByCreatedAtDesc(
+                    nutritionistId, status, PageRequest.of(page, size));
+        }
+        return consultationOrderRepository.findByNutritionistIdOrderByCreatedAtDesc(
+                nutritionistId, PageRequest.of(page, size));
+    }
+
+    /**
+     * 营养师真实回复消息
+     */
+    @Transactional
+    public ConsultationOrder nutritionistReply(Long nutritionistId, String orderNo, String content) {
+        ConsultationOrder order = consultationOrderRepository.findByOrderNo(orderNo)
+                .orElseThrow(() -> new BusinessException("订单不存在"));
+
+        if (!order.getNutritionistId().equals(nutritionistId)) {
+            throw new BusinessException("无权回复该咨询");
+        }
+
+        if (!"IN_PROGRESS".equals(order.getStatus())) {
+            throw new BusinessException("咨询未在进行中");
+        }
+
+        List<Map<String, Object>> messages = order.getMessages();
+        if (messages == null) {
+            messages = new ArrayList<>();
+        }
+
+        Map<String, Object> msg = new HashMap<>();
+        msg.put("role", "nutritionist");
+        msg.put("content", content);
+        msg.put("timestamp", LocalDateTime.now().toString());
+        messages.add(msg);
+
+        order.setMessages(messages);
+        consultationOrderRepository.save(order);
+        return order;
+    }
+
+    /**
+     * 获取营养师的活跃咨询
+     */
+    public List<ConsultationOrder> getNutritionistActiveConsultations(Long nutritionistId) {
+        return consultationOrderRepository.findActiveConsultationsByNutritionistId(nutritionistId);
+    }
+
+    /**
+     * 根据用户ID获取关联的营养师信息
+     */
+    public Nutritionist getNutritionistByUserId(Long userId) {
+        return nutritionistRepository.findByUserId(userId)
+                .orElseThrow(() -> new BusinessException("未找到关联的营养师信息"));
+    }
+
+    /**
+     * 更新营养师在线状态
+     */
+    @Transactional
+    public Nutritionist updateNutritionistStatus(Long nutritionistId, String status) {
+        Nutritionist nutritionist = nutritionistRepository.findById(nutritionistId)
+                .orElseThrow(() -> new BusinessException("营养师不存在"));
+        if (!List.of("ONLINE", "OFFLINE", "BUSY").contains(status)) {
+            throw new BusinessException("无效的状态值");
+        }
+        nutritionist.setStatus(status);
+        nutritionistRepository.save(nutritionist);
+        return nutritionist;
+    }
+
+    /**
+     * 获取单个咨询订单详情（用户端）
+     */
+    public ConsultationOrder getConsultationDetail(Long userId, String orderNo) {
+        ConsultationOrder order = consultationOrderRepository.findByOrderNo(orderNo)
+                .orElseThrow(() -> new BusinessException("订单不存在"));
+        if (!order.getUserId().equals(userId)) {
+            throw new BusinessException("无权查看该咨询");
+        }
+        return order;
+    }
+
     // === 私有方法 ===
 
     private String generateOrderNo(String prefix) {
