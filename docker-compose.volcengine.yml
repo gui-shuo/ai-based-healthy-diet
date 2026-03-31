@@ -77,15 +77,15 @@ services:
       QQ_APP_KEY: ${QQ_APP_KEY:-}
       # 针对 2C2G 低配服务器优化 JVM 参数
       JAVA_OPTS: >-
-        -Xms128m -Xmx256m
+        -Xms192m -Xmx384m
         -XX:+UseG1GC -XX:MaxGCPauseMillis=200
         -XX:+UseStringDeduplication
         -XX:MetaspaceSize=64m -XX:MaxMetaspaceSize=128m
         -XX:+UseCompressedOops -XX:+UseCompressedClassPointers
         -Djava.security.egd=file:/dev/./urandom
         -Duser.timezone=Asia/Shanghai
-    mem_limit: 512m
-    memswap_limit: 640m
+    mem_limit: 768m
+    memswap_limit: 896m
     volumes:
       - ./releases:/app/releases
     ports:
