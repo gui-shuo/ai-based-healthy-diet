@@ -495,7 +495,7 @@ function formatDate(dt) {
   }
 
   .n-avatar {
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    background: linear-gradient(135deg, #0d9488, #065f46);
     color: #fff;
     font-weight: 600;
   }
@@ -588,7 +588,7 @@ function formatDate(dt) {
     gap: 16px;
 
     .n-avatar {
-      background: linear-gradient(135deg, #667eea, #764ba2);
+      background: linear-gradient(135deg, #0d9488, #065f46);
       color: #fff;
       font-weight: 600;
     }

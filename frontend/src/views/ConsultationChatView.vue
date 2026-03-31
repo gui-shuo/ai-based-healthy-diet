@@ -375,7 +375,7 @@ function formatMsgTime(ts) {
   }
 
   .n-avatar {
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    background: linear-gradient(135deg, #0d9488, #065f46);
     color: #fff;
     font-weight: 600;
   }
@@ -424,7 +424,7 @@ function formatMsgTime(ts) {
     &.msg-user {
       justify-content: flex-end;
       .msg-bubble {
-        background: #667eea;
+        background: #0d9488;
         color: #fff;
         border-radius: 18px 18px 4px 18px;
         .msg-time { color: rgba(255,255,255,0.7); }

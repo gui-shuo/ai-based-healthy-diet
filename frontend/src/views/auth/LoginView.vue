@@ -15,13 +15,13 @@
         class="login-form"
         @submit.prevent="handleLogin"
       >
-        <!-- 用户名 -->
+        <!-- 邮箱 -->
         <el-form-item prop="username">
           <el-input
             v-model="loginForm.username"
-            placeholder="请输入用户名"
+            placeholder="请输入邮箱"
             size="large"
-            prefix-icon="User"
+            prefix-icon="Message"
             clearable
           />
         </el-form-item>
@@ -94,6 +94,8 @@
         <div class="register-link">
           还没有账号？
           <router-link to="/register" class="link"> 立即注册 </router-link>
+          <span style="margin: 0 8px; color: #d1d5db;">|</span>
+          <router-link to="/nutritionist/register" class="link"> 营养师入驻 </router-link>
         </div>
       </el-form>
 
@@ -149,8 +151,7 @@ const loginForm = reactive({
 // 验证规则
 const loginRules = {
   username: [
-    { required: true, message: '请输入用户名', trigger: 'blur' },
-    { min: 3, max: 20, message: '用户名长度为3-20个字符', trigger: 'blur' }
+    { required: true, message: '请输入邮箱', trigger: 'blur' }
   ],
   password: [
     { required: true, message: '请输入密码', trigger: 'blur' },
@@ -254,7 +255,7 @@ const handleLogin = async () => {
 
       // 显示具体错误信息
       if (errorData.code === 40006) {
-        message.error('用户名或密码错误')
+        message.error('邮箱或密码错误')
       } else if (errorData.code === 40011) {
         message.error('登录失败次数过多，请输入验证码')
         showCaptcha.value = true
@@ -298,12 +299,14 @@ onMounted(() => {
 const socialLoading = ref(false)
 
 const handleSocialLogin = async (provider) => {
+  if (provider === 'wechat') {
+    message.info('微信登录需企业身份认证，建议使用邮箱或QQ注册登录')
+    return
+  }
   socialLoading.value = true
   try {
     let response
-    if (provider === 'wechat') {
-      response = await socialAuthApi.getWechatAuthUrl('login')
-    } else if (provider === 'qq') {
+    if (provider === 'qq') {
       response = await socialAuthApi.getQqAuthUrl('login')
     }
     if (response?.data?.code === 200 && response.data.data) {

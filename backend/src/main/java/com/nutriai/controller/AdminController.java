@@ -2,6 +2,9 @@ package com.nutriai.controller;
 
 import com.nutriai.dto.admin.*;
 import com.nutriai.common.ApiResponse;
+import com.nutriai.entity.Nutritionist;
+import com.nutriai.repository.NutritionistRepository;
+import com.nutriai.repository.UserRepository;
 import com.nutriai.service.AdminAILogService;
 import com.nutriai.service.AdminConfigService;
 import com.nutriai.service.AdminDashboardService;
@@ -35,6 +38,8 @@ public class AdminController {
     private final AdminConfigService configService;
     private final ConfigOptionsService configOptionsService;
     private final JwtUtil jwtUtil;
+    private final NutritionistRepository nutritionistRepository;
+    private final UserRepository userRepository;
     
     // ==================== 数据看板 ====================
     
@@ -417,5 +422,57 @@ public class AdminController {
             return ResponseEntity.status(500)
                     .body(ApiResponse.error(500, "删除失败: " + e.getMessage()));
         }
+    }
+
+    // ==================== 营养师审核管理 ====================
+
+    /**
+     * 获取待审核的营养师列表
+     */
+    @GetMapping("/nutritionists/pending")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    public ApiResponse<List<Nutritionist>> getPendingNutritionists() {
+        List<Nutritionist> list = nutritionistRepository.findByApprovalStatus("PENDING");
+        return ApiResponse.success(list);
+    }
+
+    // GET /admin/nutritionists is handled by AdminShopController (supports keyword search)
+
+    /**
+     * 审核通过营养师
+     */
+    @PutMapping("/nutritionists/{id}/approve")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    public ApiResponse<Nutritionist> approveNutritionist(@PathVariable Long id) {
+        Nutritionist n = nutritionistRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("营养师不存在"));
+        n.setApprovalStatus("APPROVED");
+        n.setIsActive(true);
+        nutritionistRepository.save(n);
+        log.info("营养师审核通过: id={}, name={}", n.getId(), n.getName());
+        return ApiResponse.success("审核通过", n);
+    }
+
+    /**
+     * 审核拒绝营养师
+     */
+    @PutMapping("/nutritionists/{id}/reject")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    public ApiResponse<Nutritionist> rejectNutritionist(@PathVariable Long id,
+            @RequestBody(required = false) Map<String, String> body) {
+        Nutritionist n = nutritionistRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("营养师不存在"));
+        n.setApprovalStatus("REJECTED");
+        n.setIsActive(false);
+        nutritionistRepository.save(n);
+        // 将关联用户角色改回USER
+        if (n.getUserId() != null) {
+            userRepository.findById(n.getUserId()).ifPresent(user -> {
+                user.setRole("USER");
+                userRepository.save(user);
+            });
+        }
+        log.info("营养师审核拒绝: id={}, name={}", n.getId(), n.getName());
+        return ApiResponse.success("已拒绝", n);
     }
 }

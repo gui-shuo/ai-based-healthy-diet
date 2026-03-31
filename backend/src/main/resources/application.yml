@@ -218,6 +218,6 @@ social:
     app-secret: ${SOCIAL_WECHAT_APP_SECRET:}
     redirect-uri: ${SOCIAL_WECHAT_REDIRECT_URI:https://nutriai.itshuo.me/auth/callback/wechat}
   qq:
-    app-id: ${SOCIAL_QQ_APP_ID:}
-    app-key: ${SOCIAL_QQ_APP_KEY:}
+    app-id: ${QQ_APP_ID:}
+    app-key: ${QQ_APP_KEY:}
     redirect-uri: ${SOCIAL_QQ_REDIRECT_URI:https://nutriai.itshuo.me/auth/callback/qq}

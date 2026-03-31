@@ -115,7 +115,7 @@ async function toggleStatus(val) {
     border-bottom: 1px solid #f3f4f6;
 
     .n-avatar {
-      background: linear-gradient(135deg, #667eea, #764ba2);
+      background: linear-gradient(135deg, #0d9488, #065f46);
       color: #fff;
       font-weight: 600;
     }

@@ -94,6 +94,11 @@ public class Nutritionist {
     @Builder.Default
     private Boolean isActive = true;
 
+    /** 审核状态: PENDING(待审核)/APPROVED(已通过)/REJECTED(已拒绝) */
+    @Column(name = "approval_status", length = 20)
+    @Builder.Default
+    private String approvalStatus = "APPROVED";
+
     /** 排序权重 */
     @Column(name = "sort_order")
     @Builder.Default

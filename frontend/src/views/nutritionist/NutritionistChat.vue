@@ -273,7 +273,7 @@ function formatMsgTime(ts) {
     &.msg-self {
       justify-content: flex-end;
       .msg-bubble {
-        background: #667eea;
+        background: #0d9488;
         color: #fff;
         border-radius: 18px 18px 4px 18px;
         .msg-sender { color: rgba(255,255,255,0.8); }
@@ -288,7 +288,7 @@ function formatMsgTime(ts) {
         color: #1f2937;
         border-radius: 18px 18px 18px 4px;
         border: 1px solid #e5e7eb;
-        .msg-sender { color: #667eea; }
+        .msg-sender { color: #0d9488; }
         .msg-time { color: #9ca3af; }
       }
     }

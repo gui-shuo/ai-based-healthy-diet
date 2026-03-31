@@ -90,7 +90,7 @@ function formatDate(dt) {
   flex: 1;
   text-align: center;
 
-  .stat-num { font-size: 32px; font-weight: 700; color: #667eea; }
+  .stat-num { font-size: 32px; font-weight: 700; color: #0d9488; }
   .stat-label { font-size: 14px; color: #6b7280; margin-top: 4px; }
 }
 

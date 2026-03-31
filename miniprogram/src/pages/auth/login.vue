@@ -10,11 +10,11 @@
     <!-- Login Form -->
     <view class="form-section">
       <view class="input-group">
-        <text class="input-label">用户名</text>
+        <text class="input-label">邮箱</text>
         <input
           v-model="form.username"
           class="input"
-          placeholder="请输入用户名"
+          placeholder="请输入邮箱"
           :disabled="loginLoading"
         />
       </view>
@@ -134,7 +134,7 @@ async function loadCaptcha() {
 
 async function handleLogin() {
   if (!form.username.trim()) {
-    return uni.showToast({ title: '请输入用户名', icon: 'none' })
+    return uni.showToast({ title: '请输入邮箱', icon: 'none' })
   }
   if (!form.password) {
     return uni.showToast({ title: '请输入密码', icon: 'none' })
@@ -169,11 +169,13 @@ async function handleLogin() {
 }
 
 async function handleSocialLogin(provider: 'wechat' | 'qq') {
+  if (provider === 'wechat') {
+    uni.showToast({ title: '微信登录需企业身份认证，建议使用邮箱或QQ注册登录', icon: 'none', duration: 3000 })
+    return
+  }
   try {
     uni.showLoading({ title: '正在跳转...', mask: true })
-    const res = provider === 'wechat'
-      ? await socialAuthApi.getWechatAuthUrl('h5_login') as any
-      : await socialAuthApi.getQqAuthUrl('h5_login') as any
+    const res = await socialAuthApi.getQqAuthUrl('h5_login') as any
     uni.hideLoading()
 
     if (res.code === 200 && res.data) {
@@ -184,9 +186,6 @@ async function handleSocialLogin(provider: 'wechat' | 'qq') {
       // #ifdef APP-PLUS
       plus.runtime.openURL(authUrl)
       uni.showToast({ title: '请在浏览器中完成授权', icon: 'none', duration: 3000 })
-      // #endif
-      // #ifdef MP-WEIXIN
-      uni.showToast({ title: '小程序端暂不支持此登录方式', icon: 'none' })
       // #endif
     } else {
       uni.showToast({ title: res.message || '获取授权地址失败', icon: 'none' })

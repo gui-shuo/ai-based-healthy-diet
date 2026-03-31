@@ -15,50 +15,6 @@
         class="register-form"
         label-position="top"
       >
-        <!-- 用户名 -->
-        <el-form-item label="用户名" prop="username">
-          <el-input
-            v-model="registerForm.username"
-            placeholder="3-20个字符，字母数字下划线"
-            size="large"
-            prefix-icon="User"
-            clearable
-            @blur="checkUsername"
-          />
-          <span v-if="usernameAvailable === true" class="validation-tip success">
-            ✓ 用户名可用
-          </span>
-          <span v-else-if="usernameAvailable === false" class="validation-tip error">
-            ✗ 用户名已被占用
-          </span>
-        </el-form-item>
-
-        <!-- 密码 -->
-        <el-form-item label="密码" prop="password">
-          <el-input
-            v-model="registerForm.password"
-            type="password"
-            placeholder="6-20个字符，含大小写字母和数字"
-            size="large"
-            prefix-icon="Lock"
-            show-password
-          />
-          <!-- 密码强度指示器 -->
-          <PasswordStrength :password="registerForm.password" />
-        </el-form-item>
-
-        <!-- 确认密码 -->
-        <el-form-item label="确认密码" prop="confirmPassword">
-          <el-input
-            v-model="registerForm.confirmPassword"
-            type="password"
-            placeholder="请再次输入密码"
-            size="large"
-            prefix-icon="Lock"
-            show-password
-          />
-        </el-form-item>
-
         <!-- 邮箱 -->
         <el-form-item label="邮箱" prop="email">
           <el-input
@@ -96,6 +52,50 @@
               {{ emailCodeCountdown > 0 ? `${emailCodeCountdown}s` : '发送验证码' }}
             </el-button>
           </div>
+        </el-form-item>
+
+        <!-- 密码 -->
+        <el-form-item label="密码" prop="password">
+          <el-input
+            v-model="registerForm.password"
+            type="password"
+            placeholder="6-20个字符，含大小写字母和数字"
+            size="large"
+            prefix-icon="Lock"
+            show-password
+          />
+          <!-- 密码强度指示器 -->
+          <PasswordStrength :password="registerForm.password" />
+        </el-form-item>
+
+        <!-- 确认密码 -->
+        <el-form-item label="确认密码" prop="confirmPassword">
+          <el-input
+            v-model="registerForm.confirmPassword"
+            type="password"
+            placeholder="请再次输入密码"
+            size="large"
+            prefix-icon="Lock"
+            show-password
+          />
+        </el-form-item>
+
+        <!-- 用户名（选填） -->
+        <el-form-item label="用户名（选填）" prop="username">
+          <el-input
+            v-model="registerForm.username"
+            placeholder="不填则自动生成，3-20个字符"
+            size="large"
+            prefix-icon="User"
+            clearable
+            @blur="checkUsername"
+          />
+          <span v-if="registerForm.username && usernameAvailable === true" class="validation-tip success">
+            ✓ 用户名可用
+          </span>
+          <span v-else-if="registerForm.username && usernameAvailable === false" class="validation-tip error">
+            ✗ 用户名已被占用
+          </span>
         </el-form-item>
 
         <!-- 手机号（可选） -->
@@ -213,8 +213,8 @@ const registerForm = reactive({
 
 // 自定义验证规则
 const validateUsername = (rule, value, callback) => {
-  if (!value) {
-    return callback(new Error('请输入用户名'))
+  if (!value || value.trim() === '') {
+    return callback() // 选填，不填则通过
   }
   if (value.length < 3 || value.length > 20) {
     return callback(new Error('用户名长度为3-20个字符'))
@@ -403,7 +403,7 @@ const handleRegister = async () => {
 
     // 调用注册接口
     const response = await api.post('/auth/register', {
-      username: registerForm.username,
+      username: registerForm.username || undefined,
       password: registerForm.password,
       confirmPassword: registerForm.confirmPassword,
       email: registerForm.email,

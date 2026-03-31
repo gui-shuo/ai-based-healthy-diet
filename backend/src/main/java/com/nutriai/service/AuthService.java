@@ -1,8 +1,10 @@
 package com.nutriai.service;
 
 import com.nutriai.dto.auth.*;
+import com.nutriai.entity.Nutritionist;
 import com.nutriai.entity.User;
 import com.nutriai.exception.BusinessException;
+import com.nutriai.repository.NutritionistRepository;
 import com.nutriai.repository.UserRepository;
 import com.nutriai.util.CaptchaUtil;
 import com.nutriai.util.JwtUtil;
@@ -33,6 +35,7 @@ import java.util.concurrent.TimeUnit;
 public class AuthService {
     
     private final UserRepository userRepository;
+    private final NutritionistRepository nutritionistRepository;
     private final JwtUtil jwtUtil;
     private final CaptchaUtil captchaUtil;
     private final RedisTemplate<String, Object> redisTemplate;
@@ -77,9 +80,17 @@ public class AuthService {
         // 3. 邮箱验证码校验
         validateEmailCode(request.getEmail(), request.getEmailCode());
         
-        // 4. 检查用户名是否已存在
-        if (userRepository.existsByUsername(request.getUsername())) {
-            throw BusinessException.Auth.usernameExists();
+        // 4. 用户名处理：选填，不填则自动生成
+        String username = request.getUsername();
+        if (username == null || username.isBlank()) {
+            username = "user_" + UUID.randomUUID().toString().replace("-", "").substring(0, 8);
+            while (userRepository.existsByUsername(username)) {
+                username = "user_" + UUID.randomUUID().toString().replace("-", "").substring(0, 8);
+            }
+        } else {
+            if (userRepository.existsByUsername(username)) {
+                throw BusinessException.Auth.usernameExists();
+            }
         }
         
         // 5. 检查邮箱是否已存在
@@ -94,13 +105,22 @@ public class AuthService {
             }
         }
         
-        // 7. 创建用户
+        // 7. 创建用户（显示名优先级：nickname > username > 邮箱前缀）
+        String displayName = request.getNickname();
+        if (displayName == null || displayName.isBlank()) {
+            if (request.getUsername() != null && !request.getUsername().isBlank()) {
+                displayName = request.getUsername();
+            } else {
+                displayName = request.getEmail().split("@")[0];
+            }
+        }
+        
         User user = User.builder()
-                .username(request.getUsername())
+                .username(username)
                 .password(passwordEncoder.encode(request.getPassword()))
                 .email(request.getEmail())
                 .phone(request.getPhone())
-                .nickname(request.getNickname() != null ? request.getNickname() : request.getUsername())
+                .nickname(displayName)
                 .role("USER")
                 .status("ACTIVE")
                 .build();
@@ -116,7 +136,70 @@ public class AuthService {
             }
         }
 
-        log.info("用户注册成功: {}", user.getUsername());
+        log.info("用户注册成功: email={}, username={}", request.getEmail(), username);
+    }
+
+    /**
+     * 营养师注册申请（创建User+Nutritionist，角色设为NUTRITIONIST，审核状态PENDING）
+     */
+    @Transactional
+    public void registerNutritionist(NutritionistRegisterRequest request) {
+        if (!request.isPasswordMatch()) {
+            throw BusinessException.Auth.passwordMismatch();
+        }
+        validateCaptcha(request.getCaptchaKey(), request.getCaptcha());
+        validateEmailCode(request.getEmail(), request.getEmailCode());
+
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw BusinessException.Auth.emailExists();
+        }
+
+        // 用户名处理
+        String username = request.getUsername();
+        if (username == null || username.isBlank()) {
+            username = "nut_" + UUID.randomUUID().toString().replace("-", "").substring(0, 8);
+            while (userRepository.existsByUsername(username)) {
+                username = "nut_" + UUID.randomUUID().toString().replace("-", "").substring(0, 8);
+            }
+        } else if (userRepository.existsByUsername(username)) {
+            throw BusinessException.Auth.usernameExists();
+        }
+
+        // 创建用户账号
+        User user = User.builder()
+                .username(username)
+                .password(passwordEncoder.encode(request.getPassword()))
+                .email(request.getEmail())
+                .nickname(request.getName())
+                .role("NUTRITIONIST")
+                .status("ACTIVE")
+                .build();
+        userRepository.save(user);
+
+        // 构建资质证书JSON
+        Map<String, Object> certificates = new java.util.HashMap<>();
+        if (request.getCertificateUrls() != null && !request.getCertificateUrls().isEmpty()) {
+            certificates.put("urls", request.getCertificateUrls());
+        }
+
+        // 创建营养师档案
+        Nutritionist nutritionist = Nutritionist.builder()
+                .userId(user.getId())
+                .name(request.getName())
+                .title(request.getTitle())
+                .specialties(request.getSpecialties())
+                .introduction(request.getIntroduction())
+                .experienceYears(request.getExperienceYears() != null ? request.getExperienceYears() : 0)
+                .consultationFee(request.getConsultationFee())
+                .certificates(certificates)
+                .workingHours(request.getWorkingHours())
+                .status("OFFLINE")
+                .isActive(false) // 待审核期间不可用
+                .approvalStatus("PENDING")
+                .build();
+        nutritionistRepository.save(nutritionist);
+
+        log.info("营养师注册申请已提交: email={}, name={}", request.getEmail(), request.getName());
     }
     
     /**
@@ -124,10 +207,10 @@ public class AuthService {
      */
     @Transactional
     public LoginResponse login(LoginRequest request, String ipAddress) {
-        String username = request.getUsername();
+        String loginId = request.getUsername(); // 可以是邮箱或用户名
         
         // 1. 检查登录失败次数
-        int failCount = getLoginFailCount(username);
+        int failCount = getLoginFailCount(loginId);
         if (failCount >= MAX_LOGIN_FAIL) {
             // 需要验证码
             if (request.getCaptcha() == null || request.getCaptcha().isEmpty()) {
@@ -136,12 +219,17 @@ public class AuthService {
             validateCaptcha(request.getCaptchaKey(), request.getCaptcha());
         }
         
-        // 2. 查找用户
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> {
-                    incrementLoginFailCount(username);
-                    return BusinessException.Auth.loginFailed();
-                });
+        // 2. 查找用户（支持邮箱或用户名登录）
+        User user;
+        if (loginId.contains("@")) {
+            user = userRepository.findByEmail(loginId).orElse(null);
+        } else {
+            user = userRepository.findByUsername(loginId).orElse(null);
+        }
+        if (user == null) {
+            incrementLoginFailCount(loginId);
+            throw BusinessException.Auth.loginFailed();
+        }
         
         // 3. 检查账号状态
         if ("BANNED".equalsIgnoreCase(user.getStatus())) {
@@ -153,12 +241,12 @@ public class AuthService {
         
         // 4. 验证密码
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            incrementLoginFailCount(username);
+            incrementLoginFailCount(loginId);
             throw BusinessException.Auth.loginFailed();
         }
         
         // 5. 登录成功，清除失败计数
-        clearLoginFailCount(username);
+        clearLoginFailCount(loginId);
         
         // 6. 更新最后登录信息
         user.setLastLoginTime(LocalDateTime.now());
@@ -189,7 +277,7 @@ public class AuthService {
                 user.getUsername()
         );
         
-        log.info("用户登录成功: {}", username);
+        log.info("用户登录成功: {}", loginId);
         
         // 8. 构建响应
         return LoginResponse.builder()

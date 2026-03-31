@@ -130,6 +130,12 @@ const routes = [
     meta: { title: 'APP下载' }
   },
   {
+    path: '/nutritionist/register',
+    name: 'NutritionistRegister',
+    component: () => import('@/views/nutritionist/NutritionistRegister.vue'),
+    meta: { title: '营养师入驻' }
+  },
+  {
     path: '/nutritionist',
     component: () => import('@/views/nutritionist/NutritionistLayout.vue'),
     meta: { requiresAuth: true, requiresNutritionist: true },

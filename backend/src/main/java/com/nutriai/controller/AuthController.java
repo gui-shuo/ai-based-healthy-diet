@@ -143,6 +143,17 @@ public class AuthController {
     }
     
     /**
+     * 营养师注册申请
+     */
+    @PostMapping("/nutritionist/register")
+    public ApiResponse<Void> registerNutritionist(@Valid @RequestBody NutritionistRegisterRequest request) {
+        authService.registerNutritionist(request);
+        ApiResponse<Void> response = ApiResponse.success();
+        response.setMessage("营养师注册申请已提交，请等待管理员审核");
+        return response;
+    }
+
+    /**
      * 从Authorization头中提取token
      */
     private String extractToken(String authorization) {

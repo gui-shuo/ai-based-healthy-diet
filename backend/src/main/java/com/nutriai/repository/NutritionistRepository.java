@@ -26,6 +26,8 @@ public interface NutritionistRepository extends JpaRepository<Nutritionist, Long
     // Admin queries
     Page<Nutritionist> findAllByOrderBySortOrderAsc(Pageable pageable);
 
+    List<Nutritionist> findByApprovalStatus(String approvalStatus);
+
     @Query("SELECT n FROM Nutritionist n WHERE n.name LIKE %:keyword% OR n.title LIKE %:keyword% ORDER BY n.sortOrder ASC")
     Page<Nutritionist> searchByKeyword(@Param("keyword") String keyword, Pageable pageable);
 }

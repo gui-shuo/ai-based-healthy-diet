@@ -6,19 +6,6 @@
     </view>
 
     <view class="form-section">
-      <!-- Username -->
-      <view class="input-group">
-        <text class="input-label">用户名 <text class="required">*</text></text>
-        <input
-          v-model="form.username"
-          class="input"
-          placeholder="请输入用户名"
-          @blur="checkUsernameAvail"
-        />
-        <text v-if="usernameStatus === 'taken'" class="field-hint error">用户名已被占用</text>
-        <text v-if="usernameStatus === 'ok'" class="field-hint success">用户名可用</text>
-      </view>
-
       <!-- Email -->
       <view class="input-group">
         <text class="input-label">邮箱 <text class="required">*</text></text>
@@ -71,6 +58,19 @@
           type="password"
           placeholder="请再次输入密码"
         />
+      </view>
+
+      <!-- Username (optional) -->
+      <view class="input-group">
+        <text class="input-label">用户名（选填）</text>
+        <input
+          v-model="form.username"
+          class="input"
+          placeholder="不填则自动生成"
+          @blur="checkUsernameAvail"
+        />
+        <text v-if="form.username && usernameStatus === 'taken'" class="field-hint error">用户名已被占用</text>
+        <text v-if="form.username && usernameStatus === 'ok'" class="field-hint success">用户名可用</text>
       </view>
 
       <!-- Nickname -->
@@ -244,8 +244,8 @@ function startCooldown() {
 }
 
 function validate(): boolean {
-  if (!form.username.trim()) {
-    uni.showToast({ title: '请输入用户名', icon: 'none' }); return false
+  if (form.username.trim() && usernameStatus.value === 'taken') {
+    uni.showToast({ title: '用户名已被占用', icon: 'none' }); return false
   }
   if (!form.email.trim()) {
     uni.showToast({ title: '请输入邮箱', icon: 'none' }); return false
@@ -274,7 +274,7 @@ async function handleRegister() {
   loading.value = true
   try {
     const res = await authApi.register({
-      username: form.username.trim(),
+      username: form.username.trim() || undefined,
       email: form.email.trim(),
       emailCode: form.emailCode.trim(),
       password: form.password,
