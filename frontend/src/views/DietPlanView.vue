@@ -52,8 +52,11 @@
 
             <el-form-item label="计划天数" prop="days" required>
               <el-radio-group v-model="formData.days">
-                <el-radio-button :value="7"> 7天计划 </el-radio-button>
-                <el-radio-button :value="14"> 14天计划 </el-radio-button>
+                <el-radio-button :value="1"> 1天 </el-radio-button>
+                <el-radio-button :value="3"> 3天 </el-radio-button>
+                <el-radio-button :value="5"> 5天 </el-radio-button>
+                <el-radio-button :value="7"> 7天 </el-radio-button>
+                <el-radio-button :value="14"> 14天 </el-radio-button>
               </el-radio-group>
             </el-form-item>
 
@@ -226,7 +229,7 @@
           <p>{{ getEstimatedTimeText() }}</p>
           <el-progress :percentage="Math.floor(progress)" :stroke-width="8" />
           <p style="margin-top: 12px; font-size: 14px; color: #909399">
-            正在逐天生成详细计划，请耐心等待...
+            {{ progressText }}
           </p>
           <el-button
             v-if="currentTaskId"
@@ -386,10 +389,11 @@ const formRules = {
 const isGenerating = ref(false)
 const generatedPlan = ref(null)
 const progress = ref(0)
+const currentDay = ref(0)
+const progressText = ref('正在创建任务...')
 const isExportingPdf = ref(false)
 const currentTaskId = ref(null)
 const pollInterval = ref(null)
-const progressTimer = ref(null)
 const historyDrawerVisible = ref(false)
 const historyList = ref([])
 const historyLoading = ref(false)
@@ -488,28 +492,14 @@ const clearTimers = () => {
     clearInterval(pollInterval.value)
     pollInterval.value = null
   }
-  if (progressTimer.value) {
-    clearInterval(progressTimer.value)
-    progressTimer.value = null
-  }
 }
 
 // 开始轮询任务状态
 const startPolling = () => {
   clearTimers()
-
-  const estimatedSeconds = formData.days * 40
-  const progressStep = 100 / estimatedSeconds
   let pollErrorCount = 0
 
-  // 模拟进度条
-  progressTimer.value = setInterval(() => {
-    if (progress.value < 95) {
-      progress.value += progressStep
-    }
-  }, 1000)
-
-  // 轮询任务状态（每3秒查询一次）
+  // 轮询任务状态（每2秒查询一次）
   pollInterval.value = setInterval(async () => {
     try {
       const { data } = await api.get(`/diet-plan/task/${currentTaskId.value}/status`)
@@ -518,13 +508,26 @@ const startPolling = () => {
       if (data.code === 200) {
         const status = data.data
 
-        if (status.progress) {
-          progress.value = Math.max(progress.value, status.progress)
+        if (status.progress != null) {
+          progress.value = status.progress
+        }
+        if (status.currentDay != null) {
+          currentDay.value = status.currentDay
+        }
+        // 更新进度文字
+        const totalDays = status.totalDays || formData.days
+        if (status.status === 'running' && status.currentDay > 0) {
+          progressText.value = `正在生成第 ${status.currentDay} / ${totalDays} 天的计划...（${Math.floor(progress.value)}%）`
+        } else if (status.status === 'pending') {
+          progressText.value = '任务排队中...'
+        } else {
+          progressText.value = '正在生成饮食计划...'
         }
 
         if (status.status === 'completed') {
           clearTimers()
           progress.value = 100
+          progressText.value = '生成完成！'
           await loadPlanDetail(status.planId)
           isGenerating.value = false
           currentTaskId.value = null
@@ -555,7 +558,7 @@ const startPolling = () => {
         ElMessage.error('网络异常，请稍后重试或查看历史记录')
       }
     }
-  }, 3000)
+  }, 2000)
 }
 
 // 加载计划详情
@@ -585,8 +588,11 @@ const getGoalText = goal => {
 // 获取预计时间文本
 const getEstimatedTimeText = () => {
   const days = formData.days || 7
-  const minutes = Math.ceil((days * 40) / 60)
-  return `预计需要 ${minutes} 分钟（生成 ${days} 天计划）`
+  // 批量生成：1-3天约30秒，4-7天约1-2分钟，14天约3-4分钟
+  const seconds = days <= 3 ? 30 : days * 20
+  const minutes = Math.ceil(seconds / 60)
+  if (minutes <= 1) return `预计需要约 30 秒（生成 ${days} 天计划）`
+  return `预计需要 ${minutes} 分钟左右（生成 ${days} 天计划）`
 }
 
 // 导出计划为Markdown
@@ -674,6 +680,8 @@ const handleReset = () => {
       // 清空生成的计划
       generatedPlan.value = null
       progress.value = 0
+      currentDay.value = 0
+      progressText.value = '正在创建任务...'
       isGenerating.value = false
       currentTaskId.value = null
 
@@ -842,6 +850,8 @@ const handleCancelGenerate = () => {
           clearTimers()
           isGenerating.value = false
           progress.value = 0
+          currentDay.value = 0
+          progressText.value = '正在创建任务...'
           currentTaskId.value = null
           localStorage.removeItem('currentTaskId')
           ElMessage.success('已取消生成')
