@@ -38,7 +38,10 @@ public class DietPlanService {
     @Value("${ai.model-name:qwen-turbo}")
     private String modelName;
     
-    @Value("${ai.timeout:300}")
+    @Value("${ai.diet-plan-model:doubao-1.5-pro-32k}")
+    private String dietPlanModel;
+    
+    @Value("${ai.timeout:180}")
     private Integer timeout;
     
     /**
@@ -349,7 +352,9 @@ public class DietPlanService {
         CompletableFuture<String> future = new CompletableFuture<>();
         StringBuilder sb = new StringBuilder();
         
-        StreamingChatLanguageModel model = aiConfig.getStreamingChatModel(null, 0.7, maxTokens);
+        // 使用专用的饮食计划模型（doubao速度快3-5倍）
+        StreamingChatLanguageModel model = aiConfig.getStreamingChatModel(dietPlanModel, 0.7, maxTokens);
+        log.info("使用饮食计划模型: {}, maxTokens: {}", dietPlanModel, maxTokens);
         
         model.generate(prompt, new StreamingResponseHandler<AiMessage>() {
             @Override
@@ -379,7 +384,7 @@ public class DietPlanService {
      * 流式AI调用（使用默认maxTokens，用于采购清单等）
      */
     private String callStreamingAI(String prompt, String taskId, DietPlanTaskService taskService) {
-        return callStreamingAI(prompt, 2000, taskId, taskService);
+        return callStreamingAI(prompt, 1500, taskId, taskService);
     }
     
     /**

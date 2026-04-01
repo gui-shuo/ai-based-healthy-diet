@@ -68,7 +68,7 @@
     <view v-if="recognizing" class="loading-section card flex-center">
       <view class="loading-content">
         <view class="loading-spinner" />
-        <text class="loading-text">正在识别中，请稍候...</text>
+        <text class="loading-text">正在分析食物营养成分，通常需要几秒钟</text>
       </view>
     </view>
 

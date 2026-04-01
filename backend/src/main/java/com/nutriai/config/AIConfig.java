@@ -40,6 +40,10 @@ public class AIConfig {
     @Getter
     private String modelName;
 
+    @Value("${ai.diet-plan-model:doubao-1.5-pro-32k}")
+    @Getter
+    private String dietPlanModel;
+
     @Value("${ai.max-tokens:2000}")
     @Getter
     private Integer maxTokens;
