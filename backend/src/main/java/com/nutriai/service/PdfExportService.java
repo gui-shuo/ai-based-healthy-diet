@@ -94,11 +94,11 @@ public class PdfExportService {
      * 添加封面
      */
     private void addCoverPage(Document document, DietPlanResponse plan, PdfFont font, PdfFont boldFont) {
-        String title = plan.getTitle();
-        String subtitle = plan.getGoalDescription();
+        String title = sanitizeText(plan.getTitle());
+        String subtitle = sanitizeText(plan.getGoalDescription());
         String daysText = "计划天数: " + plan.getDays() + " 天";
         String timeText = "生成时间: " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
-        String footerText = "AI健康饮食规划助手";
+        String footerText = "NutriAI饮食规划助手";
         
         // 标题
         Paragraph titlePara = new Paragraph(title)
@@ -144,7 +144,7 @@ public class PdfExportService {
      * 添加内容
      */
     private void addContent(Document document, DietPlanResponse plan, PdfFont font, PdfFont boldFont) {
-        String content = plan.getMarkdownContent();
+        String content = sanitizeText(plan.getMarkdownContent());
         
         String[] lines = content.split("\n");
         
@@ -223,23 +223,17 @@ public class PdfExportService {
      * 加载中文字体
      */
     private PdfFont loadChineseFont() throws IOException {
-        // 尝试多种系统中文字体路径（Windows + Linux + macOS）
         String[] fontPaths = {
-            // Linux 常见路径
-            "/usr/share/fonts/truetype/wqy/wqy-zenhei.ttc,0",        // 文泉驿正黑
-            "/usr/share/fonts/truetype/wqy/wqy-microhei.ttc,0",      // 文泉驿微米黑
-            "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc,0",// Noto Sans CJK
-            "/usr/share/fonts/truetype/noto/NotoSansCJK-Regular.ttc,0",
+            // Alpine font-noto-cjk
+            "/usr/share/fonts/noto/NotoSansCJK-Regular.ttc,0",
             "/usr/share/fonts/noto-cjk/NotoSansCJK-Regular.ttc,0",
+            // Linux
+            "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc,0",
+            "/usr/share/fonts/truetype/noto/NotoSansCJK-Regular.ttc,0",
             "/usr/share/fonts/google-noto-cjk/NotoSansCJK-Regular.ttc,0",
+            "/usr/share/fonts/truetype/wqy/wqy-zenhei.ttc,0",
+            "/usr/share/fonts/truetype/wqy/wqy-microhei.ttc,0",
             "/usr/share/fonts/truetype/droid/DroidSansFallbackFull.ttf",
-            // Windows
-            "C:/Windows/Fonts/msyh.ttc,0",
-            "C:/Windows/Fonts/simhei.ttf",
-            "C:/Windows/Fonts/simsun.ttc,0",
-            // macOS
-            "/System/Library/Fonts/PingFang.ttc,0",
-            "/System/Library/Fonts/STHeiti Light.ttc,0",
         };
         
         for (String fontPath : fontPaths) {
@@ -252,7 +246,7 @@ public class PdfExportService {
             }
         }
         
-        // 尝试从 classpath 加载内嵌字体
+        // 尝试内嵌字体
         try {
             java.io.InputStream is = getClass().getResourceAsStream("/fonts/NotoSansSC-Regular.ttf");
             if (is != null) {
@@ -265,7 +259,7 @@ public class PdfExportService {
             log.debug("无法加载内嵌字体: {}", e.getMessage());
         }
         
-        // 最终回退：iText内置字体
+        // 最终回退：iText内置字体（有glyph限制）
         try {
             PdfFont font = PdfFontFactory.createFont("STSong-Light", "UniGB-UCS2-H");
             log.info("成功加载iText内置中文字体: STSong-Light");
@@ -274,16 +268,19 @@ public class PdfExportService {
             log.debug("无法加载iText内置字体: {}", e.getMessage());
         }
         
-        throw new IOException("无法加载任何中文字体，请安装中文字体包(如: apt-get install fonts-wqy-zenhei)");
+        throw new IOException("无法加载任何中文字体，请安装中文字体包(如: apk add font-noto-cjk)");
     }
     
     /**
-     * 移除中文字符（保留ASCII字符）
+     * 移除emoji和特殊字符（保留中英文、数字、标点）
      */
-    private String removeChinese(String text) {
+    private String sanitizeText(String text) {
         if (text == null) return "";
-        // 只保留ASCII字符（包括英文、数字、标点符号）
-        return text.replaceAll("[^\\x00-\\x7F]", " ");
+        // 移除emoji和其他不常见Unicode字符，保留CJK、拉丁文、数字、标点
+        return text.replaceAll("[\\x{1F000}-\\x{1FFFF}]", "")
+                   .replaceAll("[\\x{2600}-\\x{27BF}]", "")
+                   .replaceAll("[\\x{FE00}-\\x{FEFF}]", "")
+                   .replaceAll("[\\x{1F900}-\\x{1F9FF}]", "");
     }
     
     /**
@@ -311,7 +308,7 @@ public class PdfExportService {
                     canvas.beginText()
                         .setFontAndSize(font, 9)
                         .moveText(pageSize.getWidth() / 2 - 100, 15)
-                        .showText("AI健康饮食规划助手 - 专业营养计划定制")
+                        .showText("NutriAI饮食规划助手 - 专业营养计划定制")
                         .endText();
                 } finally {
                     canvas.release();

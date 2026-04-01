@@ -17,8 +17,8 @@ FROM eclipse-temurin:17-jre-alpine
 
 WORKDIR /app
 
-# 安装必要的工具
-RUN apk add --no-cache tzdata && \
+# 安装必要的工具和中文字体
+RUN apk add --no-cache tzdata font-noto-cjk && \
     cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
     echo "Asia/Shanghai" > /etc/timezone
 

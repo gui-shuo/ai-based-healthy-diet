@@ -72,20 +72,19 @@ public class DietPlanService {
             int dailyCalories = calculateDailyCalories(request);
             log.info("✓ 每日热量需求: {} kcal", dailyCalories);
             
-            // 2. 从数据库获取食物参考（只取前15种，用于提示AI）
-            log.info("步骤2: 加载食物参考数据...");
-            List<FoodNutrition> sampleFoods = foodNutritionRepository.findAll()
-                    .stream().limit(15).collect(Collectors.toList());
-            log.info("✓ 加载了 {} 种食物参考", sampleFoods.size());
+            // 2. 从数据库获取所有食物名称（供AI选择）
+            log.info("步骤2: 加载食物数据...");
+            List<FoodNutrition> allFoods = foodNutritionRepository.findAll();
+            log.info("✓ 数据库共 {} 种食物", allFoods.size());
             
-            if (sampleFoods.isEmpty()) {
+            if (allFoods.isEmpty()) {
                 log.error("❌ 数据库中没有食物数据！");
                 throw new RuntimeException("数据库中没有食物数据");
             }
             
             // 3. 调用AI生成计划
             log.info("步骤3: 调用AI生成饮食计划...");
-            String aiResponse = generateDietPlanInBatches(request, dailyCalories, sampleFoods, taskId, taskService);
+            String aiResponse = generateDietPlanInBatches(request, dailyCalories, allFoods, taskId, taskService);
             log.info("✓ AI响应成功，总长度: {} 字符", aiResponse.length());
             
             // 4. 生成采购清单（如果需要）
@@ -413,17 +412,16 @@ public class DietPlanService {
     }
     
     /**
-     * 构建精简prompt — 减少输入token提升速度
+     * 构建精简prompt — 包含全部食材名称供AI选择
      */
     private String buildCompactPrompt(DietPlanRequest request, int dailyCalories,
-                                       List<FoodNutrition> sampleFoods, int dayStart, int dayEnd, LocalDate startDate) {
+                                       List<FoodNutrition> allFoods, int dayStart, int dayEnd, LocalDate startDate) {
         StringBuilder p = new StringBuilder();
-        int days = dayEnd - dayStart + 1;
         
-        // 系统指令：简洁直接
+        // 系统指令
         p.append("直接输出Markdown格式饮食计划，不要多余解释。\n\n");
         
-        // 需求（一行式）
+        // 需求
         p.append("需求：").append(dailyCalories).append("kcal/天，")
          .append(getGoalDescription(request.getGoal()));
         if (request.getPreferences() != null && !request.getPreferences().isEmpty()) {
@@ -434,13 +432,15 @@ public class DietPlanService {
         }
         p.append("\n\n");
         
-        // 食材参考（紧凑）
-        p.append("食材参考：");
-        for (int i = 0; i < Math.min(sampleFoods.size(), 10); i++) {
+        // 全量食材名称列表（紧凑格式，每批随机打乱以增加多样性）
+        List<FoodNutrition> shuffled = new ArrayList<>(allFoods);
+        Collections.shuffle(shuffled);
+        p.append("可用食材（从以下食材中选择搭配）：");
+        for (int i = 0; i < shuffled.size(); i++) {
             if (i > 0) p.append("、");
-            p.append(sampleFoods.get(i).getFoodName());
+            p.append(shuffled.get(i).getFoodName());
         }
-        p.append("等\n\n");
+        p.append("\n\n");
         
         // 格式要求
         p.append("请生成第").append(dayStart).append("-").append(dayEnd).append("天计划，每天含早餐、午餐、晚餐、加餐，每餐3种食材+数量");
@@ -450,7 +450,7 @@ public class DietPlanService {
         if (request.getIncludeCookingTips() != null && request.getIncludeCookingTips()) {
             p.append("+烹饪提示");
         }
-        p.append("。食材每天要有变化。\n\n");
+        p.append("。食材每天要有变化，充分利用上述食材。\n\n");
         
         // 格式模板
         for (int d = dayStart; d <= dayEnd; d++) {
