@@ -1,10 +1,14 @@
 package com.nutriai.service;
 
+import com.nutriai.config.AIConfig;
 import com.nutriai.dto.DietPlanRequest;
 import com.nutriai.dto.DietPlanResponse;
 import com.nutriai.entity.FoodNutrition;
 import com.nutriai.repository.FoodNutritionRepository;
-import dev.langchain4j.model.chat.ChatLanguageModel;
+import dev.langchain4j.data.message.AiMessage;
+import dev.langchain4j.model.StreamingResponseHandler;
+import dev.langchain4j.model.chat.StreamingChatLanguageModel;
+import dev.langchain4j.model.output.Response;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,17 +17,19 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
- * 饮食计划生成服务
+ * 饮食计划生成服务 — 使用流式AI调用避免超时
  */
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class DietPlanService {
     
-    private final ChatLanguageModel chatLanguageModel;
+    private final AIConfig aiConfig;
     private final FoodNutritionRepository foodNutritionRepository;
     
     @Value("${ai.api-key:}")
@@ -32,7 +38,7 @@ public class DietPlanService {
     @Value("${ai.model-name:qwen-turbo}")
     private String modelName;
     
-    @Value("${ai.timeout:180}")
+    @Value("${ai.timeout:300}")
     private Integer timeout;
     
     /**
@@ -88,7 +94,7 @@ public class DietPlanService {
             if (request.getIncludeShoppingList() != null && request.getIncludeShoppingList()) {
                 log.info("步骤5: 生成采购清单...");
                 String shoppingListPrompt = buildShoppingListPrompt(aiResponse, request.getDays());
-                String shoppingListContent = chatLanguageModel.generate(shoppingListPrompt);
+                String shoppingListContent = callStreamingAI(shoppingListPrompt, taskId, taskService);
                 log.info("✓ 采购清单生成成功");
                 fullMarkdownContent = aiResponse + "\n\n---\n\n" + shoppingListContent;
             } else {
@@ -440,7 +446,7 @@ public class DietPlanService {
     }
     
     /**
-     * 带重试机制的AI生成（支持取消）
+     * 使用流式API生成（无socket超时问题，支持取消）
      */
     private String generateWithRetry(String prompt, int day, int maxRetries, 
                                      String taskId, DietPlanTaskService taskService) {
@@ -448,9 +454,8 @@ public class DietPlanService {
         Exception lastException = null;
         
         while (attempt < maxRetries) {
-            // 在每次重试前检查是否已取消
             if (taskId != null && taskService != null && taskService.isTaskCancelled(taskId)) {
-                log.info("任务已取消，停止重试: day={}", day);
+                log.info("任务已取消，停止生成: day={}", day);
                 throw new RuntimeException("任务已取消");
             }
             
@@ -460,18 +465,19 @@ public class DietPlanService {
                     log.warn("第{}天生成失败，正在重试（第{}/{}次）...", day, attempt, maxRetries);
                 }
                 
-                // AI调用（这是阻塞的，无法中断）
-                log.info("开始调用AI生成第{}天...", day);
-                String response = chatLanguageModel.generate(prompt);
-                log.info("AI调用完成，第{}天", day);
+                log.info("开始调用AI流式生成第{}天...", day);
+                long startTime = System.currentTimeMillis();
                 
-                // AI调用完成后立即检查是否已取消
+                String response = callStreamingAI(prompt, taskId, taskService);
+                
+                long elapsed = (System.currentTimeMillis() - startTime) / 1000;
+                log.info("AI流式调用完成，第{}天，耗时{}秒", day, elapsed);
+                
                 if (taskId != null && taskService != null && taskService.isTaskCancelled(taskId)) {
                     log.info("任务在AI调用完成后被取消，丢弃结果: day={}", day);
                     throw new RuntimeException("任务已取消");
                 }
                 
-                // 验证响应不为空
                 if (response == null || response.trim().isEmpty()) {
                     throw new RuntimeException("AI返回空响应");
                 }
@@ -479,9 +485,7 @@ public class DietPlanService {
                 return response;
                 
             } catch (Exception e) {
-                // 检查是否是取消导致的异常
                 if (taskId != null && taskService != null && taskService.isTaskCancelled(taskId)) {
-                    log.info("任务已取消: day={}", day);
                     throw new RuntimeException("任务已取消");
                 }
                 
@@ -489,11 +493,9 @@ public class DietPlanService {
                 log.error("第{}天生成失败（第{}/{}次）: {}", day, attempt, maxRetries, e.getMessage());
                 
                 if (attempt < maxRetries) {
-                    // 等待一段时间后重试（期间检查取消状态）
                     try {
-                        for (int i = 0; i < 20; i++) { // 分成20个100ms的检查
+                        for (int i = 0; i < 30; i++) {
                             if (taskId != null && taskService != null && taskService.isTaskCancelled(taskId)) {
-                                log.info("任务在等待重试期间被取消: day={}", day);
                                 throw new RuntimeException("任务已取消");
                             }
                             Thread.sleep(100);
@@ -506,9 +508,43 @@ public class DietPlanService {
             }
         }
         
-        // 所有重试都失败，返回简化版本
         log.error("第{}天生成失败，所有重试都失败，使用简化版本", day);
         return generateSimplifiedDay(day, LocalDate.now().plusDays(day - 1));
+    }
+    
+    /**
+     * 流式AI调用 — token逐个到达，不会socket超时
+     */
+    private String callStreamingAI(String prompt, String taskId, DietPlanTaskService taskService) {
+        CompletableFuture<String> future = new CompletableFuture<>();
+        StringBuilder sb = new StringBuilder();
+        
+        // 获取专用于饮食计划的流式模型（maxTokens=4096）
+        StreamingChatLanguageModel model = aiConfig.getStreamingChatModel(null, 0.7, 4096);
+        
+        model.generate(prompt, new StreamingResponseHandler<AiMessage>() {
+            @Override
+            public void onNext(String token) {
+                sb.append(token);
+            }
+            
+            @Override
+            public void onComplete(Response<AiMessage> response) {
+                future.complete(sb.toString());
+            }
+            
+            @Override
+            public void onError(Throwable error) {
+                future.completeExceptionally(error);
+            }
+        });
+        
+        try {
+            // 10分钟绝对上限（流式一般不会触发）
+            return future.get(600, TimeUnit.SECONDS);
+        } catch (Exception e) {
+            throw new RuntimeException("AI流式调用失败: " + e.getMessage(), e);
+        }
     }
     
     /**
@@ -670,18 +706,6 @@ public class DietPlanService {
     }
     
     /**
-     * 使用LangChain4j ChatLanguageModel调用AI
-     */
-    private String callDashScopeWithTimeout(String prompt) {
-        try {
-            return chatLanguageModel.generate(prompt);
-        } catch (Exception e) {
-            log.error("AI调用失败: {}", e.getMessage());
-            throw new RuntimeException("AI调用失败: " + e.getMessage(), e);
-        }
-    }
-    
-    /**
      * 获取运动强度描述
      */
     private String getExerciseLevelDescription(String level) {
@@ -711,8 +735,8 @@ public class DietPlanService {
                 taskService.updateTaskStatus(taskId, "running", 30, 0, null, null);
             }
             
-            // 调用AI生成修改后的计划
-            String modifiedContent = chatLanguageModel.generate(prompt);
+            // 调用AI生成修改后的计划（流式）
+            String modifiedContent = callStreamingAI(prompt, taskId, taskService);
             
             if (taskId != null && taskService != null) {
                 if (taskService.isTaskCancelled(taskId)) {
