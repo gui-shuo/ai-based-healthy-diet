@@ -40,7 +40,7 @@ public class AIConfig {
     @Getter
     private String modelName;
 
-    @Value("${ai.diet-plan-model:doubao-1.5-pro-32k}")
+    @Value("${ai.diet-plan-model:doubao-seed-2.0-lite}")
     @Getter
     private String dietPlanModel;
 

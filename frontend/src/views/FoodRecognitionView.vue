@@ -59,7 +59,8 @@
             </el-icon>
             <div class="el-upload__text">拖拽图片到此处或 <em>点击上传</em></div>
             <template #tip>
-              <div class="el-upload__tip">支持 JPG / PNG / GIF / WebP / BMP，大小不超过 5MB</div>
+              <div class="el-upload__tip">支持 JPG / PNG / GIF / WebP / BMP，大小不超过 5MB（大图将自动压缩）</div>
+              <div class="el-upload__tip" style="color: #e6a23c; margin-top: 4px;">💡 识别结果请以置信度为准，置信度越高结果越可靠</div>
             </template>
           </el-upload>
 
@@ -431,6 +432,7 @@ const ALLOWED_IMAGE_TYPES = new Set([
   'image/bmp'
 ])
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024 // 5MB
+const COMPRESS_THRESHOLD = 1 * 1024 * 1024 // 1MB — 超过此大小自动压缩
 
 const router = useRouter()
 
@@ -459,14 +461,39 @@ const quickFoods = [
 
 // ─── 图片处理 ────────────────────────────────────────────────────
 
-/** el-upload onChange 回调：校验文件类型和大小后再预览 */
-const handleImageChange = file => {
+/** canvas压缩图片 — 大图自动缩小以加速识别 */
+const compressImage = (file, maxWidth = 1280, quality = 0.7) => {
+  return new Promise((resolve) => {
+    const img = new Image()
+    img.onload = () => {
+      let { width, height } = img
+      if (width > maxWidth) {
+        height = Math.round(height * maxWidth / width)
+        width = maxWidth
+      }
+      const canvas = document.createElement('canvas')
+      canvas.width = width
+      canvas.height = height
+      const ctx = canvas.getContext('2d')
+      ctx.drawImage(img, 0, 0, width, height)
+      canvas.toBlob(
+        blob => resolve(new File([blob], file.name, { type: 'image/jpeg' })),
+        'image/jpeg',
+        quality
+      )
+    }
+    img.onerror = () => resolve(file)
+    img.src = URL.createObjectURL(file)
+  })
+}
+
+/** el-upload onChange 回调：校验文件类型和大小，大图自动压缩 */
+const handleImageChange = async file => {
   const raw = file.raw
   if (!raw) return
 
   if (!ALLOWED_IMAGE_TYPES.has(raw.type)) {
     ElMessage.error('仅支持 JPG / PNG / GIF / WebP / BMP 格式的图片')
-    // 清除 el-upload 内部文件列表
     uploadRef.value?.clearFiles()
     return
   }
@@ -476,10 +503,17 @@ const handleImageChange = file => {
     return
   }
 
-  // 释放旧的 blob URL 再赋新值
+  // 大图自动压缩
+  let finalFile = raw
+  if (raw.size > COMPRESS_THRESHOLD) {
+    ElMessage.info('图片较大，正在自动压缩...')
+    finalFile = await compressImage(raw)
+    ElMessage.success(`已压缩: ${(raw.size / 1024).toFixed(0)}KB → ${(finalFile.size / 1024).toFixed(0)}KB`)
+  }
+
   if (previewUrl.value) URL.revokeObjectURL(previewUrl.value)
-  selectedFile.value = raw
-  previewUrl.value = URL.createObjectURL(raw)
+  selectedFile.value = finalFile
+  previewUrl.value = URL.createObjectURL(finalFile)
 }
 
 /** 清除已选图片 */

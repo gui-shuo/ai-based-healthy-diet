@@ -41,6 +41,9 @@
           从相册选择
         </button>
       </view>
+      <view class="photo-tip" style="padding: 12rpx 20rpx; font-size: 24rpx; color: #e6a23c;">
+        💡 识别结果请以置信度为准，置信度越高结果越可靠。大图将自动压缩以加速识别。
+      </view>
     </view>
 
     <!-- Text Mode -->

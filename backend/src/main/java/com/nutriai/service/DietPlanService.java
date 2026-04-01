@@ -38,7 +38,7 @@ public class DietPlanService {
     @Value("${ai.model-name:qwen-turbo}")
     private String modelName;
     
-    @Value("${ai.diet-plan-model:doubao-1.5-pro-32k}")
+    @Value("${ai.diet-plan-model:doubao-seed-2.0-lite}")
     private String dietPlanModel;
     
     @Value("${ai.timeout:180}")
