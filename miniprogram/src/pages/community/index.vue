@@ -21,7 +21,19 @@
 
     <!-- Post Feed -->
     <view class="feed-list" v-if="posts.length > 0">
-      <view class="post-card" v-for="post in posts" :key="post.id" @tap="goDetail(post.id)">
+      <view
+        class="post-card"
+        :class="{ pinned: post.pinned }"
+        v-for="post in posts"
+        :key="post.id"
+        @tap="goDetail(post.id)"
+        @longpress="onLongPress(post)"
+      >
+        <!-- Pinned indicator -->
+        <view class="pinned-badge" v-if="post.pinned">
+          <text>📌 置顶</text>
+        </view>
+
         <!-- Author Info -->
         <view class="post-header">
           <image class="avatar" :src="defaultAvatar(post.avatarUrl)" mode="aspectFill" />
@@ -34,22 +46,27 @@
 
         <!-- Content -->
         <view class="post-content">
-          <text class="content-text">{{ truncate(post.content, 120) }}</text>
+          <text class="content-text">{{ post.content }}</text>
         </view>
 
-        <!-- Image Grid -->
-        <view class="image-grid" v-if="getPostImages(post).length > 0">
+        <!-- Image Grid: dynamic columns based on count -->
+        <view
+          class="image-grid"
+          :class="imageGridClass(getPostImages(post).length)"
+          v-if="getPostImages(post).length > 0"
+        >
           <view
             class="grid-item"
-            v-for="(img, idx) in getPostImages(post).slice(0, getMaxImages(getPostImages(post).length))"
+            v-for="(img, idx) in getPostImages(post).slice(0, 9)"
             :key="idx"
+            @tap.stop="previewImage(getPostImages(post), idx)"
           >
             <image class="grid-img" :src="img" mode="aspectFill" />
             <view
               class="more-badge"
-              v-if="idx === getMaxImages(getPostImages(post).length) - 1 && getPostImages(post).length > getMaxImages(getPostImages(post).length)"
+              v-if="idx === 8 && getPostImages(post).length > 9"
             >
-              +{{ getPostImages(post).length - getMaxImages(getPostImages(post).length) }}
+              +{{ getPostImages(post).length - 9 }}
             </view>
           </view>
         </view>
@@ -62,13 +79,24 @@
 
         <!-- Bottom Bar -->
         <view class="post-footer">
-          <view class="footer-item">
-            <text class="icon">❤️</text>
+          <view
+            class="footer-item"
+            :class="{ liked: post.liked }"
+            @tap.stop="handleLike(post)"
+          >
+            <text class="icon">{{ post.liked ? '❤️' : '🤍' }}</text>
             <text class="count">{{ post.likesCount || 0 }}</text>
           </view>
           <view class="footer-item">
             <text class="icon">💬</text>
             <text class="count">{{ post.commentsCount || 0 }}</text>
+          </view>
+          <view
+            class="footer-item delete-item"
+            v-if="post.userId === currentUserId"
+            @tap.stop="handleDeletePost(post)"
+          >
+            <text class="icon">🗑️</text>
           </view>
         </view>
       </view>
@@ -76,8 +104,8 @@
 
     <!-- Empty State -->
     <view class="empty-state" v-else-if="!loading">
-      <text class="empty-icon">📭</text>
-      <text class="empty-text">暂无帖子，快来发布第一条吧</text>
+      <text class="empty-icon">🌱</text>
+      <text class="empty-text">暂无动态，快来发布第一条吧</text>
     </view>
 
     <!-- Loading -->
@@ -99,7 +127,11 @@
 import { ref, computed } from 'vue'
 import { onPullDownRefresh, onReachBottom, onShow } from '@dcloudio/uni-app'
 import { communityApi, PostCategories } from '@/services/api'
-import { checkLogin, formatTime, defaultAvatar, truncate } from '@/utils/common'
+import { checkLogin, formatTime, defaultAvatar } from '@/utils/common'
+import { useUserStore } from '@/stores/user'
+
+const userStore = useUserStore()
+const currentUserId = computed(() => userStore.userInfo?.id)
 
 const posts = ref<any[]>([])
 const loading = ref(false)
@@ -110,13 +142,9 @@ const currentCategory = ref('')
 const showDisclaimer = ref(true)
 
 const categoryList = computed(() => [
-  { value: '', label: '全部' },
+  { value: '', label: '🔥 全部' },
   ...PostCategories
 ])
-
-function getMaxImages(total: number): number {
-  return total === 1 ? 1 : total <= 4 ? total : 3
-}
 
 function getPostImages(post: any): string[] {
   if (Array.isArray(post.images)) return post.images
@@ -125,6 +153,12 @@ function getPostImages(post: any): string[] {
   }
   if (Array.isArray(post.imageUrls)) return post.imageUrls
   return []
+}
+
+function imageGridClass(count: number): string {
+  if (count === 1) return 'cols-1'
+  if (count === 2) return 'cols-2'
+  return 'cols-3'
 }
 
 function switchCategory(value: string) {
@@ -140,7 +174,8 @@ async function loadPosts(isRefresh = false) {
     const params: any = { page: page.value, size: pageSize }
     if (currentCategory.value) params.category = currentCategory.value
     const res = await communityApi.getFeed(params)
-    const list = res.data?.content || res.data?.records || res.data?.list || res.data || []
+    const data = res.data
+    const list = data?.content || data?.records || data?.list || (Array.isArray(data) ? data : [])
     if (isRefresh) {
       posts.value = list
     } else {
@@ -169,6 +204,48 @@ function goCreate() {
   uni.navigateTo({ url: '/pages/community/create' })
 }
 
+function previewImage(images: string[], index: number) {
+  uni.previewImage({ urls: images, current: index })
+}
+
+async function handleLike(post: any) {
+  if (!checkLogin()) return
+  try {
+    const res = await communityApi.toggleLike({ targetType: 'POST', targetId: post.id })
+    const liked = res.data?.liked ?? !post.liked
+    post.liked = liked
+    post.likesCount = liked
+      ? (post.likesCount || 0) + 1
+      : Math.max((post.likesCount || 0) - 1, 0)
+  } catch {
+    uni.showToast({ title: '操作失败', icon: 'none' })
+  }
+}
+
+function handleDeletePost(post: any) {
+  if (post.userId !== currentUserId.value) return
+  uni.showModal({
+    title: '提示',
+    content: '确定删除这篇帖子吗？删除后不可恢复',
+    success: async (res) => {
+      if (res.confirm) {
+        try {
+          await communityApi.deletePost(post.id)
+          posts.value = posts.value.filter((p: any) => p.id !== post.id)
+          uni.showToast({ title: '已删除', icon: 'success' })
+        } catch {
+          uni.showToast({ title: '删除失败', icon: 'none' })
+        }
+      }
+    }
+  })
+}
+
+function onLongPress(post: any) {
+  if (post.userId !== currentUserId.value) return
+  handleDeletePost(post)
+}
+
 onShow(() => {
   refreshData()
 })
@@ -190,9 +267,32 @@ onReachBottom(() => {
 .community-page {
   min-height: 100vh;
   background: $background;
-  padding-bottom: 120rpx;
+  padding-bottom: 140rpx;
 }
 
+/* ===== Disclaimer ===== */
+.disclaimer-tip {
+  background: $muted;
+  color: $foreground;
+  border: 1rpx solid $border;
+  border-radius: $radius-lg;
+  padding: 14rpx 48rpx 14rpx 20rpx;
+  font-size: 22rpx;
+  margin: 16rpx 20rpx;
+  position: relative;
+  font-family: 'Inter', 'PingFang SC', sans-serif;
+  line-height: 1.5;
+}
+.disclaimer-tip .dismiss {
+  position: absolute;
+  right: 16rpx;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 28rpx;
+  color: $muted-foreground;
+}
+
+/* ===== Category Bar ===== */
 .category-bar {
   white-space: nowrap;
   background: $card;
@@ -202,11 +302,10 @@ onReachBottom(() => {
   z-index: 10;
   border-bottom: 1rpx solid $border;
 }
-
 .category-item {
   display: inline-block;
   padding: 12rpx 28rpx;
-  margin: 0 10rpx;
+  margin: 0 8rpx;
   border-radius: $radius-full;
   font-size: 26rpx;
   color: $foreground;
@@ -215,18 +314,19 @@ onReachBottom(() => {
   font-family: 'Inter', 'PingFang SC', sans-serif;
   transition: all 0.2s;
 }
-
 .category-item.active {
-  background: $accent;
-  color: $accent-foreground;
-  border-color: $accent;
+  background: $gradient-accent;
+  color: #fff;
+  border-color: transparent;
   box-shadow: $shadow-accent;
 }
 
+/* ===== Feed List ===== */
 .feed-list {
   padding: 16rpx;
 }
 
+/* ===== Post Card ===== */
 .post-card {
   background: $card;
   border: 1rpx solid $border;
@@ -235,14 +335,31 @@ onReachBottom(() => {
   margin-bottom: 20rpx;
   box-shadow: $shadow-sm;
   position: relative;
+  transition: box-shadow 0.2s;
+}
+.post-card.pinned {
+  border-left: 6rpx solid $accent;
+}
+.pinned-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6rpx;
+  padding: 4rpx 16rpx;
+  background: rgba(239, 68, 68, 0.08);
+  border-radius: $radius-full;
+  margin-bottom: 16rpx;
+  font-size: 22rpx;
+  color: $uni-error;
+  font-weight: 600;
+  font-family: 'Inter', 'PingFang SC', sans-serif;
 }
 
+/* ===== Post Header ===== */
 .post-header {
   display: flex;
   align-items: center;
   margin-bottom: 20rpx;
 }
-
 .avatar {
   width: 72rpx;
   height: 72rpx;
@@ -250,28 +367,29 @@ onReachBottom(() => {
   border: none;
   margin-right: 16rpx;
   flex-shrink: 0;
+  background: $muted;
 }
-
 .author-info {
   flex: 1;
   display: flex;
   flex-direction: column;
+  min-width: 0;
 }
-
 .nickname {
   font-size: 28rpx;
   font-weight: 600;
   color: $foreground;
   font-family: 'Inter', 'PingFang SC', sans-serif;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
-
 .time {
   font-size: 22rpx;
   color: $muted-foreground;
   margin-top: 4rpx;
   font-family: 'Inter', 'PingFang SC', sans-serif;
 }
-
 .category-tag {
   font-size: 22rpx;
   color: $accent;
@@ -280,52 +398,62 @@ onReachBottom(() => {
   border-radius: $radius-full;
   border: none;
   flex-shrink: 0;
-  font-family: 'JetBrains Mono', 'PingFang SC', monospace;
+  font-family: 'Inter', 'PingFang SC', sans-serif;
+  margin-left: 12rpx;
 }
 
+/* ===== Post Content ===== */
 .post-content {
   margin-bottom: 20rpx;
 }
-
 .content-text {
   font-size: 28rpx;
   color: $foreground;
-  line-height: 1.6;
+  line-height: 1.7;
   font-family: 'Inter', 'PingFang SC', sans-serif;
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 
+/* ===== Image Grid ===== */
 .image-grid {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
   gap: 8rpx;
   margin-bottom: 20rpx;
-}
-
-.grid-item {
-  position: relative;
-  width: calc(33.33% - 6rpx);
-  aspect-ratio: 1;
   border-radius: $radius-lg;
   overflow: hidden;
-  border: none;
 }
-
+.image-grid.cols-1 {
+  grid-template-columns: 1fr;
+  max-width: 480rpx;
+}
+.image-grid.cols-2 {
+  grid-template-columns: 1fr 1fr;
+  max-width: 540rpx;
+}
+.image-grid.cols-3 {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+.grid-item {
+  position: relative;
+  aspect-ratio: 1;
+  overflow: hidden;
+}
 .grid-img {
   width: 100%;
   height: 100%;
 }
-
 .more-badge {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(15, 23, 42, 0.5);
+  background: rgba(15, 23, 42, 0.55);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -335,6 +463,7 @@ onReachBottom(() => {
   font-family: 'Inter', 'PingFang SC', sans-serif;
 }
 
+/* ===== Video Thumbnail ===== */
 .video-thumb {
   position: relative;
   width: 100%;
@@ -342,14 +471,12 @@ onReachBottom(() => {
   border-radius: $radius-lg;
   overflow: hidden;
   margin-bottom: 20rpx;
-  border: none;
+  border: 1rpx solid $border;
 }
-
 .video-cover {
   width: 100%;
   height: 100%;
 }
-
 .play-icon {
   position: absolute;
   top: 50%;
@@ -367,29 +494,38 @@ onReachBottom(() => {
   justify-content: center;
 }
 
+/* ===== Post Footer ===== */
 .post-footer {
   display: flex;
   gap: 40rpx;
   padding-top: 16rpx;
   border-top: 1rpx solid $border;
+  align-items: center;
 }
-
 .footer-item {
   display: flex;
   align-items: center;
   gap: 8rpx;
+  padding: 8rpx 16rpx;
+  border-radius: $radius-full;
+  transition: all 0.2s;
 }
-
+.footer-item.liked {
+  background: rgba(239, 68, 68, 0.06);
+}
 .footer-item .icon {
   font-size: 28rpx;
 }
-
 .footer-item .count {
   font-size: 24rpx;
   color: $muted-foreground;
   font-family: 'Inter', 'PingFang SC', sans-serif;
 }
+.delete-item {
+  margin-left: auto;
+}
 
+/* ===== Empty State ===== */
 .empty-state {
   display: flex;
   flex-direction: column;
@@ -397,18 +533,17 @@ onReachBottom(() => {
   justify-content: center;
   padding: 200rpx 0;
 }
-
 .empty-icon {
   font-size: 80rpx;
   margin-bottom: 20rpx;
 }
-
 .empty-text {
   font-size: 28rpx;
   color: $muted-foreground;
   font-family: 'Inter', 'PingFang SC', sans-serif;
 }
 
+/* ===== Loading ===== */
 .loading-more,
 .no-more {
   text-align: center;
@@ -418,6 +553,7 @@ onReachBottom(() => {
   font-family: 'Inter', 'PingFang SC', sans-serif;
 }
 
+/* ===== FAB ===== */
 .fab-btn {
   position: fixed;
   right: 40rpx;
@@ -434,34 +570,12 @@ onReachBottom(() => {
   transition: transform 0.15s ease;
 }
 .fab-btn:active {
-  transform: scale(0.95);
+  transform: scale(0.92);
 }
-
 .fab-icon {
   font-size: 52rpx;
   color: #fff;
   line-height: 1;
   font-family: 'Inter', 'PingFang SC', sans-serif;
-}
-
-.disclaimer-tip {
-  background: $muted;
-  color: $foreground;
-  border: 1rpx solid $border;
-  border-radius: $radius-lg;
-  padding: 14rpx 48rpx 14rpx 20rpx;
-  font-size: 22rpx;
-  margin: 16rpx 20rpx;
-  position: relative;
-  font-family: 'Inter', 'PingFang SC', sans-serif;
-}
-
-.disclaimer-tip .dismiss {
-  position: absolute;
-  right: 16rpx;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 28rpx;
-  color: $muted-foreground;
 }
 </style>

@@ -4,8 +4,12 @@
     <view class="page-header">
       <view class="cancel-btn" @tap="goBack">取消</view>
       <text class="page-title">发布动态</text>
-      <view class="publish-btn" :class="{ disabled: !canPublish }" @tap="handlePublish">
-        发布
+      <view
+        class="publish-btn"
+        :class="{ disabled: !canPublish, loading: publishing }"
+        @tap="handlePublish"
+      >
+        {{ publishing ? '发布中...' : '发布' }}
       </view>
     </view>
 
@@ -58,12 +62,15 @@
 
     <!-- Image Upload -->
     <view class="section" v-if="mediaType === 'image' && !videoUrl">
-      <view class="section-label">图片（最多9张）</view>
+      <view class="section-label">图片（最多9张）<text class="label-hint">{{ imageList.length }}/9</text></view>
       <view class="image-upload-grid">
         <view class="upload-item" v-for="(img, idx) in imageList" :key="idx">
           <image class="upload-img" :src="img.localPath" mode="aspectFill" />
           <view class="upload-status" v-if="img.uploading">
-            <text class="uploading-text">上传中</text>
+            <text class="uploading-text">上传中...</text>
+          </view>
+          <view class="upload-done" v-else-if="img.url">
+            <text class="done-icon">✓</text>
           </view>
           <view class="remove-btn" @tap="removeImage(idx)">✕</view>
         </view>
@@ -87,6 +94,33 @@
         <video :src="videoUrl" class="preview-video" controls :poster="videoCover" />
         <view class="remove-video" @tap="removeVideo">
           <text>✕ 移除视频</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- Preview Section -->
+    <view class="section preview-section" v-if="canPreview">
+      <view class="section-label">预览</view>
+      <view class="preview-card">
+        <view class="preview-meta">
+          <view class="preview-category" v-if="selectedCategory">{{ getCategoryLabel(selectedCategory) }}</view>
+        </view>
+        <text class="preview-content">{{ content }}</text>
+        <view
+          class="preview-images"
+          :class="previewGridClass"
+          v-if="imageList.length > 0"
+        >
+          <image
+            class="preview-img"
+            v-for="(img, idx) in imageList"
+            :key="idx"
+            :src="img.localPath"
+            mode="aspectFill"
+          />
+        </view>
+        <view class="preview-video-box" v-if="videoUrl">
+          <text class="preview-video-tag">🎬 已添加视频</text>
         </view>
       </view>
     </view>
@@ -121,6 +155,22 @@ const canPublish = computed(() => {
     !imageList.value.some(img => img.uploading)
   )
 })
+
+const canPreview = computed(() => {
+  return content.value.trim().length > 0 || imageList.value.length > 0 || videoUrl.value
+})
+
+const previewGridClass = computed(() => {
+  const count = imageList.value.length
+  if (count === 1) return 'cols-1'
+  if (count === 2) return 'cols-2'
+  return 'cols-3'
+})
+
+function getCategoryLabel(value: string): string {
+  const found = PostCategories.find((c: any) => c.value === value)
+  return found ? found.label : value
+}
 
 function goBack() {
   if (content.value.trim() || imageList.value.length || videoUrl.value) {
@@ -242,8 +292,10 @@ async function handlePublish() {
 .create-page {
   min-height: 100vh;
   background: $background;
+  padding-bottom: 40rpx;
 }
 
+/* ===== Header ===== */
 .page-header {
   display: flex;
   align-items: center;
@@ -255,63 +307,70 @@ async function handlePublish() {
   z-index: 10;
   border-bottom: 1rpx solid $border;
 }
-
 .cancel-btn {
   font-size: 28rpx;
   color: $muted-foreground;
   padding: 8rpx 16rpx;
   font-family: 'Inter', 'PingFang SC', sans-serif;
 }
-
 .page-title {
   font-size: 32rpx;
   font-weight: 600;
   color: $foreground;
-  font-family: 'Calistoga', 'PingFang SC', sans-serif;
+  font-family: 'Inter', 'PingFang SC', sans-serif;
 }
-
 .publish-btn {
   font-size: 28rpx;
-  color: $accent-foreground;
-  background: $accent;
+  color: #fff;
+  background: $gradient-accent;
   padding: 12rpx 32rpx;
   border-radius: $radius-full;
   border: none;
   box-shadow: $shadow-accent;
   font-family: 'Inter', 'PingFang SC', sans-serif;
-  transition: transform 0.15s ease;
+  transition: transform 0.15s ease, opacity 0.2s;
 }
 .publish-btn:active {
   transform: scale(0.97);
 }
-
 .publish-btn.disabled {
   background: $muted;
   color: $muted-foreground;
   box-shadow: none;
 }
+.publish-btn.loading {
+  opacity: 0.7;
+}
 
+/* ===== Sections ===== */
 .section {
   background: $card;
   margin-top: 16rpx;
   padding: 28rpx;
   border-top: 1rpx solid $border;
 }
-
 .section-label {
   font-size: 28rpx;
   font-weight: 600;
   color: $foreground;
   margin-bottom: 20rpx;
-  font-family: 'Calistoga', 'PingFang SC', sans-serif;
+  font-family: 'Inter', 'PingFang SC', sans-serif;
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+.label-hint {
+  font-size: 22rpx;
+  color: $muted-foreground;
+  font-weight: 400;
 }
 
+/* ===== Category Grid ===== */
 .category-grid {
   display: flex;
   flex-wrap: wrap;
   gap: 16rpx;
 }
-
 .category-chip {
   padding: 14rpx 24rpx;
   border-radius: $radius-full;
@@ -322,14 +381,14 @@ async function handlePublish() {
   font-family: 'Inter', 'PingFang SC', sans-serif;
   transition: all 0.2s;
 }
-
 .category-chip.active {
-  background: $accent;
-  color: $accent-foreground;
-  border-color: $accent;
+  background: $gradient-accent;
+  color: #fff;
+  border-color: transparent;
   box-shadow: $shadow-accent;
 }
 
+/* ===== Textarea ===== */
 .textarea-wrapper {
   position: relative;
   border: 1rpx solid $border;
@@ -337,7 +396,6 @@ async function handlePublish() {
   padding: 20rpx;
   background: $muted;
 }
-
 .content-textarea {
   width: 100%;
   font-size: 30rpx;
@@ -345,7 +403,6 @@ async function handlePublish() {
   line-height: 1.6;
   font-family: 'Inter', 'PingFang SC', sans-serif;
 }
-
 .char-count {
   text-align: right;
   font-size: 22rpx;
@@ -353,16 +410,15 @@ async function handlePublish() {
   margin-top: 12rpx;
   font-family: 'Inter', 'PingFang SC', sans-serif;
 }
-
 .char-count.warn {
   color: $uni-error;
 }
 
+/* ===== Media Toggle ===== */
 .media-toggle {
   display: flex;
   gap: 20rpx;
 }
-
 .toggle-btn {
   flex: 1;
   text-align: center;
@@ -375,19 +431,18 @@ async function handlePublish() {
   font-family: 'Inter', 'PingFang SC', sans-serif;
   transition: all 0.2s;
 }
-
 .toggle-btn.active {
   background: rgba(16, 185, 129, 0.06);
   color: $accent;
   border: 1rpx solid $accent;
 }
 
+/* ===== Image Upload Grid ===== */
 .image-upload-grid {
   display: flex;
   flex-wrap: wrap;
   gap: 12rpx;
 }
-
 .upload-item {
   position: relative;
   width: calc(33.33% - 8rpx);
@@ -396,12 +451,10 @@ async function handlePublish() {
   overflow: hidden;
   border: none;
 }
-
 .upload-img {
   width: 100%;
   height: 100%;
 }
-
 .upload-status {
   position: absolute;
   top: 0;
@@ -413,13 +466,28 @@ async function handlePublish() {
   align-items: center;
   justify-content: center;
 }
-
 .uploading-text {
   color: #fff;
   font-size: 24rpx;
   font-family: 'Inter', 'PingFang SC', sans-serif;
 }
-
+.upload-done {
+  position: absolute;
+  bottom: 6rpx;
+  right: 6rpx;
+  width: 36rpx;
+  height: 36rpx;
+  border-radius: $radius-full;
+  background: $accent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.done-icon {
+  color: #fff;
+  font-size: 20rpx;
+  font-weight: 700;
+}
 .remove-btn {
   position: absolute;
   top: 6rpx;
@@ -435,7 +503,6 @@ async function handlePublish() {
   align-items: center;
   justify-content: center;
 }
-
 .add-btn {
   width: calc(33.33% - 8rpx);
   aspect-ratio: 1;
@@ -447,23 +514,22 @@ async function handlePublish() {
   justify-content: center;
   gap: 8rpx;
   background: $muted;
+  transition: border-color 0.2s;
 }
-
 .add-icon {
   font-size: 48rpx;
   color: $muted-foreground;
 }
-
 .add-text {
   font-size: 22rpx;
   color: $muted-foreground;
   font-family: 'Inter', 'PingFang SC', sans-serif;
 }
 
+/* ===== Video Upload ===== */
 .video-upload-area {
   display: flex;
 }
-
 .add-video-btn {
   width: 200rpx;
   height: 200rpx;
@@ -475,24 +541,92 @@ async function handlePublish() {
   justify-content: center;
   gap: 12rpx;
   background: $muted;
+  transition: border-color 0.2s;
 }
-
 .video-preview {
   position: relative;
 }
-
 .preview-video {
   width: 100%;
   height: 400rpx;
   border-radius: $radius-lg;
   border: none;
 }
-
 .remove-video {
   text-align: center;
   margin-top: 16rpx;
   font-size: 26rpx;
   color: $uni-error;
+  font-family: 'Inter', 'PingFang SC', sans-serif;
+}
+
+/* ===== Preview Section ===== */
+.preview-section {
+  border-top: 1rpx solid $border;
+}
+.preview-card {
+  background: $muted;
+  border: 1rpx solid $border;
+  border-radius: $radius-lg;
+  padding: 24rpx;
+}
+.preview-meta {
+  display: flex;
+  gap: 12rpx;
+  margin-bottom: 16rpx;
+}
+.preview-category {
+  font-size: 22rpx;
+  color: $accent;
+  background: rgba(16, 185, 129, 0.08);
+  padding: 6rpx 16rpx;
+  border-radius: $radius-full;
+  font-family: 'Inter', 'PingFang SC', sans-serif;
+}
+.preview-content {
+  font-size: 28rpx;
+  color: $foreground;
+  line-height: 1.7;
+  font-family: 'Inter', 'PingFang SC', sans-serif;
+  white-space: pre-wrap;
+  word-break: break-word;
+  display: -webkit-box;
+  -webkit-line-clamp: 5;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.preview-images {
+  display: grid;
+  gap: 8rpx;
+  margin-top: 16rpx;
+  border-radius: $radius-lg;
+  overflow: hidden;
+}
+.preview-images.cols-1 {
+  grid-template-columns: 1fr;
+  max-width: 400rpx;
+}
+.preview-images.cols-2 {
+  grid-template-columns: 1fr 1fr;
+  max-width: 480rpx;
+}
+.preview-images.cols-3 {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+.preview-img {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: $radius-md;
+}
+.preview-video-box {
+  margin-top: 16rpx;
+}
+.preview-video-tag {
+  font-size: 24rpx;
+  color: $accent;
+  background: rgba(16, 185, 129, 0.06);
+  padding: 8rpx 20rpx;
+  border-radius: $radius-full;
   font-family: 'Inter', 'PingFang SC', sans-serif;
 }
 </style>

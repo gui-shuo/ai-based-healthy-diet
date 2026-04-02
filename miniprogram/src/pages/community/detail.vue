@@ -22,21 +22,28 @@
 
     <!-- Post Content -->
     <view class="post-body">
-      <view class="category-tag" v-if="post.category">{{ post.category }}</view>
+      <view class="post-meta-row" v-if="post.category || post.pinned">
+        <view class="pinned-tag" v-if="post.pinned">📌 置顶</view>
+        <view class="category-tag" v-if="post.category">{{ post.category }}</view>
+      </view>
       <text class="content-text">{{ post.content }}</text>
     </view>
 
-    <!-- Image Gallery -->
-    <view class="image-gallery" v-if="postImages.length > 0">
-      <image
+    <!-- Image Gallery with dynamic grid -->
+    <view
+      class="image-gallery"
+      :class="imageGridClass(postImages.length)"
+      v-if="postImages.length > 0"
+    >
+      <view
+        class="gallery-item"
+        :class="{ 'single-item': postImages.length === 1 }"
         v-for="(img, idx) in postImages"
         :key="idx"
-        class="gallery-img"
-        :class="{ 'single-img': postImages.length === 1 }"
-        :src="img"
-        mode="aspectFill"
         @tap="previewImage(idx)"
-      />
+      >
+        <image class="gallery-img" :src="img" mode="aspectFill" />
+      </view>
     </view>
 
     <!-- Video Player -->
@@ -53,11 +60,11 @@
     <view class="stats-bar">
       <view class="stat-item" :class="{ liked: isLiked }" @tap="handleLike">
         <text class="stat-icon">{{ isLiked ? '❤️' : '🤍' }}</text>
-        <text class="stat-count">{{ post.likesCount || 0 }}</text>
+        <text class="stat-count">{{ post.likesCount || 0 }} 赞</text>
       </view>
       <view class="stat-item">
         <text class="stat-icon">💬</text>
-        <text class="stat-count">{{ post.commentsCount || 0 }}</text>
+        <text class="stat-count">{{ post.commentsCount || 0 }} 条评论</text>
       </view>
     </view>
 
@@ -78,6 +85,13 @@
             </view>
             <text class="comment-content">{{ comment.content }}</text>
             <view class="comment-actions">
+              <text
+                class="action-btn like-action"
+                :class="{ active: comment.liked }"
+                @tap="handleCommentLike(comment)"
+              >
+                {{ comment.liked ? '❤️' : '🤍' }} {{ comment.likesCount || 0 }}
+              </text>
               <text class="action-btn" @tap="setReply(comment)">回复</text>
               <text
                 class="action-btn delete"
@@ -90,7 +104,7 @@
       </view>
 
       <view class="empty-comments" v-else-if="!commentLoading">
-        <text>暂无评论，快来说两句</text>
+        <text>还没有评论，快来抢沙发 🛋️</text>
       </view>
 
       <view class="loading-more" v-if="commentLoading">
@@ -106,7 +120,7 @@
     </view>
 
     <!-- Spacer for bottom bar -->
-    <view style="height: 120rpx"></view>
+    <view style="height: 140rpx"></view>
 
     <!-- Bottom Input Bar -->
     <view class="bottom-bar">
@@ -160,7 +174,6 @@ const replyTo = ref<any>(null)
 
 const isAuthor = computed(() => post.value?.userId === userStore.userInfo?.id)
 
-// Backend stores images as JSON string, parse to array
 const postImages = computed(() => {
   if (!post.value) return []
   if (Array.isArray(post.value.images)) return post.value.images
@@ -170,6 +183,12 @@ const postImages = computed(() => {
   if (Array.isArray(post.value.imageUrls)) return post.value.imageUrls
   return []
 })
+
+function imageGridClass(count: number): string {
+  if (count === 1) return 'cols-1'
+  if (count === 2) return 'cols-2'
+  return 'cols-3'
+}
 
 async function loadPost() {
   pageLoading.value = true
@@ -222,7 +241,23 @@ async function handleLike() {
   try {
     const res = await communityApi.toggleLike({ targetType: 'POST', targetId: postId.value })
     isLiked.value = res.data?.liked ?? !isLiked.value
-    post.value.likesCount = (post.value.likesCount || 0) + (isLiked.value ? 1 : -1)
+    post.value.likesCount = isLiked.value
+      ? (post.value.likesCount || 0) + 1
+      : Math.max((post.value.likesCount || 0) - 1, 0)
+  } catch {
+    uni.showToast({ title: '操作失败', icon: 'none' })
+  }
+}
+
+async function handleCommentLike(comment: any) {
+  if (!checkLogin()) return
+  try {
+    const res = await communityApi.toggleLike({ targetType: 'COMMENT', targetId: comment.id })
+    const liked = res.data?.liked ?? !comment.liked
+    comment.liked = liked
+    comment.likesCount = liked
+      ? (comment.likesCount || 0) + 1
+      : Math.max((comment.likesCount || 0) - 1, 0)
   } catch {
     uni.showToast({ title: '操作失败', icon: 'none' })
   }
@@ -333,6 +368,7 @@ onLoad((query) => {
   font-family: 'Inter', 'PingFang SC', sans-serif;
 }
 
+/* ===== Author Bar ===== */
 .author-bar {
   display: flex;
   align-items: center;
@@ -340,7 +376,6 @@ onLoad((query) => {
   padding: 28rpx;
   border-bottom: 1rpx solid $border;
 }
-
 .avatar {
   width: 80rpx;
   height: 80rpx;
@@ -348,21 +383,23 @@ onLoad((query) => {
   border: none;
   margin-right: 20rpx;
   flex-shrink: 0;
+  background: $muted;
 }
-
 .author-info {
   flex: 1;
   display: flex;
   flex-direction: column;
+  min-width: 0;
 }
-
 .nickname {
   font-size: 30rpx;
   font-weight: 600;
   color: $foreground;
   font-family: 'Inter', 'PingFang SC', sans-serif;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
-
 .time {
   font-size: 24rpx;
   color: $muted-foreground;
@@ -375,16 +412,16 @@ onLoad((query) => {
   border-radius: $radius-full;
   font-size: 24rpx;
   background: $accent;
-  color: $accent-foreground;
+  color: #fff;
   border: none;
   box-shadow: $shadow-accent;
   font-family: 'Inter', 'PingFang SC', sans-serif;
   transition: transform 0.15s ease;
+  flex-shrink: 0;
 }
 .follow-btn:active {
   transform: scale(0.97);
 }
-
 .follow-btn.followed {
   background: $muted;
   color: $muted-foreground;
@@ -401,16 +438,35 @@ onLoad((query) => {
   border: none;
   font-family: 'Inter', 'PingFang SC', sans-serif;
   transition: transform 0.15s ease;
+  flex-shrink: 0;
 }
 .delete-btn:active {
   transform: scale(0.97);
 }
 
+/* ===== Post Body ===== */
 .post-body {
   background: $card;
   padding: 0 28rpx 28rpx;
 }
-
+.post-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  padding-top: 20rpx;
+  margin-bottom: 16rpx;
+  flex-wrap: wrap;
+}
+.pinned-tag {
+  display: inline-flex;
+  font-size: 22rpx;
+  color: $uni-error;
+  background: rgba(239, 68, 68, 0.08);
+  padding: 6rpx 16rpx;
+  border-radius: $radius-full;
+  font-weight: 600;
+  font-family: 'Inter', 'PingFang SC', sans-serif;
+}
 .category-tag {
   display: inline-block;
   font-size: 22rpx;
@@ -419,44 +475,57 @@ onLoad((query) => {
   padding: 6rpx 16rpx;
   border-radius: $radius-full;
   border: none;
-  margin-bottom: 16rpx;
-  font-family: 'JetBrains Mono', 'PingFang SC', monospace;
+  font-family: 'Inter', 'PingFang SC', sans-serif;
 }
-
 .content-text {
   font-size: 30rpx;
   color: $foreground;
   line-height: 1.8;
   word-break: break-all;
+  white-space: pre-wrap;
   font-family: 'Inter', 'PingFang SC', sans-serif;
 }
 
+/* ===== Image Gallery ===== */
 .image-gallery {
   background: $card;
   padding: 0 28rpx 28rpx;
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
   gap: 8rpx;
+  border-radius: $radius-lg;
+  overflow: hidden;
 }
-
-.gallery-img {
-  width: calc(33.33% - 6rpx);
+.image-gallery.cols-1 {
+  grid-template-columns: 1fr;
+  max-width: 480rpx;
+}
+.image-gallery.cols-2 {
+  grid-template-columns: 1fr 1fr;
+  max-width: 540rpx;
+}
+.image-gallery.cols-3 {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+.gallery-item {
   aspect-ratio: 1;
   border-radius: $radius-lg;
-  border: none;
+  overflow: hidden;
 }
-
-.gallery-img.single-img {
-  width: 100%;
-  max-height: 600rpx;
+.gallery-item.single-item {
   aspect-ratio: auto;
+  max-height: 600rpx;
+}
+.gallery-img {
+  width: 100%;
+  height: 100%;
+  border-radius: $radius-lg;
 }
 
+/* ===== Video ===== */
 .video-wrapper {
   background: $card;
   padding: 0 28rpx 28rpx;
 }
-
 .post-video {
   width: 100%;
   height: 400rpx;
@@ -464,14 +533,15 @@ onLoad((query) => {
   border: none;
 }
 
+/* ===== Stats Bar ===== */
 .stats-bar {
   background: $card;
   display: flex;
   padding: 24rpx 28rpx;
-  gap: 60rpx;
+  gap: 40rpx;
   border-top: 1rpx solid $border;
+  align-items: center;
 }
-
 .stat-item {
   display: flex;
   align-items: center;
@@ -480,34 +550,31 @@ onLoad((query) => {
   border-radius: $radius-full;
   transition: all 0.2s;
 }
-
 .stat-item.liked {
   background: rgba(239, 68, 68, 0.06);
 }
-
 .stat-icon {
   font-size: 32rpx;
 }
-
 .stat-count {
   font-size: 26rpx;
   color: $muted-foreground;
   font-family: 'Inter', 'PingFang SC', sans-serif;
 }
 
+/* ===== Comments Section ===== */
 .comments-section {
   background: $card;
   margin-top: 16rpx;
   padding: 28rpx;
   border-top: 1rpx solid $border;
 }
-
 .section-title {
   font-size: 30rpx;
   font-weight: 600;
   color: $foreground;
   margin-bottom: 24rpx;
-  font-family: 'Calistoga', 'PingFang SC', sans-serif;
+  font-family: 'Inter', 'PingFang SC', sans-serif;
   position: relative;
   display: inline-block;
 }
@@ -517,7 +584,7 @@ onLoad((query) => {
   bottom: -4rpx;
   left: 0;
   width: 100%;
-  height: 3rpx;
+  height: 4rpx;
   background: $accent;
   border-radius: 2rpx;
 }
@@ -527,7 +594,6 @@ onLoad((query) => {
   padding: 20rpx 0;
   border-bottom: 1rpx solid $border;
 }
-
 .comment-avatar {
   width: 64rpx;
   height: 64rpx;
@@ -535,68 +601,65 @@ onLoad((query) => {
   border: none;
   margin-right: 16rpx;
   flex-shrink: 0;
+  background: $muted;
 }
-
 .comment-body {
   flex: 1;
   min-width: 0;
   background: $muted;
-  border: none;
+  border: 1rpx solid $border;
   border-radius: $radius-lg;
   padding: 16rpx;
   position: relative;
 }
-
 .comment-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 8rpx;
 }
-
 .comment-nick {
   font-size: 26rpx;
   font-weight: 600;
   color: $foreground;
   font-family: 'Inter', 'PingFang SC', sans-serif;
 }
-
 .comment-time {
   font-size: 22rpx;
   color: $muted-foreground;
   font-family: 'Inter', 'PingFang SC', sans-serif;
 }
-
 .reply-tag {
   font-size: 22rpx;
   color: $muted-foreground;
   margin-bottom: 8rpx;
 }
-
 .reply-nick {
   color: $accent;
   font-weight: 600;
 }
-
 .comment-content {
   font-size: 28rpx;
   color: $foreground;
   line-height: 1.6;
   font-family: 'Inter', 'PingFang SC', sans-serif;
+  word-break: break-all;
 }
-
 .comment-actions {
   display: flex;
   gap: 24rpx;
   margin-top: 12rpx;
+  align-items: center;
 }
-
 .action-btn {
   font-size: 22rpx;
-  color: $accent;
+  color: $muted-foreground;
   font-family: 'Inter', 'PingFang SC', sans-serif;
+  transition: color 0.2s;
 }
-
+.action-btn.like-action.active {
+  color: $accent;
+}
 .action-btn.delete {
   color: $uni-error;
 }
@@ -608,7 +671,6 @@ onLoad((query) => {
   color: $muted-foreground;
   font-family: 'Inter', 'PingFang SC', sans-serif;
 }
-
 .loading-more {
   text-align: center;
   padding: 20rpx;
@@ -616,7 +678,6 @@ onLoad((query) => {
   color: $muted-foreground;
   font-family: 'Inter', 'PingFang SC', sans-serif;
 }
-
 .load-more-btn {
   text-align: center;
   padding: 20rpx;
@@ -629,6 +690,7 @@ onLoad((query) => {
   transition: background 0.2s;
 }
 
+/* ===== Bottom Bar ===== */
 .bottom-bar {
   position: fixed;
   bottom: 0;
@@ -640,32 +702,28 @@ onLoad((query) => {
   padding-bottom: calc(16rpx + env(safe-area-inset-bottom));
   z-index: 100;
 }
-
 .reply-hint {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 8rpx 16rpx;
   margin-bottom: 8rpx;
-  background: $muted;
+  background: rgba(16, 185, 129, 0.06);
   border-radius: $radius-lg;
   border: none;
   font-size: 22rpx;
-  color: $foreground;
+  color: $accent;
   font-family: 'Inter', 'PingFang SC', sans-serif;
 }
-
 .cancel-reply {
   color: $muted-foreground;
   padding: 4rpx 8rpx;
 }
-
 .input-row {
   display: flex;
   align-items: center;
   gap: 16rpx;
 }
-
 .comment-input {
   flex: 1;
   height: 72rpx;
@@ -677,7 +735,6 @@ onLoad((query) => {
   font-family: 'Inter', 'PingFang SC', sans-serif;
   color: $foreground;
 }
-
 .send-btn {
   padding: 16rpx 32rpx;
   border-radius: $radius-lg;
@@ -689,10 +746,9 @@ onLoad((query) => {
   font-family: 'Inter', 'PingFang SC', sans-serif;
   transition: all 0.2s;
 }
-
 .send-btn.active {
   background: $accent;
-  color: $accent-foreground;
+  color: #fff;
   box-shadow: $shadow-accent;
 }
 .send-btn.active:active {
