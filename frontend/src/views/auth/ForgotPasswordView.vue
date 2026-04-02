@@ -1,10 +1,10 @@
 <template>
   <div class="forgot-container">
-    <div class="forgot-card decoration-tape">
+    <div class="forgot-card">
       <!-- Logo和标题 -->
       <div class="forgot-header">
-        <h1 class="logo font-heading">🥗 NutriAI</h1>
-        <p class="subtitle font-hand">重置您的密码</p>
+        <h1 class="logo font-display gradient-text">🥗 NutriAI</h1>
+        <p class="subtitle font-sans">重置您的密码</p>
       </div>
 
       <!-- 步骤指示器 -->
@@ -23,7 +23,7 @@
         class="forgot-form"
         @submit.prevent="handleSendCode"
       >
-        <p class="form-tip font-hand">请输入您注册时使用的邮箱地址，我们将发送验证码到该邮箱。</p>
+        <p class="form-tip font-sans">请输入您注册时使用的邮箱地址，我们将发送验证码到该邮箱。</p>
 
         <el-form-item prop="email">
           <el-input
@@ -61,7 +61,7 @@
         label-position="top"
         @submit.prevent="handleResetPassword"
       >
-        <p class="form-tip font-hand">
+        <p class="form-tip font-sans">
           验证码已发送至 <strong>{{ maskedEmail }}</strong
           >，请查收。
         </p>
@@ -127,7 +127,7 @@
       </div>
 
       <!-- 返回登录 -->
-      <div v-if="currentStep < 2" class="back-link font-hand">
+      <div v-if="currentStep < 2" class="back-link font-sans">
         <router-link to="/login" class="link"> ← 返回登录 </router-link>
       </div>
     </div>
@@ -342,22 +342,19 @@ onUnmounted(() => {
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background-color: #fdfbf7;
-  background-image: radial-gradient(#e5e0d8 1px, transparent 1px);
-  background-size: 24px 24px;
+  background: #FAFAFA;
   padding: 20px;
 }
 
 .forgot-card {
   width: 100%;
   max-width: 480px;
-  background: #fff;
-  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+  background: #FFFFFF;
+  border-radius: 16px;
   padding: 48px 32px 40px;
-  border: 3px solid #2d2d2d;
-  box-shadow: 8px 8px 0px 0px #2d2d2d;
+  border: 1px solid #E2E8F0;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
   position: relative;
-  transform: rotate(-0.5deg);
 }
 
 .forgot-header {
@@ -367,16 +364,13 @@ onUnmounted(() => {
   .logo {
     font-size: 32px;
     font-weight: bold;
-    color: #ff4d4d;
     margin: 0 0 8px 0;
-    font-family: 'Kalam', 'ZCOOL KuaiLe', cursive;
   }
 
   .subtitle {
-    color: #5a5a5a;
+    color: #64748B;
     font-size: 14px;
     margin: 0;
-    font-family: 'Patrick Hand', cursive;
   }
 }
 
@@ -384,20 +378,39 @@ onUnmounted(() => {
   margin-bottom: 32px;
 }
 
-.forgot-form {
-  font-family: 'Patrick Hand', cursive;
+:deep(.el-step__title) {
+  font-size: 13px;
+}
 
+:deep(.el-step__head.is-finish) {
+  color: #0052FF;
+  border-color: #0052FF;
+}
+
+:deep(.el-step__title.is-finish) {
+  color: #0052FF;
+}
+
+:deep(.el-step__head.is-process) {
+  color: #0052FF;
+  border-color: #0052FF;
+}
+
+:deep(.el-step__title.is-process) {
+  color: #0052FF;
+  font-weight: 600;
+}
+
+.forgot-form {
   :deep(.el-form-item__label) {
-    font-family: 'Patrick Hand', cursive;
-    color: #2d2d2d;
+    color: #0F172A;
   }
 
   .form-tip {
-    color: #5a5a5a;
+    color: #64748B;
     font-size: 14px;
     margin: 0 0 20px 0;
     line-height: 1.6;
-    font-family: 'Patrick Hand', cursive;
   }
 
   .code-wrapper {
@@ -414,24 +427,59 @@ onUnmounted(() => {
     height: 44px;
     font-size: 16px;
     font-weight: 600;
-    font-family: 'Kalam', 'ZCOOL KuaiLe', cursive;
-    background: #ff4d4d;
-    border: 3px solid #2d2d2d;
-    border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
-    box-shadow: 4px 4px 0px 0px #2d2d2d;
+    background: linear-gradient(135deg, #0052FF, #4D7CFF);
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 4px 14px rgba(0, 82, 255, 0.25);
     color: #fff;
-    transition: all 0.2s;
+    transition: all 0.3s ease;
 
     &:hover {
-      transform: translate(2px, 2px);
-      box-shadow: 2px 2px 0px 0px #2d2d2d;
-      background: #e04343;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0, 82, 255, 0.35);
     }
   }
 }
 
+:deep(.el-input__wrapper) {
+  border-radius: 10px;
+  box-shadow: 0 0 0 1px #E2E8F0 inset;
+  transition: box-shadow 0.2s;
+}
+
+:deep(.el-input__wrapper:hover) {
+  box-shadow: 0 0 0 1px #0052FF inset;
+}
+
+:deep(.el-input__wrapper.is-focus) {
+  box-shadow: 0 0 0 1px #0052FF inset, 0 0 0 3px rgba(0, 82, 255, 0.1);
+}
+
 .success-section {
   padding: 20px 0;
+
+  :deep(.el-result__title p) {
+    color: #0F172A;
+    font-weight: 600;
+  }
+
+  :deep(.el-result__subtitle p) {
+    color: #64748B;
+  }
+
+  :deep(.el-button--primary) {
+    background: linear-gradient(135deg, #0052FF, #4D7CFF);
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 4px 14px rgba(0, 82, 255, 0.25);
+    font-weight: 600;
+    transition: all 0.3s ease;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0, 82, 255, 0.35);
+    }
+  }
 }
 
 .back-link {
@@ -439,13 +487,13 @@ onUnmounted(() => {
   margin-top: 20px;
 
   .link {
-    color: #2d5da1;
+    color: #0052FF;
     text-decoration: none;
     font-size: 14px;
-    font-family: 'Patrick Hand', cursive;
+    transition: color 0.2s;
 
     &:hover {
-      color: #ff4d4d;
+      color: #4D7CFF;
       text-decoration: underline;
     }
   }

@@ -1,10 +1,10 @@
 <template>
   <div class="register-container">
-    <div class="register-card decoration-tape">
+    <div class="register-card">
       <!-- Logo和标题 -->
       <div class="register-header">
-        <h1 class="logo font-heading">🥗 NutriAI</h1>
-        <p class="subtitle font-hand">创建您的账号，开启智能饮食之旅</p>
+        <h1 class="logo font-display gradient-text">🥗 NutriAI</h1>
+        <p class="subtitle font-sans">创建您的账号，开启智能饮食之旅</p>
       </div>
 
       <!-- 注册表单 -->
@@ -153,9 +153,9 @@
         <el-form-item prop="agree">
           <el-checkbox v-model="registerForm.agree">
             我已阅读并同意
-            <router-link to="/legal/terms" target="_blank" style="color:#2d5da1;text-decoration:none">《用户协议》</router-link>
+            <router-link to="/legal/terms" target="_blank" style="color:#0052FF;text-decoration:none">《用户协议》</router-link>
             和
-            <router-link to="/legal/privacy" target="_blank" style="color:#2d5da1;text-decoration:none">《隐私政策》</router-link>
+            <router-link to="/legal/privacy" target="_blank" style="color:#0052FF;text-decoration:none">《隐私政策》</router-link>
           </el-checkbox>
         </el-form-item>
 
@@ -173,7 +173,7 @@
         </el-form-item>
 
         <!-- 登录链接 -->
-        <div class="login-link font-hand">
+        <div class="login-link font-sans">
           已有账号？
           <router-link to="/login" class="link"> 立即登录 </router-link>
         </div>
@@ -467,22 +467,19 @@ onMounted(() => {
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background-color: #fdfbf7;
-  background-image: radial-gradient(#e5e0d8 1px, transparent 1px);
-  background-size: 24px 24px;
+  background: #FAFAFA;
   padding: 40px 20px;
 }
 
 .register-card {
   width: 100%;
   max-width: 500px;
-  background: #fff;
-  border-radius: 15px 225px 15px 255px / 255px 15px 225px 15px;
+  background: #FFFFFF;
+  border-radius: 16px;
   padding: 48px 32px 40px;
-  border: 3px solid #2d2d2d;
-  box-shadow: 8px 8px 0px 0px #2d2d2d;
+  border: 1px solid #E2E8F0;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
   position: relative;
-  transform: rotate(0.5deg);
 }
 
 .register-header {
@@ -492,26 +489,20 @@ onMounted(() => {
   .logo {
     font-size: 32px;
     font-weight: bold;
-    color: #ff4d4d;
     margin: 0 0 8px 0;
-    font-family: 'Kalam', 'ZCOOL KuaiLe', cursive;
   }
 
   .subtitle {
-    color: #5a5a5a;
+    color: #64748B;
     font-size: 14px;
     margin: 0;
-    font-family: 'Patrick Hand', cursive;
   }
 }
 
 .register-form {
-  font-family: 'Patrick Hand', cursive;
-
   :deep(.el-form-item__label) {
     font-weight: 500;
-    color: #2d2d2d;
-    font-family: 'Patrick Hand', cursive;
+    color: #0F172A;
   }
 
   .validation-tip {
@@ -520,11 +511,11 @@ onMounted(() => {
     font-size: 12px;
 
     &.success {
-      color: #2d5da1;
+      color: #10B981;
     }
 
     &.error {
-      color: #ff4d4d;
+      color: #EF4444;
     }
   }
 
@@ -545,13 +536,13 @@ onMounted(() => {
     .captcha-image {
       width: 100%;
       height: 100%;
-      border-radius: 185px 10px 155px 10px / 10px 155px 10px 185px;
-      border: 2px solid #2d2d2d;
+      border-radius: 8px;
+      border: 1px solid #E2E8F0;
       transition: all 0.3s;
 
       &:hover {
         opacity: 0.8;
-        border-color: #ff4d4d;
+        border-color: #0052FF;
       }
     }
 
@@ -562,11 +553,11 @@ onMounted(() => {
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      background: #fdfbf7;
-      border: 2px dashed #e5e0d8;
-      border-radius: 185px 10px 155px 10px / 10px 155px 10px 185px;
+      background: #F1F5F9;
+      border: 1px solid #E2E8F0;
+      border-radius: 8px;
       font-size: 12px;
-      color: #5a5a5a;
+      color: #64748B;
       gap: 4px;
     }
   }
@@ -583,6 +574,7 @@ onMounted(() => {
     .send-code-btn {
       width: 120px;
       flex-shrink: 0;
+      border-radius: 10px;
     }
   }
 
@@ -591,36 +583,49 @@ onMounted(() => {
     height: 44px;
     font-size: 16px;
     font-weight: 600;
-    font-family: 'Kalam', 'ZCOOL KuaiLe', cursive;
-    background: #ff4d4d;
-    border: 3px solid #2d2d2d;
-    border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
-    box-shadow: 4px 4px 0px 0px #2d2d2d;
+    background: linear-gradient(135deg, #0052FF, #4D7CFF);
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 4px 14px rgba(0, 82, 255, 0.25);
     color: #fff;
-    transition: all 0.2s;
+    transition: all 0.3s ease;
 
     &:hover {
-      transform: translate(2px, 2px);
-      box-shadow: 2px 2px 0px 0px #2d2d2d;
-      background: #e04343;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0, 82, 255, 0.35);
     }
   }
 
   .login-link {
     text-align: center;
-    color: #5a5a5a;
+    color: #64748B;
     font-size: 14px;
 
     .link {
-      color: #2d5da1;
+      color: #0052FF;
       text-decoration: none;
       font-weight: 500;
+      transition: color 0.2s;
 
       &:hover {
-        color: #ff4d4d;
+        color: #4D7CFF;
         text-decoration: underline;
       }
     }
   }
+}
+
+:deep(.el-input__wrapper) {
+  border-radius: 10px;
+  box-shadow: 0 0 0 1px #E2E8F0 inset;
+  transition: box-shadow 0.2s;
+}
+
+:deep(.el-input__wrapper:hover) {
+  box-shadow: 0 0 0 1px #0052FF inset;
+}
+
+:deep(.el-input__wrapper.is-focus) {
+  box-shadow: 0 0 0 1px #0052FF inset, 0 0 0 3px rgba(0, 82, 255, 0.1);
 }
 </style>

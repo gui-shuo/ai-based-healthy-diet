@@ -3,11 +3,11 @@
     <div class="callback-card">
       <div v-if="loading" class="loading-state">
         <el-icon class="is-loading" :size="48"><Loading /></el-icon>
-        <p class="font-hand">{{ statusMsg }}</p>
+        <p class="font-sans">{{ statusMsg }}</p>
       </div>
       <div v-else-if="error" class="error-state">
-        <el-icon :size="48" color="#ff4d4d"><CircleCloseFilled /></el-icon>
-        <p class="font-hand">{{ statusMsg }}</p>
+        <el-icon :size="48" color="#EF4444"><CircleCloseFilled /></el-icon>
+        <p class="font-sans">{{ statusMsg }}</p>
         <el-button type="primary" @click="goLogin">返回登录</el-button>
       </div>
     </div>
@@ -115,18 +115,16 @@ const goLogin = () => router.push('/login')
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background-color: #fdfbf7;
-  background-image: radial-gradient(#e5e0d8 1px, transparent 1px);
-  background-size: 24px 24px;
+  background: #FAFAFA;
 }
 
 .callback-card {
-  background: #fff;
-  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+  background: #FFFFFF;
+  border-radius: 16px;
   padding: 60px 40px;
   text-align: center;
-  border: 3px solid #2d2d2d;
-  box-shadow: 8px 8px 0px 0px #2d2d2d;
+  border: 1px solid #E2E8F0;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
   min-width: 360px;
 }
 
@@ -138,8 +136,25 @@ const goLogin = () => router.push('/login')
 }
 
 .loading-state p, .error-state p {
-  color: #2d2d2d;
+  color: #0F172A;
   font-size: 16px;
-  font-family: 'Patrick Hand', cursive;
+}
+
+.loading-state :deep(.el-icon) {
+  color: #0052FF;
+}
+
+.error-state :deep(.el-button--primary) {
+  background: linear-gradient(135deg, #0052FF, #4D7CFF);
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 4px 14px rgba(0, 82, 255, 0.25);
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.error-state :deep(.el-button--primary:hover) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 82, 255, 0.35);
 }
 </style>

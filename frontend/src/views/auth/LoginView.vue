@@ -1,10 +1,10 @@
 <template>
   <div class="login-container">
-    <div class="login-card decoration-tape">
+    <div class="login-card">
       <!-- Logo和标题 -->
       <div class="login-header">
-        <h1 class="logo font-heading">🥗 NutriAI</h1>
-        <p class="subtitle font-hand">NutriAI饮食规划助手</p>
+        <h1 class="logo font-display gradient-text">🥗 NutriAI</h1>
+        <p class="subtitle font-sans">NutriAI饮食规划助手</p>
       </div>
 
       <!-- 登录表单 -->
@@ -91,12 +91,12 @@
         </el-form-item>
 
         <!-- 注册链接 -->
-        <div class="register-link font-hand">
+        <div class="register-link font-sans">
           还没有账号？
           <router-link to="/register" class="link"> 立即注册 </router-link>
-          <span style="margin: 0 8px; color: #e5e0d8;">|</span>
+          <span style="margin: 0 8px; color: #E2E8F0;">|</span>
           <router-link to="/nutritionist/register" class="link"> 营养师入驻 </router-link>
-          <span style="margin: 0 8px; color: #e5e0d8;">|</span>
+          <span style="margin: 0 8px; color: #E2E8F0;">|</span>
           <router-link to="/nutritionist/login" class="link"> 营养师登录 </router-link>
         </div>
       </el-form>
@@ -331,22 +331,19 @@ const handleSocialLogin = async (provider) => {
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background-color: #fdfbf7;
-  background-image: radial-gradient(#e5e0d8 1px, transparent 1px);
-  background-size: 24px 24px;
+  background: #FAFAFA;
   padding: 20px;
 }
 
 .login-card {
   width: 100%;
   max-width: 420px;
-  background: #fff;
-  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+  background: #FFFFFF;
+  border-radius: 16px;
   padding: 48px 32px 40px;
-  border: 3px solid #2d2d2d;
-  box-shadow: 8px 8px 0px 0px #2d2d2d;
+  border: 1px solid #E2E8F0;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
   position: relative;
-  transform: rotate(-0.5deg);
 }
 
 .login-header {
@@ -356,22 +353,17 @@ const handleSocialLogin = async (provider) => {
   .logo {
     font-size: 32px;
     font-weight: bold;
-    color: #ff4d4d;
     margin: 0 0 8px 0;
-    font-family: 'Kalam', 'ZCOOL KuaiLe', cursive;
   }
 
   .subtitle {
-    color: #5a5a5a;
+    color: #64748B;
     font-size: 14px;
     margin: 0;
-    font-family: 'Patrick Hand', cursive;
   }
 }
 
 .login-form {
-  font-family: 'Patrick Hand', cursive;
-
   .captcha-wrapper {
     display: flex;
     gap: 12px;
@@ -389,13 +381,13 @@ const handleSocialLogin = async (provider) => {
     .captcha-image {
       width: 100%;
       height: 100%;
-      border-radius: 185px 10px 155px 10px / 10px 155px 10px 185px;
-      border: 2px solid #2d2d2d;
+      border-radius: 8px;
+      border: 1px solid #E2E8F0;
       transition: all 0.3s;
 
       &:hover {
         opacity: 0.8;
-        border-color: #ff4d4d;
+        border-color: #0052FF;
       }
     }
 
@@ -406,11 +398,11 @@ const handleSocialLogin = async (provider) => {
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      background: #fdfbf7;
-      border: 2px dashed #e5e0d8;
-      border-radius: 185px 10px 155px 10px / 10px 155px 10px 185px;
+      background: #F1F5F9;
+      border: 1px solid #E2E8F0;
+      border-radius: 8px;
       font-size: 12px;
-      color: #5a5a5a;
+      color: #64748B;
       gap: 4px;
     }
   }
@@ -427,49 +419,50 @@ const handleSocialLogin = async (provider) => {
     height: 44px;
     font-size: 16px;
     font-weight: 600;
-    font-family: 'Kalam', 'ZCOOL KuaiLe', cursive;
-    background: #ff4d4d;
-    border: 3px solid #2d2d2d;
-    border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
-    box-shadow: 4px 4px 0px 0px #2d2d2d;
+    background: linear-gradient(135deg, #0052FF, #4D7CFF);
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 4px 14px rgba(0, 82, 255, 0.25);
     color: #fff;
-    transition: all 0.2s;
+    transition: all 0.3s ease;
 
     &:hover {
-      transform: translate(2px, 2px);
-      box-shadow: 2px 2px 0px 0px #2d2d2d;
-      background: #e04343;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0, 82, 255, 0.35);
     }
   }
 
   .register-link {
     text-align: center;
-    color: #5a5a5a;
+    color: #64748B;
     font-size: 14px;
 
     .link {
-      color: #2d5da1;
+      color: #0052FF;
       text-decoration: none;
       font-weight: 500;
+      transition: color 0.2s;
 
       &:hover {
-        color: #ff4d4d;
+        color: #4D7CFF;
         text-decoration: underline;
       }
     }
   }
 }
 
-.quick-login-tip {
-  margin-top: 24px;
+:deep(.el-input__wrapper) {
+  border-radius: 10px;
+  box-shadow: 0 0 0 1px #E2E8F0 inset;
+  transition: box-shadow 0.2s;
+}
 
-  .tip-text {
-    text-align: center;
-    font-size: 12px;
-    color: #5a5a5a;
-    line-height: 1.6;
-    margin: 8px 0 0 0;
-  }
+:deep(.el-input__wrapper:hover) {
+  box-shadow: 0 0 0 1px #0052FF inset;
+}
+
+:deep(.el-input__wrapper.is-focus) {
+  box-shadow: 0 0 0 1px #0052FF inset, 0 0 0 3px rgba(0, 82, 255, 0.1);
 }
 
 .social-login-section {
@@ -477,12 +470,11 @@ const handleSocialLogin = async (provider) => {
 
   :deep(.el-divider__text) {
     font-size: 13px;
-    color: #5a5a5a;
-    font-family: 'Patrick Hand', cursive;
-    background: #fff;
+    color: #64748B;
+    background: #FFFFFF;
   }
   :deep(.el-divider) {
-    border-color: #e5e0d8;
+    border-color: #E2E8F0;
   }
 }
 
@@ -496,20 +488,20 @@ const handleSocialLogin = async (provider) => {
 .social-btn {
   width: 48px;
   height: 48px;
-  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
-  border: 2px solid #2d2d2d;
-  background: #fdfbf7;
+  border-radius: 12px;
+  border: 1px solid #E2E8F0;
+  background: #FFFFFF;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 3px 3px 0px 0px rgba(45, 45, 45, 0.1);
-  transition: all 0.2s;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s ease;
 
   &:hover {
-    transform: translate(2px, 2px);
-    box-shadow: 1px 1px 0px 0px rgba(45, 45, 45, 0.1);
-    background: #fff9c4;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+    border-color: #0052FF;
   }
 
   &:disabled {

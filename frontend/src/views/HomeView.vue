@@ -6,7 +6,7 @@
         <div class="nav-content">
           <div class="logo">
             <img src="/logo.svg" alt="NutriAI" class="logo-img" />
-            <span class="logo-text font-heading">{{ siteName }}</span>
+            <span class="logo-text font-display gradient-text">{{ siteName }}</span>
           </div>
           <div class="nav-buttons">
             <el-button link @click="goToAnnouncements">
@@ -47,17 +47,17 @@
     <!-- 主要内容区 -->
     <main class="main-content">
       <div class="hero-section">
-        <h1 class="hero-title font-heading">
-          ✏️ {{ siteName }}
+        <h1 class="hero-title font-display animate-fade-in-up">
+          <span class="gradient-text">{{ siteName }}</span>
         </h1>
-        <p class="hero-subtitle font-hand">
+        <p class="hero-subtitle font-sans animate-fade-in-up" style="animation-delay: 0.1s">
           {{ getConfig('system.site_description', '智能营养分析 · 个性化饮食方案 · 饮食管理') }}
         </p>
-        <div class="hero-buttons">
+        <div class="hero-buttons animate-fade-in-up" style="animation-delay: 0.2s">
           <el-button type="primary" size="large" @click="getStarted"> 立即开始 </el-button>
           <el-button size="large" @click="learnMore"> 了解更多 </el-button>
         </div>
-        <div class="hero-mobile-hint">
+        <div class="hero-mobile-hint animate-fade-in-up" style="animation-delay: 0.3s">
           📱 手机用户？访问
           <a href="/h5/" target="_blank" class="h5-link">H5移动版</a>
           或前往
@@ -69,69 +69,69 @@
       <!-- 功能特色 -->
       <div class="features-section">
         <div class="container">
-          <h2 class="section-title font-heading"><span class="wavy-underline">核心功能</span></h2>
+          <h2 class="section-title font-display"><span class="gradient-text">核心功能</span></h2>
           <div class="features-grid">
             <div class="feature-card" @click="goToFeature('profile')">
-              <div class="sketch-icon"><el-icon :size="32" color="#2d5da1">
+              <div class="feature-icon"><el-icon :size="32" color="white">
                 <user />
               </el-icon></div>
-              <h3 class="font-heading">个人中心</h3>
+              <h3 class="font-display">个人中心</h3>
               <p>管理个人资料，记录身体数据</p>
             </div>
             <div class="feature-card" @click="goToFeature('ai-chat')">
-              <div class="sketch-icon"><el-icon :size="32" color="#2d5da1">
+              <div class="feature-icon"><el-icon :size="32" color="white">
                 <chatDotRound />
               </el-icon></div>
-              <h3 class="font-heading">AI营养师</h3>
+              <h3 class="font-display">AI营养师</h3>
               <p>智能对话，获取专业营养建议</p>
             </div>
             <div class="feature-card" @click="goToFeature('diet-plan')">
-              <div class="sketch-icon"><el-icon :size="32" color="#2d5da1">
+              <div class="feature-icon"><el-icon :size="32" color="white">
                 <calendar />
               </el-icon></div>
-              <h3 class="font-heading">AI饮食计划</h3>
+              <h3 class="font-display">AI饮食计划</h3>
               <p>智能生成个性化饮食计划</p>
             </div>
             <div class="feature-card" @click="goToFeature('food-recognition')">
-              <div class="sketch-icon"><el-icon :size="32" color="#2d5da1">
+              <div class="feature-icon"><el-icon :size="32" color="white">
                 <camera />
               </el-icon></div>
-              <h3 class="font-heading">AI食物识别</h3>
+              <h3 class="font-display">AI食物识别</h3>
               <p>拍照识别食物，智能分析营养</p>
             </div>
             <div class="feature-card" @click="goToFeature('food-records')">
-              <div class="sketch-icon"><el-icon :size="32" color="#2d5da1">
+              <div class="feature-icon"><el-icon :size="32" color="white">
                 <document />
               </el-icon></div>
-              <h3 class="font-heading">饮食记录</h3>
+              <h3 class="font-display">饮食记录</h3>
               <p>记录每日饮食，分析营养摄入</p>
             </div>
             <div class="feature-card" @click="goToFeature('consultation')">
-              <div class="sketch-icon"><el-icon :size="32" color="#2d5da1">
+              <div class="feature-icon"><el-icon :size="32" color="white">
                 <service />
               </el-icon></div>
-              <h3 class="font-heading">营养师咨询</h3>
+              <h3 class="font-display">营养师咨询</h3>
               <p>专业营养师在线咨询，获取个性化指导</p>
             </div>
             <div class="feature-card" @click="goToFeature('product-shop')">
-              <div class="sketch-icon"><el-icon :size="32" color="#2d5da1">
+              <div class="feature-icon"><el-icon :size="32" color="white">
                 <goods />
               </el-icon></div>
-              <h3 class="font-heading">营养产品商城</h3>
+              <h3 class="font-display">营养产品商城</h3>
               <p>优质营养产品，品质生活从此开始</p>
             </div>
             <div class="feature-card" @click="goToFeature('membership')">
-              <div class="sketch-icon"><el-icon :size="32" color="#2d5da1">
+              <div class="feature-icon"><el-icon :size="32" color="white">
                 <trophy />
               </el-icon></div>
-              <h3 class="font-heading">会员服务</h3>
+              <h3 class="font-display">会员服务</h3>
               <p>专属功能，更多权益</p>
             </div>
             <div class="feature-card" @click="goToFeature('community')">
-              <div class="sketch-icon"><el-icon :size="32" color="#2d5da1">
+              <div class="feature-icon"><el-icon :size="32" color="white">
                 <chatDotRound />
               </el-icon></div>
-              <h3 class="font-heading">营养圈</h3>
+              <h3 class="font-display">营养圈</h3>
               <p>分享饮食心得，交流营养知识</p>
             </div>
           </div>
@@ -140,7 +140,7 @@
     </main>
 
     <!-- 页脚 -->
-    <footer class="footer font-hand">
+    <footer class="footer font-sans">
       <div class="container">
         <div class="footer-content">
           <div class="footer-info">
@@ -312,18 +312,20 @@ const goToFeature = feature => {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  font-family: 'Patrick Hand', 'PingFang SC', 'Microsoft YaHei', cursive;
-  color: #2d2d2d;
+  font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;
+  color: #0F172A;
+  background: #FAFAFA;
 }
 
 /* 导航栏 */
 .navbar {
-  background: #fdfbf7;
-  border-bottom: 3px solid #2d2d2d;
-  box-shadow: 0 4px 0px 0px rgba(45, 45, 45, 0.08);
+  border-bottom: 1px solid #E2E8F0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
   position: sticky;
   top: 0;
   z-index: 100;
+  backdrop-filter: blur(12px);
+  background: rgba(255, 255, 255, 0.88);
 }
 
 .container {
@@ -353,13 +355,18 @@ const goToFeature = feature => {
 .logo-text {
   font-size: 22px;
   font-weight: 700;
-  color: #ff4d4d;
-  font-family: 'Kalam', 'ZCOOL KuaiLe', cursive;
 }
 
 .nav-buttons {
   display: flex;
   gap: 12px;
+}
+
+.nav-buttons :deep(.el-button--primary) {
+  background: linear-gradient(135deg, #0052FF, #4D7CFF);
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
 }
 
 /* 主要内容 */
@@ -369,67 +376,126 @@ const goToFeature = feature => {
 
 /* Hero区域 */
 .hero-section {
-  background-color: #fdfbf7;
-  background-image: radial-gradient(#e5e0d8 1px, transparent 1px);
-  background-size: 24px 24px;
-  padding: 100px 20px;
+  background: #FAFAFA;
+  padding: 120px 20px 100px;
   text-align: center;
   position: relative;
+  overflow: hidden;
+}
+
+.hero-section::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle at 30% 40%, rgba(0, 82, 255, 0.05) 0%, transparent 50%),
+              radial-gradient(circle at 70% 60%, rgba(77, 124, 255, 0.04) 0%, transparent 50%);
+  animation: floatBg 8s ease-in-out infinite;
+  pointer-events: none;
 }
 
 .hero-title {
-  font-size: 48px;
+  font-size: 52px;
   font-weight: 700;
-  color: #2d2d2d;
-  margin-bottom: 16px;
-  font-family: 'Kalam', 'ZCOOL KuaiLe', cursive;
+  color: #0F172A;
+  margin-bottom: 20px;
+  position: relative;
+  z-index: 1;
+  letter-spacing: -0.02em;
 }
 
 .hero-subtitle {
   font-size: 20px;
-  color: #5a5a5a;
-  margin-bottom: 32px;
-  font-family: 'Patrick Hand', cursive;
+  color: #64748B;
+  margin-bottom: 40px;
+  margin-left: auto;
+  margin-right: auto;
+  position: relative;
+  z-index: 1;
+  max-width: 600px;
+  line-height: 1.7;
 }
 
 .hero-buttons {
   display: flex;
   gap: 16px;
   justify-content: center;
+  position: relative;
+  z-index: 1;
+}
+
+.hero-buttons :deep(.el-button--primary) {
+  background: linear-gradient(135deg, #0052FF, #4D7CFF);
+  border: none;
+  box-shadow: 0 4px 14px rgba(0, 82, 255, 0.25);
+  border-radius: 12px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.hero-buttons :deep(.el-button--primary:hover) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 82, 255, 0.35);
+}
+
+.hero-buttons :deep(.el-button--default) {
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  font-weight: 600;
+  background: #FFFFFF;
+  color: #0F172A;
+  transition: all 0.3s ease;
+}
+
+.hero-buttons :deep(.el-button--default:hover) {
+  border-color: #0052FF;
+  color: #0052FF;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
 }
 
 .hero-mobile-hint {
-  margin-top: 20px;
+  margin-top: 24px;
   font-size: 14px;
-  color: #5a5a5a;
+  color: #64748B;
+  position: relative;
+  z-index: 1;
 }
+
 .h5-link {
-  color: #2d5da1;
+  color: #0052FF;
   font-weight: 600;
   text-decoration: none;
-  &:hover { color: #ff4d4d; text-decoration: underline; }
+  transition: color 0.2s;
+}
+
+.h5-link:hover {
+  color: #4D7CFF;
+  text-decoration: underline;
 }
 
 /* 功能特色 */
 .features-section {
   padding: 80px 20px;
-  background: #fdfbf7;
-  border-top: 2px dashed #e5e0d8;
+  background: #FFFFFF;
+  border-top: 1px solid #E2E8F0;
 }
 
 .section-title {
   font-size: 36px;
-  font-weight: 600;
+  font-weight: 700;
   text-align: center;
-  color: #2d2d2d;
+  color: #0F172A;
   margin-bottom: 48px;
-  font-family: 'Kalam', 'ZCOOL KuaiLe', cursive;
+  letter-spacing: -0.02em;
 }
 
 .features-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 32px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 24px;
   max-width: 1000px;
   margin: 0 auto;
 }
@@ -437,61 +503,52 @@ const goToFeature = feature => {
 .feature-card {
   text-align: center;
   padding: 32px 24px;
-  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
-  background: #fff;
-  border: 2px solid #2d2d2d;
-  box-shadow: 4px 4px 0px 0px #2d2d2d;
+  border-radius: 16px;
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
   transition: all 0.3s ease;
   cursor: pointer;
 }
 
-.feature-card:nth-child(odd) {
-  transform: rotate(-1deg);
-}
-.feature-card:nth-child(even) {
-  transform: rotate(1deg);
-}
-
 .feature-card:hover {
-  transform: translateY(-4px) rotate(0deg);
-  box-shadow: 6px 6px 0px 0px #2d2d2d;
-  background: #fff9c4;
+  transform: translateY(-4px);
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.08);
+  border-color: rgba(0, 82, 255, 0.2);
 }
 
-.feature-card .sketch-icon {
+.feature-card .feature-icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 56px;
   height: 56px;
-  border: 2px solid #2d2d2d;
-  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
-  box-shadow: 2px 2px 0px 0px rgba(45, 45, 45, 0.1);
-  background: #fdfbf7;
-  margin-bottom: 8px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #0052FF, #4D7CFF);
+  box-shadow: 0 4px 14px rgba(0, 82, 255, 0.25);
+  margin-bottom: 12px;
 }
 
 .feature-card h3 {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 600;
   margin: 12px 0 8px;
-  color: #2d2d2d;
-  font-family: 'Kalam', 'ZCOOL KuaiLe', cursive;
+  color: #0F172A;
 }
 
 .feature-card p {
-  color: #5a5a5a;
+  color: #64748B;
   line-height: 1.6;
-  font-family: 'Patrick Hand', cursive;
+  font-size: 14px;
 }
 
 /* 页脚 */
 .footer {
-  background: #fdfbf7;
+  background: #FFFFFF;
   padding: 32px 20px;
-  color: #5a5a5a;
-  border-top: 3px dashed #e5e0d8;
-  font-family: 'Patrick Hand', cursive;
+  color: #64748B;
+  border-top: 1px solid #E2E8F0;
+  font-size: 14px;
 }
 
 .footer-content {
@@ -513,7 +570,7 @@ const goToFeature = feature => {
 
 .icp-number {
   font-size: 12px;
-  color: #5a5a5a;
+  color: #64748B;
 }
 
 .footer-contact {
@@ -530,24 +587,51 @@ const goToFeature = feature => {
 
 .feedback-link {
   cursor: pointer;
-  color: #2d5da1;
-  transition: color .2s;
+  color: #0052FF;
+  transition: color 0.2s;
 }
-.feedback-link:hover { color: #ff4d4d; text-decoration: underline; }
+
+.feedback-link:hover {
+  color: #4D7CFF;
+  text-decoration: underline;
+}
 
 .footer-legal {
   width: 100%;
   text-align: center;
   margin-top: 16px;
   padding-top: 12px;
-  border-top: 2px dashed #e5e0d8;
+  border-top: 1px solid #E2E8F0;
   font-size: 13px;
-  a { color: #5a5a5a; text-decoration: none; &:hover { color: #2d5da1; } }
-  .sep { margin: 0 8px; color: #e5e0d8; }
+}
+
+.footer-legal a {
+  color: #64748B;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.footer-legal a:hover {
+  color: #0052FF;
+}
+
+.footer-legal .sep {
+  margin: 0 8px;
+  color: #E2E8F0;
+}
+
+/* Animations */
+@keyframes floatBg {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-20px) rotate(1deg); }
 }
 
 /* 响应式 */
 @media (max-width: 768px) {
+  .hero-section {
+    padding: 80px 20px 60px;
+  }
+
   .hero-title {
     font-size: 32px;
   }
@@ -573,11 +657,6 @@ const goToFeature = feature => {
 
   .features-grid {
     grid-template-columns: 1fr;
-  }
-
-  .feature-card:nth-child(odd),
-  .feature-card:nth-child(even) {
-    transform: rotate(0deg);
   }
 }
 </style>
