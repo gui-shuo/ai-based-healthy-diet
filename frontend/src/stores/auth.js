@@ -58,7 +58,7 @@ export const useAuthStore = defineStore('auth', () => {
         setUser(userInfo)
 
         // 登录后获取会员权限
-        fetchPermissions()
+        await fetchPermissions()
 
         return { success: true, data: response.data.data }
       }
@@ -162,6 +162,11 @@ export const useAuthStore = defineStore('auth', () => {
       console.error('Failed to parse user data:', e)
       localStorage.removeItem('user')
     }
+  }
+
+  // 如果token存在，启动时也获取权限
+  if (token.value && !isTokenExpired.value) {
+    fetchPermissions()
   }
 
   return {

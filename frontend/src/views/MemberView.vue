@@ -14,8 +14,19 @@
     </nav>
 
     <main class="main-area">
-      <!-- VIP 状态卡片 -->
-      <div class="vip-status-banner" :class="{ 'is-vip': permissions?.isVip }">
+      <!-- VIP 状态卡片 - 加载中骨架 -->
+      <div v-if="loading" class="vip-status-banner loading-state">
+        <div class="banner-content">
+          <div class="banner-left">
+            <div class="vip-icon skeleton-pulse">⏳</div>
+            <div class="vip-info">
+              <h3 class="skeleton-text">加载中...</h3>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- VIP 状态卡片 - 实际内容 -->
+      <div v-else class="vip-status-banner" :class="{ 'is-vip': permissions?.isVip }">
         <div class="banner-content">
           <div class="banner-left">
             <div class="vip-icon">{{ permissions?.isVip ? '💎' : '🌱' }}</div>
@@ -66,7 +77,8 @@ const authStore = useAuthStore()
 const router = useRouter()
 
 const memberInfo = ref(null)
-const permissions = ref(null)
+const permissions = ref(authStore.permissions)
+const loading = ref(!authStore.permissions)
 
 const refreshAll = async () => {
   try {
@@ -79,6 +91,8 @@ const refreshAll = async () => {
     authStore.fetchPermissions()
   } catch (err) {
     console.error('刷新会员信息失败:', err)
+  } finally {
+    loading.value = false
   }
 }
 
@@ -150,6 +164,19 @@ onBeforeUnmount(() => {
     border-color: #c5cae9;
   }
 
+  &.loading-state {
+    background: linear-gradient(135deg, #e8e8e8, #f5f5f5) !important;
+    border-color: #ddd;
+  }
+
+  .skeleton-pulse {
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+
+  .skeleton-text {
+    color: #999;
+  }
+
   .banner-content {
     display: flex;
     align-items: center;
@@ -207,6 +234,11 @@ onBeforeUnmount(() => {
   grid-template-columns: 1fr 1fr;
   gap: 16px;
   margin-top: 16px;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
 }
 
 @media (max-width: 768px) {
