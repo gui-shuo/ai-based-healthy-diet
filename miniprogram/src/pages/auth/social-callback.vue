@@ -55,7 +55,7 @@ function goLogin() {
 <style scoped>
 .page {
   min-height: 100vh;
-  background: #fff;
+  background: #fdfbf7;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -66,25 +66,36 @@ function goLogin() {
   align-items: center;
   gap: 24rpx;
   padding: 60rpx;
+  background: #fff;
+  border: 2px solid #2d2d2d;
+  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+  box-shadow: 4px 4px 0px 0px #2d2d2d;
 }
 .status-icon {
   font-size: 80rpx;
 }
 .status-msg {
   font-size: 28rpx;
-  color: #666;
+  color: #5a5a5a;
   text-align: center;
+  font-family: 'Patrick Hand', 'PingFang SC', 'Microsoft YaHei', cursive;
 }
 .btn-back {
   margin-top: 40rpx;
-  background: #07c160;
+  background: #ff4d4d;
   color: #fff;
-  border: none;
-  border-radius: 44rpx;
+  border: 2px solid #2d2d2d;
+  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+  box-shadow: 3px 3px 0px 0px rgba(45, 45, 45, 0.1);
   height: 80rpx;
   line-height: 80rpx;
   padding: 0 60rpx;
   font-size: 28rpx;
+  font-family: 'Patrick Hand', 'PingFang SC', 'Microsoft YaHei', cursive;
+}
+.btn-back:active {
+  transform: translate(2px, 2px);
+  box-shadow: none;
 }
 .btn-back::after {
   border: none;

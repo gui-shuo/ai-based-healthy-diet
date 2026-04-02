@@ -220,7 +220,7 @@ function goLogin() {
 <style scoped lang="scss">
 .page {
   min-height: 100vh;
-  background: #fff;
+  background: #fdfbf7;
   padding: 0 48rpx 60rpx;
 }
 
@@ -232,13 +232,15 @@ function goLogin() {
   display: block;
   font-size: 44rpx;
   font-weight: 700;
-  color: #333;
+  color: #2d2d2d;
   margin-bottom: 12rpx;
+  font-family: 'Kalam', 'ZCOOL KuaiLe', 'PingFang SC', cursive;
 }
 
 .subtitle {
   font-size: 26rpx;
-  color: #999;
+  color: rgba(45, 45, 45, 0.4);
+  font-family: 'Patrick Hand', 'PingFang SC', 'Microsoft YaHei', cursive;
 }
 
 /* Steps */
@@ -259,7 +261,8 @@ function goLogin() {
   width: 56rpx;
   height: 56rpx;
   border-radius: 50%;
-  background: #e0e0e0;
+  background: #e5e0d8;
+  border: 2px solid #2d2d2d;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -271,24 +274,26 @@ function goLogin() {
   font-size: 26rpx;
   color: #fff;
   font-weight: 600;
+  font-family: 'Patrick Hand', 'PingFang SC', 'Microsoft YaHei', cursive;
 }
 
 .step-label {
   font-size: 22rpx;
-  color: #999;
+  color: rgba(45, 45, 45, 0.4);
+  font-family: 'Patrick Hand', 'PingFang SC', 'Microsoft YaHei', cursive;
 }
 
 .step.active .step-circle {
-  background: #07c160;
+  background: #ff4d4d;
 }
 
 .step.active .step-label {
-  color: #07c160;
+  color: #ff4d4d;
   font-weight: 500;
 }
 
 .step.done .step-circle {
-  background: #07c160;
+  background: #2d5da1;
 }
 
 /* Form */
@@ -303,24 +308,25 @@ function goLogin() {
 .input-label {
   display: block;
   font-size: 26rpx;
-  color: #666;
+  color: #5a5a5a;
   margin-bottom: 12rpx;
   font-weight: 500;
+  font-family: 'Patrick Hand', 'PingFang SC', 'Microsoft YaHei', cursive;
 }
 
 .input {
   width: 100%;
   height: 88rpx;
-  background: #f7f7f7;
-  border-radius: 14rpx;
+  background: #fdfbf7;
+  border-radius: 185px 10px 155px 10px / 10px 155px 10px 185px;
   padding: 0 28rpx;
   font-size: 28rpx;
-  color: #333;
+  color: #2d2d2d;
   box-sizing: border-box;
-  border: 2rpx solid transparent;
+  border: 2rpx solid #e5e0d8;
 
   &:focus {
-    border-color: #07c160;
+    border-color: #ff4d4d;
     background: #fff;
   }
 }
@@ -343,15 +349,17 @@ function goLogin() {
   line-height: 88rpx;
   padding: 0 24rpx;
   font-size: 24rpx;
-  color: #07c160;
-  background: #e8f8ee;
-  border: none;
-  border-radius: 14rpx;
+  color: #2d5da1;
+  background: #fdfbf7;
+  border: 2rpx solid #2d5da1;
+  border-radius: 185px 10px 155px 10px / 10px 155px 10px 185px;
   white-space: nowrap;
+  font-family: 'Patrick Hand', 'PingFang SC', 'Microsoft YaHei', cursive;
 
   &[disabled] {
-    color: #999;
-    background: #f0f0f0;
+    color: rgba(45, 45, 45, 0.4);
+    background: #e5e0d8;
+    border-color: #e5e0d8;
   }
 }
 
@@ -359,13 +367,20 @@ function goLogin() {
   width: 100%;
   height: 88rpx;
   line-height: 88rpx;
-  background: #07c160;
+  background: #ff4d4d;
   color: #fff;
   font-size: 32rpx;
   font-weight: 600;
-  border-radius: 16rpx;
-  border: none;
+  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+  border: 2px solid #2d2d2d;
+  box-shadow: 4px 4px 0px 0px #2d2d2d;
   margin-top: 16rpx;
+  font-family: 'Patrick Hand', 'PingFang SC', 'Microsoft YaHei', cursive;
+
+  &:active {
+    transform: translate(2px, 2px);
+    box-shadow: none;
+  }
 
   &[disabled] {
     opacity: 0.6;
@@ -388,13 +403,14 @@ function goLogin() {
 .success-title {
   font-size: 36rpx;
   font-weight: 700;
-  color: #333;
+  color: #2d2d2d;
   margin-bottom: 16rpx;
+  font-family: 'Kalam', 'ZCOOL KuaiLe', 'PingFang SC', cursive;
 }
 
 .success-desc {
   font-size: 28rpx;
-  color: #999;
+  color: rgba(45, 45, 45, 0.4);
   margin-bottom: 60rpx;
 }
 </style>

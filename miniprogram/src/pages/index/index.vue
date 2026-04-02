@@ -113,7 +113,7 @@ function goTo(url: string) {
 <style scoped lang="scss">
 .page {
   min-height: 100vh;
-  background: #f5f5f5;
+  background: #fdfbf7;
 }
 
 .nav-bar {
@@ -122,7 +122,8 @@ function goTo(url: string) {
   left: 0;
   right: 0;
   z-index: 999;
-  background: linear-gradient(135deg, #07c160, #06ad56);
+  background: #ff4d4d;
+  border-bottom: 2px solid #2d2d2d;
 }
 
 .nav-bar-content {
@@ -138,6 +139,7 @@ function goTo(url: string) {
   font-weight: 700;
   color: #fff;
   letter-spacing: 2rpx;
+  font-family: 'Kalam', 'ZCOOL KuaiLe', 'PingFang SC', cursive;
 }
 
 .nav-bell {
@@ -162,8 +164,9 @@ function goTo(url: string) {
   padding: 32rpx;
   margin-bottom: 24rpx;
   background: #fff;
-  border-radius: 20rpx;
-  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.05);
+  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+  border: 2px solid #2d2d2d;
+  box-shadow: 4px 4px 0px 0px #2d2d2d;
 }
 
 .avatar {
@@ -171,7 +174,7 @@ function goTo(url: string) {
   height: 96rpx;
   border-radius: 50%;
   margin-right: 24rpx;
-  border: 4rpx solid #07c160;
+  border: 2px solid #2d2d2d;
 }
 
 .avatar-placeholder {
@@ -179,7 +182,8 @@ function goTo(url: string) {
   height: 96rpx;
   border-radius: 50%;
   margin-right: 24rpx;
-  background: #e8f8ee;
+  background: #fff9c4;
+  border: 2px solid #2d2d2d;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -194,13 +198,14 @@ function goTo(url: string) {
 .greeting-hello {
   font-size: 32rpx;
   font-weight: 600;
-  color: #333;
+  color: #2d2d2d;
   margin-bottom: 8rpx;
+  font-family: 'Kalam', 'ZCOOL KuaiLe', 'PingFang SC', cursive;
 }
 
 .greeting-sub {
   font-size: 24rpx;
-  color: #999;
+  color: rgba(45, 45, 45, 0.4);
 }
 
 .grid {
@@ -216,12 +221,14 @@ function goTo(url: string) {
   justify-content: space-between;
   padding: 28rpx 32rpx;
   background: #fff;
-  border-radius: 16rpx;
-  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
-  transition: transform 0.15s;
+  border-radius: 15px 225px 15px 255px / 255px 15px 225px 15px;
+  border: 2px solid #2d2d2d;
+  box-shadow: 3px 3px 0px 0px rgba(45, 45, 45, 0.1);
+  transition: transform 0.15s, box-shadow 0.15s;
 
   &:active {
-    transform: scale(0.98);
+    transform: translate(2px, 2px);
+    box-shadow: none;
   }
 }
 
@@ -244,38 +251,42 @@ function goTo(url: string) {
 .grid-label {
   font-size: 30rpx;
   font-weight: 500;
-  color: #333;
+  color: #2d2d2d;
+  font-family: 'Patrick Hand', 'PingFang SC', 'Microsoft YaHei', cursive;
 }
 
 .vip-badge {
   font-size: 20rpx;
   color: #fff;
-  background: linear-gradient(135deg, #f5a623, #f7c948);
+  background: #ff4d4d;
   padding: 2rpx 12rpx;
-  border-radius: 8rpx;
+  border-radius: 185px 10px 155px 10px / 10px 155px 10px 185px;
+  border: 1px solid #2d2d2d;
   font-weight: 600;
+  font-family: 'Patrick Hand', 'PingFang SC', 'Microsoft YaHei', cursive;
 }
 
 .grid-arrow {
   font-size: 36rpx;
-  color: #ccc;
+  color: rgba(45, 45, 45, 0.4);
 }
 
 .app-desc {
   text-align: center;
   padding: 32rpx 0 24rpx;
+  border-top: 2px dashed #e5e0d8;
 }
 
 .desc-text {
   display: block;
   font-size: 24rpx;
-  color: #bbb;
+  color: rgba(45, 45, 45, 0.3);
   margin-bottom: 8rpx;
 }
 
 .copy-text {
   display: block;
   font-size: 22rpx;
-  color: #ccc;
+  color: rgba(45, 45, 45, 0.25);
 }
 </style>

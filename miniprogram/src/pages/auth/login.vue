@@ -204,7 +204,7 @@ function goTo(url: string) {
 <style scoped lang="scss">
 .page {
   min-height: 100vh;
-  background: #fff;
+  background: #fdfbf7;
   padding: 0 48rpx;
 }
 
@@ -223,14 +223,16 @@ function goTo(url: string) {
 .app-name {
   font-size: 48rpx;
   font-weight: 700;
-  color: #07c160;
+  color: #ff4d4d;
   letter-spacing: 4rpx;
+  font-family: 'Kalam', 'ZCOOL KuaiLe', 'PingFang SC', cursive;
 }
 
 .app-slogan {
   font-size: 26rpx;
-  color: #999;
+  color: rgba(45, 45, 45, 0.4);
   margin-top: 12rpx;
+  font-family: 'Patrick Hand', 'PingFang SC', 'Microsoft YaHei', cursive;
 }
 
 .form-section {
@@ -244,24 +246,25 @@ function goTo(url: string) {
 .input-label {
   display: block;
   font-size: 26rpx;
-  color: #666;
+  color: #5a5a5a;
   margin-bottom: 12rpx;
   font-weight: 500;
+  font-family: 'Patrick Hand', 'PingFang SC', 'Microsoft YaHei', cursive;
 }
 
 .input {
   width: 100%;
   height: 88rpx;
-  background: #f7f7f7;
-  border-radius: 16rpx;
+  background: #fdfbf7;
+  border-radius: 185px 10px 155px 10px / 10px 155px 10px 185px;
   padding: 0 28rpx;
   font-size: 28rpx;
-  color: #333;
+  color: #2d2d2d;
   box-sizing: border-box;
-  border: 2rpx solid transparent;
+  border: 2rpx solid #e5e0d8;
 
   &:focus {
-    border-color: #07c160;
+    border-color: #ff4d4d;
     background: #fff;
   }
 }
@@ -281,9 +284,10 @@ function goTo(url: string) {
 .captcha-img-wrap {
   width: 220rpx;
   height: 88rpx;
-  border-radius: 16rpx;
+  border-radius: 185px 10px 155px 10px / 10px 155px 10px 185px;
   overflow: hidden;
-  background: #f0f0f0;
+  background: #e5e0d8;
+  border: 2rpx solid #e5e0d8;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -297,20 +301,27 @@ function goTo(url: string) {
 
 .captcha-placeholder {
   font-size: 24rpx;
-  color: #999;
+  color: rgba(45, 45, 45, 0.4);
 }
 
 .btn-primary {
   width: 100%;
   height: 88rpx;
   line-height: 88rpx;
-  background: #07c160;
+  background: #ff4d4d;
   color: #fff;
   font-size: 32rpx;
   font-weight: 600;
-  border-radius: 16rpx;
-  border: none;
+  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+  border: 2px solid #2d2d2d;
+  box-shadow: 4px 4px 0px 0px #2d2d2d;
   margin-bottom: 24rpx;
+  font-family: 'Patrick Hand', 'PingFang SC', 'Microsoft YaHei', cursive;
+
+  &:active {
+    transform: translate(2px, 2px);
+    box-shadow: none;
+  }
 
   &[disabled] {
     opacity: 0.6;
@@ -326,17 +337,18 @@ function goTo(url: string) {
 
 .link {
   font-size: 26rpx;
-  color: #07c160;
+  color: #2d5da1;
+  font-family: 'Patrick Hand', 'PingFang SC', 'Microsoft YaHei', cursive;
 }
 
 .legal-links {
   text-align: center;
   margin-top: 40rpx;
   font-size: 22rpx;
-  color: #999;
+  color: rgba(45, 45, 45, 0.4);
 }
 .legal-link {
-  color: #07c160;
+  color: #2d5da1;
 }
 
 /* Social Login */
@@ -348,12 +360,12 @@ function goTo(url: string) {
 }
 .divider-line {
   flex: 1;
-  height: 1rpx;
-  background: #e5e5e5;
+  height: 0;
+  border-top: 2rpx dashed #e5e0d8;
 }
 .divider-text {
   font-size: 24rpx;
-  color: #999;
+  color: rgba(45, 45, 45, 0.4);
   white-space: nowrap;
 }
 .social-row {
@@ -367,24 +379,28 @@ function goTo(url: string) {
   align-items: center;
   gap: 12rpx;
   padding: 20rpx 32rpx;
-  border-radius: 16rpx;
-  background: #f7f7f7;
+  border-radius: 185px 10px 155px 10px / 10px 155px 10px 185px;
+  background: #fdfbf7;
+  border: 2rpx solid #e5e0d8;
   min-width: 160rpx;
 }
 .social-btn:active {
-  opacity: 0.7;
+  transform: translate(1px, 1px);
+  box-shadow: none;
 }
 .social-icon {
   font-size: 48rpx;
 }
 .social-label {
   font-size: 22rpx;
-  color: #666;
+  color: #5a5a5a;
 }
 .wechat-btn {
   background: #f0faf3;
+  border-color: #e5e0d8;
 }
 .qq-btn {
   background: #f0f4ff;
+  border-color: #e5e0d8;
 }
 </style>

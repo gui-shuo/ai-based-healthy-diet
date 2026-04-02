@@ -313,7 +313,7 @@ function goLogin() {
 <style scoped lang="scss">
 .page {
   min-height: 100vh;
-  background: #fff;
+  background: #fdfbf7;
   padding: 0 48rpx 60rpx;
 }
 
@@ -325,13 +325,15 @@ function goLogin() {
   display: block;
   font-size: 44rpx;
   font-weight: 700;
-  color: #333;
+  color: #2d2d2d;
   margin-bottom: 12rpx;
+  font-family: 'Kalam', 'ZCOOL KuaiLe', 'PingFang SC', cursive;
 }
 
 .subtitle {
   font-size: 26rpx;
-  color: #999;
+  color: rgba(45, 45, 45, 0.4);
+  font-family: 'Patrick Hand', 'PingFang SC', 'Microsoft YaHei', cursive;
 }
 
 .form-section {
@@ -345,28 +347,29 @@ function goLogin() {
 .input-label {
   display: block;
   font-size: 26rpx;
-  color: #666;
+  color: #5a5a5a;
   margin-bottom: 10rpx;
   font-weight: 500;
+  font-family: 'Patrick Hand', 'PingFang SC', 'Microsoft YaHei', cursive;
 }
 
 .required {
-  color: #e64340;
+  color: #ff4d4d;
 }
 
 .input {
   width: 100%;
   height: 84rpx;
-  background: #f7f7f7;
-  border-radius: 14rpx;
+  background: #fdfbf7;
+  border-radius: 185px 10px 155px 10px / 10px 155px 10px 185px;
   padding: 0 28rpx;
   font-size: 28rpx;
-  color: #333;
+  color: #2d2d2d;
   box-sizing: border-box;
-  border: 2rpx solid transparent;
+  border: 2rpx solid #e5e0d8;
 
   &:focus {
-    border-color: #07c160;
+    border-color: #ff4d4d;
     background: #fff;
   }
 }
@@ -378,11 +381,11 @@ function goLogin() {
   padding-left: 8rpx;
 
   &.error {
-    color: #e64340;
+    color: #ff4d4d;
   }
 
   &.success {
-    color: #07c160;
+    color: #2d5da1;
   }
 }
 
@@ -404,15 +407,17 @@ function goLogin() {
   line-height: 84rpx;
   padding: 0 24rpx;
   font-size: 24rpx;
-  color: #07c160;
-  background: #e8f8ee;
-  border: none;
-  border-radius: 14rpx;
+  color: #2d5da1;
+  background: #fdfbf7;
+  border: 2rpx solid #2d5da1;
+  border-radius: 185px 10px 155px 10px / 10px 155px 10px 185px;
   white-space: nowrap;
+  font-family: 'Patrick Hand', 'PingFang SC', 'Microsoft YaHei', cursive;
 
   &[disabled] {
-    color: #999;
-    background: #f0f0f0;
+    color: rgba(45, 45, 45, 0.4);
+    background: #e5e0d8;
+    border-color: #e5e0d8;
   }
 }
 
@@ -431,9 +436,10 @@ function goLogin() {
 .captcha-img-wrap {
   width: 220rpx;
   height: 84rpx;
-  border-radius: 14rpx;
+  border-radius: 185px 10px 155px 10px / 10px 155px 10px 185px;
   overflow: hidden;
-  background: #f0f0f0;
+  background: #e5e0d8;
+  border: 2rpx solid #e5e0d8;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -447,19 +453,26 @@ function goLogin() {
 
 .captcha-placeholder {
   font-size: 24rpx;
-  color: #999;
+  color: rgba(45, 45, 45, 0.4);
 }
 
 .btn-primary {
   width: 100%;
   height: 88rpx;
   line-height: 88rpx;
-  background: #07c160;
+  background: #ff4d4d;
   color: #fff;
   font-size: 32rpx;
   font-weight: 600;
-  border-radius: 16rpx;
-  border: none;
+  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+  border: 2px solid #2d2d2d;
+  box-shadow: 4px 4px 0px 0px #2d2d2d;
+  font-family: 'Patrick Hand', 'PingFang SC', 'Microsoft YaHei', cursive;
+
+  &:active {
+    transform: translate(2px, 2px);
+    box-shadow: none;
+  }
 
   &[disabled] {
     opacity: 0.6;
@@ -473,6 +486,7 @@ function goLogin() {
 
 .link-text {
   font-size: 26rpx;
-  color: #07c160;
+  color: #2d5da1;
+  font-family: 'Patrick Hand', 'PingFang SC', 'Microsoft YaHei', cursive;
 }
 </style>
