@@ -42,7 +42,28 @@ onMounted(async () => {
   }
 
   try {
+    const stateStr = String(state || '')
     let response
+
+    // 绑定模式：用户已登录，将QQ绑定到当前账号
+    if (stateStr === 'bind') {
+      if (provider === 'qq') {
+        statusMsg.value = '正在绑定QQ账号...'
+        response = await socialAuthApi.bindQq(code)
+      } else if (provider === 'wechat') {
+        statusMsg.value = '正在绑定微信账号...'
+        response = await socialAuthApi.bindWechat(code)
+      }
+      if (response.data.code === 200) {
+        ElMessage.success('绑定成功！')
+        router.push('/profile')
+      } else {
+        throw new Error(response.data.message || '绑定失败')
+      }
+      return
+    }
+
+    // 登录模式
     if (provider === 'wechat') {
       statusMsg.value = '正在通过微信登录...'
       response = await socialAuthApi.wechatLogin(code)
@@ -55,7 +76,6 @@ onMounted(async () => {
 
     if (response.data.code === 200) {
       const loginData = response.data.data
-      const stateStr = String(state || '')
 
       // H5/APP redirect: pass token back to H5 app
       if (stateStr.startsWith('h5_')) {
@@ -74,12 +94,7 @@ onMounted(async () => {
       authStore.setUser(loginData.userInfo)
 
       ElMessage.success('登录成功！')
-
-      if (stateStr === 'bind') {
-        router.push('/profile')
-      } else {
-        router.push('/')
-      }
+      router.push('/')
     } else {
       throw new Error(response.data.message || '登录失败')
     }

@@ -630,7 +630,8 @@ const confirmDeleteHistory = id => {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
     type: 'warning',
-    center: true
+    center: true,
+    customClass: 'custom-message-box'
   })
     .then(() => deleteHistory(id))
     .catch(() => {})
