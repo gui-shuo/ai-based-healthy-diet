@@ -19,7 +19,30 @@
         </view>
       </view>
       <text class="product-name">{{ product.name }}</text>
-      <text class="sales-info">已售 {{ product.salesCount || 0 }}件</text>
+
+      <!-- Brand -->
+      <view class="brand-tag" v-if="product.brand">
+        <text>{{ product.brand }}</text>
+      </view>
+
+      <!-- Rating -->
+      <view class="rating-row" v-if="product.rating">
+        <text class="stars">{{ getStars(product.rating) }}</text>
+        <text class="review-count">{{ product.reviewCount || 0 }} 评价</text>
+      </view>
+
+      <!-- Stock -->
+      <view class="stock-row">
+        <view class="stock-badge" :class="{ danger: (product.stock ?? 999) <= 0 }">
+          {{ (product.stock ?? 999) > 0 ? `库存 ${product.stock ?? '充足'}` : '已售罄' }}
+        </view>
+        <text class="sales-info">已售 {{ product.salesCount || 0 }}件</text>
+      </view>
+
+      <!-- Tags -->
+      <view class="tags-row" v-if="product.tags && product.tags.length">
+        <view class="tag-chip" v-for="(t, i) in product.tags" :key="i">{{ t }}</view>
+      </view>
     </view>
 
     <!-- Description -->
@@ -40,11 +63,18 @@
     </view>
 
     <!-- Spacer -->
-    <view style="height: 140rpx"></view>
+    <view style="height: 160rpx"></view>
 
-    <!-- Bottom Buy Bar -->
+    <!-- Bottom Action Bar -->
     <view class="bottom-buy-bar">
-      <view class="buy-btn" @tap="openPurchase">立即购买</view>
+      <view class="bottom-bar-row">
+        <view class="cart-icon-btn" @tap="addToCart">
+          <text class="cart-icon-emoji">🛒</text>
+          <text class="cart-icon-label">加入购物车</text>
+          <view class="cart-icon-badge" v-if="cartCount > 0">{{ cartCount }}</view>
+        </view>
+        <view class="buy-btn" @tap="openPurchase">立即购买</view>
+      </view>
     </view>
 
     <!-- Purchase Modal -->
@@ -161,11 +191,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onUnmounted } from 'vue'
+import { ref, computed, watch, onUnmounted } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import { productApi, addressApi } from '@/services/api'
 import { checkLogin } from '@/utils/common'
 
+const CART_KEY = 'nutriai_cart'
 const product = ref<any>(null)
 const pageLoading = ref(true)
 const showPurchase = ref(false)
@@ -179,6 +210,40 @@ const savedAddresses = ref<any[]>([])
 const selectedAddressId = ref<number | null>(null)
 const useManualAddress = ref(false)
 
+// Cart state (shared via storage with shop page)
+function loadCartFromStorage(): any[] {
+  try {
+    const raw = uni.getStorageSync(CART_KEY)
+    return raw ? (typeof raw === 'string' ? JSON.parse(raw) : raw) : []
+  } catch { return [] }
+}
+
+const cart = ref<any[]>(loadCartFromStorage())
+const cartCount = computed(() => cart.value.reduce((s: number, i: any) => s + i.quantity, 0))
+
+watch(cart, (val) => {
+  try { uni.setStorageSync(CART_KEY, JSON.stringify(val)) } catch { /* ignore */ }
+}, { deep: true })
+
+function addToCart() {
+  if (!product.value) return
+  if (!checkLogin()) return
+  const p = product.value
+  const existing = cart.value.find((c: any) => c.productId === p.id)
+  if (existing) {
+    if (existing.quantity < 10) existing.quantity++
+  } else {
+    cart.value.push({
+      productId: p.id,
+      name: p.name,
+      imageUrl: p.imageUrl || p.image || productImages.value[0] || '',
+      salePrice: p.salePrice || p.price || 0,
+      quantity: 1
+    })
+  }
+  uni.showToast({ title: '已加入购物车', icon: 'none', duration: 1200 })
+}
+
 const productImages = computed(() => {
   if (!product.value) return []
   if (product.value.imageUrls && product.value.imageUrls.length > 0) return product.value.imageUrls
@@ -190,6 +255,11 @@ const productImages = computed(() => {
 
 function formatPrice(val: number | undefined): string {
   return (val || 0).toFixed(2)
+}
+
+function getStars(rating: number | undefined): string {
+  const r = Math.round(rating || 0)
+  return '★'.repeat(r) + '☆'.repeat(5 - r)
 }
 
 function parseSpecs(specs: any): Record<string, string> {
@@ -427,9 +497,72 @@ async function loadProduct(id: number) {
 .sales-info {
   font-size: 24rpx;
   color: $muted-foreground;
-  margin-top: 8rpx;
   display: block;
   font-family: 'Inter', sans-serif;
+}
+
+.brand-tag {
+  display: inline-block;
+  margin-top: 12rpx;
+  font-size: 22rpx;
+  color: $muted-foreground;
+  background: $muted;
+  padding: 4rpx 16rpx;
+  border-radius: $radius-full;
+  border: 1rpx solid $border;
+}
+
+.rating-row {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  margin-top: 12rpx;
+}
+
+.stars {
+  font-size: 24rpx;
+  color: #F59E0B;
+  letter-spacing: -2rpx;
+}
+
+.review-count {
+  font-size: 24rpx;
+  color: $muted-foreground;
+}
+
+.stock-row {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  margin-top: 12rpx;
+}
+
+.stock-badge {
+  font-size: 22rpx;
+  color: $accent-foreground;
+  background: $accent;
+  padding: 4rpx 16rpx;
+  border-radius: $radius-full;
+
+  &.danger {
+    background: #EF4444;
+  }
+}
+
+.tags-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8rpx;
+  margin-top: 12rpx;
+}
+
+.tag-chip {
+  font-size: 22rpx;
+  color: $muted-foreground;
+  background: $muted;
+  padding: 4rpx 16rpx;
+  border-radius: $radius-full;
+  border: 1rpx solid $border;
 }
 
 .info-section {
@@ -494,7 +627,54 @@ async function loadProduct(id: number) {
   z-index: 100;
 }
 
+.bottom-bar-row {
+  display: flex;
+  gap: 16rpx;
+  align-items: stretch;
+}
+
+.cart-icon-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  padding: 20rpx;
+  border: 1rpx solid $border;
+  border-radius: $radius-xl;
+  background: $background;
+  position: relative;
+}
+
+.cart-icon-emoji {
+  font-size: 28rpx;
+}
+
+.cart-icon-label {
+  font-size: 26rpx;
+  color: $foreground;
+  font-family: 'Inter', sans-serif;
+}
+
+.cart-icon-badge {
+  position: absolute;
+  top: -6rpx;
+  right: -6rpx;
+  min-width: 32rpx;
+  height: 32rpx;
+  line-height: 32rpx;
+  text-align: center;
+  font-size: 20rpx;
+  font-weight: 600;
+  color: $accent-foreground;
+  background: $accent;
+  border-radius: $radius-full;
+  padding: 0 6rpx;
+  font-family: 'JetBrains Mono', monospace;
+}
+
 .buy-btn {
+  flex: 2;
   text-align: center;
   padding: 24rpx;
   background: $gradient-accent;
