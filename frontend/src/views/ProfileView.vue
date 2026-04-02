@@ -58,9 +58,9 @@ const handleMenuChange = menu => {
 <style scoped lang="scss">
 .profile-container {
   min-height: 100vh;
-  background: #fdfbf7;
+  background: #FAFAFA;
   padding: 40px 20px;
-  font-family: 'Patrick Hand', 'ZCOOL KuaiLe', cursive, sans-serif;
+  font-family: 'Inter', sans-serif;
 }
 
 .profile-layout {
@@ -76,27 +76,17 @@ const handleMenuChange = menu => {
 }
 
 .profile-content {
-  background: #fff;
-  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
-  border: 2.5px solid #2d2d2d;
-  box-shadow: 4px 4px 0px 0px #2d2d2d;
+  background: #FFFFFF;
+  border-radius: 16px;
+  border: 1px solid #E2E8F0;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
   padding: 32px;
   min-height: 600px;
   position: relative;
-  transition: box-shadow 0.2s, transform 0.2s;
-
-  // notebook ruled-line effect
-  background-image: repeating-linear-gradient(
-    transparent,
-    transparent 31px,
-    #e5e0d8 31px,
-    #e5e0d8 32px
-  );
-  background-position: 0 32px;
+  transition: box-shadow 0.2s;
 
   &:hover {
-    box-shadow: 2px 2px 0px 0px #2d2d2d;
-    transform: translate(2px, 2px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
   }
 
   @media (max-width: 768px) {

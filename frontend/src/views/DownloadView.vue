@@ -128,34 +128,20 @@ onMounted(loadData)
   max-width: 800px;
   margin: 0 auto;
   padding: 20px;
-  font-family: 'Patrick Hand', 'ZCOOL KuaiLe', cursive, sans-serif;
-  background: #fdfbf7;
+  font-family: 'Inter', sans-serif;
+  background: #FAFAFA;
   min-height: 100vh;
 }
 
 .download-hero {
   text-align: center;
   padding: 60px 20px 40px;
-  background: #fff;
-  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
-  border: 2.5px solid #2d2d2d;
-  box-shadow: 4px 4px 0px 0px #2d2d2d;
+  background: #FFFFFF;
+  border-radius: 16px;
+  border: 1px solid #E2E8F0;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
   margin-bottom: 30px;
   position: relative;
-}
-
-/* tape decoration on hero card */
-.download-hero::before {
-  content: '';
-  position: absolute;
-  top: -8px;
-  left: 50%;
-  transform: translateX(-50%) rotate(-2deg);
-  width: 80px;
-  height: 24px;
-  background: rgba(255, 249, 196, 0.85);
-  border: 1.5px solid #e5e0d8;
-  z-index: 1;
 }
 
 .app-icon {
@@ -165,25 +151,40 @@ onMounted(loadData)
 
 .download-hero h1 {
   font-size: 32px;
-  font-family: 'Kalam', 'ZCOOL KuaiLe', cursive;
-  color: #2d2d2d;
+  font-family: 'Calistoga', 'Inter', sans-serif;
+  color: #0F172A;
   margin: 0 0 8px;
 }
 
 .subtitle {
-  color: #2d2d2d;
+  color: #0F172A;
   font-size: 16px;
   margin-bottom: 24px;
-  opacity: 0.7;
+  opacity: 0.6;
 }
 
 .latest-info {
   margin-top: 20px;
 }
 
+.latest-info :deep(.el-button--success) {
+  background: linear-gradient(135deg, #0052FF, #4D7CFF);
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 82, 255, 0.25);
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.latest-info :deep(.el-button--success:hover) {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 15px -3px rgba(0, 82, 255, 0.3);
+}
+
 .version-meta {
   margin-top: 12px;
-  color: #2d2d2d;
+  color: #0F172A;
   opacity: 0.5;
   font-size: 13px;
   display: flex;
@@ -194,20 +195,18 @@ onMounted(loadData)
 .alt-access {
   margin-top: 24px;
   padding-top: 20px;
-  border-top: 2px dashed #e5e0d8;
-  color: #2d2d2d;
+  border-top: 1px solid #E2E8F0;
+  color: #0F172A;
   font-size: 14px;
 }
 .alt-access a {
-  color: #2d5da1;
+  color: #0052FF;
   font-weight: 600;
   text-decoration: none;
-  text-decoration-style: wavy;
 }
 .alt-access a:hover {
   text-decoration: underline;
-  text-decoration-style: wavy;
-  text-decoration-color: #ff4d4d;
+  text-decoration-color: #4D7CFF;
 }
 
 .update-log, .version-history {
@@ -216,24 +215,24 @@ onMounted(loadData)
 
 .update-log h2, .version-history h2 {
   font-size: 20px;
-  font-family: 'Kalam', 'ZCOOL KuaiLe', cursive;
-  color: #2d2d2d;
+  font-family: 'Calistoga', 'Inter', sans-serif;
+  color: #0F172A;
   margin-bottom: 16px;
 }
 
 .log-content {
-  background: #fff9c4;
-  border-radius: 15px 225px 15px 255px / 255px 15px 225px 15px;
-  border: 2px solid #2d2d2d;
-  box-shadow: 3px 3px 0px 0px rgba(45, 45, 45, 0.1);
+  background: #F1F5F9;
+  border-radius: 12px;
+  border: 1px solid #E2E8F0;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   padding: 16px;
 }
 
 .log-content pre {
   margin: 0;
   white-space: pre-wrap;
-  font-family: 'Patrick Hand', cursive;
-  color: #2d2d2d;
+  font-family: 'JetBrains Mono', monospace;
+  color: #0F172A;
   font-size: 14px;
   line-height: 1.6;
 }
@@ -249,36 +248,36 @@ onMounted(loadData)
   align-items: center;
   justify-content: space-between;
   padding: 16px;
-  background: #fff;
-  border: 2px solid #2d2d2d;
-  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
-  box-shadow: 3px 3px 0px 0px rgba(45, 45, 45, 0.1);
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   transition: box-shadow 0.2s, transform 0.2s;
 }
 
 .version-card:hover {
-  box-shadow: 2px 2px 0px 0px #2d2d2d;
-  transform: translate(2px, 2px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
 }
 
 .version-card.latest {
-  border-color: #ff4d4d;
-  background: #fff9c4;
-  box-shadow: 4px 4px 0px 0px #ff4d4d;
+  border-color: #0052FF;
+  background: linear-gradient(135deg, rgba(0, 82, 255, 0.03), rgba(77, 124, 255, 0.06));
+  box-shadow: 0 4px 6px -1px rgba(0, 82, 255, 0.1), 0 2px 4px -2px rgba(0, 82, 255, 0.1);
 }
 
 .version-name {
   font-weight: 600;
   font-size: 16px;
-  font-family: 'Kalam', 'ZCOOL KuaiLe', cursive;
-  color: #2d2d2d;
+  font-family: 'Calistoga', 'Inter', sans-serif;
+  color: #0F172A;
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
 .version-desc {
-  color: #2d2d2d;
+  color: #0F172A;
   opacity: 0.6;
   font-size: 13px;
   margin-top: 4px;
@@ -290,7 +289,7 @@ onMounted(loadData)
 
 .version-info {
   margin-top: 6px;
-  color: #2d2d2d;
+  color: #0F172A;
   opacity: 0.45;
   font-size: 12px;
   display: flex;

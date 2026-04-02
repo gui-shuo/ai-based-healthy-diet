@@ -113,17 +113,17 @@ onBeforeUnmount(() => {
 <style scoped lang="scss">
 .member-view {
   min-height: 100vh;
-  background: #fdfbf7;
-  font-family: 'Patrick Hand', 'ZCOOL KuaiLe', cursive, sans-serif;
+  background: #FAFAFA;
+  font-family: 'Inter', sans-serif;
 }
 
 .top-nav {
   position: sticky;
   top: 0;
   z-index: 100;
-  background: #fff;
-  border-bottom: 2.5px solid #2d2d2d;
-  box-shadow: 0 3px 0px 0px rgba(45, 45, 45, 0.08);
+  background: #FFFFFF;
+  border-bottom: 1px solid #E2E8F0;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
 }
 
 .nav-inner {
@@ -143,9 +143,9 @@ onBeforeUnmount(() => {
 
 .page-title {
   font-size: 17px;
-  font-family: 'Kalam', 'ZCOOL KuaiLe', cursive;
+  font-family: 'Calistoga', 'Inter', sans-serif;
   font-weight: 600;
-  color: #2d2d2d;
+  color: #0F172A;
   margin: 0;
 }
 
@@ -156,24 +156,24 @@ onBeforeUnmount(() => {
 }
 
 .vip-status-banner {
-  background: #fff;
-  border: 2.5px solid #2d2d2d;
-  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
-  box-shadow: 4px 4px 0px 0px #2d2d2d;
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 16px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
   padding: 16px 20px;
   margin-bottom: 16px;
   position: relative;
 
   &.is-vip {
-    background: #fff9c4;
-    border-color: #2d2d2d;
-    box-shadow: 4px 4px 0px 0px #ff4d4d;
+    background: linear-gradient(135deg, rgba(0, 82, 255, 0.05), rgba(77, 124, 255, 0.08));
+    border-color: #4D7CFF;
+    box-shadow: 0 4px 6px -1px rgba(0, 82, 255, 0.1), 0 2px 4px -2px rgba(0, 82, 255, 0.1);
   }
 
   &.loading-state {
-    background: #e5e0d8 !important;
-    border-color: #2d2d2d;
-    box-shadow: 3px 3px 0px 0px rgba(45, 45, 45, 0.1);
+    background: #F1F5F9 !important;
+    border-color: #E2E8F0;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   }
 
   .skeleton-pulse {
@@ -181,7 +181,7 @@ onBeforeUnmount(() => {
   }
 
   .skeleton-text {
-    color: #2d2d2d;
+    color: #0F172A;
     opacity: 0.5;
   }
 
@@ -204,14 +204,14 @@ onBeforeUnmount(() => {
   .vip-info {
     h3 {
       font-size: 16px;
-      font-family: 'Kalam', 'ZCOOL KuaiLe', cursive;
+      font-family: 'Calistoga', 'Inter', sans-serif;
       font-weight: 600;
-      color: #2d2d2d;
+      color: #0F172A;
       margin: 0 0 2px;
     }
     p {
       font-size: 12px;
-      color: #2d2d2d;
+      color: #0F172A;
       opacity: 0.6;
       margin: 0;
     }
@@ -229,14 +229,14 @@ onBeforeUnmount(() => {
 
     .quota-label {
       font-size: 11px;
-      color: #2d2d2d;
+      color: #0F172A;
       opacity: 0.5;
     }
     .quota-value {
       font-size: 20px;
       font-weight: 700;
-      font-family: 'Kalam', 'ZCOOL KuaiLe', cursive;
-      color: #2d5da1;
+      font-family: 'Calistoga', 'Inter', sans-serif;
+      color: #0052FF;
     }
   }
 }
