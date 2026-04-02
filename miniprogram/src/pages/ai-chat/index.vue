@@ -396,12 +396,12 @@ function goBack() {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .chat-page {
   height: 100vh;
   display: flex;
   flex-direction: column;
-  background: #fdfbf7;
+  background: $background;
 }
 
 /* Navigation Bar */
@@ -411,9 +411,8 @@ function goBack() {
   left: 0;
   right: 0;
   z-index: 100;
-  background: #ff4d4d;
-  border-bottom: 3rpx solid #2d2d2d;
-  box-shadow: 0 3px 0px 0px rgba(45, 45, 45, 0.15);
+  background: $gradient-accent;
+  box-shadow: $shadow-md;
 }
 .nav-bar-inner {
   height: 88rpx;
@@ -438,25 +437,20 @@ function goBack() {
   font-size: 34rpx;
   font-weight: 700;
   color: #fff;
-  font-family: 'Kalam', 'ZCOOL KuaiLe', 'PingFang SC', cursive;
+  font-family: 'Calistoga', Georgia, 'PingFang SC', serif;
 }
 .nav-placeholder {
   width: 80rpx;
 }
 
-/* Message List — notebook feel */
+/* Message List */
 .message-list {
   position: fixed;
   left: 0;
   right: 0;
   overflow-y: auto;
   padding: 20rpx 24rpx;
-  background-image: repeating-linear-gradient(
-    transparent,
-    transparent 55rpx,
-    #e5e0d8 55rpx,
-    #e5e0d8 56rpx
-  );
+  background: $background;
 }
 
 .message-wrapper {
@@ -479,51 +473,52 @@ function goBack() {
   width: 72rpx;
   height: 72rpx;
   min-width: 72rpx;
-  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+  border-radius: $radius-full;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 36rpx;
   flex-shrink: 0;
   overflow: hidden;
-  border: 2rpx solid #2d2d2d;
+  border: 1rpx solid $border;
 }
 .avatar-ai {
-  background: #fff;
+  background: $card;
   margin-right: 16rpx;
-  box-shadow: 2px 2px 0px 0px rgba(45, 45, 45, 0.1);
+  box-shadow: $shadow-sm;
 }
 .avatar-user {
   margin-left: 16rpx;
-  background: #e5e0d8;
+  background: $muted;
 }
 
-/* Chat bubbles — hand-drawn */
+/* Chat bubbles */
 .bubble {
   max-width: 65%;
   padding: 20rpx 28rpx;
-  border: 2rpx solid #2d2d2d;
-  border-radius: 15px 225px 15px 255px / 255px 15px 225px 15px;
+  border: 1rpx solid $border;
+  border-radius: $radius-xl;
   word-break: break-all;
 }
 .bubble-ai {
-  background: #fff9c4;
-  border-top-left-radius: 4rpx;
-  box-shadow: 3px 3px 0px 0px rgba(45, 45, 45, 0.1);
+  background: $card;
+  border-top-left-radius: $radius-sm;
+  box-shadow: $shadow-sm;
 }
 .bubble-user {
-  background: #fff;
-  border-top-right-radius: 4rpx;
-  box-shadow: 4px 4px 0px 0px #2d2d2d;
+  background: $accent;
+  border-color: $accent;
+  border-top-right-radius: $radius-sm;
+  box-shadow: $shadow-accent;
 }
 .bubble-user .bubble-text {
-  color: #2d2d2d;
+  color: #fff;
 }
 .bubble-text {
   font-size: 30rpx;
   line-height: 1.6;
-  color: #2d2d2d;
-  font-family: 'Patrick Hand', 'PingFang SC', cursive;
+  color: $foreground;
+  font-family: 'Inter', 'PingFang SC', sans-serif;
 }
 
 /* Typing Indicator */
@@ -533,7 +528,7 @@ function goBack() {
 .waiting-hint {
   display: block;
   font-size: 22rpx;
-  color: #5a5a5a;
+  color: $muted-foreground;
   margin-top: 12rpx;
   animation: fadeIn 0.3s;
 }
@@ -549,7 +544,7 @@ function goBack() {
 .dot {
   width: 14rpx;
   height: 14rpx;
-  background: #2d2d2d;
+  background: $accent;
   border-radius: 50%;
   animation: bounce 1.4s infinite ease-in-out;
 }
@@ -572,11 +567,12 @@ function goBack() {
   bottom: var(--window-bottom, 0);
   left: 0;
   right: 0;
-  background: #fdfbf7;
+  background: $card;
   padding: 16rpx 24rpx;
   padding-bottom: calc(16rpx + env(safe-area-inset-bottom));
-  border-top: 2rpx dashed #e5e0d8;
+  border-top: 1rpx solid $border;
   z-index: 100;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.04);
 }
 .input-row {
   display: flex;
@@ -586,20 +582,21 @@ function goBack() {
 .chat-input {
   flex: 1;
   height: 72rpx;
-  background: #fff;
-  border: 2rpx solid #2d2d2d;
-  border-radius: 185px 10px 155px 10px / 10px 155px 10px 185px;
+  background: $muted;
+  border: 1rpx solid $border;
+  border-radius: $radius-full;
   padding: 0 28rpx;
   font-size: 28rpx;
-  color: #2d2d2d;
-  font-family: 'Patrick Hand', 'PingFang SC', cursive;
+  color: $foreground;
+  font-family: 'Inter', 'PingFang SC', sans-serif;
+  transition: border-color 0.2s;
 }
 .send-btn {
   width: 120rpx;
   height: 72rpx;
-  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
-  background: #e5e0d8;
-  border: 2rpx solid #2d2d2d;
+  border-radius: $radius-full;
+  background: $muted;
+  border: none;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -607,37 +604,40 @@ function goBack() {
 }
 .send-btn text {
   font-size: 28rpx;
-  color: #fff;
+  color: $muted-foreground;
   font-weight: 500;
-  font-family: 'Patrick Hand', 'PingFang SC', cursive;
+  font-family: 'Inter', 'PingFang SC', sans-serif;
 }
 .send-btn-active {
-  background: #ff4d4d;
-  box-shadow: 3px 3px 0px 0px #2d2d2d;
+  background: $gradient-accent;
+  box-shadow: $shadow-accent;
+}
+.send-btn-active text {
+  color: #fff;
 }
 .send-btn-active:active {
-  box-shadow: none;
-  transform: translate(3rpx, 3rpx);
+  opacity: 0.9;
+  transform: translateY(1px);
 }
 .disclaimer-bar {
   position: fixed;
   left: 0; right: 0;
   z-index: 90;
-  background: #fff9c4;
-  color: #2d2d2d;
+  background: rgba(0, 82, 255, 0.06);
+  color: $foreground;
   font-size: 22rpx;
   text-align: center;
   padding: 8rpx 48rpx 8rpx 16rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-bottom: 2rpx dashed #e5e0d8;
+  border-bottom: 1rpx solid $border;
 }
 .disclaimer-bar .dismiss {
   position: absolute;
   right: 16rpx;
   font-size: 28rpx;
-  color: #5a5a5a;
+  color: $muted-foreground;
 }
 
 /* Connection Status Bar */
@@ -645,30 +645,30 @@ function goBack() {
   position: fixed;
   left: 0; right: 0;
   z-index: 89;
-  background: #fff0f0;
-  color: #ff4d4d;
+  background: rgba(239, 68, 68, 0.06);
+  color: #EF4444;
   font-size: 22rpx;
   padding: 6rpx 24rpx;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 16rpx;
-  border-bottom: 2rpx dashed #e5e0d8;
+  border-bottom: 1rpx solid $border;
 }
 .conn-bar.connecting {
-  background: #fff9c4;
-  color: #ff9800;
+  background: rgba(245, 158, 11, 0.06);
+  color: #F59E0B;
 }
 .conn-bar.connected {
-  background: #e8f5e9;
-  color: #2e7d32;
+  background: rgba(16, 185, 129, 0.06);
+  color: #10B981;
 }
 .conn-text {
   font-size: 22rpx;
 }
 .conn-retry {
   font-size: 22rpx;
-  color: #ff4d4d;
+  color: $accent;
   font-weight: 600;
   text-decoration: underline;
 }

@@ -483,12 +483,12 @@ function sourceText(source: string): string {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .container {
   padding: 20rpx 30rpx;
   padding-bottom: 60rpx;
   min-height: 100vh;
-  background: #fdfbf7;
+  background: $background;
 }
 
 .page-header {
@@ -498,8 +498,8 @@ function sourceText(source: string): string {
   display: block;
   font-size: 40rpx;
   font-weight: 700;
-  color: #2d2d2d;
-  font-family: 'Kalam', 'ZCOOL KuaiLe', 'PingFang SC', cursive;
+  color: $foreground;
+  font-family: 'Calistoga', Georgia, 'PingFang SC', serif;
 }
 .page-desc {
   display: block;
@@ -509,39 +509,37 @@ function sourceText(source: string): string {
 
 /* Mode Tabs */
 .mode-tabs {
-  background: #fff;
-  border: 2rpx solid #2d2d2d;
-  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+  background: $card;
+  border: 1rpx solid $border;
+  border-radius: $radius-full;
   margin: 20rpx 0;
   overflow: hidden;
   padding: 6rpx;
-  box-shadow: 3px 3px 0px 0px rgba(45, 45, 45, 0.1);
+  box-shadow: $shadow-sm;
 }
 .mode-tab {
   height: 80rpx;
   font-size: 28rpx;
-  color: #5a5a5a;
-  border-radius: 185px 10px 155px 10px / 10px 155px 10px 185px;
+  color: $muted-foreground;
+  border-radius: $radius-full;
   transition: all 0.2s;
-  font-family: 'Patrick Hand', 'PingFang SC', cursive;
+  font-family: 'Inter', 'PingFang SC', sans-serif;
 }
 .mode-tab.active {
-  background: #ff4d4d;
+  background: $gradient-accent;
   color: #fff;
   font-weight: 500;
-  border: 2rpx solid #2d2d2d;
-  box-shadow: 2px 2px 0px 0px rgba(45, 45, 45, 0.15);
+  box-shadow: $shadow-accent;
 }
 
-/* Photo Section — dashed upload area */
+/* Photo Section */
 .photo-area {
   height: 400rpx;
   overflow: hidden;
   margin-bottom: 20rpx;
   cursor: pointer;
-  border-style: dashed;
-  border-width: 3rpx;
-  border-color: #2d2d2d;
+  border: 2rpx dashed $border;
+  border-radius: $radius-2xl;
 }
 .preview-image {
   width: 100%;
@@ -556,8 +554,8 @@ function sourceText(source: string): string {
 }
 .photo-hint {
   font-size: 28rpx;
-  color: #5a5a5a;
-  font-family: 'Patrick Hand', 'PingFang SC', cursive;
+  color: $muted-foreground;
+  font-family: 'Inter', 'PingFang SC', sans-serif;
 }
 .photo-actions {
   gap: 20rpx;
@@ -587,8 +585,8 @@ function sourceText(source: string): string {
 .loading-spinner {
   width: 60rpx;
   height: 60rpx;
-  border: 6rpx solid #e5e0d8;
-  border-top-color: #ff4d4d;
+  border: 6rpx solid $border;
+  border-top-color: $accent;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
@@ -597,8 +595,8 @@ function sourceText(source: string): string {
 }
 .loading-text {
   font-size: 28rpx;
-  color: #5a5a5a;
-  font-family: 'Patrick Hand', 'PingFang SC', cursive;
+  color: $muted-foreground;
+  font-family: 'Inter', 'PingFang SC', sans-serif;
 }
 
 /* Result Count */
@@ -607,21 +605,21 @@ function sourceText(source: string): string {
 }
 .result-count-text {
   font-size: 26rpx;
-  color: #5a5a5a;
+  color: $muted-foreground;
   font-weight: 500;
-  font-family: 'Kalam', 'ZCOOL KuaiLe', 'PingFang SC', cursive;
+  font-family: 'Inter', 'PingFang SC', sans-serif;
 }
 
-/* Result Card — sketchy */
+/* Result Card */
 .result-card {
   padding: 30rpx;
   margin-bottom: 20rpx;
-  border: 3rpx solid transparent;
+  border: 2rpx solid transparent;
   transition: border-color 0.2s;
 }
 .result-card-selected {
-  border-color: #ff4d4d;
-  box-shadow: 4px 4px 0px 0px #2d2d2d;
+  border-color: $accent;
+  box-shadow: $shadow-accent;
 }
 
 .result-header {
@@ -635,8 +633,8 @@ function sourceText(source: string): string {
 .result-name {
   font-size: 36rpx;
   font-weight: 700;
-  color: #2d2d2d;
-  font-family: 'Kalam', 'ZCOOL KuaiLe', 'PingFang SC', cursive;
+  color: $foreground;
+  font-family: 'Calistoga', Georgia, 'PingFang SC', serif;
 }
 .result-name-wrap {
   display: flex;
@@ -646,17 +644,17 @@ function sourceText(source: string): string {
 .category-badge {
   font-size: 20rpx;
   padding: 2rpx 12rpx;
-  border-radius: 185px 10px 155px 10px / 10px 155px 10px 185px;
+  border-radius: $radius-full;
   font-weight: 500;
-  border: 1rpx solid #2d2d2d;
+  font-family: 'JetBrains Mono', monospace;
 }
 .category-dish {
-  background: #fff9c4;
-  color: #2d2d2d;
+  background: rgba(245, 158, 11, 0.1);
+  color: #F59E0B;
 }
 .category-fruit {
-  background: #e8f5e9;
-  color: #2e7d32;
+  background: rgba(16, 185, 129, 0.1);
+  color: #10B981;
 }
 .result-portion {
   display: block;
@@ -669,21 +667,21 @@ function sourceText(source: string): string {
   font-size: 22rpx;
   font-weight: 600;
   padding: 6rpx 16rpx;
-  border-radius: 185px 10px 155px 10px / 10px 155px 10px 185px;
+  border-radius: $radius-full;
   flex-shrink: 0;
-  border: 1rpx solid #2d2d2d;
+  font-family: 'JetBrains Mono', monospace;
 }
 .confidence-high {
-  background: #e8f5e9;
-  color: #2e7d32;
+  background: rgba(16, 185, 129, 0.1);
+  color: #10B981;
 }
 .confidence-mid {
-  background: #fff9c4;
-  color: #2d2d2d;
+  background: rgba(245, 158, 11, 0.1);
+  color: #F59E0B;
 }
 .confidence-low {
-  background: #fff0f0;
-  color: #ff4d4d;
+  background: rgba(239, 68, 68, 0.1);
+  color: #EF4444;
 }
 
 .nutrition-grid {
@@ -693,37 +691,38 @@ function sourceText(source: string): string {
   margin-top: 10rpx;
 }
 .nutrition-card {
-  background: #fdfbf7;
-  border: 2rpx solid #2d2d2d;
-  border-radius: 185px 10px 155px 10px / 10px 155px 10px 185px;
+  background: $muted;
+  border: 1rpx solid $border;
+  border-radius: $radius-lg;
   padding: 20rpx 12rpx;
   text-align: center;
-  box-shadow: 2px 2px 0px 0px rgba(45, 45, 45, 0.08);
 }
 .calories-card {
   grid-column: span 3;
-  background: #fff9c4;
-  border: 2rpx solid #2d2d2d;
-  border-radius: 15px 225px 15px 255px / 255px 15px 225px 15px;
+  background: $gradient-accent;
+  border: none;
+  border-radius: $radius-xl;
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: center;
   gap: 12rpx;
   padding: 28rpx;
-  box-shadow: 3px 3px 0px 0px rgba(45, 45, 45, 0.1);
+  box-shadow: $shadow-accent;
 }
 .calories-card .n-value {
   font-size: 48rpx;
-  color: #ff4d4d;
+  color: #fff;
 }
 .calories-card .n-label {
-  color: #2d2d2d;
+  color: rgba(255, 255, 255, 0.85);
 }
 .calories-card .n-unit {
   font-size: 24rpx;
-  color: #2d2d2d;
-  opacity: 0.8;
+  color: rgba(255, 255, 255, 0.75);
+}
+.calories-card .n-icon {
+  font-size: 36rpx;
 }
 .n-icon {
   display: block;
@@ -734,13 +733,13 @@ function sourceText(source: string): string {
   display: block;
   font-size: 32rpx;
   font-weight: 700;
-  color: #2d2d2d;
-  font-family: 'Kalam', 'ZCOOL KuaiLe', 'PingFang SC', cursive;
+  color: $foreground;
+  font-family: 'Calistoga', Georgia, 'PingFang SC', serif;
 }
 .n-label {
   display: block;
   font-size: 22rpx;
-  color: #5a5a5a;
+  color: $muted-foreground;
   margin-top: 4rpx;
 }
 
@@ -752,9 +751,9 @@ function sourceText(source: string): string {
   display: block;
   font-size: 24rpx;
   font-weight: 700;
-  color: #2d2d2d;
+  color: $foreground;
   margin-bottom: 10rpx;
-  font-family: 'Kalam', 'ZCOOL KuaiLe', 'PingFang SC', cursive;
+  font-family: 'Inter', 'PingFang SC', sans-serif;
 }
 .nutrition-grid-sm {
   display: grid;
@@ -762,37 +761,37 @@ function sourceText(source: string): string {
   gap: 10rpx;
 }
 .n-item-sm {
-  background: #fdfbf7;
-  border: 1rpx solid #e5e0d8;
-  border-radius: 185px 10px 155px 10px / 10px 155px 10px 185px;
+  background: $muted;
+  border: 1rpx solid $border;
+  border-radius: $radius-md;
   padding: 12rpx 6rpx;
   text-align: center;
 }
 .n-sm-label {
   display: block;
   font-size: 20rpx;
-  color: #5a5a5a;
+  color: $muted-foreground;
   margin-bottom: 4rpx;
 }
 .n-sm-value {
   display: block;
   font-size: 24rpx;
   font-weight: 600;
-  color: #2d2d2d;
+  color: $foreground;
 }
 .n-sm-unit {
   font-size: 18rpx;
   font-weight: normal;
-  color: #5a5a5a;
+  color: $muted-foreground;
 }
 .data-source-row {
   margin-top: 14rpx;
   padding-top: 10rpx;
-  border-top: 2rpx dashed #e5e0d8;
+  border-top: 1rpx solid $border;
 }
 .data-source-text {
   font-size: 22rpx;
-  color: #5a5a5a;
+  color: $muted-foreground;
 }
 
 .record-btn-inline {
@@ -810,7 +809,7 @@ function sourceText(source: string): string {
 .error-text {
   display: block;
   font-size: 30rpx;
-  color: #2d2d2d;
+  color: $foreground;
   margin-bottom: 8rpx;
 }
 .error-hint {
@@ -818,15 +817,14 @@ function sourceText(source: string): string {
   font-size: 24rpx;
 }
 .disclaimer-tip {
-  background: #fff9c4;
-  color: #2d2d2d;
-  border: 2rpx solid #2d2d2d;
-  border-radius: 15px 225px 15px 255px / 255px 15px 225px 15px;
+  background: rgba(0, 82, 255, 0.06);
+  color: $foreground;
+  border: 1rpx solid rgba(0, 82, 255, 0.15);
+  border-radius: $radius-lg;
   padding: 14rpx 48rpx 14rpx 20rpx;
   font-size: 22rpx;
   margin-bottom: 20rpx;
   position: relative;
-  box-shadow: 3px 3px 0px 0px rgba(45, 45, 45, 0.1);
 }
 .disclaimer-tip .dismiss {
   position: absolute;
@@ -834,6 +832,6 @@ function sourceText(source: string): string {
   top: 50%;
   transform: translateY(-50%);
   font-size: 28rpx;
-  color: #5a5a5a;
+  color: $muted-foreground;
 }
 </style>

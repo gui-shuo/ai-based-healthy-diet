@@ -415,12 +415,12 @@ async function deleteRecord(record: FoodRecord) {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .container {
   padding: 20rpx 30rpx;
   padding-bottom: 60rpx;
   min-height: 100vh;
-  background: #fdfbf7;
+  background: $background;
 }
 
 /* Date Selector */
@@ -430,18 +430,18 @@ async function deleteRecord(record: FoodRecord) {
 .date-arrow {
   width: 64rpx;
   height: 64rpx;
-  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
-  background: #fdfbf7;
-  border: 2rpx solid #2d2d2d;
-  box-shadow: 2px 2px 0px 0px rgba(45, 45, 45, 0.1);
+  border-radius: $radius-full;
+  background: $muted;
+  border: 1rpx solid $border;
+  transition: all 0.2s;
 }
 .date-arrow:active {
-  box-shadow: none;
-  transform: translate(2rpx, 2rpx);
+  background: rgba(0, 82, 255, 0.08);
+  border-color: $accent;
 }
 .arrow-icon {
   font-size: 40rpx;
-  color: #2d2d2d;
+  color: $foreground;
   font-weight: bold;
 }
 .date-display {
@@ -450,24 +450,26 @@ async function deleteRecord(record: FoodRecord) {
 .date-text {
   font-size: 32rpx;
   font-weight: 700;
-  color: #2d2d2d;
-  font-family: 'Kalam', 'ZCOOL KuaiLe', 'PingFang SC', cursive;
+  color: $foreground;
+  font-family: 'Calistoga', Georgia, 'PingFang SC', serif;
 }
 .today-badge {
   font-size: 20rpx;
-  color: #ff4d4d;
-  background: rgba(255, 77, 77, 0.1);
+  color: $accent;
+  background: rgba(0, 82, 255, 0.08);
   padding: 4rpx 12rpx;
-  border-radius: 185px 10px 155px 10px / 10px 155px 10px 185px;
-  border: 1rpx solid #ff4d4d;
+  border-radius: $radius-full;
+  font-family: 'JetBrains Mono', monospace;
 }
 
-/* Summary Card — sticky note */
+/* Summary Card */
 .summary-card {
   padding: 24rpx;
-  background: #fff9c4;
-  border: 2rpx solid #2d2d2d;
-  box-shadow: 4px 4px 0px 0px #2d2d2d;
+  background: $gradient-accent;
+  border: none;
+  box-shadow: $shadow-accent;
+  border-radius: $radius-2xl;
+  color: #fff;
 }
 .summary-header {
   margin-bottom: 20rpx;
@@ -475,11 +477,12 @@ async function deleteRecord(record: FoodRecord) {
 .summary-title {
   font-size: 30rpx;
   font-weight: 700;
-  font-family: 'Kalam', 'ZCOOL KuaiLe', 'PingFang SC', cursive;
+  color: #fff;
+  font-family: 'Calistoga', Georgia, 'PingFang SC', serif;
 }
 .summary-cal {
   font-size: 24rpx;
-  color: #ff4d4d;
+  color: rgba(255, 255, 255, 0.85);
   font-weight: 500;
 }
 
@@ -491,37 +494,37 @@ async function deleteRecord(record: FoodRecord) {
 }
 .p-label {
   font-size: 24rpx;
-  color: #2d2d2d;
+  color: #fff;
 }
 .p-value {
   font-size: 22rpx;
-  color: #5a5a5a;
+  color: rgba(255, 255, 255, 0.75);
 }
 .progress-bar {
   height: 12rpx;
-  background: #e5e0d8;
-  border: 1rpx solid #2d2d2d;
-  border-radius: 185px 10px 155px 10px / 10px 155px 10px 185px;
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  border-radius: $radius-full;
   margin-top: 8rpx;
   overflow: hidden;
 }
 .progress-fill {
   height: 100%;
-  border-radius: 185px 10px 155px 10px / 10px 155px 10px 185px;
+  border-radius: $radius-full;
   transition: width 0.3s ease;
   min-width: 4rpx;
 }
 .calories-fill {
-  background: #ff4d4d;
+  background: #fff;
 }
 .protein-fill {
-  background: #2d5da1;
+  background: rgba(255, 255, 255, 0.85);
 }
 .fat-fill {
-  background: #ff9800;
+  background: rgba(255, 255, 255, 0.7);
 }
 .carbs-fill {
-  background: #4caf50;
+  background: rgba(255, 255, 255, 0.55);
 }
 
 /* Meal Section */
@@ -530,7 +533,7 @@ async function deleteRecord(record: FoodRecord) {
 }
 .meal-header {
   padding-bottom: 16rpx;
-  border-bottom: 2rpx dashed #e5e0d8;
+  border-bottom: 1rpx solid $border;
 }
 .meal-icon {
   font-size: 36rpx;
@@ -538,8 +541,8 @@ async function deleteRecord(record: FoodRecord) {
 .meal-name {
   font-size: 30rpx;
   font-weight: 700;
-  color: #2d2d2d;
-  font-family: 'Kalam', 'ZCOOL KuaiLe', 'PingFang SC', cursive;
+  color: $foreground;
+  font-family: 'Calistoga', Georgia, 'PingFang SC', serif;
 }
 .meal-cal {
   font-size: 24rpx;
@@ -547,13 +550,13 @@ async function deleteRecord(record: FoodRecord) {
 .add-btn {
   width: 56rpx;
   height: 56rpx;
-  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
-  background: rgba(255, 77, 77, 0.1);
-  border: 2rpx solid #ff4d4d;
+  border-radius: $radius-full;
+  background: rgba(0, 82, 255, 0.08);
+  border: none;
 }
 .add-icon {
   font-size: 36rpx;
-  color: #ff4d4d;
+  color: $accent;
   font-weight: bold;
 }
 
@@ -570,22 +573,22 @@ async function deleteRecord(record: FoodRecord) {
 }
 .food-item-content {
   padding: 18rpx 0;
-  border-bottom: 2rpx dashed #e5e0d8;
-  background: #fff;
+  border-bottom: 1rpx solid $border;
+  background: $card;
   position: relative;
   z-index: 1;
   transition: transform 0.15s ease;
 }
 .food-name {
   font-size: 28rpx;
-  color: #2d2d2d;
+  color: $foreground;
 }
 .food-amount {
   font-size: 24rpx;
 }
 .food-cal {
   font-size: 26rpx;
-  color: #ff4d4d;
+  color: $accent;
   font-weight: 500;
 }
 
@@ -595,11 +598,11 @@ async function deleteRecord(record: FoodRecord) {
   top: 0;
   bottom: 0;
   width: 160rpx;
-  background: #ff4d4d;
+  background: #EF4444;
   color: #fff;
   font-size: 26rpx;
   z-index: 0;
-  border: 2rpx solid #2d2d2d;
+  border-radius: 0 $radius-lg $radius-lg 0;
 }
 
 /* Add Dialog */
@@ -609,32 +612,32 @@ async function deleteRecord(record: FoodRecord) {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(45, 45, 45, 0.4);
+  background: rgba(15, 23, 42, 0.5);
   z-index: 1000;
   display: flex;
   align-items: flex-end;
 }
 .dialog-content {
   width: 100%;
-  background: #fdfbf7;
-  border-radius: 255px 15px 0 0 / 15px 225px 0 0;
-  border-top: 3rpx solid #2d2d2d;
+  background: $card;
+  border-radius: $radius-2xl $radius-2xl 0 0;
   max-height: 85vh;
   overflow-y: auto;
   padding-bottom: env(safe-area-inset-bottom);
 }
 .dialog-header {
   padding: 28rpx 30rpx;
-  border-bottom: 2rpx dashed #e5e0d8;
+  border-bottom: 1rpx solid $border;
 }
 .dialog-title {
   font-size: 32rpx;
   font-weight: 700;
-  font-family: 'Kalam', 'ZCOOL KuaiLe', 'PingFang SC', cursive;
+  font-family: 'Calistoga', Georgia, 'PingFang SC', serif;
+  color: $foreground;
 }
 .dialog-close {
   font-size: 36rpx;
-  color: #5a5a5a;
+  color: $muted-foreground;
   padding: 0 10rpx;
 }
 .dialog-body {
@@ -655,35 +658,35 @@ async function deleteRecord(record: FoodRecord) {
 }
 .meal-type-option {
   padding: 12rpx 20rpx;
-  border: 2rpx solid #2d2d2d;
-  border-radius: 185px 10px 155px 10px / 10px 155px 10px 185px;
+  border: 1rpx solid $border;
+  border-radius: $radius-full;
   font-size: 26rpx;
-  color: #5a5a5a;
+  color: $muted-foreground;
   transition: all 0.2s;
-  font-family: 'Patrick Hand', 'PingFang SC', cursive;
+  font-family: 'Inter', 'PingFang SC', sans-serif;
 }
 .meal-type-option.selected {
-  border-color: #ff4d4d;
-  color: #ff4d4d;
-  background: rgba(255, 77, 77, 0.06);
-  box-shadow: 2px 2px 0px 0px rgba(45, 45, 45, 0.1);
+  border-color: $accent;
+  color: $accent;
+  background: rgba(0, 82, 255, 0.06);
+  box-shadow: 0 0 0 3px rgba(0, 82, 255, 0.1);
 }
 
 .nutrition-input {
-  background: #fdfbf7;
-  border: 2rpx solid #e5e0d8;
-  border-radius: 185px 10px 155px 10px / 10px 155px 10px 185px;
+  background: $muted;
+  border: 1rpx solid $border;
+  border-radius: $radius-lg;
   padding: 12rpx 16rpx;
 }
 .mini-label {
   display: block;
   font-size: 20rpx;
-  color: #5a5a5a;
+  color: $muted-foreground;
   margin-bottom: 4rpx;
 }
 .nutrition-input input {
   height: 40rpx;
   font-size: 26rpx;
-  font-family: 'Patrick Hand', 'PingFang SC', cursive;
+  font-family: 'Inter', 'PingFang SC', sans-serif;
 }
 </style>

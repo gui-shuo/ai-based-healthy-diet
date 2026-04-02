@@ -377,12 +377,12 @@ function goVip() {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .container {
   padding: 20rpx 30rpx;
   padding-bottom: 40rpx;
   min-height: 100vh;
-  background: #fdfbf7;
+  background: $background;
 }
 
 /* VIP Gate */
@@ -399,14 +399,14 @@ function goVip() {
   display: block;
   font-size: 36rpx;
   font-weight: 700;
-  color: #2d2d2d;
+  color: $foreground;
   margin-bottom: 16rpx;
-  font-family: 'Kalam', 'ZCOOL KuaiLe', 'PingFang SC', cursive;
+  font-family: 'Calistoga', Georgia, 'PingFang SC', serif;
 }
 .vip-desc {
   display: block;
   font-size: 26rpx;
-  color: #5a5a5a;
+  color: $muted-foreground;
   margin-bottom: 40rpx;
   line-height: 1.6;
 }
@@ -417,35 +417,32 @@ function goVip() {
 
 /* Tabs */
 .tab-bar {
-  background: #fff;
-  border: 2rpx solid #2d2d2d;
-  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+  background: $card;
+  border: 1rpx solid $border;
+  border-radius: $radius-full;
   margin-bottom: 20rpx;
   overflow: hidden;
-  box-shadow: 3px 3px 0px 0px rgba(45, 45, 45, 0.1);
+  box-shadow: $shadow-sm;
+  padding: 6rpx;
 }
 .tab-item {
   text-align: center;
   padding: 24rpx 0;
   font-size: 28rpx;
-  color: #5a5a5a;
+  color: $muted-foreground;
   position: relative;
   transition: all 0.2s;
-  font-family: 'Patrick Hand', 'PingFang SC', cursive;
+  font-family: 'Inter', 'PingFang SC', sans-serif;
+  border-radius: $radius-full;
 }
 .tab-item.active {
-  color: #ff4d4d;
+  color: #fff;
   font-weight: 600;
+  background: $gradient-accent;
+  box-shadow: $shadow-accent;
 }
 .tab-item.active::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 30%;
-  right: 30%;
-  height: 4rpx;
-  background: #ff4d4d;
-  border-radius: 2rpx;
+  display: none;
 }
 
 /* Form */
@@ -453,8 +450,8 @@ function goVip() {
   font-size: 32rpx;
   font-weight: 700;
   margin-bottom: 24rpx;
-  color: #2d2d2d;
-  font-family: 'Kalam', 'ZCOOL KuaiLe', 'PingFang SC', cursive;
+  color: $foreground;
+  font-family: 'Calistoga', Georgia, 'PingFang SC', serif;
 }
 .radio-group {
   gap: 20rpx;
@@ -463,30 +460,30 @@ function goVip() {
 .radio-item {
   flex: 1;
   height: 72rpx;
-  border: 2rpx solid #2d2d2d;
-  border-radius: 185px 10px 155px 10px / 10px 155px 10px 185px;
+  border: 1rpx solid $border;
+  border-radius: $radius-lg;
   font-size: 28rpx;
-  color: #5a5a5a;
+  color: $muted-foreground;
   transition: all 0.2s;
-  font-family: 'Patrick Hand', 'PingFang SC', cursive;
+  font-family: 'Inter', 'PingFang SC', sans-serif;
 }
 .radio-item.selected {
-  border-color: #ff4d4d;
-  background: rgba(255, 77, 77, 0.06);
-  color: #ff4d4d;
+  border-color: $accent;
+  background: rgba(0, 82, 255, 0.06);
+  color: $accent;
   font-weight: 500;
-  box-shadow: 3px 3px 0px 0px rgba(45, 45, 45, 0.1);
+  box-shadow: 0 0 0 3px rgba(0, 82, 255, 0.1);
 }
 .picker-display {
   margin-top: 8rpx;
   padding: 8rpx 0;
 }
 .placeholder {
-  color: rgba(45, 45, 45, 0.4);
+  color: $uni-text-color-placeholder;
 }
 .arrow {
   font-size: 32rpx;
-  color: #e5e0d8;
+  color: $border;
 }
 .special-textarea {
   width: 100%;
@@ -494,76 +491,71 @@ function goVip() {
   font-size: 28rpx;
   margin-top: 8rpx;
   line-height: 1.5;
-  font-family: 'Patrick Hand', 'PingFang SC', cursive;
+  font-family: 'Inter', 'PingFang SC', sans-serif;
 }
 .generate-btn {
   margin-top: 30rpx;
 }
 
-/* Result — calorie card as sticky note */
+/* Result — calorie card */
 .calorie-card {
-  background: #fff9c4;
-  border: 2rpx solid #2d2d2d;
-  box-shadow: 4px 4px 0px 0px #2d2d2d;
-  color: #2d2d2d;
+  background: $gradient-accent;
+  border: none;
+  box-shadow: $shadow-accent;
+  color: #fff;
+  border-radius: $radius-2xl;
 }
 .calorie-header {
   margin-bottom: 24rpx;
 }
 .calorie-label {
   font-size: 28rpx;
-  color: #2d2d2d;
-  opacity: 0.8;
-  font-family: 'Kalam', 'ZCOOL KuaiLe', 'PingFang SC', cursive;
+  color: rgba(255, 255, 255, 0.85);
+  font-family: 'Calistoga', Georgia, 'PingFang SC', serif;
 }
 .calorie-value {
   font-size: 40rpx;
   font-weight: 700;
-  color: #ff4d4d;
-  font-family: 'Kalam', 'ZCOOL KuaiLe', 'PingFang SC', cursive;
+  color: #fff;
+  font-family: 'Calistoga', Georgia, 'PingFang SC', serif;
 }
 .nutrition-row {
   gap: 16rpx;
 }
 .nutrition-item {
   text-align: center;
-  background: rgba(255, 255, 255, 0.5);
-  border: 2rpx solid #2d2d2d;
-  border-radius: 185px 10px 155px 10px / 10px 155px 10px 185px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1rpx solid rgba(255, 255, 255, 0.2);
+  border-radius: $radius-lg;
   padding: 16rpx 0;
 }
 .n-value {
   display: block;
   font-size: 32rpx;
   font-weight: 600;
-  color: #2d2d2d;
+  color: #fff;
 }
 .n-label {
   display: block;
   font-size: 22rpx;
-  color: #5a5a5a;
+  color: rgba(255, 255, 255, 0.75);
   margin-top: 4rpx;
 }
 
-/* Meal cards — sticky-note style */
+/* Meal cards */
 .meal-card {
   padding: 24rpx;
-  background: #fff9c4;
-  border: 2rpx solid #2d2d2d;
-  box-shadow: 3px 3px 0px 0px rgba(45, 45, 45, 0.1);
-}
-.meal-card:nth-child(odd) {
-  transform: rotate(-0.5deg);
-}
-.meal-card:nth-child(even) {
-  transform: rotate(0.5deg);
+  background: $card;
+  border: 1rpx solid $border;
+  box-shadow: $shadow-sm;
+  border-radius: $radius-2xl;
 }
 .meal-header {
   align-items: center;
   gap: 12rpx;
   margin-bottom: 20rpx;
   padding-bottom: 16rpx;
-  border-bottom: 2rpx dashed #e5e0d8;
+  border-bottom: 1rpx solid $border;
 }
 .meal-icon {
   font-size: 36rpx;
@@ -572,21 +564,22 @@ function goVip() {
   font-size: 30rpx;
   font-weight: 700;
   flex: 1;
-  font-family: 'Kalam', 'ZCOOL KuaiLe', 'PingFang SC', cursive;
+  font-family: 'Calistoga', Georgia, 'PingFang SC', serif;
+  color: $foreground;
 }
 .meal-calories {
   font-size: 26rpx;
 }
 .food-item {
   padding: 12rpx 0;
-  border-bottom: 2rpx dashed #e5e0d8;
+  border-bottom: 1rpx solid $border;
 }
 .food-item:last-child {
   border-bottom: none;
 }
 .food-name {
   font-size: 28rpx;
-  color: #2d2d2d;
+  color: $foreground;
 }
 .food-amount {
   font-size: 24rpx;
@@ -602,16 +595,16 @@ function goVip() {
 .history-target {
   font-size: 30rpx;
   font-weight: 600;
-  color: #ff4d4d;
-  font-family: 'Kalam', 'ZCOOL KuaiLe', 'PingFang SC', cursive;
+  color: $accent;
+  font-family: 'Calistoga', Georgia, 'PingFang SC', serif;
 }
 .history-goal {
   font-size: 24rpx;
-  background: rgba(255, 77, 77, 0.1);
-  color: #ff4d4d;
+  background: rgba(0, 82, 255, 0.08);
+  color: $accent;
   padding: 4rpx 16rpx;
-  border-radius: 185px 10px 155px 10px / 10px 155px 10px 185px;
-  border: 1rpx solid #ff4d4d;
+  border-radius: $radius-full;
+  font-family: 'JetBrains Mono', monospace;
 }
 .history-date {
   display: block;
@@ -630,7 +623,7 @@ function goVip() {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(45, 45, 45, 0.4);
+  background: rgba(15, 23, 42, 0.5);
   z-index: 999;
 }
 .loading-card {
@@ -641,8 +634,8 @@ function goVip() {
 .loading-spinner {
   width: 80rpx;
   height: 80rpx;
-  border: 6rpx solid #e5e0d8;
-  border-top-color: #ff4d4d;
+  border: 6rpx solid $border;
+  border-top-color: $accent;
   border-radius: 50%;
   margin: 0 auto 30rpx;
   animation: spin 0.8s linear infinite;
@@ -653,9 +646,9 @@ function goVip() {
 .loading-text {
   display: block;
   font-size: 30rpx;
-  color: #2d2d2d;
+  color: $foreground;
   margin-bottom: 12rpx;
-  font-family: 'Patrick Hand', 'PingFang SC', cursive;
+  font-family: 'Inter', 'PingFang SC', sans-serif;
 }
 .loading-hint {
   display: block;
@@ -669,48 +662,48 @@ function goVip() {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(45, 45, 45, 0.4);
+  background: rgba(15, 23, 42, 0.5);
   z-index: 1000;
   display: flex;
   align-items: flex-end;
 }
 .picker-content {
   width: 100%;
-  background: #fdfbf7;
-  border-radius: 255px 15px 0 0 / 15px 225px 0 0;
-  border-top: 3rpx solid #2d2d2d;
+  background: $card;
+  border-radius: $radius-2xl $radius-2xl 0 0;
   padding-bottom: env(safe-area-inset-bottom);
 }
 .picker-header {
   padding: 24rpx 30rpx;
-  border-bottom: 2rpx dashed #e5e0d8;
+  border-bottom: 1rpx solid $border;
   font-size: 28rpx;
 }
 .picker-title {
   font-weight: 700;
-  font-family: 'Kalam', 'ZCOOL KuaiLe', 'PingFang SC', cursive;
+  font-family: 'Calistoga', Georgia, 'PingFang SC', serif;
+  color: $foreground;
 }
 .picker-option {
   padding: 28rpx 30rpx;
   font-size: 30rpx;
-  border-bottom: 2rpx dashed #e5e0d8;
-  font-family: 'Patrick Hand', 'PingFang SC', cursive;
+  border-bottom: 1rpx solid $border;
+  font-family: 'Inter', 'PingFang SC', sans-serif;
+  color: $foreground;
 }
 .picker-option.selected {
-  color: #ff4d4d;
+  color: $accent;
   font-weight: 500;
-  background: rgba(255, 77, 77, 0.04);
+  background: rgba(0, 82, 255, 0.04);
 }
 .disclaimer-tip {
-  background: #fff9c4;
-  color: #2d2d2d;
-  border: 2rpx solid #2d2d2d;
-  border-radius: 15px 225px 15px 255px / 255px 15px 225px 15px;
+  background: rgba(0, 82, 255, 0.06);
+  color: $foreground;
+  border: 1rpx solid rgba(0, 82, 255, 0.15);
+  border-radius: $radius-lg;
   padding: 14rpx 48rpx 14rpx 20rpx;
   font-size: 22rpx;
   margin-bottom: 20rpx;
   position: relative;
-  box-shadow: 3px 3px 0px 0px rgba(45, 45, 45, 0.1);
 }
 .disclaimer-tip .dismiss {
   position: absolute;
@@ -718,6 +711,6 @@ function goVip() {
   top: 50%;
   transform: translateY(-50%);
   font-size: 28rpx;
-  color: #5a5a5a;
+  color: $muted-foreground;
 }
 </style>
