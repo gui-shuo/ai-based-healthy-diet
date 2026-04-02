@@ -1,5 +1,6 @@
 <template>
   <div class="food-recognition-view">
+    <!-- Frosted-glass header -->
     <div class="recognition-header">
       <el-button :icon="ArrowLeft" text style="margin-bottom: 16px" @click="goToHome">
         返回首页
@@ -9,14 +10,16 @@
     </div>
 
     <div class="recognition-body">
+      <!-- Alert banner -->
       <el-alert type="info" :closable="true" show-icon style="margin-bottom: 16px">
         <template #title>
           上传食物图片即可自动识别并获取完整营养成分数据，支持各类常见食物。营养数据仅供参考。
           <router-link to="/legal/disclaimer" style="color:#409eff">详细声明</router-link>
         </template>
       </el-alert>
+
       <!-- 左侧：输入区域 -->
-      <el-card class="input-card">
+      <el-card class="input-card glass-card">
         <template #header>
           <h3>食物识别</h3>
         </template>
@@ -24,45 +27,49 @@
         <!-- 文本输入方式 -->
         <div class="input-section">
           <h4>📝 文本输入</h4>
-          <el-input
-            v-model="foodName"
-            placeholder="请输入食物名称，如：苹果、鸡胸肉、燕麦"
-            size="large"
-            clearable
-            @keyup.enter="recognizeByName"
-          >
-            <template #append>
-              <el-button type="primary" :loading="isRecognizing" @click="recognizeByName">
-                识别
-              </el-button>
-            </template>
-          </el-input>
+          <div class="text-input-wrapper">
+            <el-input
+              v-model="foodName"
+              placeholder="请输入食物名称，如：苹果、鸡胸肉、燕麦"
+              size="large"
+              clearable
+              @keyup.enter="recognizeByName"
+            >
+              <template #append>
+                <el-button type="primary" :loading="isRecognizing" @click="recognizeByName">
+                  识别
+                </el-button>
+              </template>
+            </el-input>
+          </div>
           <div class="input-tip">💡 提示：输入常见食物名称，AI会自动识别营养成分</div>
         </div>
 
         <!-- 图片上传方式 -->
         <div class="upload-section">
           <h4>📷 图片识别</h4>
-          <el-upload
-            ref="uploadRef"
-            class="upload-demo"
-            drag
-            :auto-upload="false"
-            :on-change="handleImageChange"
-            :show-file-list="false"
-            :disabled="isRecognizing"
-            :limit="1"
-            accept="image/jpeg,image/png,image/gif,image/webp,image/bmp"
-          >
-            <el-icon class="el-icon--upload">
-              <upload-filled />
-            </el-icon>
-            <div class="el-upload__text">拖拽图片到此处或 <em>点击上传</em></div>
-            <template #tip>
-              <div class="el-upload__tip">支持 JPG / PNG / GIF / WebP / BMP，大小不超过 5MB（大图将自动压缩）</div>
-              <div class="el-upload__tip" style="color: #e6a23c; margin-top: 4px;">💡 识别结果请以置信度为准，置信度越高结果越可靠</div>
-            </template>
-          </el-upload>
+          <div class="upload-zone-wrapper">
+            <el-upload
+              ref="uploadRef"
+              class="upload-demo"
+              drag
+              :auto-upload="false"
+              :on-change="handleImageChange"
+              :show-file-list="false"
+              :disabled="isRecognizing"
+              :limit="1"
+              accept="image/jpeg,image/png,image/gif,image/webp,image/bmp"
+            >
+              <el-icon class="el-icon--upload">
+                <upload-filled />
+              </el-icon>
+              <div class="el-upload__text">拖拽图片到此处或 <em>点击上传</em></div>
+              <template #tip>
+                <div class="el-upload__tip">支持 JPG / PNG / GIF / WebP / BMP，大小不超过 5MB（大图将自动压缩）</div>
+                <div class="el-upload__tip" style="color: #e6a23c; margin-top: 4px;">💡 识别结果请以置信度为准，置信度越高结果越可靠</div>
+              </template>
+            </el-upload>
+          </div>
 
           <!-- 预览图片 -->
           <div v-if="previewUrl" class="preview-section">
@@ -109,8 +116,8 @@
         </div>
       </el-card>
 
-      <!-- 右侧：识别结果或空状态 -->
-      <el-card v-if="recognitionResult" class="result-card">
+      <!-- 右侧：识别结果 -->
+      <el-card v-if="recognitionResult" class="result-card glass-card">
         <template #header>
           <div class="result-header">
             <h3>识别结果</h3>
@@ -124,58 +131,68 @@
             :key="index"
             class="food-result-item"
           >
-            <div class="food-header">
-              <div class="food-name-wrap">
-                <h4>{{ food.name }}</h4>
-                <el-tag v-if="food.category" :type="food.category === '果蔬' ? 'success' : 'warning'" size="small" effect="plain">
-                  {{ food.category }}
-                </el-tag>
+            <div class="food-item-gradient-header">
+              <div class="food-header">
+                <div class="food-name-wrap">
+                  <h4>{{ food.name }}</h4>
+                  <el-tag v-if="food.category" :type="food.category === '果蔬' ? 'success' : 'warning'" size="small" effect="plain">
+                    {{ food.category }}
+                  </el-tag>
+                </div>
+                <div class="confidence-badge-wrapper">
+                  <el-tag :type="getConfidenceType(food.confidence)" size="small">
+                    置信度: {{ (food.confidence * 100).toFixed(0) }}%
+                  </el-tag>
+                </div>
               </div>
-              <el-tag :type="getConfidenceType(food.confidence)" size="small">
-                置信度: {{ (food.confidence * 100).toFixed(0) }}%
-              </el-tag>
             </div>
 
             <!-- 基础营养（每100g） -->
             <div class="nutrition-section">
               <div class="section-label">🔥 基础营养 (每100g)</div>
               <div class="nutrition-grid basic-grid">
-                <div class="nutrition-item energy-item">
+                <div class="nutrition-item nut-calories">
+                  <div class="nut-icon">🔥</div>
                   <div class="nutrition-label">热量</div>
                   <div class="nutrition-value">
                     {{ safeFixed(food.nutrition.energy) }}
                     <span class="unit">kcal</span>
                   </div>
                 </div>
-                <div class="nutrition-item">
+                <div class="nutrition-item nut-protein">
+                  <div class="nut-icon">💪</div>
                   <div class="nutrition-label">蛋白质</div>
                   <div class="nutrition-value">
                     {{ safeFixed(food.nutrition.protein) }}
                     <span class="unit">g</span>
                   </div>
                 </div>
-                <div class="nutrition-item">
+                <div class="nutrition-item nut-carbs">
+                  <div class="nut-icon">🌾</div>
                   <div class="nutrition-label">碳水化合物</div>
                   <div class="nutrition-value">
                     {{ safeFixed(food.nutrition.carbohydrate) }}
                     <span class="unit">g</span>
                   </div>
                 </div>
-                <div class="nutrition-item">
+                <div class="nutrition-item nut-fat">
+                  <div class="nut-icon">🫒</div>
                   <div class="nutrition-label">脂肪</div>
                   <div class="nutrition-value">
                     {{ safeFixed(food.nutrition.fat) }}
                     <span class="unit">g</span>
                   </div>
                 </div>
-                <div class="nutrition-item">
+                <div class="nutrition-item nut-fiber">
+                  <div class="nut-icon">🥬</div>
                   <div class="nutrition-label">膳食纤维</div>
                   <div class="nutrition-value">
                     {{ safeFixed(food.nutrition.fiber) }}
                     <span class="unit">g</span>
                   </div>
                 </div>
-                <div class="nutrition-item">
+                <div class="nutrition-item nut-cholesterol">
+                  <div class="nut-icon">❤️</div>
                   <div class="nutrition-label">胆固醇</div>
                   <div class="nutrition-value">
                     {{ safeFixed(food.nutrition.cholesterol) }}
@@ -189,43 +206,43 @@
             <div v-if="hasMineral(food.nutrition)" class="nutrition-section">
               <div class="section-label">💎 矿物质</div>
               <div class="nutrition-grid mineral-grid">
-                <div v-if="food.nutrition.calcium != null" class="nutrition-item-sm">
+                <div v-if="food.nutrition.calcium != null" class="nutrition-item-sm mineral-pill">
                   <span class="label-sm">钙</span>
                   <span class="value-sm">{{ safeFixed(food.nutrition.calcium) }} <em>mg</em></span>
                 </div>
-                <div v-if="food.nutrition.iron != null" class="nutrition-item-sm">
+                <div v-if="food.nutrition.iron != null" class="nutrition-item-sm mineral-pill">
                   <span class="label-sm">铁</span>
                   <span class="value-sm">{{ safeFixed(food.nutrition.iron) }} <em>mg</em></span>
                 </div>
-                <div v-if="food.nutrition.zinc != null" class="nutrition-item-sm">
+                <div v-if="food.nutrition.zinc != null" class="nutrition-item-sm mineral-pill">
                   <span class="label-sm">锌</span>
                   <span class="value-sm">{{ safeFixed(food.nutrition.zinc) }} <em>mg</em></span>
                 </div>
-                <div v-if="food.nutrition.sodium != null" class="nutrition-item-sm">
+                <div v-if="food.nutrition.sodium != null" class="nutrition-item-sm mineral-pill">
                   <span class="label-sm">钠</span>
                   <span class="value-sm">{{ safeFixed(food.nutrition.sodium) }} <em>mg</em></span>
                 </div>
-                <div v-if="food.nutrition.potassium != null" class="nutrition-item-sm">
+                <div v-if="food.nutrition.potassium != null" class="nutrition-item-sm mineral-pill">
                   <span class="label-sm">钾</span>
                   <span class="value-sm">{{ safeFixed(food.nutrition.potassium) }} <em>mg</em></span>
                 </div>
-                <div v-if="food.nutrition.magnesium != null" class="nutrition-item-sm">
+                <div v-if="food.nutrition.magnesium != null" class="nutrition-item-sm mineral-pill">
                   <span class="label-sm">镁</span>
                   <span class="value-sm">{{ safeFixed(food.nutrition.magnesium) }} <em>mg</em></span>
                 </div>
-                <div v-if="food.nutrition.phosphorus != null" class="nutrition-item-sm">
+                <div v-if="food.nutrition.phosphorus != null" class="nutrition-item-sm mineral-pill">
                   <span class="label-sm">磷</span>
                   <span class="value-sm">{{ safeFixed(food.nutrition.phosphorus) }} <em>mg</em></span>
                 </div>
-                <div v-if="food.nutrition.selenium != null" class="nutrition-item-sm">
+                <div v-if="food.nutrition.selenium != null" class="nutrition-item-sm mineral-pill">
                   <span class="label-sm">硒</span>
                   <span class="value-sm">{{ safeFixed(food.nutrition.selenium) }} <em>μg</em></span>
                 </div>
-                <div v-if="food.nutrition.copper != null" class="nutrition-item-sm">
+                <div v-if="food.nutrition.copper != null" class="nutrition-item-sm mineral-pill">
                   <span class="label-sm">铜</span>
                   <span class="value-sm">{{ safeFixed(food.nutrition.copper, 2) }} <em>mg</em></span>
                 </div>
-                <div v-if="food.nutrition.manganese != null" class="nutrition-item-sm">
+                <div v-if="food.nutrition.manganese != null" class="nutrition-item-sm mineral-pill">
                   <span class="label-sm">锰</span>
                   <span class="value-sm">{{ safeFixed(food.nutrition.manganese, 2) }} <em>mg</em></span>
                 </div>
@@ -236,35 +253,35 @@
             <div v-if="hasVitamin(food.nutrition)" class="nutrition-section">
               <div class="section-label">🧪 维生素</div>
               <div class="nutrition-grid mineral-grid">
-                <div v-if="food.nutrition.vitaminA != null" class="nutrition-item-sm">
+                <div v-if="food.nutrition.vitaminA != null" class="nutrition-item-sm vitamin-pill">
                   <span class="label-sm">维生素A</span>
                   <span class="value-sm">{{ safeFixed(food.nutrition.vitaminA) }} <em>μg</em></span>
                 </div>
-                <div v-if="food.nutrition.vitaminC != null" class="nutrition-item-sm">
+                <div v-if="food.nutrition.vitaminC != null" class="nutrition-item-sm vitamin-pill">
                   <span class="label-sm">维生素C</span>
                   <span class="value-sm">{{ safeFixed(food.nutrition.vitaminC) }} <em>mg</em></span>
                 </div>
-                <div v-if="food.nutrition.vitaminE != null" class="nutrition-item-sm">
+                <div v-if="food.nutrition.vitaminE != null" class="nutrition-item-sm vitamin-pill">
                   <span class="label-sm">维生素E</span>
                   <span class="value-sm">{{ safeFixed(food.nutrition.vitaminE, 2) }} <em>mg</em></span>
                 </div>
-                <div v-if="food.nutrition.carotene != null" class="nutrition-item-sm">
+                <div v-if="food.nutrition.carotene != null" class="nutrition-item-sm vitamin-pill">
                   <span class="label-sm">胡萝卜素</span>
                   <span class="value-sm">{{ safeFixed(food.nutrition.carotene) }} <em>μg</em></span>
                 </div>
-                <div v-if="food.nutrition.thiamine != null" class="nutrition-item-sm">
+                <div v-if="food.nutrition.thiamine != null" class="nutrition-item-sm vitamin-pill">
                   <span class="label-sm">硫胺素(B1)</span>
                   <span class="value-sm">{{ safeFixed(food.nutrition.thiamine, 2) }} <em>mg</em></span>
                 </div>
-                <div v-if="food.nutrition.riboflavin != null" class="nutrition-item-sm">
+                <div v-if="food.nutrition.riboflavin != null" class="nutrition-item-sm vitamin-pill">
                   <span class="label-sm">核黄素(B2)</span>
                   <span class="value-sm">{{ safeFixed(food.nutrition.riboflavin, 2) }} <em>mg</em></span>
                 </div>
-                <div v-if="food.nutrition.niacin != null" class="nutrition-item-sm">
+                <div v-if="food.nutrition.niacin != null" class="nutrition-item-sm vitamin-pill">
                   <span class="label-sm">烟酸(B3)</span>
                   <span class="value-sm">{{ safeFixed(food.nutrition.niacin) }} <em>mg</em></span>
                 </div>
-                <div v-if="food.nutrition.retinolEquivalent != null" class="nutrition-item-sm">
+                <div v-if="food.nutrition.retinolEquivalent != null" class="nutrition-item-sm vitamin-pill">
                   <span class="label-sm">视黄醇当量</span>
                   <span class="value-sm">{{ safeFixed(food.nutrition.retinolEquivalent) }} <em>μg</em></span>
                 </div>
@@ -284,22 +301,26 @@
       </el-card>
 
       <!-- 空状态提示 -->
-      <el-card v-if="!recognitionResult && !isRecognizing" class="empty-card">
+      <el-card v-if="!recognitionResult && !isRecognizing" class="empty-card glass-card">
         <div class="empty-content">
-          <el-icon :size="80" color="#dcdfe6">
-            <Picture />
-          </el-icon>
+          <div class="empty-icon-wrapper">
+            <el-icon :size="80" color="#dcdfe6">
+              <Picture />
+            </el-icon>
+          </div>
           <h3>开始识别食物</h3>
           <p>输入食物名称或上传图片，AI将为您分析营养成分</p>
         </div>
       </el-card>
 
       <!-- 加载状态 -->
-      <el-card v-if="isRecognizing" class="loading-card">
+      <el-card v-if="isRecognizing" class="loading-card glass-card">
         <div class="loading-content">
-          <el-icon class="loading-icon">
-            <Loading />
-          </el-icon>
+          <div class="loading-pulse">
+            <el-icon class="loading-icon">
+              <Loading />
+            </el-icon>
+          </div>
           <h3>AI正在识别食物...</h3>
           <p>正在分析食物营养成分，通常需要几秒钟，请耐心等待</p>
         </div>
@@ -307,7 +328,7 @@
     </div>
 
     <!-- 识别历史 -->
-    <el-card v-if="history.length > 0" class="history-card">
+    <el-card v-if="history.length > 0" class="history-card glass-card">
       <template #header>
         <div class="history-header">
           <h3>📜 识别历史</h3>
@@ -765,43 +786,114 @@ onBeforeUnmount(() => {
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+/* ═══════════════════════════════════════════════════════════
+   Premium glassmorphism theme for AI Food Recognition
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── Gradient background ──────────────────────────────────── */
 .food-recognition-view {
   min-height: 100vh;
-  background: #f5f7fa;
-  padding: 24px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 32px 24px 48px;
+  position: relative;
+
+  &::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 20% 50%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 20%, rgba(255, 119, 198, 0.15) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  > * {
+    position: relative;
+    z-index: 1;
+  }
 }
 
+/* ── Frosted-glass header ─────────────────────────────────── */
 .recognition-header {
   text-align: center;
-  margin-bottom: 32px;
+  margin-bottom: 36px;
+  padding: 28px 24px 24px;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+
+  :deep(.el-button) {
+    color: rgba(255, 255, 255, 0.85) !important;
+    font-weight: 500;
+
+    &:hover {
+      color: #fff !important;
+    }
+  }
+
+  h2 {
+    font-size: 36px;
+    margin: 0 0 8px;
+    color: #fff;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  p {
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.75);
+    margin: 0;
+    font-weight: 400;
+  }
 }
 
-.recognition-header h2 {
-  font-size: 32px;
-  margin: 0 0 8px 0;
-  color: #303133;
+/* ── Glass card mixin ─────────────────────────────────────── */
+.glass-card {
+  background: rgba(255, 255, 255, 0.72) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.45) !important;
+  border-radius: 16px !important;
+  box-shadow:
+    0 8px 32px rgba(31, 38, 135, 0.12),
+    0 2px 8px rgba(0, 0, 0, 0.06) !important;
+  overflow: hidden;
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+
+  &:hover {
+    box-shadow:
+      0 12px 40px rgba(31, 38, 135, 0.18),
+      0 4px 12px rgba(0, 0, 0, 0.08) !important;
+  }
 }
 
-.recognition-header p {
-  font-size: 16px;
-  color: #909399;
-  margin: 0;
+/* ── Alert override ───────────────────────────────────────── */
+.recognition-body {
+  :deep(.el-alert) {
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.65);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+  }
 }
 
+/* ── Two-column grid ──────────────────────────────────────── */
 .recognition-body {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 24px;
-  margin-bottom: 24px;
+  margin-bottom: 28px;
+  max-width: 1280px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-@media (max-width: 768px) {
-  .recognition-body {
-    grid-template-columns: 1fr;
-  }
-}
-
+/* ── Input / result / loading / history cards ─────────────── */
 .input-card,
 .result-card,
 .loading-card,
@@ -809,53 +901,190 @@ onBeforeUnmount(() => {
   height: fit-content;
 }
 
+/* ── Section headings ─────────────────────────────────────── */
 .input-section,
 .upload-section,
 .quick-input {
-  margin-bottom: 24px;
+  margin-bottom: 28px;
 }
 
 .input-section h4,
 .upload-section h4,
 .quick-input h4 {
   font-size: 16px;
-  margin: 0 0 12px 0;
+  margin: 0 0 14px;
   color: #303133;
+  font-weight: 700;
+}
+
+/* ── Text input glow ──────────────────────────────────────── */
+.text-input-wrapper {
+  :deep(.el-input) {
+    .el-input__wrapper {
+      border-radius: 12px;
+      transition: box-shadow 0.35s ease;
+    }
+
+    &.is-focus .el-input__wrapper,
+    .el-input__wrapper:focus-within {
+      box-shadow:
+        0 0 0 1px var(--el-input-focus-border-color) inset,
+        0 0 16px rgba(102, 126, 234, 0.25);
+    }
+  }
+
+  :deep(.el-input-group__append) {
+    border-radius: 0 12px 12px 0;
+  }
 }
 
 .input-tip {
-  margin-top: 8px;
+  margin-top: 10px;
   font-size: 12px;
   color: #909399;
 }
 
+/* ── Upload zone ──────────────────────────────────────────── */
+.upload-zone-wrapper {
+  :deep(.el-upload-dragger) {
+    border-radius: 14px;
+    border: 2px dashed rgba(102, 126, 234, 0.35);
+    background: rgba(102, 126, 234, 0.03);
+    padding: 40px 20px;
+    transition: all 0.4s ease;
+
+    &:hover {
+      border-color: transparent;
+      background: linear-gradient(white, white) padding-box,
+        linear-gradient(135deg, #667eea, #764ba2, #f093fb) border-box;
+      border: 2px solid transparent;
+      box-shadow: 0 4px 20px rgba(102, 126, 234, 0.15);
+    }
+
+    .el-icon--upload {
+      font-size: 52px;
+      color: #764ba2;
+      margin-bottom: 8px;
+      transition: transform 0.3s ease;
+    }
+
+    &:hover .el-icon--upload {
+      transform: translateY(-4px) scale(1.1);
+    }
+  }
+}
+
+.upload-demo {
+  width: 100%;
+}
+
+/* ── Image preview ────────────────────────────────────────── */
+.preview-section {
+  margin-top: 18px;
+  text-align: center;
+}
+
+.preview-image-wrapper {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+
+.preview-image {
+  max-width: 100%;
+  max-height: 300px;
+  border-radius: 14px;
+  margin-bottom: 16px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.12);
+  transition: transform 0.3s ease;
+
+  &:hover {
+    transform: scale(1.01);
+  }
+}
+
+.delete-image-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 10;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: scale(1.15);
+  }
+}
+
+/* ── Quick foods pills ────────────────────────────────────── */
+.quick-input {
+  :deep(.el-tag) {
+    cursor: pointer;
+    border-radius: 20px;
+    padding: 6px 16px;
+    font-weight: 500;
+    font-size: 13px;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.08), rgba(118, 75, 162, 0.08));
+    border-color: rgba(102, 126, 234, 0.2);
+    color: #5b4b8a;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+    &:hover {
+      transform: translateY(-3px) scale(1.05);
+      box-shadow: 0 6px 16px rgba(102, 126, 234, 0.3);
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: #fff;
+      border-color: transparent;
+    }
+  }
+}
+
+/* ── Result card ──────────────────────────────────────────── */
 .result-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-}
 
-.result-header h3 {
-  margin: 0;
+  h3 {
+    margin: 0;
+    font-weight: 700;
+  }
 }
 
 .result-list {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 20px;
 }
 
 .food-result-item {
-  padding: 16px;
-  background: #f5f7fa;
-  border-radius: 8px;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  transition: box-shadow 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.08);
+  }
+}
+
+.food-item-gradient-header {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.06), rgba(118, 75, 162, 0.06));
+  padding: 16px 18px 12px;
 }
 
 .food-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
+
+  h4 {
+    margin: 0;
+    font-size: 19px;
+    color: #303133;
+    font-weight: 700;
+  }
 }
 
 .food-name-wrap {
@@ -864,21 +1093,26 @@ onBeforeUnmount(() => {
   gap: 8px;
 }
 
-.food-header h4 {
-  margin: 0;
-  font-size: 18px;
-  color: #303133;
+.confidence-badge-wrapper {
+  :deep(.el-tag) {
+    font-size: 13px;
+    font-weight: 600;
+    padding: 4px 14px;
+    border-radius: 20px;
+  }
 }
 
+/* ── Nutrition sections ───────────────────────────────────── */
 .nutrition-section {
-  margin-bottom: 14px;
+  margin: 0 18px 16px;
 }
 
 .section-label {
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 700;
   color: #606266;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
+  padding-top: 4px;
 }
 
 .nutrition-grid {
@@ -894,43 +1128,52 @@ onBeforeUnmount(() => {
   grid-template-columns: repeat(5, 1fr);
 }
 
+/* ── Basic nutrition colorful cards ───────────────────────── */
 .nutrition-item {
   text-align: center;
-  padding: 12px 8px;
-  background: #f5f7fa;
-  border-radius: 8px;
+  padding: 14px 8px 12px;
+  border-radius: 12px;
+  transition: transform 0.2s ease;
+  position: relative;
+
+  &:hover {
+    transform: translateY(-2px);
+  }
+
+  .nut-icon {
+    font-size: 20px;
+    margin-bottom: 4px;
+  }
 }
 
-.energy-item {
+.nut-calories {
   background: linear-gradient(135deg, #fff7ed, #ffedd5);
+  border: 1px solid rgba(251, 146, 60, 0.15);
 }
 
-.nutrition-item-sm {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 8px 4px;
-  background: #f5f7fa;
-  border-radius: 6px;
+.nut-protein {
+  background: linear-gradient(135deg, #eff6ff, #dbeafe);
+  border: 1px solid rgba(59, 130, 246, 0.15);
 }
 
-.label-sm {
-  font-size: 11px;
-  color: #909399;
-  margin-bottom: 2px;
+.nut-carbs {
+  background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+  border: 1px solid rgba(34, 197, 94, 0.15);
 }
 
-.value-sm {
-  font-size: 13px;
-  font-weight: 600;
-  color: #303133;
+.nut-fat {
+  background: linear-gradient(135deg, #fefce8, #fef9c3);
+  border: 1px solid rgba(234, 179, 8, 0.15);
 }
 
-.value-sm em {
-  font-style: normal;
-  font-size: 10px;
-  font-weight: normal;
-  color: #909399;
+.nut-fiber {
+  background: linear-gradient(135deg, #faf5ff, #f3e8ff);
+  border: 1px solid rgba(168, 85, 247, 0.15);
+}
+
+.nut-cholesterol {
+  background: linear-gradient(135deg, #fef2f2, #fecaca);
+  border: 1px solid rgba(239, 68, 68, 0.15);
 }
 
 .nutrition-label {
@@ -940,30 +1183,82 @@ onBeforeUnmount(() => {
 }
 
 .nutrition-value {
-  font-size: 20px;
-  font-weight: bold;
+  font-size: 22px;
+  font-weight: 800;
   color: #303133;
+  line-height: 1.2;
+
+  .unit {
+    font-size: 12px;
+    font-weight: normal;
+    color: #909399;
+    margin-left: 2px;
+  }
 }
 
-.nutrition-value .unit {
-  font-size: 12px;
-  font-weight: normal;
-  color: #909399;
-  margin-left: 2px;
-}
-
-.data-source {
+/* ── Mineral & vitamin pills ──────────────────────────────── */
+.nutrition-item-sm {
   display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 6px;
+  border-radius: 10px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.06);
+  }
+}
+
+.mineral-pill {
+  background: linear-gradient(135deg, #f0fdfa, #ccfbf1);
+  border: 1px solid rgba(20, 184, 166, 0.12);
+}
+
+.vitamin-pill {
+  background: linear-gradient(135deg, #fff7ed, #fed7aa);
+  border: 1px solid rgba(249, 115, 22, 0.12);
+}
+
+.label-sm {
+  font-size: 11px;
+  color: #909399;
+  margin-bottom: 3px;
+  font-weight: 500;
+}
+
+.value-sm {
+  font-size: 13px;
+  font-weight: 700;
+  color: #303133;
+
+  em {
+    font-style: normal;
+    font-size: 10px;
+    font-weight: normal;
+    color: #909399;
+  }
+}
+
+/* ── Data source footer badge ─────────────────────────────── */
+.data-source {
+  display: inline-flex;
   align-items: center;
   gap: 4px;
   font-size: 12px;
   color: #909399;
+  margin: 4px 18px 16px;
+  padding: 4px 12px;
+  background: rgba(0, 0, 0, 0.03);
+  border-radius: 20px;
 }
 
+/* ── Result footer ────────────────────────────────────────── */
 .result-footer {
   margin-top: 16px;
   padding-top: 16px;
-  border-top: 1px solid #ebeef5;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
 }
 
 .recognition-time {
@@ -972,57 +1267,59 @@ onBeforeUnmount(() => {
   text-align: right;
 }
 
+/* ── Loading state with pulse ─────────────────────────────── */
 .loading-card {
   grid-column: 1 / -1;
 }
 
 .loading-content {
   text-align: center;
-  padding: 48px 24px;
+  padding: 56px 24px;
+
+  h3 {
+    margin: 20px 0 8px;
+    color: #303133;
+    font-weight: 700;
+  }
+
+  p {
+    margin: 0;
+    color: #909399;
+  }
+}
+
+.loading-pulse {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+  animation: pulse-ring 2s ease-in-out infinite;
 }
 
 .loading-icon {
-  font-size: 48px;
-  color: #409eff;
-  animation: rotate 1s linear infinite;
+  font-size: 44px;
+  color: #667eea;
+  animation: spin 1.2s linear infinite;
 }
 
-@keyframes rotate {
-  from {
-    transform: rotate(0deg);
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+@keyframes pulse-ring {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.25);
   }
-  to {
-    transform: rotate(360deg);
+  50% {
+    box-shadow: 0 0 0 20px rgba(102, 126, 234, 0);
   }
 }
 
-.loading-content h3 {
-  margin: 16px 0 8px 0;
-  color: #303133;
-}
-
-.loading-content p {
-  margin: 0;
-  color: #909399;
-}
-
-.preview-section {
-  margin-top: 16px;
-  text-align: center;
-}
-
-.preview-image {
-  max-width: 100%;
-  max-height: 300px;
-  border-radius: 8px;
-  margin-bottom: 16px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
-}
-
-.upload-demo {
-  width: 100%;
-}
-
+/* ── Empty state ──────────────────────────────────────────── */
 .empty-card {
   grid-column: 2;
 }
@@ -1032,78 +1329,46 @@ onBeforeUnmount(() => {
   padding: 80px 24px;
 }
 
+.empty-icon-wrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.06), rgba(118, 75, 162, 0.06));
+  margin-bottom: 8px;
+}
+
 .empty-content h3 {
-  margin: 24px 0 12px 0;
-  color: #909399;
-  font-size: 20px;
+  margin: 20px 0 12px;
+  color: #606266;
+  font-size: 22px;
+  font-weight: 700;
 }
 
 .empty-content p {
   margin: 0;
-  color: #c0c4cc;
-  font-size: 14px;
+  color: #a8abb2;
+  font-size: 15px;
 }
 
-.quick-input .el-tag {
-  cursor: pointer;
-  transition: all 0.3s;
-}
-
-.quick-input .el-tag:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 2px 8px rgba(34, 197, 94, 0.3);
-}
-
+/* ── History section ──────────────────────────────────────── */
 .history-card {
-  max-width: 100%;
+  max-width: 1280px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-@media (max-width: 768px) {
-  .recognition-header h2 {
-    font-size: 24px;
-  }
-
-  .basic-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .mineral-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-
-  .empty-card {
-    grid-column: 1;
-  }
-}
-
-/* 图片预览删除按钮 */
-.preview-image-wrapper {
-  position: relative;
-  display: inline-block;
-  width: 100%;
-}
-
-.delete-image-btn {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  z-index: 10;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-}
-
-.delete-image-btn:hover {
-  transform: scale(1.1);
-}
-
-/* 历史记录样式 */
 .history-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-}
 
-.history-header h3 {
-  margin: 0;
+  h3 {
+    margin: 0;
+    font-weight: 700;
+  }
 }
 
 .history-item {
@@ -1114,13 +1379,17 @@ onBeforeUnmount(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 8px 12px;
-  border-radius: 6px;
-  transition: all 0.3s;
-}
+  padding: 10px 14px;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(0, 0, 0, 0.04);
 
-.history-summary:hover {
-  background-color: #f5f7fa;
+  &:hover {
+    background: rgba(102, 126, 234, 0.05);
+    border-color: rgba(102, 126, 234, 0.12);
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.08);
+  }
 }
 
 .history-text {
@@ -1128,10 +1397,12 @@ onBeforeUnmount(() => {
   font-size: 14px;
   color: #303133;
   cursor: pointer;
-}
+  font-weight: 500;
+  transition: color 0.2s;
 
-.history-text:hover {
-  color: #409eff;
+  &:hover {
+    color: #667eea;
+  }
 }
 
 .history-actions {
@@ -1142,21 +1413,34 @@ onBeforeUnmount(() => {
 
 .expand-icon {
   cursor: pointer;
-  transition: transform 0.3s;
+  transition: all 0.3s ease;
   color: #909399;
   font-size: 16px;
-}
 
-.expand-icon:hover {
-  color: #409eff;
+  &:hover {
+    color: #667eea;
+    transform: scale(1.2);
+  }
 }
 
 .history-detail {
-  margin-top: 12px;
-  padding: 16px;
-  background-color: #f9fafb;
-  border-radius: 8px;
-  border-left: 3px solid #409eff;
+  margin-top: 14px;
+  padding: 18px;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.03), rgba(118, 75, 162, 0.03));
+  border-radius: 12px;
+  border-left: 3px solid #667eea;
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .detail-info {
@@ -1178,21 +1462,28 @@ onBeforeUnmount(() => {
 }
 
 .result-detail h5 {
-  margin: 0 0 12px 0;
+  margin: 0 0 12px;
   font-size: 14px;
   color: #303133;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .history-food-item {
-  background: white;
-  padding: 12px;
-  border-radius: 6px;
-  margin-bottom: 8px;
-}
+  background: rgba(255, 255, 255, 0.8);
+  padding: 14px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
 
-.history-food-item:last-child {
-  margin-bottom: 0;
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    transform: translateY(-1px);
+  }
 }
 
 .food-name-row {
@@ -1200,11 +1491,11 @@ onBeforeUnmount(() => {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 8px;
-}
 
-.food-name-row strong {
-  font-size: 15px;
-  color: #303133;
+  strong {
+    font-size: 15px;
+    color: #303133;
+  }
 }
 
 .nutrition-mini-grid {
@@ -1213,49 +1504,84 @@ onBeforeUnmount(() => {
   gap: 8px;
   font-size: 13px;
   color: #606266;
-}
 
-.nutrition-mini-grid span {
-  padding: 4px 8px;
-  background: #f5f7fa;
-  border-radius: 4px;
+  span {
+    padding: 6px 10px;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
+    border-radius: 8px;
+    font-weight: 500;
+  }
 }
 
 .data-source-mini {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 4px;
   font-size: 11px;
   color: #909399;
-  margin-top: 6px;
+  margin-top: 8px;
+  padding: 2px 10px;
+  background: rgba(0, 0, 0, 0.03);
+  border-radius: 12px;
 }
 
 .history-image-section {
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 
   h5 {
-    margin: 0 0 8px 0;
+    margin: 0 0 10px;
     font-size: 14px;
     color: #303133;
-    font-weight: 600;
+    font-weight: 700;
   }
 }
 
 .history-image-wrapper {
   text-align: center;
-  background: white;
-  border-radius: 8px;
-  padding: 8px;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 12px;
+  padding: 10px;
 }
 
 .history-image {
   max-width: 100%;
   max-height: 200px;
-  border-radius: 6px;
+  border-radius: 10px;
   object-fit: contain;
 }
 
+/* ── Responsive ───────────────────────────────────────────── */
 @media (max-width: 768px) {
+  .food-recognition-view {
+    padding: 16px 12px 32px;
+  }
+
+  .recognition-header {
+    padding: 20px 16px;
+    border-radius: 14px;
+    margin-bottom: 24px;
+
+    h2 {
+      font-size: 26px;
+    }
+  }
+
+  .recognition-body {
+    grid-template-columns: 1fr;
+  }
+
+  .empty-card {
+    grid-column: 1;
+  }
+
+  .basic-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .mineral-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
   .nutrition-mini-grid {
     grid-template-columns: 1fr;
   }
