@@ -2,12 +2,28 @@
   <view class="chat-page">
     <!-- Custom Navigation Bar -->
     <view class="nav-bar" :style="{ paddingTop: statusBarHeight + 'px' }">
-      <view class="nav-bar-inner flex-between">
-        <view class="nav-back" @tap="goBack">
-          <text class="icon-back">‹</text>
+      <view class="nav-bar-inner">
+        <view class="nav-left">
+          <view class="nav-back" @tap="goBack">
+            <text class="icon-back">‹</text>
+          </view>
+          <text class="nav-title">AI 营养师</text>
+          <view class="conn-dot" :class="connStatusClass" />
         </view>
-        <text class="nav-title">AI 营养师</text>
-        <view class="nav-placeholder" />
+        <view class="nav-right">
+          <view class="nav-icon-btn" @tap="showHistoryPopup = true">
+            <text>📂</text>
+          </view>
+          <view class="nav-icon-btn" @tap="showFavoritesPopup = true">
+            <text>⭐</text>
+          </view>
+          <view class="nav-icon-btn" @tap="handleClearConversation">
+            <text>🗑️</text>
+          </view>
+          <view class="nav-icon-btn" @tap="showSettingsPopup = true">
+            <text>⚙️</text>
+          </view>
+        </view>
       </view>
     </view>
 
@@ -18,14 +34,14 @@
     </view>
 
     <!-- Connection Status -->
-    <view class="conn-bar" v-if="!connected && !isConnecting" :style="{ top: (navHeight + (showDisclaimer ? 32 : 0)) + 'px' }">
+    <view class="conn-bar" v-if="!connected && !isConnecting" :style="{ top: connBarTop + 'px' }">
       <text class="conn-text">⚠️ 连接已断开</text>
       <text class="conn-retry" @tap="retryConnect">点击重连</text>
     </view>
-    <view class="conn-bar connecting" v-else-if="isConnecting" :style="{ top: (navHeight + (showDisclaimer ? 32 : 0)) + 'px' }">
+    <view class="conn-bar connecting" v-else-if="isConnecting" :style="{ top: connBarTop + 'px' }">
       <text class="conn-text">🔄 正在连接...</text>
     </view>
-    <view class="conn-bar connected" v-else-if="showConnected" :style="{ top: (navHeight + (showDisclaimer ? 32 : 0)) + 'px' }">
+    <view class="conn-bar conn-ok" v-else-if="showConnected" :style="{ top: connBarTop + 'px' }">
       <text class="conn-text">✅ 已连接</text>
     </view>
 
@@ -33,16 +49,44 @@
     <scroll-view
       class="message-list"
       scroll-y
-      :scroll-top="scrollTop"
       :scroll-into-view="scrollIntoView"
-      :style="{ top: (navHeight + (showDisclaimer ? 32 : 0) + (!connected || showConnected ? 32 : 0)) + 'px', bottom: inputAreaHeight + 'px' }"
+      :style="{ top: messageListTop + 'px', bottom: bottomAreaHeight + 'px' }"
     >
-      <view class="message-wrapper" v-for="(msg, idx) in messages" :key="idx" :id="'msg-' + idx">
+      <!-- Welcome message when empty -->
+      <view v-if="messages.length === 0" class="welcome-block">
+        <text class="welcome-icon">🤖</text>
+        <text class="welcome-title">你好！我是AI营养师</text>
+        <text class="welcome-desc">我可以帮你分析食物营养、制定饮食计划、提供健康建议</text>
+      </view>
+
+      <view class="message-wrapper" v-for="(msg, idx) in messages" :key="msg.id || idx" :id="'msg-' + idx">
         <!-- AI Message -->
         <view v-if="msg.role === 'assistant'" class="message-row assistant">
           <view class="avatar avatar-ai">🤖</view>
-          <view class="bubble bubble-ai">
-            <text class="bubble-text">{{ msg.content }}</text>
+          <view class="bubble-wrap">
+            <view class="bubble bubble-ai">
+              <!-- Streaming: show with cursor -->
+              <view v-if="msg.streaming" class="md-content">
+                <rich-text :nodes="renderMarkdown(msg.content)" />
+                <text class="streaming-cursor">|</text>
+              </view>
+              <!-- Complete: render markdown -->
+              <view v-else class="md-content">
+                <rich-text :nodes="renderMarkdown(msg.content)" />
+              </view>
+            </view>
+            <!-- Message actions -->
+            <view v-if="!msg.streaming && msg.content" class="msg-actions">
+              <text class="msg-time">{{ formatMsgTime(msg.timestamp) }}</text>
+              <view class="msg-action-btns">
+                <text class="action-btn" @tap="copyMessage(msg.content)">📋</text>
+                <text
+                  class="action-btn"
+                  :class="{ 'favorited': msg.favorite }"
+                  @tap="toggleFavorite(msg, idx)"
+                >{{ msg.favorite ? '💛' : '🤍' }}</text>
+              </view>
+            </view>
           </view>
         </view>
         <!-- User Message -->
@@ -55,7 +99,7 @@
       </view>
 
       <!-- Typing Indicator -->
-      <view v-if="isTyping" class="message-row assistant" id="typing-indicator">
+      <view v-if="isTyping && !streamingIdx" class="message-row assistant" id="typing-indicator">
         <view class="avatar avatar-ai">🤖</view>
         <view class="bubble bubble-ai typing-bubble">
           <view class="typing-dots">
@@ -64,7 +108,7 @@
             <view class="dot" />
           </view>
           <text v-if="waitingSeconds >= 5" class="waiting-hint">
-            {{ waitingSeconds >= 15 ? 'AI正在深度思考，请耐心等待...' : '网络响应中，请稍候...' }}
+            {{ waitingHintText }}
           </text>
         </view>
       </view>
@@ -72,11 +116,41 @@
       <view class="scroll-bottom-anchor" :id="'msg-' + messages.length" />
     </scroll-view>
 
+    <!-- Quick Actions (collapsible, above input) -->
+    <view class="quick-actions-area" :style="{ bottom: inputBaseHeight + 'px' }" v-if="showQuickActions">
+      <view class="qa-header" @tap="quickActionsExpanded = !quickActionsExpanded">
+        <text class="qa-title">💡 快捷操作</text>
+        <text class="qa-toggle">{{ quickActionsExpanded ? '收起 ▲' : '展开 ▼' }}</text>
+      </view>
+      <view v-if="quickActionsExpanded" class="qa-sections">
+        <view class="qa-section" v-for="section in quickActionSections" :key="section.title">
+          <text class="qa-section-title">{{ section.icon }} {{ section.title }}</text>
+          <view class="qa-btns">
+            <view
+              class="qa-btn"
+              v-for="item in section.items"
+              :key="item.label"
+              :class="{ disabled: isSending }"
+              @tap="handleQuickAction(item.content)"
+            >
+              <text class="qa-btn-icon">{{ item.icon }}</text>
+              <text class="qa-btn-text">{{ item.label }}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
     <!-- Bottom Input Area -->
-    <view class="input-area" :id="'input-area'">
-      <view class="input-row flex">
+    <view class="input-area">
+      <view class="input-top-row">
+        <view class="qa-toggle-btn" @tap="showQuickActions = !showQuickActions">
+          <text>{{ showQuickActions ? '💡' : '💡' }}</text>
+        </view>
+      </view>
+      <view class="input-row">
         <input
-          class="chat-input flex-1"
+          class="chat-input"
           v-model="inputText"
           placeholder="输入你的营养饮食问题..."
           :disabled="isSending"
@@ -93,47 +167,198 @@
         </view>
       </view>
     </view>
+
+    <!-- Settings Popup -->
+    <view class="popup-mask" v-if="showSettingsPopup" @tap="showSettingsPopup = false">
+      <view class="popup-panel" @tap.stop>
+        <view class="popup-header">
+          <text class="popup-title">⚙️ 聊天设置</text>
+          <text class="popup-close" @tap="showSettingsPopup = false">✕</text>
+        </view>
+        <view class="popup-body">
+          <view class="setting-item">
+            <text class="setting-label">温度参数</text>
+            <text class="setting-value">{{ settings.temperature.toFixed(1) }}</text>
+          </view>
+          <slider
+            class="setting-slider"
+            :value="settings.temperature * 10"
+            :min="0"
+            :max="10"
+            :step="1"
+            activeColor="#10B981"
+            backgroundColor="#E2E8F0"
+            @change="(e: any) => settings.temperature = e.detail.value / 10"
+          />
+          <text class="setting-tip">控制回答的随机性，值越大回答越发散</text>
+
+          <view class="setting-item">
+            <text class="setting-label">最大字数</text>
+            <text class="setting-value">{{ settings.maxTokens }}</text>
+          </view>
+          <slider
+            class="setting-slider"
+            :value="settings.maxTokens"
+            :min="500"
+            :max="4000"
+            :step="100"
+            activeColor="#10B981"
+            backgroundColor="#E2E8F0"
+            @change="(e: any) => settings.maxTokens = e.detail.value"
+          />
+          <text class="setting-tip">单次回复的最大字数</text>
+
+          <view class="setting-item">
+            <text class="setting-label">上下文记忆</text>
+            <switch
+              :checked="settings.keepContext"
+              color="#10B981"
+              @change="(e: any) => settings.keepContext = e.detail.value"
+            />
+          </view>
+          <text class="setting-tip">开启后AI会记住之前的对话内容</text>
+        </view>
+        <view class="popup-footer">
+          <view class="popup-btn popup-btn-primary" @tap="saveSettings">
+            <text>保存设置</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- History Popup -->
+    <view class="popup-mask" v-if="showHistoryPopup" @tap="showHistoryPopup = false">
+      <view class="popup-panel popup-panel-tall" @tap.stop>
+        <view class="popup-header">
+          <text class="popup-title">📂 历史记录</text>
+          <text class="popup-close" @tap="showHistoryPopup = false">✕</text>
+        </view>
+        <view class="popup-body">
+          <view class="popup-action-row">
+            <view class="popup-btn popup-btn-sm popup-btn-primary" @tap="saveCurrentConversation">
+              <text>💾 保存当前对话</text>
+            </view>
+          </view>
+          <view v-if="historyList.length === 0" class="empty-hint">
+            <text>暂无历史记录</text>
+          </view>
+          <scroll-view v-else scroll-y class="history-scroll">
+            <view
+              class="history-item"
+              v-for="item in historyList"
+              :key="item.id"
+              @tap="loadHistoryConversation(item)"
+            >
+              <view class="history-top">
+                <text class="history-title">{{ item.title }}</text>
+                <text class="history-time">{{ formatMsgTime(item.timestamp) }}</text>
+              </view>
+              <text class="history-preview">{{ item.preview }}</text>
+              <view class="history-del" @tap.stop="deleteHistory(item.id)">
+                <text>删除</text>
+              </view>
+            </view>
+          </scroll-view>
+        </view>
+      </view>
+    </view>
+
+    <!-- Favorites Popup -->
+    <view class="popup-mask" v-if="showFavoritesPopup" @tap="showFavoritesPopup = false">
+      <view class="popup-panel popup-panel-tall" @tap.stop>
+        <view class="popup-header">
+          <text class="popup-title">⭐ 我的收藏</text>
+          <text class="popup-close" @tap="showFavoritesPopup = false">✕</text>
+        </view>
+        <view class="popup-body">
+          <view v-if="favoritesList.length === 0" class="empty-hint">
+            <text>暂无收藏</text>
+          </view>
+          <scroll-view v-else scroll-y class="history-scroll">
+            <view class="favorite-item" v-for="fav in favoritesList" :key="fav.id">
+              <view class="fav-content">
+                <rich-text :nodes="renderMarkdown(fav.content)" />
+              </view>
+              <view class="fav-footer">
+                <text class="fav-time">{{ formatMsgTime(fav.timestamp) }}</text>
+                <view class="fav-actions">
+                  <text class="action-btn" @tap="copyMessage(fav.content)">📋</text>
+                  <text class="action-btn" @tap="removeFavorite(fav.id)">🗑️</text>
+                </view>
+              </view>
+            </view>
+          </scroll-view>
+        </view>
+      </view>
+    </view>
   </view>
 </template>
 
 <script setup lang="ts">
-import { ref, nextTick, onMounted, onUnmounted, computed } from 'vue'
+import { ref, reactive, nextTick, onUnmounted, computed } from 'vue'
 import { onLoad, onShow, onHide } from '@dcloudio/uni-app'
 import { checkLogin, defaultAvatar } from '@/utils/common'
-import { getToken } from '@/utils/request'
+import { getToken, request } from '@/utils/request'
 import { useUserStore } from '@/stores/user'
 
+// ─── Types ───
 interface ChatMessage {
+  id: string
   role: 'user' | 'assistant'
   content: string
+  timestamp: number
+  streaming?: boolean
+  favorite?: boolean
 }
 
+interface HistoryRecord {
+  id: string
+  title: string
+  preview: string
+  timestamp: number
+  messages: ChatMessage[]
+}
+
+interface FavoriteRecord {
+  id: string
+  content: string
+  timestamp: number
+}
+
+// ─── WebSocket URL (conditional compilation) ───
 // #ifdef H5
-const WS_URL = `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}/api/ws/ai/chat`
+const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
+const WS_URL = `${protocol}//${window.location.host}/api/ws/ai/chat`
 // #endif
 // #ifndef H5
 const WS_URL = 'wss://nutriai.itshuo.me/api/ws/ai/chat'
 // #endif
 
+// ─── Stores & computed ───
 const userStore = useUserStore()
 const userAvatar = computed(() => defaultAvatar(userStore.userInfo?.avatar))
 
+// ─── State ───
 const messages = ref<ChatMessage[]>([])
 const inputText = ref('')
 const isTyping = ref(false)
 const isSending = ref(false)
-const scrollTop = ref(0)
 const scrollIntoView = ref('')
 const statusBarHeight = ref(0)
 const navHeight = ref(0)
-const inputAreaHeight = ref(100)
+const inputBaseHeight = ref(100)
 const showDisclaimer = ref(true)
 const showConnected = ref(false)
 let connectedTimer: ReturnType<typeof setTimeout> | null = null
 
+// Streaming tracking
+const streamingIdx = ref<number | null>(null)
+
+// Waiting timer
 const waitingSeconds = ref(0)
 let waitingTimer: ReturnType<typeof setInterval> | null = null
 
+// WebSocket
 let socketTask: UniApp.SocketTask | null = null
 const connected = ref(false)
 let reconnectTimer: ReturnType<typeof setTimeout> | null = null
@@ -142,7 +367,167 @@ const MAX_RECONNECT = 5
 const isConnecting = ref(false)
 let pageVisible = true
 let heartbeatTimer: ReturnType<typeof setInterval> | null = null
+let pendingMessage = ''
 
+// Popups
+const showSettingsPopup = ref(false)
+const showHistoryPopup = ref(false)
+const showFavoritesPopup = ref(false)
+
+// Quick actions
+const showQuickActions = ref(false)
+const quickActionsExpanded = ref(true)
+
+// Settings (persisted in localStorage)
+const settings = reactive({
+  temperature: 0.7,
+  maxTokens: 2000,
+  keepContext: true
+})
+
+// History & Favorites (localStorage)
+const historyList = ref<HistoryRecord[]>([])
+const favoritesList = ref<FavoriteRecord[]>([])
+
+// ─── Computed ───
+const connStatusClass = computed(() => {
+  if (connected.value) return 'dot-ok'
+  if (isConnecting.value) return 'dot-connecting'
+  return 'dot-off'
+})
+
+const connBarTop = computed(() => navHeight.value + (showDisclaimer.value ? 32 : 0))
+
+const messageListTop = computed(() => {
+  let top = navHeight.value
+  if (showDisclaimer.value) top += 32
+  if (!connected.value || showConnected.value || isConnecting.value) top += 32
+  return top
+})
+
+const bottomAreaHeight = computed(() => {
+  let h = inputBaseHeight.value
+  if (showQuickActions.value) h += quickActionsExpanded.value ? 320 : 48
+  return h
+})
+
+const waitingHintText = computed(() => {
+  if (waitingSeconds.value >= 60) return '🔄 AI仍在处理中，请继续等待...'
+  if (waitingSeconds.value >= 30) return '⏳ AI正在生成回复，请耐心等待...'
+  if (waitingSeconds.value >= 15) return '🧠 AI正在深度思考，请耐心等待...'
+  return '⏳ 网络响应中，请稍候...'
+})
+
+// ─── Quick Action Data ───
+const quickActionSections = [
+  {
+    title: '常用问题', icon: '❓',
+    items: [
+      { icon: '👋', label: '你能帮我做什么？', content: '你能帮我做什么？' },
+      { icon: '📊', label: '查看营养数据', content: '如何查看我的营养摄入数据？' },
+      { icon: '🎯', label: '设置饮食目标', content: '如何设置我的饮食目标？' },
+      { icon: '💡', label: '营养饮食建议', content: '给我一些营养饮食的建议' }
+    ]
+  },
+  {
+    title: '食物分析', icon: '🍎',
+    items: [
+      { icon: '🍎', label: '分析苹果', content: '帮我分析一下苹果的营养成分' },
+      { icon: '🥗', label: '分析沙拉', content: '帮我分析一下蔬菜沙拉的营养价值' },
+      { icon: '🍗', label: '分析鸡胸肉', content: '鸡胸肉有什么营养？适合减肥吃吗？' },
+      { icon: '🥛', label: '对比牛奶', content: '纯牛奶和酸奶哪个更好？' }
+    ]
+  },
+  {
+    title: '饮食计划', icon: '📅',
+    items: [
+      { icon: '📅', label: '今日饮食', content: '帮我制定今天的饮食计划' },
+      { icon: '🗓️', label: '一周计划', content: '帮我制定一周的营养饮食计划' },
+      { icon: '💪', label: '增肌计划', content: '帮我制定增肌饮食计划' },
+      { icon: '⚖️', label: '减脂计划', content: '帮我制定减脂饮食计划' }
+    ]
+  },
+  {
+    title: '营养建议', icon: '✨',
+    items: [
+      { icon: '🏃', label: '运动建议', content: '给我一些适合的运动建议' },
+      { icon: '💧', label: '饮水提醒', content: '每天应该喝多少水？' },
+      { icon: '😴', label: '睡眠建议', content: '如何改善睡眠质量？' },
+      { icon: '🧘', label: '减压方法', content: '有什么减压的方法推荐吗？' }
+    ]
+  }
+]
+
+// ─── ID generation ───
+function genId(): string {
+  return `msg_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`
+}
+
+// ─── Markdown Renderer (regex-based, returns HTML string) ───
+function renderMarkdown(text: string): string {
+  if (!text) return ''
+  let html = text
+    // Escape HTML entities
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+
+  // Code blocks (```...```)
+  html = html.replace(/```[\s\S]*?```/g, (match) => {
+    const code = match.slice(3, -3).replace(/^\w*\n/, '')
+    return `<div style="background:#F1F5F9;padding:12px;border-radius:8px;margin:8px 0;font-family:monospace;font-size:13px;overflow-x:auto;white-space:pre-wrap;border:1px solid #E2E8F0;">${code}</div>`
+  })
+
+  // Inline code
+  html = html.replace(/`([^`]+)`/g, '<span style="background:#F1F5F9;padding:2px 6px;border-radius:4px;font-family:monospace;font-size:0.9em;border:1px solid #E2E8F0;">$1</span>')
+
+  // Bold
+  html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+
+  // Italic
+  html = html.replace(/\*(.+?)\*/g, '<em>$1</em>')
+
+  // Headers (### > ## > #)
+  html = html.replace(/^### (.+)$/gm, '<div style="font-size:15px;font-weight:700;margin:12px 0 6px;color:#0F172A;">$1</div>')
+  html = html.replace(/^## (.+)$/gm, '<div style="font-size:16px;font-weight:700;margin:14px 0 6px;color:#0F172A;">$1</div>')
+  html = html.replace(/^# (.+)$/gm, '<div style="font-size:17px;font-weight:700;margin:16px 0 8px;color:#0F172A;">$1</div>')
+
+  // Blockquote
+  html = html.replace(/^&gt; (.+)$/gm, '<div style="border-left:3px solid #10B981;padding-left:10px;margin:6px 0;color:#64748B;">$1</div>')
+
+  // Unordered list items
+  html = html.replace(/^[\-\*] (.+)$/gm, '<div style="padding-left:16px;margin:3px 0;">• $1</div>')
+
+  // Ordered list items
+  html = html.replace(/^(\d+)\. (.+)$/gm, '<div style="padding-left:16px;margin:3px 0;">$1. $2</div>')
+
+  // Line breaks
+  html = html.replace(/\n/g, '<br/>')
+
+  return html
+}
+
+// ─── Time formatting ───
+function formatMsgTime(ts: number): string {
+  if (!ts) return ''
+  const diff = Date.now() - ts
+  if (diff < 60000) return '刚刚'
+  if (diff < 3600000) return `${Math.floor(diff / 60000)}分钟前`
+  if (diff < 86400000) return `${Math.floor(diff / 3600000)}小时前`
+  const d = new Date(ts)
+  return `${(d.getMonth() + 1).toString().padStart(2, '0')}-${d.getDate().toString().padStart(2, '0')} ${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`
+}
+
+// ─── Clipboard ───
+function copyMessage(content: string) {
+  uni.setClipboardData({
+    data: content,
+    success: () => uni.showToast({ title: '已复制', icon: 'success' }),
+    fail: () => uni.showToast({ title: '复制失败', icon: 'none' })
+  })
+}
+
+// ─── Waiting Timer ───
 function startWaitingTimer() {
   stopWaitingTimer()
   waitingSeconds.value = 0
@@ -154,50 +539,146 @@ function stopWaitingTimer() {
   waitingSeconds.value = 0
 }
 
-onLoad(() => {
-  if (!checkLogin()) return
-  const sysInfo = uni.getSystemInfoSync()
-  // #ifdef APP-PLUS
-  statusBarHeight.value = sysInfo.statusBarHeight || 44
-  // #endif
-  // #ifdef H5
-  statusBarHeight.value = 0
-  // #endif
-  // #ifdef MP
-  statusBarHeight.value = sysInfo.statusBarHeight || 20
-  // #endif
-  navHeight.value = statusBarHeight.value + 44
-  // Account for tabBar height (windowBottom) + safe area
-  const tabBarHeight = sysInfo.windowBottom || 50
-  inputAreaHeight.value = 100 + tabBarHeight + (sysInfo.safeAreaInsets?.bottom || 0)
+// ─── Settings persistence ───
+function loadSettings() {
+  try {
+    const saved = uni.getStorageSync('aiChatSettings')
+    if (saved) {
+      const parsed = typeof saved === 'string' ? JSON.parse(saved) : saved
+      if (typeof parsed.temperature === 'number') settings.temperature = parsed.temperature
+      if (typeof parsed.maxTokens === 'number') settings.maxTokens = parsed.maxTokens
+      if (typeof parsed.keepContext === 'boolean') settings.keepContext = parsed.keepContext
+    }
+  } catch { /* ignore */ }
+}
 
-  messages.value.push({
-    role: 'assistant',
-    content: '你好！我是AI营养师，有什么营养饮食问题可以问我哦～'
-  })
+function saveSettings() {
+  uni.setStorageSync('aiChatSettings', JSON.stringify(settings))
+  showSettingsPopup.value = false
+  uni.showToast({ title: '设置已保存', icon: 'success' })
+}
 
-  connectWebSocket()
-})
+// ─── History persistence (localStorage) ───
+function loadHistoryList() {
+  try {
+    const saved = uni.getStorageSync('aiChatHistory')
+    if (saved) {
+      historyList.value = typeof saved === 'string' ? JSON.parse(saved) : saved
+    }
+  } catch { historyList.value = [] }
+}
 
-onShow(() => {
-  pageVisible = true
-  if (!connected.value && !isConnecting.value && getToken()) {
-    connectWebSocket()
+function persistHistory() {
+  uni.setStorageSync('aiChatHistory', JSON.stringify(historyList.value))
+}
+
+function saveCurrentConversation() {
+  if (messages.value.length === 0) {
+    uni.showToast({ title: '当前没有对话', icon: 'none' })
+    return
   }
-})
+  const firstUser = messages.value.find(m => m.role === 'user')
+  const title = firstUser
+    ? firstUser.content.substring(0, 20) + (firstUser.content.length > 20 ? '...' : '')
+    : '新对话'
+  const lastMsg = messages.value[messages.value.length - 1]
+  const preview = lastMsg.content.substring(0, 60) + (lastMsg.content.length > 60 ? '...' : '')
 
-onHide(() => {
-  pageVisible = false
-  clearReconnectTimer()
-})
+  const record: HistoryRecord = {
+    id: genId(),
+    title,
+    preview,
+    timestamp: Date.now(),
+    messages: JSON.parse(JSON.stringify(messages.value.map(m => ({ ...m, streaming: false }))))
+  }
+  historyList.value.unshift(record)
+  // Keep max 20 records
+  if (historyList.value.length > 20) historyList.value = historyList.value.slice(0, 20)
+  persistHistory()
+  uni.showToast({ title: '已保存', icon: 'success' })
+}
 
-onUnmounted(() => {
-  pageVisible = false
-  closeWebSocket()
-  clearReconnectTimer()
-  stopWaitingTimer()
-})
+function loadHistoryConversation(item: HistoryRecord) {
+  messages.value = item.messages.map(m => ({ ...m, streaming: false }))
+  showHistoryPopup.value = false
+  scrollToBottom()
+  uni.showToast({ title: '已加载', icon: 'success' })
+}
 
+function deleteHistory(id: string) {
+  historyList.value = historyList.value.filter(h => h.id !== id)
+  persistHistory()
+  uni.showToast({ title: '已删除', icon: 'success' })
+}
+
+// ─── Favorites persistence (localStorage) ───
+function loadFavorites() {
+  try {
+    const saved = uni.getStorageSync('aiChatFavorites')
+    if (saved) {
+      favoritesList.value = typeof saved === 'string' ? JSON.parse(saved) : saved
+    }
+  } catch { favoritesList.value = [] }
+}
+
+function persistFavorites() {
+  uni.setStorageSync('aiChatFavorites', JSON.stringify(favoritesList.value))
+}
+
+function toggleFavorite(msg: ChatMessage, idx: number) {
+  if (msg.favorite) {
+    // Unfavorite
+    favoritesList.value = favoritesList.value.filter(f => f.id !== msg.id)
+    messages.value[idx] = { ...msg, favorite: false }
+  } else {
+    // Favorite
+    favoritesList.value.unshift({ id: msg.id, content: msg.content, timestamp: msg.timestamp })
+    messages.value[idx] = { ...msg, favorite: true }
+  }
+  persistFavorites()
+}
+
+function removeFavorite(id: string) {
+  favoritesList.value = favoritesList.value.filter(f => f.id !== id)
+  // Also update message list
+  const msgIdx = messages.value.findIndex(m => m.id === id)
+  if (msgIdx > -1) messages.value[msgIdx] = { ...messages.value[msgIdx], favorite: false }
+  persistFavorites()
+}
+
+// ─── Clear Conversation ───
+function handleClearConversation() {
+  if (messages.value.length === 0) {
+    uni.showToast({ title: '当前没有对话', icon: 'none' })
+    return
+  }
+  uni.showModal({
+    title: '开启新对话',
+    content: '确定要清空当前对话吗？',
+    confirmColor: '#10B981',
+    success: (res) => {
+      if (res.confirm) {
+        messages.value = []
+        streamingIdx.value = null
+        isTyping.value = false
+        isSending.value = false
+        stopWaitingTimer()
+        uni.showToast({ title: '已清空', icon: 'success' })
+      }
+    }
+  })
+}
+
+// ─── Quick Action ───
+function handleQuickAction(content: string) {
+  if (isSending.value) return
+  inputText.value = content
+  showQuickActions.value = false
+  quickActionsExpanded.value = false
+  nextTick(() => sendMessage())
+}
+
+// ─── WebSocket ───
 function retryConnect() {
   reconnectAttempts = 0
   connectWebSocket()
@@ -207,12 +688,11 @@ function connectWebSocket() {
   const token = getToken()
   if (!token || isConnecting.value) return
 
-  // Close existing connection without triggering reconnect
   if (socketTask) {
     const oldTask = socketTask
     socketTask = null
     connected.value = false
-    try { oldTask.close({}) } catch {}
+    try { oldTask.close({}) } catch { /* */ }
   }
 
   isConnecting.value = true
@@ -235,14 +715,13 @@ function connectWebSocket() {
     isConnecting.value = false
     reconnectAttempts = 0
     startHeartbeat()
-    // Show "已连接" indicator for 2 seconds
     showConnected.value = true
     if (connectedTimer) clearTimeout(connectedTimer)
     connectedTimer = setTimeout(() => { showConnected.value = false }, 2000)
     if (pendingMessage) {
       const msg = pendingMessage
       pendingMessage = ''
-      doSend(msg)
+      doSendWs(msg)
     }
   })
 
@@ -250,7 +729,7 @@ function connectWebSocket() {
     if (currentTask !== socketTask) return
     try {
       const data = JSON.parse(res.data as string)
-      handleMessage(data)
+      handleWsMessage(data)
     } catch (e) {
       console.error('Parse message error:', e)
     }
@@ -267,33 +746,65 @@ function connectWebSocket() {
     if (currentTask !== socketTask) return
     connected.value = false
     isConnecting.value = false
+    stopHeartbeat()
     if (pageVisible && !isSending.value) {
       scheduleReconnect()
     }
   })
 }
 
-function handleMessage(data: { type: string; content?: string; message?: string; status?: string }) {
-  if (data.type === 'connection') {
-    return
-  } else if (data.type === 'start') {
-    if (!isTyping.value) isTyping.value = true
+function handleWsMessage(data: { type: string; content?: string; message?: string }) {
+  if (data.type === 'connection') return
+
+  if (data.type === 'start') {
+    // Create a new streaming AI message
+    const aiMsg: ChatMessage = {
+      id: genId(),
+      role: 'assistant',
+      content: '',
+      timestamp: Date.now(),
+      streaming: true
+    }
+    messages.value.push(aiMsg)
+    streamingIdx.value = messages.value.length - 1
+    isTyping.value = false
+    scrollToBottom()
   } else if (data.type === 'token' || data.type === 'chunk') {
     stopWaitingTimer()
-    const lastMsg = messages.value[messages.value.length - 1]
-    if (lastMsg && lastMsg.role === 'assistant' && isTyping.value) {
-      lastMsg.content += data.content || ''
+    const idx = streamingIdx.value
+    if (idx !== null && messages.value[idx]) {
+      messages.value[idx].content += data.content || ''
     } else {
-      messages.value.push({ role: 'assistant', content: data.content || '' })
+      // No streaming message yet – append
+      const aiMsg: ChatMessage = {
+        id: genId(),
+        role: 'assistant',
+        content: data.content || '',
+        timestamp: Date.now(),
+        streaming: true
+      }
+      messages.value.push(aiMsg)
+      streamingIdx.value = messages.value.length - 1
+      isTyping.value = false
     }
     scrollToBottom()
   } else if (data.type === 'done' || data.type === 'complete') {
     stopWaitingTimer()
+    const idx = streamingIdx.value
+    if (idx !== null && messages.value[idx]) {
+      messages.value[idx].streaming = false
+      messages.value[idx].timestamp = Date.now()
+      // Check if content in favorites
+      const isFav = favoritesList.value.some(f => f.id === messages.value[idx].id)
+      if (isFav) messages.value[idx].favorite = true
+    }
+    streamingIdx.value = null
     isTyping.value = false
     isSending.value = false
     scrollToBottom()
   } else if (data.type === 'error') {
     stopWaitingTimer()
+    streamingIdx.value = null
     isTyping.value = false
     isSending.value = false
     uni.showToast({ title: data.message || 'AI响应出错', icon: 'none' })
@@ -302,41 +813,98 @@ function handleMessage(data: { type: string; content?: string; message?: string;
   }
 }
 
-let pendingMessage = ''
-
+// ─── Send message ───
 function sendMessage() {
   const text = inputText.value.trim()
   if (!text || isSending.value) return
 
-  messages.value.push({ role: 'user', content: text })
+  messages.value.push({
+    id: genId(),
+    role: 'user',
+    content: text,
+    timestamp: Date.now()
+  })
   inputText.value = ''
   isSending.value = true
   isTyping.value = true
+  streamingIdx.value = null
   startWaitingTimer()
   scrollToBottom()
 
   if (!connected.value) {
+    // Try to connect, if fails use HTTP fallback
     pendingMessage = text
     connectWebSocket()
+    // Set a timeout for HTTP fallback
+    setTimeout(() => {
+      if (pendingMessage === text && !connected.value) {
+        pendingMessage = ''
+        sendViaHttp(text)
+      }
+    }, 5000)
     return
   }
 
-  doSend(text)
+  doSendWs(text)
 }
 
-function doSend(text: string) {
+function doSendWs(text: string) {
   socketTask?.send({
-    data: JSON.stringify({ type: 'chat', message: text }),
+    data: JSON.stringify({
+      type: 'chat',
+      message: text,
+      keepContext: settings.keepContext
+    }),
     success: () => {},
     fail: () => {
-      stopWaitingTimer()
-      isSending.value = false
-      isTyping.value = false
-      uni.showToast({ title: '发送失败，请重试', icon: 'none' })
+      // WebSocket send failed, try HTTP fallback
+      sendViaHttp(text)
     }
   })
 }
 
+// ─── HTTP Fallback ───
+async function sendViaHttp(text: string) {
+  try {
+    const res = await request<{ message?: string }>({
+      url: '/ai/chat',
+      method: 'POST',
+      data: {
+        message: text,
+        temperature: settings.temperature,
+        maxTokens: settings.maxTokens,
+        keepContext: settings.keepContext
+      },
+      showLoading: false,
+      showError: false
+    })
+
+    stopWaitingTimer()
+    isTyping.value = false
+    isSending.value = false
+
+    const reply = (res as any)?.data?.message || (res as any)?.data || (res as any)?.message || ''
+    if (reply) {
+      messages.value.push({
+        id: genId(),
+        role: 'assistant',
+        content: typeof reply === 'string' ? reply : JSON.stringify(reply),
+        timestamp: Date.now()
+      })
+    } else {
+      uni.showToast({ title: 'AI回复为空，请重试', icon: 'none' })
+    }
+    scrollToBottom()
+  } catch (err: any) {
+    stopWaitingTimer()
+    isTyping.value = false
+    isSending.value = false
+    const msg = err?.message || err?.errMsg || '发送失败，请重试'
+    uni.showToast({ title: msg, icon: 'none' })
+  }
+}
+
+// ─── Scroll ───
 function scrollToBottom() {
   nextTick(() => {
     scrollIntoView.value = ''
@@ -346,12 +914,10 @@ function scrollToBottom() {
   })
 }
 
+// ─── Reconnect ───
 function scheduleReconnect() {
   clearReconnectTimer()
-  if (reconnectAttempts >= MAX_RECONNECT) {
-    uni.showToast({ title: '连接失败，请重新进入', icon: 'none' })
-    return
-  }
+  if (reconnectAttempts >= MAX_RECONNECT) return
   const delay = Math.min(1000 * Math.pow(2, reconnectAttempts), 10000)
   reconnectAttempts++
   reconnectTimer = setTimeout(() => {
@@ -360,10 +926,7 @@ function scheduleReconnect() {
 }
 
 function clearReconnectTimer() {
-  if (reconnectTimer) {
-    clearTimeout(reconnectTimer)
-    reconnectTimer = null
-  }
+  if (reconnectTimer) { clearTimeout(reconnectTimer); reconnectTimer = null }
 }
 
 function closeWebSocket() {
@@ -372,33 +935,72 @@ function closeWebSocket() {
   socketTask = null
   connected.value = false
   isConnecting.value = false
-  if (task) {
-    try { task.close({}) } catch {}
-  }
+  if (task) { try { task.close({}) } catch { /* */ } }
 }
 
 function startHeartbeat() {
   stopHeartbeat()
   heartbeatTimer = setInterval(() => {
     if (connected.value && socketTask) {
-      socketTask.send({
-        data: JSON.stringify({ type: 'ping' }),
-        fail: () => {}
-      })
+      socketTask.send({ data: JSON.stringify({ type: 'ping' }), fail: () => {} })
     }
   }, 25000)
 }
 
 function stopHeartbeat() {
-  if (heartbeatTimer) {
-    clearInterval(heartbeatTimer)
-    heartbeatTimer = null
-  }
+  if (heartbeatTimer) { clearInterval(heartbeatTimer); heartbeatTimer = null }
 }
 
 function goBack() {
   uni.navigateBack({ fail: () => uni.switchTab({ url: '/pages/index/index' }) })
 }
+
+// ─── Lifecycle ───
+onLoad(() => {
+  if (!checkLogin()) return
+  const sysInfo = uni.getSystemInfoSync()
+  // #ifdef APP-PLUS
+  statusBarHeight.value = sysInfo.statusBarHeight || 44
+  // #endif
+  // #ifdef H5
+  statusBarHeight.value = 0
+  // #endif
+  // #ifdef MP
+  statusBarHeight.value = sysInfo.statusBarHeight || 20
+  // #endif
+  navHeight.value = statusBarHeight.value + 44
+  const tabBarHeight = sysInfo.windowBottom || 50
+  inputBaseHeight.value = 110 + tabBarHeight + (sysInfo.safeAreaInsets?.bottom || 0)
+
+  loadSettings()
+  loadHistoryList()
+  loadFavorites()
+
+  // Show quick actions on first load if no messages
+  showQuickActions.value = true
+
+  connectWebSocket()
+})
+
+onShow(() => {
+  pageVisible = true
+  if (!connected.value && !isConnecting.value && getToken()) {
+    connectWebSocket()
+  }
+})
+
+onHide(() => {
+  pageVisible = false
+  clearReconnectTimer()
+})
+
+onUnmounted(() => {
+  pageVisible = false
+  closeWebSocket()
+  clearReconnectTimer()
+  stopWaitingTimer()
+  if (connectedTimer) clearTimeout(connectedTimer)
+})
 </script>
 
 <style lang="scss" scoped>
@@ -409,26 +1011,34 @@ function goBack() {
   background: $background;
 }
 
-/* Navigation Bar */
+/* ─── Navigation Bar ─── */
 .nav-bar {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
+  top: 0; left: 0; right: 0;
   z-index: 100;
   background: $gradient-accent;
   box-shadow: $shadow-md;
 }
 .nav-bar-inner {
   height: 88rpx;
-  padding: 0 20rpx;
+  padding: 0 16rpx;
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
+.nav-left {
+  display: flex;
+  align-items: center;
+  gap: 4rpx;
+}
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 4rpx;
+}
 .nav-back {
-  width: 80rpx;
-  height: 80rpx;
+  width: 64rpx;
+  height: 64rpx;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -439,71 +1049,168 @@ function goBack() {
   font-weight: bold;
 }
 .nav-title {
-  font-size: 34rpx;
+  font-size: 32rpx;
   font-weight: 700;
   color: #fff;
   font-family: 'Calistoga', Georgia, 'PingFang SC', serif;
 }
-.nav-placeholder {
-  width: 80rpx;
+.nav-icon-btn {
+  width: 56rpx;
+  height: 56rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: $radius-full;
+  &:active { opacity: 0.7; }
+  text { font-size: 28rpx; }
+}
+.conn-dot {
+  width: 14rpx;
+  height: 14rpx;
+  border-radius: 50%;
+  margin-left: 10rpx;
+  &.dot-ok { background: #fff; box-shadow: 0 0 6px rgba(255,255,255,0.8); }
+  &.dot-connecting { background: #FCD34D; animation: pulse-dot 1.5s infinite; }
+  &.dot-off { background: #FCA5A5; }
+}
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
 }
 
-/* Message List */
+/* ─── Disclaimer ─── */
+.disclaimer-bar {
+  position: fixed;
+  left: 0; right: 0;
+  z-index: 90;
+  background: rgba(16, 185, 129, 0.06);
+  color: $foreground;
+  font-size: 22rpx;
+  text-align: center;
+  padding: 8rpx 48rpx 8rpx 16rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1rpx solid $border;
+}
+.disclaimer-bar .dismiss {
+  position: absolute;
+  right: 16rpx;
+  font-size: 28rpx;
+  color: $muted-foreground;
+}
+
+/* ─── Connection Status Bar ─── */
+.conn-bar {
+  position: fixed;
+  left: 0; right: 0;
+  z-index: 89;
+  background: rgba(239, 68, 68, 0.06);
+  color: #EF4444;
+  font-size: 22rpx;
+  padding: 6rpx 24rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16rpx;
+  border-bottom: 1rpx solid $border;
+}
+.conn-bar.connecting {
+  background: rgba(245, 158, 11, 0.06);
+  color: #F59E0B;
+}
+.conn-bar.conn-ok {
+  background: rgba(16, 185, 129, 0.06);
+  color: #10B981;
+}
+.conn-text { font-size: 22rpx; }
+.conn-retry {
+  font-size: 22rpx;
+  color: $accent;
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+/* ─── Welcome ─── */
+.welcome-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 80rpx 40rpx;
+  animation: fadeInUp 0.4s ease-out;
+}
+.welcome-icon { font-size: 80rpx; margin-bottom: 20rpx; }
+.welcome-title {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: $foreground;
+  margin-bottom: 12rpx;
+  font-family: 'Calistoga', Georgia, 'PingFang SC', serif;
+}
+.welcome-desc {
+  font-size: 26rpx;
+  color: $muted-foreground;
+  text-align: center;
+  line-height: 1.6;
+}
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(40rpx); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── Message List ─── */
 .message-list {
   position: fixed;
-  left: 0;
-  right: 0;
+  left: 0; right: 0;
   overflow-y: auto;
   padding: 20rpx 24rpx;
   background: $background;
 }
-
-.message-wrapper {
-  margin-bottom: 24rpx;
-}
+.message-wrapper { margin-bottom: 24rpx; }
 
 .message-row {
   display: flex;
   align-items: flex-start;
   padding: 0 8rpx;
 }
-.message-row.user {
-  justify-content: flex-end;
-}
-.message-row.assistant {
-  justify-content: flex-start;
-}
+.message-row.user { justify-content: flex-end; }
+.message-row.assistant { justify-content: flex-start; }
 
 .avatar {
-  width: 72rpx;
-  height: 72rpx;
-  min-width: 72rpx;
+  width: 68rpx;
+  height: 68rpx;
+  min-width: 68rpx;
   border-radius: $radius-full;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 36rpx;
+  font-size: 34rpx;
   flex-shrink: 0;
   overflow: hidden;
   border: 1rpx solid $border;
 }
 .avatar-ai {
   background: $card;
-  margin-right: 16rpx;
+  margin-right: 14rpx;
   box-shadow: $shadow-sm;
 }
 .avatar-user {
-  margin-left: 16rpx;
+  margin-left: 14rpx;
   background: $muted;
 }
 
-/* Chat bubbles */
+.bubble-wrap {
+  max-width: 72%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ─── Chat bubbles ─── */
 .bubble {
-  max-width: 65%;
   padding: 20rpx 28rpx;
   border: 1rpx solid $border;
   border-radius: $radius-xl;
-  word-break: break-all;
+  word-break: break-word;
 }
 .bubble-ai {
   background: $card;
@@ -511,14 +1218,13 @@ function goBack() {
   box-shadow: $shadow-sm;
 }
 .bubble-user {
+  max-width: 72%;
   background: $accent;
   border-color: $accent;
   border-top-right-radius: $radius-sm;
   box-shadow: $shadow-accent;
 }
-.bubble-user .bubble-text {
-  color: #fff;
-}
+.bubble-user .bubble-text { color: #fff; }
 .bubble-text {
   font-size: 30rpx;
   line-height: 1.6;
@@ -526,10 +1232,49 @@ function goBack() {
   font-family: 'Inter', 'PingFang SC', sans-serif;
 }
 
-/* Typing Indicator */
-.typing-bubble {
-  padding: 24rpx 32rpx;
+/* ─── Markdown content ─── */
+.md-content {
+  font-size: 30rpx;
+  line-height: 1.6;
+  color: $foreground;
 }
+
+/* ─── Streaming cursor ─── */
+.streaming-cursor {
+  display: inline;
+  color: $accent;
+  font-weight: bold;
+  animation: blink-cursor 1s step-end infinite;
+}
+@keyframes blink-cursor {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* ─── Message actions ─── */
+.msg-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6rpx 4rpx 0;
+  margin-top: 4rpx;
+}
+.msg-time {
+  font-size: 20rpx;
+  color: $muted-foreground;
+}
+.msg-action-btns {
+  display: flex;
+  gap: 12rpx;
+}
+.action-btn {
+  font-size: 26rpx;
+  &:active { opacity: 0.6; }
+}
+.favorited { transform: scale(1.1); }
+
+/* ─── Typing Indicator ─── */
+.typing-bubble { padding: 24rpx 32rpx; }
 .waiting-hint {
   display: block;
   font-size: 22rpx;
@@ -556,28 +1301,96 @@ function goBack() {
 .dot:nth-child(1) { animation-delay: 0s; }
 .dot:nth-child(2) { animation-delay: 0.2s; }
 .dot:nth-child(3) { animation-delay: 0.4s; }
-
 @keyframes bounce {
   0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
   40% { transform: scale(1); opacity: 1; }
 }
+.scroll-bottom-anchor { height: 2rpx; }
 
-.scroll-bottom-anchor {
-  height: 2rpx;
+/* ─── Quick Actions ─── */
+.quick-actions-area {
+  position: fixed;
+  left: 0; right: 0;
+  z-index: 99;
+  background: $card;
+  border-top: 1rpx solid $border;
+  max-height: 640rpx;
+  overflow-y: auto;
+}
+.qa-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12rpx 24rpx;
+}
+.qa-title {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: $foreground;
+}
+.qa-toggle {
+  font-size: 22rpx;
+  color: $accent;
+}
+.qa-sections { padding: 0 24rpx 12rpx; }
+.qa-section { margin-bottom: 16rpx; }
+.qa-section-title {
+  font-size: 24rpx;
+  font-weight: 600;
+  color: $foreground;
+  margin-bottom: 10rpx;
+  display: block;
+}
+.qa-btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+}
+.qa-btn {
+  display: flex;
+  align-items: center;
+  gap: 6rpx;
+  padding: 12rpx 18rpx;
+  background: $muted;
+  border: 1rpx solid $border;
+  border-radius: $radius-lg;
+  &:active:not(.disabled) {
+    border-color: $accent;
+    background: rgba(16, 185, 129, 0.06);
+  }
+  &.disabled { opacity: 0.5; }
+}
+.qa-btn-icon { font-size: 26rpx; }
+.qa-btn-text {
+  font-size: 22rpx;
+  color: $foreground;
+  white-space: nowrap;
 }
 
-/* Input Area */
+/* ─── Input Area ─── */
 .input-area {
   position: fixed;
   bottom: var(--window-bottom, 0);
-  left: 0;
-  right: 0;
+  left: 0; right: 0;
   background: $card;
-  padding: 16rpx 24rpx;
-  padding-bottom: calc(16rpx + env(safe-area-inset-bottom));
+  padding: 8rpx 24rpx;
+  padding-bottom: calc(12rpx + env(safe-area-inset-bottom));
   border-top: 1rpx solid $border;
   z-index: 100;
   box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.04);
+}
+.input-top-row {
+  display: flex;
+  justify-content: flex-start;
+  padding-bottom: 6rpx;
+}
+.qa-toggle-btn {
+  padding: 4rpx 14rpx;
+  border-radius: $radius-full;
+  background: $muted;
+  border: 1rpx solid $border;
+  &:active { opacity: 0.7; }
+  text { font-size: 24rpx; }
 }
 .input-row {
   display: flex;
@@ -606,75 +1419,202 @@ function goBack() {
   align-items: center;
   justify-content: center;
   transition: all 0.2s;
-}
-.send-btn text {
-  font-size: 28rpx;
-  color: $muted-foreground;
-  font-weight: 500;
-  font-family: 'Inter', 'PingFang SC', sans-serif;
+  text {
+    font-size: 28rpx;
+    color: $muted-foreground;
+    font-weight: 500;
+  }
 }
 .send-btn-active {
   background: $gradient-accent;
   box-shadow: $shadow-accent;
-}
-.send-btn-active text {
-  color: #fff;
-}
-.send-btn-active:active {
-  opacity: 0.9;
-  transform: translateY(1px);
-}
-.disclaimer-bar {
-  position: fixed;
-  left: 0; right: 0;
-  z-index: 90;
-  background: rgba(16, 185, 129, 0.06);
-  color: $foreground;
-  font-size: 22rpx;
-  text-align: center;
-  padding: 8rpx 48rpx 8rpx 16rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-bottom: 1rpx solid $border;
-}
-.disclaimer-bar .dismiss {
-  position: absolute;
-  right: 16rpx;
-  font-size: 28rpx;
-  color: $muted-foreground;
+  text { color: #fff; }
+  &:active { opacity: 0.9; transform: translateY(1px); }
 }
 
-/* Connection Status Bar */
-.conn-bar {
+/* ─── Popup (shared) ─── */
+.popup-mask {
   position: fixed;
-  left: 0; right: 0;
-  z-index: 89;
-  background: rgba(239, 68, 68, 0.06);
-  color: #EF4444;
-  font-size: 22rpx;
-  padding: 6rpx 24rpx;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 200;
+  background: rgba(0, 0, 0, 0.45);
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 16rpx;
+  animation: fadeIn 0.2s;
+}
+.popup-panel {
+  width: 88%;
+  max-width: 680rpx;
+  max-height: 70vh;
+  background: $card;
+  border-radius: $radius-xl;
+  box-shadow: $shadow-lg;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.popup-panel-tall { max-height: 80vh; }
+.popup-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24rpx 28rpx;
   border-bottom: 1rpx solid $border;
 }
-.conn-bar.connecting {
-  background: rgba(245, 158, 11, 0.06);
-  color: #F59E0B;
+.popup-title {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: $foreground;
 }
-.conn-bar.connected {
-  background: rgba(16, 185, 129, 0.06);
-  color: #10B981;
+.popup-close {
+  font-size: 32rpx;
+  color: $muted-foreground;
+  padding: 8rpx;
 }
-.conn-text {
-  font-size: 22rpx;
+.popup-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20rpx 28rpx;
 }
-.conn-retry {
-  font-size: 22rpx;
+.popup-footer {
+  padding: 16rpx 28rpx;
+  border-top: 1rpx solid $border;
+}
+.popup-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 72rpx;
+  border-radius: $radius-full;
+  text { font-size: 28rpx; font-weight: 500; }
+}
+.popup-btn-primary {
+  background: $gradient-accent;
+  box-shadow: $shadow-accent;
+  text { color: #fff; }
+  &:active { opacity: 0.9; }
+}
+.popup-btn-sm {
+  height: 60rpx;
+  padding: 0 24rpx;
+  text { font-size: 24rpx; }
+}
+.popup-action-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 16rpx;
+}
+
+/* ─── Settings ─── */
+.setting-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20rpx;
+  margin-bottom: 8rpx;
+}
+.setting-label {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: $foreground;
+}
+.setting-value {
+  font-size: 28rpx;
   color: $accent;
   font-weight: 600;
-  text-decoration: underline;
+}
+.setting-slider {
+  margin: 8rpx 0;
+}
+.setting-tip {
+  font-size: 22rpx;
+  color: $muted-foreground;
+  display: block;
+  margin-bottom: 8rpx;
+}
+
+/* ─── History list ─── */
+.history-scroll {
+  max-height: 60vh;
+}
+.history-item {
+  padding: 16rpx 0;
+  border-bottom: 1rpx solid $border;
+  position: relative;
+  &:active { background: rgba(16, 185, 129, 0.04); }
+}
+.history-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6rpx;
+}
+.history-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: $foreground;
+  flex: 1;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.history-time {
+  font-size: 22rpx;
+  color: $muted-foreground;
+  flex-shrink: 0;
+  margin-left: 16rpx;
+}
+.history-preview {
+  font-size: 24rpx;
+  color: $muted-foreground;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+.history-del {
+  position: absolute;
+  right: 0;
+  top: 16rpx;
+  text {
+    font-size: 22rpx;
+    color: #EF4444;
+    font-weight: 500;
+  }
+  &:active { opacity: 0.6; }
+}
+
+/* ─── Favorites list ─── */
+.favorite-item {
+  padding: 16rpx 0;
+  border-bottom: 1rpx solid $border;
+}
+.fav-content {
+  font-size: 28rpx;
+  color: $foreground;
+  line-height: 1.6;
+  margin-bottom: 8rpx;
+}
+.fav-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.fav-time {
+  font-size: 22rpx;
+  color: $muted-foreground;
+}
+.fav-actions {
+  display: flex;
+  gap: 16rpx;
+}
+
+.empty-hint {
+  display: flex;
+  justify-content: center;
+  padding: 60rpx 0;
+  text { font-size: 26rpx; color: $muted-foreground; }
 }
 </style>
