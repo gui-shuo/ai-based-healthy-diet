@@ -52,51 +52,58 @@ function goLogin() {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .page {
   min-height: 100vh;
-  background: #fdfbf7;
+  background: $background;
   display: flex;
   align-items: center;
   justify-content: center;
 }
+
 .status-box {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 24rpx;
   padding: 60rpx;
-  background: #fff;
-  border: 2px solid #2d2d2d;
-  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
-  box-shadow: 4px 4px 0px 0px #2d2d2d;
+  background: $card;
+  border: 1rpx solid $border;
+  border-radius: $radius-2xl;
+  box-shadow: $shadow-md;
 }
+
 .status-icon {
   font-size: 80rpx;
 }
+
 .status-msg {
   font-size: 28rpx;
-  color: #5a5a5a;
+  color: $muted-foreground;
   text-align: center;
-  font-family: 'Patrick Hand', 'PingFang SC', 'Microsoft YaHei', cursive;
+  font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif;
 }
+
 .btn-back {
   margin-top: 40rpx;
-  background: #ff4d4d;
+  background: $gradient-accent;
   color: #fff;
-  border: 2px solid #2d2d2d;
-  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
-  box-shadow: 3px 3px 0px 0px rgba(45, 45, 45, 0.1);
+  border: none;
+  border-radius: $radius-xl;
+  box-shadow: $shadow-accent;
   height: 80rpx;
   line-height: 80rpx;
   padding: 0 60rpx;
   font-size: 28rpx;
-  font-family: 'Patrick Hand', 'PingFang SC', 'Microsoft YaHei', cursive;
+  font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif;
 }
+
 .btn-back:active {
-  transform: translate(2px, 2px);
-  box-shadow: none;
+  transform: translateY(1px);
+  box-shadow: 0 2px 6px rgba(0, 82, 255, 0.15);
+  opacity: 0.95;
 }
+
 .btn-back::after {
   border: none;
 }

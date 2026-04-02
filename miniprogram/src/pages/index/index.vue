@@ -113,7 +113,7 @@ function goTo(url: string) {
 <style scoped lang="scss">
 .page {
   min-height: 100vh;
-  background: #fdfbf7;
+  background: $background;
 }
 
 .nav-bar {
@@ -122,8 +122,8 @@ function goTo(url: string) {
   left: 0;
   right: 0;
   z-index: 999;
-  background: #ff4d4d;
-  border-bottom: 2px solid #2d2d2d;
+  background: $gradient-accent;
+  border-bottom: 1rpx solid rgba(0, 82, 255, 0.15);
 }
 
 .nav-bar-content {
@@ -139,7 +139,7 @@ function goTo(url: string) {
   font-weight: 700;
   color: #fff;
   letter-spacing: 2rpx;
-  font-family: 'Kalam', 'ZCOOL KuaiLe', 'PingFang SC', cursive;
+  font-family: 'Calistoga', Georgia, 'PingFang SC', serif;
 }
 
 .nav-bell {
@@ -163,10 +163,10 @@ function goTo(url: string) {
   align-items: center;
   padding: 32rpx;
   margin-bottom: 24rpx;
-  background: #fff;
-  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
-  border: 2px solid #2d2d2d;
-  box-shadow: 4px 4px 0px 0px #2d2d2d;
+  background: $card;
+  border-radius: $radius-2xl;
+  border: 1rpx solid $border;
+  box-shadow: $shadow-sm;
 }
 
 .avatar {
@@ -174,7 +174,7 @@ function goTo(url: string) {
   height: 96rpx;
   border-radius: 50%;
   margin-right: 24rpx;
-  border: 2px solid #2d2d2d;
+  border: 2rpx solid $border;
 }
 
 .avatar-placeholder {
@@ -182,8 +182,8 @@ function goTo(url: string) {
   height: 96rpx;
   border-radius: 50%;
   margin-right: 24rpx;
-  background: #fff9c4;
-  border: 2px solid #2d2d2d;
+  background: $muted;
+  border: 2rpx solid $border;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -198,14 +198,14 @@ function goTo(url: string) {
 .greeting-hello {
   font-size: 32rpx;
   font-weight: 600;
-  color: #2d2d2d;
+  color: $foreground;
   margin-bottom: 8rpx;
-  font-family: 'Kalam', 'ZCOOL KuaiLe', 'PingFang SC', cursive;
+  font-family: 'Calistoga', Georgia, 'PingFang SC', serif;
 }
 
 .greeting-sub {
   font-size: 24rpx;
-  color: rgba(45, 45, 45, 0.4);
+  color: $muted-foreground;
 }
 
 .grid {
@@ -220,14 +220,14 @@ function goTo(url: string) {
   align-items: center;
   justify-content: space-between;
   padding: 28rpx 32rpx;
-  background: #fff;
-  border-radius: 15px 225px 15px 255px / 255px 15px 225px 15px;
-  border: 2px solid #2d2d2d;
-  box-shadow: 3px 3px 0px 0px rgba(45, 45, 45, 0.1);
+  background: $card;
+  border-radius: $radius-xl;
+  border: 1rpx solid $border;
+  box-shadow: $shadow-sm;
   transition: transform 0.15s, box-shadow 0.15s;
 
   &:active {
-    transform: translate(2px, 2px);
+    transform: translateY(1px);
     box-shadow: none;
   }
 }
@@ -251,42 +251,44 @@ function goTo(url: string) {
 .grid-label {
   font-size: 30rpx;
   font-weight: 500;
-  color: #2d2d2d;
-  font-family: 'Patrick Hand', 'PingFang SC', 'Microsoft YaHei', cursive;
+  color: $foreground;
+  font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif;
 }
 
 .vip-badge {
   font-size: 20rpx;
   color: #fff;
-  background: #ff4d4d;
-  padding: 2rpx 12rpx;
-  border-radius: 185px 10px 155px 10px / 10px 155px 10px 185px;
-  border: 1px solid #2d2d2d;
-  font-weight: 600;
-  font-family: 'Patrick Hand', 'PingFang SC', 'Microsoft YaHei', cursive;
+  background: $gradient-accent;
+  padding: 2rpx 16rpx;
+  border-radius: $radius-full;
+  border: none;
+  font-weight: 500;
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.05em;
 }
 
 .grid-arrow {
   font-size: 36rpx;
-  color: rgba(45, 45, 45, 0.4);
+  color: $muted-foreground;
 }
 
 .app-desc {
   text-align: center;
   padding: 32rpx 0 24rpx;
-  border-top: 2px dashed #e5e0d8;
+  border-top: 1rpx solid $border;
 }
 
 .desc-text {
   display: block;
   font-size: 24rpx;
-  color: rgba(45, 45, 45, 0.3);
+  color: $muted-foreground;
   margin-bottom: 8rpx;
 }
 
 .copy-text {
   display: block;
   font-size: 22rpx;
-  color: rgba(45, 45, 45, 0.25);
+  color: $muted-foreground;
+  opacity: 0.7;
 }
 </style>

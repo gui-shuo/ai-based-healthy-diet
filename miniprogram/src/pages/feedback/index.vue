@@ -187,33 +187,25 @@ onMounted(() => {
 <style scoped lang="scss">
 .page {
   min-height: 100vh;
-  background: #fdfbf7;
+  background: $background;
   padding: 20rpx 0 30rpx;
-  font-family: 'Patrick Hand', cursive;
+  font-family: 'Inter', sans-serif;
 }
 
 .card {
-  background: #fdfbf7;
-  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+  background: $card;
+  border-radius: $radius-xl;
   margin: 0 24rpx 20rpx;
   padding: 30rpx;
-  border: 2rpx solid #2d2d2d;
-  box-shadow: 4px 4px 0px 0px #2d2d2d;
-  /* Notebook top-edge decoration */
-  background-image: repeating-linear-gradient(
-    transparent,
-    transparent 59rpx,
-    rgba(229, 224, 216, 0.3) 59rpx,
-    rgba(229, 224, 216, 0.3) 60rpx
-  );
-  background-color: #fdfbf7;
+  border: 1rpx solid $border;
+  box-shadow: $shadow-sm;
 }
 
 .card-title {
   font-size: 32rpx;
   margin-bottom: 24rpx;
-  color: #2d2d2d;
-  font-family: 'Kalam', cursive;
+  color: $foreground;
+  font-family: 'Calistoga', cursive;
 }
 
 .type-selector {
@@ -226,49 +218,45 @@ onMounted(() => {
   flex: 1;
   text-align: center;
   padding: 16rpx 0;
-  border: 2rpx dashed #e5e0d8;
-  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+  border: 1rpx solid $border;
+  border-radius: $radius-lg;
   font-size: 26rpx;
-  color: #2d2d2d;
-  opacity: 0.7;
-  font-family: 'Patrick Hand', cursive;
-  transition: all 0.2s;
+  color: $muted-foreground;
+  font-family: 'Inter', sans-serif;
+  transition: all 0.2s ease;
 
   &.active {
-    border-color: #ff4d4d;
-    border-style: solid;
-    color: #ff4d4d;
-    opacity: 1;
-    background: rgba(255, 77, 77, 0.06);
-    box-shadow: 3px 3px 0px 0px rgba(45,45,45,0.1);
+    border-color: $accent;
+    color: $accent;
+    background: rgba(0, 82, 255, 0.06);
+    box-shadow: $shadow-sm;
   }
 }
 
 .input-group {
-  background: #fdfbf7;
-  border: 2rpx dashed #e5e0d8;
-  border-radius: 15px 225px 15px 255px / 255px 15px 225px 15px;
+  background: $background;
+  border: 1rpx solid $border;
+  border-radius: $radius-lg;
   padding: 16rpx 24rpx;
   margin-bottom: 16rpx;
 }
 
 .input-group .label {
   font-size: 24rpx;
-  color: #2d2d2d;
-  opacity: 0.5;
+  color: $muted-foreground;
   margin-bottom: 6rpx;
   display: block;
-  font-family: 'Kalam', cursive;
+  font-family: 'Inter', sans-serif;
 }
 
 .required {
-  color: #ff4d4d;
+  color: $uni-error;
 }
 
 .input-group input {
   height: 48rpx;
   font-size: 28rpx;
-  font-family: 'Patrick Hand', cursive;
+  font-family: 'Inter', sans-serif;
 }
 
 .textarea-group {
@@ -280,15 +268,14 @@ onMounted(() => {
   height: 200rpx;
   font-size: 28rpx;
   line-height: 1.6;
-  font-family: 'Patrick Hand', cursive;
+  font-family: 'Inter', sans-serif;
 }
 
 .char-count {
   text-align: right;
   display: block;
   margin-top: 6rpx;
-  color: #2d2d2d;
-  opacity: 0.5;
+  color: $muted-foreground;
   font-size: 24rpx;
 }
 
@@ -296,13 +283,13 @@ onMounted(() => {
   margin-top: 10rpx;
   height: 84rpx;
   line-height: 84rpx;
-  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+  border-radius: $radius-xl;
   font-size: 30rpx;
-  background: #ff4d4d !important;
-  color: #fdfbf7 !important;
-  border: 2rpx solid #2d2d2d;
-  box-shadow: 4px 4px 0px 0px #2d2d2d;
-  font-family: 'Kalam', cursive;
+  background: $gradient-accent !important;
+  color: $accent-foreground !important;
+  border: none;
+  box-shadow: $shadow-accent;
+  font-family: 'Calistoga', cursive;
 }
 
 .submit-btn::after {
@@ -312,13 +299,12 @@ onMounted(() => {
 .loading-state {
   text-align: center;
   padding: 40rpx 0;
-  color: #2d2d2d;
-  opacity: 0.6;
+  color: $muted-foreground;
 }
 
 .feedback-item {
   padding: 20rpx 0;
-  border-bottom: 2rpx dashed #e5e0d8;
+  border-bottom: 1rpx solid $border;
 
   &:last-child {
     border-bottom: none;
@@ -340,97 +326,96 @@ onMounted(() => {
 .feedback-title {
   font-size: 28rpx;
   font-weight: 600;
-  color: #2d2d2d;
+  color: $foreground;
   flex: 1;
   margin-right: 16rpx;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-family: 'Kalam', cursive;
+  font-family: 'Calistoga', cursive;
 }
 
 .feedback-time {
   display: block;
-  color: #2d2d2d;
-  opacity: 0.5;
+  color: $muted-foreground;
   font-size: 24rpx;
 }
 
 .badge {
   font-size: 20rpx;
   padding: 4rpx 12rpx;
-  border-radius: 8px 18px 8px 18px / 18px 8px 18px 8px;
+  border-radius: $radius-full;
   white-space: nowrap;
-  border: 1rpx solid #2d2d2d;
+  border: none;
+  font-family: 'JetBrains Mono', monospace;
 }
 
 .badge-SUGGESTION {
-  background: rgba(255, 77, 77, 0.1);
-  color: #ff4d4d;
+  background: rgba(0, 82, 255, 0.1);
+  color: $accent;
 }
 
 .badge-BUG {
-  background: #fff9c4;
-  color: #2d2d2d;
+  background: rgba(245, 158, 11, 0.1);
+  color: $uni-warning;
 }
 
 .badge-OTHER {
-  background: #e5e0d8;
-  color: #2d2d2d;
+  background: $muted;
+  color: $muted-foreground;
 }
 
 .status-PENDING {
-  background: #fff9c4;
-  color: #2d2d2d;
+  background: rgba(245, 158, 11, 0.1);
+  color: $uni-warning;
 }
 
 .status-REPLIED {
-  background: rgba(255, 77, 77, 0.1);
-  color: #ff4d4d;
+  background: rgba(16, 185, 129, 0.1);
+  color: $uni-success;
 }
 
 .status-CLOSED {
-  background: #e5e0d8;
-  color: #2d2d2d;
-  opacity: 0.7;
+  background: $muted;
+  color: $muted-foreground;
 }
 
 .feedback-detail {
   margin-top: 16rpx;
   padding: 16rpx;
-  background: #fff9c4;
-  border-radius: 15px 225px 15px 255px / 255px 15px 225px 15px;
-  border: 1rpx dashed #2d2d2d;
+  background: $muted;
+  border-radius: $radius-lg;
+  border: 1rpx solid $border;
 }
 
 .detail-content {
   font-size: 26rpx;
-  color: #2d2d2d;
+  color: $foreground;
   line-height: 1.7;
   word-break: break-all;
-  font-family: 'Patrick Hand', cursive;
+  font-family: 'Inter', sans-serif;
 }
 
 .reply-box {
   margin-top: 16rpx;
   padding-top: 16rpx;
-  border-top: 2rpx dashed #e5e0d8;
+  border-top: 1rpx solid $border;
 }
 
 .reply-label {
   font-size: 24rpx;
-  color: #2d5da1;
+  color: $accent;
   font-weight: 600;
   display: block;
   margin-bottom: 6rpx;
-  font-family: 'Kalam', cursive;
+  font-family: 'Inter', sans-serif;
 }
 
 .reply-content {
   font-size: 26rpx;
-  color: #2d2d2d;
+  color: $foreground;
   line-height: 1.7;
-  font-family: 'Patrick Hand', cursive;
+  font-family: 'Inter', sans-serif;
 }
 
 .empty-state {
@@ -447,9 +432,8 @@ onMounted(() => {
 
 .empty-text {
   font-size: 26rpx;
-  color: #2d2d2d;
-  opacity: 0.6;
-  font-family: 'Patrick Hand', cursive;
+  color: $muted-foreground;
+  font-family: 'Inter', sans-serif;
 }
 
 .safe-bottom {

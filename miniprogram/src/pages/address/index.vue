@@ -91,7 +91,7 @@
           </view>
           <view class="form-group switch-group">
             <text class="form-label">设为默认地址</text>
-            <switch :checked="form.isDefault" @change="form.isDefault = $event.detail.value" color="#ff4d4d" />
+            <switch :checked="form.isDefault" @change="form.isDefault = $event.detail.value" color="#0052FF" />
           </view>
         </scroll-view>
         <view class="modal-footer">
@@ -270,26 +270,26 @@ onShow(() => {
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .address-page {
   min-height: 100vh;
-  background: #fdfbf7;
+  background: $background;
   padding-bottom: 140rpx;
-  font-family: 'Patrick Hand', cursive;
+  font-family: 'Inter', sans-serif;
 }
 
 .address-card {
-  background: #fdfbf7;
+  background: $card;
   margin: 16rpx 24rpx;
-  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+  border-radius: $radius-xl;
   padding: 28rpx;
-  border: 2rpx solid #2d2d2d;
-  box-shadow: 4px 4px 0px 0px #2d2d2d;
+  border: 1rpx solid $border;
+  box-shadow: $shadow-sm;
 }
 
 .address-card.selected {
-  border: 2rpx solid #ff4d4d;
-  box-shadow: 4px 4px 0px 0px #ff4d4d;
+  border: 2rpx solid $accent;
+  box-shadow: $shadow-accent;
 }
 
 .address-top {
@@ -302,24 +302,23 @@ onShow(() => {
 .receiver-name {
   font-size: 32rpx;
   font-weight: 600;
-  color: #2d2d2d;
-  font-family: 'Kalam', cursive;
+  color: $foreground;
+  font-family: 'Calistoga', cursive;
 }
 
 .receiver-phone {
   font-size: 28rpx;
-  color: #2d2d2d;
-  opacity: 0.6;
-  font-family: 'Patrick Hand', cursive;
+  color: $muted-foreground;
+  font-family: 'Inter', sans-serif;
 }
 
 .default-tag {
   font-size: 20rpx;
-  color: #fdfbf7;
-  background: #ff4d4d;
+  color: $accent-foreground;
+  background: $accent;
   padding: 4rpx 12rpx;
-  border-radius: 8px 18px 8px 18px / 18px 8px 18px 8px;
-  border: 1rpx solid #2d2d2d;
+  border-radius: $radius-full;
+  font-family: 'JetBrains Mono', monospace;
 }
 
 .address-detail {
@@ -330,21 +329,20 @@ onShow(() => {
 
 .address-label {
   font-size: 22rpx;
-  color: #2d5da1;
-  border: 1rpx solid #2d5da1;
+  color: $accent;
+  border: 1rpx solid $accent;
   padding: 2rpx 10rpx;
-  border-radius: 8px 18px 8px 18px / 18px 8px 18px 8px;
+  border-radius: $radius-full;
   flex-shrink: 0;
   margin-top: 4rpx;
-  font-family: 'Patrick Hand', cursive;
+  font-family: 'JetBrains Mono', monospace;
 }
 
 .address-text {
   font-size: 26rpx;
-  color: #2d2d2d;
-  opacity: 0.7;
+  color: $muted-foreground;
   line-height: 1.5;
-  font-family: 'Patrick Hand', cursive;
+  font-family: 'Inter', sans-serif;
 }
 
 .address-actions {
@@ -352,7 +350,7 @@ onShow(() => {
   gap: 24rpx;
   margin-top: 20rpx;
   padding-top: 20rpx;
-  border-top: 2rpx dashed #e5e0d8;
+  border-top: 1rpx solid $border;
 }
 
 .action-btn {
@@ -367,14 +365,12 @@ onShow(() => {
 
 .action-text {
   font-size: 24rpx;
-  color: #2d2d2d;
-  opacity: 0.7;
-  font-family: 'Patrick Hand', cursive;
+  color: $muted-foreground;
+  font-family: 'Inter', sans-serif;
 }
 
 .action-btn.danger .action-text {
-  color: #ff4d4d;
-  opacity: 1;
+  color: $uni-error;
 }
 
 .empty-state {
@@ -391,25 +387,23 @@ onShow(() => {
 
 .empty-text {
   font-size: 30rpx;
-  color: #2d2d2d;
+  color: $foreground;
   margin-bottom: 8rpx;
-  font-family: 'Kalam', cursive;
+  font-family: 'Calistoga', cursive;
 }
 
 .empty-hint {
   font-size: 24rpx;
-  color: #2d2d2d;
-  opacity: 0.5;
-  font-family: 'Patrick Hand', cursive;
+  color: $muted-foreground;
+  font-family: 'Inter', sans-serif;
 }
 
 .loading-state {
   text-align: center;
   padding: 40rpx;
   font-size: 28rpx;
-  color: #2d2d2d;
-  opacity: 0.6;
-  font-family: 'Patrick Hand', cursive;
+  color: $muted-foreground;
+  font-family: 'Inter', sans-serif;
 }
 
 .add-btn-wrap {
@@ -419,28 +413,27 @@ onShow(() => {
   right: 0;
   padding: 20rpx 28rpx;
   padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
-  background: #fdfbf7;
-  border-top: 2rpx dashed #e5e0d8;
+  background: $card;
+  border-top: 1rpx solid $border;
 }
 
 .add-btn {
   text-align: center;
   padding: 24rpx;
-  background: #ff4d4d;
-  color: #fdfbf7;
+  background: $gradient-accent;
+  color: $accent-foreground;
   font-size: 30rpx;
   font-weight: 600;
-  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
-  border: 2rpx solid #2d2d2d;
-  box-shadow: 4px 4px 0px 0px #2d2d2d;
-  font-family: 'Kalam', cursive;
+  border-radius: $radius-xl;
+  box-shadow: $shadow-accent;
+  font-family: 'Calistoga', cursive;
 }
 
 /* Modal */
 .modal-mask {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.5);
+  background: $uni-bg-color-mask;
   z-index: 1000;
   display: flex;
   align-items: flex-end;
@@ -449,11 +442,11 @@ onShow(() => {
 .modal-content {
   width: 100%;
   max-height: 90vh;
-  background: #fdfbf7;
-  border-radius: 30rpx 30rpx 0 0;
-  border-top: 3rpx solid #2d2d2d;
+  background: $card;
+  border-radius: $radius-2xl $radius-2xl 0 0;
   display: flex;
   flex-direction: column;
+  box-shadow: $shadow-lg;
 }
 
 .modal-header {
@@ -461,19 +454,19 @@ onShow(() => {
   align-items: center;
   justify-content: space-between;
   padding: 28rpx;
-  border-bottom: 2rpx dashed #e5e0d8;
+  border-bottom: 1rpx solid $border;
 }
 
 .modal-title {
   font-size: 32rpx;
   font-weight: 600;
-  color: #2d2d2d;
-  font-family: 'Kalam', cursive;
+  color: $foreground;
+  font-family: 'Calistoga', cursive;
 }
 
 .modal-close {
   font-size: 36rpx;
-  color: #2d2d2d;
+  color: $muted-foreground;
   padding: 8rpx;
 }
 
@@ -490,36 +483,36 @@ onShow(() => {
 .form-label {
   font-size: 28rpx;
   font-weight: 500;
-  color: #2d2d2d;
+  color: $foreground;
   margin-bottom: 12rpx;
   display: block;
-  font-family: 'Kalam', cursive;
+  font-family: 'Inter', sans-serif;
 }
 
 .required {
-  color: #ff4d4d;
+  color: $uni-error;
 }
 
 .form-input {
   width: 100%;
   height: 80rpx;
-  border: 2rpx solid #e5e0d8;
-  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+  border: 1rpx solid $border;
+  border-radius: $radius-lg;
   padding: 0 24rpx;
   font-size: 28rpx;
-  font-family: 'Patrick Hand', cursive;
-  background: #fdfbf7;
+  font-family: 'Inter', sans-serif;
+  background: $background;
 }
 
 .form-textarea {
   width: 100%;
   height: 160rpx;
-  border: 2rpx solid #e5e0d8;
-  border-radius: 15px 225px 15px 255px / 255px 15px 225px 15px;
+  border: 1rpx solid $border;
+  border-radius: $radius-lg;
   padding: 16rpx 24rpx;
   font-size: 28rpx;
-  font-family: 'Patrick Hand', cursive;
-  background: #fdfbf7;
+  font-family: 'Inter', sans-serif;
+  background: $background;
 }
 
 .region-picker {
@@ -527,21 +520,21 @@ onShow(() => {
   align-items: center;
   justify-content: space-between;
   height: 80rpx;
-  border: 2rpx solid #e5e0d8;
-  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+  border: 1rpx solid $border;
+  border-radius: $radius-lg;
   padding: 0 24rpx;
   font-size: 28rpx;
-  color: #2d2d2d;
-  font-family: 'Patrick Hand', cursive;
+  color: $foreground;
+  font-family: 'Inter', sans-serif;
 }
 
 .placeholder-text {
-  color: #e5e0d8;
+  color: $uni-text-color-placeholder;
 }
 
 .arrow {
   font-size: 32rpx;
-  color: #e5e0d8;
+  color: $muted-foreground;
 }
 
 .label-tags {
@@ -552,20 +545,18 @@ onShow(() => {
 
 .label-tag {
   padding: 10rpx 28rpx;
-  border: 2rpx dashed #e5e0d8;
-  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+  border: 1rpx solid $border;
+  border-radius: $radius-full;
   font-size: 26rpx;
-  color: #2d2d2d;
-  opacity: 0.7;
-  font-family: 'Patrick Hand', cursive;
+  color: $muted-foreground;
+  font-family: 'Inter', sans-serif;
+  transition: all 0.2s ease;
 }
 
 .label-tag.active {
-  border-color: #ff4d4d;
-  border-style: solid;
-  color: #ff4d4d;
-  opacity: 1;
-  background: rgba(255, 77, 77, 0.06);
+  border-color: $accent;
+  color: $accent;
+  background: rgba(0, 82, 255, 0.06);
 }
 
 .switch-group {
@@ -581,19 +572,18 @@ onShow(() => {
 .modal-footer {
   padding: 20rpx 28rpx;
   padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
-  border-top: 2rpx dashed #e5e0d8;
+  border-top: 1rpx solid $border;
 }
 
 .save-btn {
   text-align: center;
   padding: 24rpx;
-  background: #ff4d4d;
-  color: #fdfbf7;
+  background: $gradient-accent;
+  color: $accent-foreground;
   font-size: 30rpx;
   font-weight: 600;
-  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
-  border: 2rpx solid #2d2d2d;
-  box-shadow: 4px 4px 0px 0px #2d2d2d;
-  font-family: 'Kalam', cursive;
+  border-radius: $radius-xl;
+  box-shadow: $shadow-accent;
+  font-family: 'Calistoga', cursive;
 }
 </style>

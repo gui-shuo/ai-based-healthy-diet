@@ -159,22 +159,16 @@ onLoad((query) => {
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .container {
   min-height: 100vh;
-  background-color: #fdfbf7;
-  background-image: repeating-linear-gradient(
-    transparent,
-    transparent 59rpx,
-    rgba(229, 224, 216, 0.35) 59rpx,
-    rgba(229, 224, 216, 0.35) 60rpx
-  );
+  background-color: $background;
   padding: 0 24rpx 30rpx;
 }
 
 .legal-page {
   padding: 20rpx 0;
-  font-family: 'Patrick Hand', cursive;
+  font-family: 'Inter', sans-serif;
 }
 
 .legal-title {
@@ -182,23 +176,22 @@ onLoad((query) => {
   font-weight: 700;
   text-align: center;
   margin-bottom: 10rpx;
-  color: #2d2d2d;
-  font-family: 'Kalam', cursive;
+  color: $foreground;
+  font-family: 'Calistoga', cursive;
 }
 
 .legal-date {
   font-size: 24rpx;
-  color: #2d2d2d;
-  opacity: 0.5;
+  color: $muted-foreground;
   text-align: center;
   margin-bottom: 30rpx;
-  font-family: 'Patrick Hand', cursive;
+  font-family: 'Inter', sans-serif;
 }
 
 .section {
   margin-bottom: 28rpx;
   padding-bottom: 28rpx;
-  border-bottom: 1rpx dashed #e5e0d8;
+  border-bottom: 1rpx solid $border;
 }
 
 .section:last-child {
@@ -208,42 +201,39 @@ onLoad((query) => {
 .section-title {
   font-size: 30rpx;
   font-weight: 600;
-  color: #2d2d2d;
+  color: $foreground;
   margin-bottom: 12rpx;
-  font-family: 'Kalam', cursive;
+  font-family: 'Calistoga', cursive;
   padding-left: 16rpx;
-  border-left: 4rpx solid #ff4d4d;
+  border-left: 4rpx solid $accent;
 }
 
 .section-text {
   font-size: 26rpx;
-  color: #2d2d2d;
-  opacity: 0.75;
+  color: $muted-foreground;
   line-height: 1.8;
   white-space: pre-line;
-  font-family: 'Patrick Hand', cursive;
+  font-family: 'Inter', sans-serif;
 }
 
 .section-text.highlight {
-  color: #ff4d4d;
-  opacity: 1;
-  background: rgba(255, 77, 77, 0.05);
+  color: $uni-error;
+  background: rgba(239, 68, 68, 0.05);
   padding: 16rpx;
-  border-radius: 15px 225px 15px 255px / 255px 15px 225px 15px;
-  border: 1rpx dashed #ff4d4d;
+  border-radius: $radius-lg;
+  border: 1rpx solid rgba(239, 68, 68, 0.2);
 }
 
 .warning-box {
-  background: #fff9c4;
-  color: #2d2d2d;
-  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+  background: rgba(245, 158, 11, 0.08);
+  color: $foreground;
+  border-radius: $radius-lg;
   padding: 20rpx 24rpx;
   font-size: 26rpx;
   font-weight: 600;
   text-align: center;
   margin-bottom: 30rpx;
-  border: 2rpx solid #2d2d2d;
-  box-shadow: 3px 3px 0px 0px rgba(45,45,45,0.1);
-  font-family: 'Kalam', cursive;
+  border: 1rpx solid rgba(245, 158, 11, 0.2);
+  font-family: 'Inter', sans-serif;
 }
 </style>

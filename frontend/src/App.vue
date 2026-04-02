@@ -19,20 +19,22 @@ const isDark = computed(() => themeStore.isDark)
 <style>
 #app {
   min-height: 100vh;
-  background-color: #fdfbf7;
-  background-image: radial-gradient(#e5e0d8 1px, transparent 1px);
-  background-size: 24px 24px;
+  background-color: #FAFAFA;
   transition: background-color 0.3s ease;
-  font-family: 'Patrick Hand', 'PingFang SC', 'Microsoft YaHei', cursive;
+  font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;
 }
 
 /* 页面切换动画 */
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.2s ease;
+  transition: opacity 0.2s ease, transform 0.2s ease;
 }
 
-.fade-enter-from,
+.fade-enter-from {
+  opacity: 0;
+  transform: translateY(8px);
+}
+
 .fade-leave-to {
   opacity: 0;
 }

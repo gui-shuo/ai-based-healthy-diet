@@ -204,7 +204,7 @@ function goTo(url: string) {
 <style scoped lang="scss">
 .page {
   min-height: 100vh;
-  background: #fdfbf7;
+  background: $background;
   padding: 0 48rpx;
 }
 
@@ -223,16 +223,18 @@ function goTo(url: string) {
 .app-name {
   font-size: 48rpx;
   font-weight: 700;
-  color: #ff4d4d;
+  background: $gradient-accent;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
   letter-spacing: 4rpx;
-  font-family: 'Kalam', 'ZCOOL KuaiLe', 'PingFang SC', cursive;
+  font-family: 'Calistoga', Georgia, 'PingFang SC', serif;
 }
 
 .app-slogan {
   font-size: 26rpx;
-  color: rgba(45, 45, 45, 0.4);
+  color: $muted-foreground;
   margin-top: 12rpx;
-  font-family: 'Patrick Hand', 'PingFang SC', 'Microsoft YaHei', cursive;
+  font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif;
 }
 
 .form-section {
@@ -246,26 +248,27 @@ function goTo(url: string) {
 .input-label {
   display: block;
   font-size: 26rpx;
-  color: #5a5a5a;
+  color: $muted-foreground;
   margin-bottom: 12rpx;
   font-weight: 500;
-  font-family: 'Patrick Hand', 'PingFang SC', 'Microsoft YaHei', cursive;
+  font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif;
 }
 
 .input {
   width: 100%;
   height: 88rpx;
-  background: #fdfbf7;
-  border-radius: 185px 10px 155px 10px / 10px 155px 10px 185px;
+  background: $card;
+  border-radius: $radius-xl;
   padding: 0 28rpx;
   font-size: 28rpx;
-  color: #2d2d2d;
+  color: $foreground;
   box-sizing: border-box;
-  border: 2rpx solid #e5e0d8;
+  border: 2rpx solid $border;
+  transition: border-color 0.2s ease;
 
   &:focus {
-    border-color: #ff4d4d;
-    background: #fff;
+    border-color: $accent;
+    box-shadow: 0 0 0 3px rgba(0, 82, 255, 0.1);
   }
 }
 
@@ -284,10 +287,10 @@ function goTo(url: string) {
 .captcha-img-wrap {
   width: 220rpx;
   height: 88rpx;
-  border-radius: 185px 10px 155px 10px / 10px 155px 10px 185px;
+  border-radius: $radius-xl;
   overflow: hidden;
-  background: #e5e0d8;
-  border: 2rpx solid #e5e0d8;
+  background: $muted;
+  border: 2rpx solid $border;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -301,26 +304,31 @@ function goTo(url: string) {
 
 .captcha-placeholder {
   font-size: 24rpx;
-  color: rgba(45, 45, 45, 0.4);
+  color: $muted-foreground;
 }
 
 .btn-primary {
   width: 100%;
   height: 88rpx;
   line-height: 88rpx;
-  background: #ff4d4d;
+  background: $gradient-accent;
   color: #fff;
   font-size: 32rpx;
   font-weight: 600;
-  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
-  border: 2px solid #2d2d2d;
-  box-shadow: 4px 4px 0px 0px #2d2d2d;
+  border-radius: $radius-xl;
+  border: none;
+  box-shadow: $shadow-accent;
   margin-bottom: 24rpx;
-  font-family: 'Patrick Hand', 'PingFang SC', 'Microsoft YaHei', cursive;
+  font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+
+  &::after {
+    border: none;
+  }
 
   &:active {
-    transform: translate(2px, 2px);
-    box-shadow: none;
+    transform: translateY(1px);
+    box-shadow: 0 2px 6px rgba(0, 82, 255, 0.15);
+    opacity: 0.95;
   }
 
   &[disabled] {
@@ -337,18 +345,19 @@ function goTo(url: string) {
 
 .link {
   font-size: 26rpx;
-  color: #2d5da1;
-  font-family: 'Patrick Hand', 'PingFang SC', 'Microsoft YaHei', cursive;
+  color: $accent;
+  font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif;
 }
 
 .legal-links {
   text-align: center;
   margin-top: 40rpx;
   font-size: 22rpx;
-  color: rgba(45, 45, 45, 0.4);
+  color: $muted-foreground;
 }
+
 .legal-link {
-  color: #2d5da1;
+  color: $accent;
 }
 
 /* Social Login */
@@ -358,49 +367,60 @@ function goTo(url: string) {
   margin: 48rpx 0 32rpx;
   gap: 16rpx;
 }
+
 .divider-line {
   flex: 1;
   height: 0;
-  border-top: 2rpx dashed #e5e0d8;
+  border-top: 1rpx solid $border;
 }
+
 .divider-text {
   font-size: 24rpx;
-  color: rgba(45, 45, 45, 0.4);
+  color: $muted-foreground;
   white-space: nowrap;
 }
+
 .social-row {
   display: flex;
   justify-content: center;
   gap: 60rpx;
 }
+
 .social-btn {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 12rpx;
   padding: 20rpx 32rpx;
-  border-radius: 185px 10px 155px 10px / 10px 155px 10px 185px;
-  background: #fdfbf7;
-  border: 2rpx solid #e5e0d8;
+  border-radius: $radius-xl;
+  background: $card;
+  border: 1rpx solid $border;
   min-width: 160rpx;
+  box-shadow: $shadow-sm;
+  transition: transform 0.15s;
 }
+
 .social-btn:active {
-  transform: translate(1px, 1px);
+  transform: translateY(1px);
   box-shadow: none;
 }
+
 .social-icon {
   font-size: 48rpx;
 }
+
 .social-label {
   font-size: 22rpx;
-  color: #5a5a5a;
+  color: $muted-foreground;
 }
+
 .wechat-btn {
   background: #f0faf3;
-  border-color: #e5e0d8;
+  border-color: $border;
 }
+
 .qq-btn {
   background: #f0f4ff;
-  border-color: #e5e0d8;
+  border-color: $border;
 }
 </style>

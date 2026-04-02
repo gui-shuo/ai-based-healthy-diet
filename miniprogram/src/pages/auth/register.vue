@@ -313,7 +313,7 @@ function goLogin() {
 <style scoped lang="scss">
 .page {
   min-height: 100vh;
-  background: #fdfbf7;
+  background: $background;
   padding: 0 48rpx 60rpx;
 }
 
@@ -325,15 +325,15 @@ function goLogin() {
   display: block;
   font-size: 44rpx;
   font-weight: 700;
-  color: #2d2d2d;
+  color: $foreground;
   margin-bottom: 12rpx;
-  font-family: 'Kalam', 'ZCOOL KuaiLe', 'PingFang SC', cursive;
+  font-family: 'Calistoga', Georgia, 'PingFang SC', serif;
 }
 
 .subtitle {
   font-size: 26rpx;
-  color: rgba(45, 45, 45, 0.4);
-  font-family: 'Patrick Hand', 'PingFang SC', 'Microsoft YaHei', cursive;
+  color: $muted-foreground;
+  font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif;
 }
 
 .form-section {
@@ -347,30 +347,31 @@ function goLogin() {
 .input-label {
   display: block;
   font-size: 26rpx;
-  color: #5a5a5a;
+  color: $muted-foreground;
   margin-bottom: 10rpx;
   font-weight: 500;
-  font-family: 'Patrick Hand', 'PingFang SC', 'Microsoft YaHei', cursive;
+  font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif;
 }
 
 .required {
-  color: #ff4d4d;
+  color: #EF4444;
 }
 
 .input {
   width: 100%;
   height: 84rpx;
-  background: #fdfbf7;
-  border-radius: 185px 10px 155px 10px / 10px 155px 10px 185px;
+  background: $card;
+  border-radius: $radius-xl;
   padding: 0 28rpx;
   font-size: 28rpx;
-  color: #2d2d2d;
+  color: $foreground;
   box-sizing: border-box;
-  border: 2rpx solid #e5e0d8;
+  border: 2rpx solid $border;
+  transition: border-color 0.2s ease;
 
   &:focus {
-    border-color: #ff4d4d;
-    background: #fff;
+    border-color: $accent;
+    box-shadow: 0 0 0 3px rgba(0, 82, 255, 0.1);
   }
 }
 
@@ -381,11 +382,11 @@ function goLogin() {
   padding-left: 8rpx;
 
   &.error {
-    color: #ff4d4d;
+    color: #EF4444;
   }
 
   &.success {
-    color: #2d5da1;
+    color: $accent;
   }
 }
 
@@ -407,17 +408,17 @@ function goLogin() {
   line-height: 84rpx;
   padding: 0 24rpx;
   font-size: 24rpx;
-  color: #2d5da1;
-  background: #fdfbf7;
-  border: 2rpx solid #2d5da1;
-  border-radius: 185px 10px 155px 10px / 10px 155px 10px 185px;
+  color: $accent;
+  background: $card;
+  border: 2rpx solid $accent;
+  border-radius: $radius-xl;
   white-space: nowrap;
-  font-family: 'Patrick Hand', 'PingFang SC', 'Microsoft YaHei', cursive;
+  font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif;
 
   &[disabled] {
-    color: rgba(45, 45, 45, 0.4);
-    background: #e5e0d8;
-    border-color: #e5e0d8;
+    color: $muted-foreground;
+    background: $muted;
+    border-color: $border;
   }
 }
 
@@ -436,10 +437,10 @@ function goLogin() {
 .captcha-img-wrap {
   width: 220rpx;
   height: 84rpx;
-  border-radius: 185px 10px 155px 10px / 10px 155px 10px 185px;
+  border-radius: $radius-xl;
   overflow: hidden;
-  background: #e5e0d8;
-  border: 2rpx solid #e5e0d8;
+  background: $muted;
+  border: 2rpx solid $border;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -453,25 +454,30 @@ function goLogin() {
 
 .captcha-placeholder {
   font-size: 24rpx;
-  color: rgba(45, 45, 45, 0.4);
+  color: $muted-foreground;
 }
 
 .btn-primary {
   width: 100%;
   height: 88rpx;
   line-height: 88rpx;
-  background: #ff4d4d;
+  background: $gradient-accent;
   color: #fff;
   font-size: 32rpx;
   font-weight: 600;
-  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
-  border: 2px solid #2d2d2d;
-  box-shadow: 4px 4px 0px 0px #2d2d2d;
-  font-family: 'Patrick Hand', 'PingFang SC', 'Microsoft YaHei', cursive;
+  border-radius: $radius-xl;
+  border: none;
+  box-shadow: $shadow-accent;
+  font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+
+  &::after {
+    border: none;
+  }
 
   &:active {
-    transform: translate(2px, 2px);
-    box-shadow: none;
+    transform: translateY(1px);
+    box-shadow: 0 2px 6px rgba(0, 82, 255, 0.15);
+    opacity: 0.95;
   }
 
   &[disabled] {
@@ -486,7 +492,7 @@ function goLogin() {
 
 .link-text {
   font-size: 26rpx;
-  color: #2d5da1;
-  font-family: 'Patrick Hand', 'PingFang SC', 'Microsoft YaHei', cursive;
+  color: $accent;
+  font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif;
 }
 </style>

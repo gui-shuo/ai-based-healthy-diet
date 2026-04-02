@@ -135,16 +135,15 @@ onMounted(() => {
 <style scoped lang="scss">
 .page {
   min-height: 100vh;
-  background: #fdfbf7;
+  background: $background;
   padding: 20rpx 0 30rpx;
-  font-family: 'Patrick Hand', cursive;
+  font-family: 'Inter', sans-serif;
 }
 
 .loading-state {
   text-align: center;
   padding: 100rpx 0;
-  color: #2d2d2d;
-  opacity: 0.6;
+  color: $muted-foreground;
 }
 
 .announcement-list {
@@ -152,31 +151,17 @@ onMounted(() => {
 }
 
 .announcement-card {
-  background: #fdfbf7;
-  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+  background: $card;
+  border-radius: $radius-xl;
   padding: 28rpx;
   margin-bottom: 24rpx;
-  border: 2rpx solid #2d2d2d;
-  box-shadow: 4px 4px 0px 0px #2d2d2d;
+  border: 1rpx solid $border;
+  box-shadow: $shadow-sm;
   position: relative;
-  transition: all 0.2s;
-
-  /* Tack decoration */
-  &::before {
-    content: '\1F4CC';
-    position: absolute;
-    top: -14rpx;
-    right: 30rpx;
-    font-size: 32rpx;
-    z-index: 1;
-  }
+  transition: all 0.2s ease;
 
   &.important {
-    border-left: 6rpx solid #ff4d4d;
-
-    &::before {
-      content: '\1F4CD';
-    }
+    border-left: 6rpx solid $accent;
   }
 }
 
@@ -192,71 +177,66 @@ onMounted(() => {
 }
 
 .priority-badge {
-  background: #ff4d4d;
-  color: #fdfbf7;
+  background: $accent;
+  color: $accent-foreground;
   font-size: 20rpx;
   padding: 4rpx 12rpx;
-  border-radius: 8px 18px 8px 18px / 18px 8px 18px 8px;
+  border-radius: $radius-full;
   white-space: nowrap;
   font-weight: 600;
-  border: 1rpx solid #2d2d2d;
+  font-family: 'JetBrains Mono', monospace;
 }
 
 .announcement-title {
   font-size: 30rpx;
   font-weight: 700;
-  color: #2d2d2d;
+  color: $foreground;
   flex: 1;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-family: 'Kalam', cursive;
+  font-family: 'Calistoga', cursive;
 }
 
 .announcement-date {
   display: block;
-  color: #2d2d2d;
-  opacity: 0.5;
+  color: $muted-foreground;
   font-size: 24rpx;
 }
 
 .announcement-preview {
   font-size: 26rpx;
-  color: #2d2d2d;
-  opacity: 0.7;
+  color: $muted-foreground;
   line-height: 1.7;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  font-family: 'Patrick Hand', cursive;
+  font-family: 'Inter', sans-serif;
 }
 
 .announcement-content {
   font-size: 26rpx;
-  color: #2d2d2d;
+  color: $foreground;
   line-height: 1.8;
   word-break: break-all;
-  font-family: 'Patrick Hand', cursive;
+  font-family: 'Inter', sans-serif;
 }
 
 .expand-hint {
   margin-top: 12rpx;
   text-align: right;
-  color: #2d5da1;
+  color: $accent;
   font-size: 24rpx;
-  text-decoration: underline;
-  text-decoration-style: wavy;
-  font-family: 'Patrick Hand', cursive;
+  font-family: 'Inter', sans-serif;
 }
 
 .load-more {
   text-align: center;
   padding: 30rpx 0;
-  color: #2d2d2d;
-  opacity: 0.5;
+  color: $muted-foreground;
   font-size: 24rpx;
-  font-family: 'Patrick Hand', cursive;
+  font-family: 'Inter', sans-serif;
 }
 
 .empty-state {
@@ -273,9 +253,8 @@ onMounted(() => {
 
 .empty-text {
   font-size: 28rpx;
-  color: #2d2d2d;
-  opacity: 0.6;
-  font-family: 'Patrick Hand', cursive;
+  color: $muted-foreground;
+  font-family: 'Inter', sans-serif;
 }
 
 .safe-bottom {

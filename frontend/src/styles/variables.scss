@@ -1,35 +1,39 @@
-// ========== Hand-Drawn Design System Tokens ==========
+// ========== Minimalist Modern Design Tokens ==========
 
 // Core palette
-$paper: #fdfbf7;
-$pencil: #2d2d2d;
-$muted: #e5e0d8;
-$accent: #ff4d4d;
-$ink: #2d5da1;
-$sticky: #fff9c4;
+$background: #FAFAFA;
+$foreground: #0F172A;
+$muted: #F1F5F9;
+$muted-foreground: #64748B;
+$accent: #0052FF;
+$accent-secondary: #4D7CFF;
+$accent-foreground: #FFFFFF;
+$border: #E2E8F0;
+$card: #FFFFFF;
+$ring: #0052FF;
 
-// Semantic colors (remapped)
-$primary-color: #ff4d4d;
-$secondary-color: #2d5da1;
-$success-color: #4caf50;
-$warning-color: #ff9800;
-$error-color: #ff4d4d;
-$info-color: #2d5da1;
+// Semantic colors
+$primary-color: #0052FF;
+$secondary-color: #4D7CFF;
+$success-color: #10B981;
+$warning-color: #F59E0B;
+$error-color: #EF4444;
+$info-color: #0052FF;
 
 // Text colors
-$text-primary: #2d2d2d;
-$text-secondary: #5a5a5a;
-$text-disabled: #b0a89f;
+$text-primary: #0F172A;
+$text-secondary: #64748B;
+$text-disabled: #94A3B8;
 
 // Background colors
-$bg-primary: #fdfbf7;
-$bg-secondary: #ffffff;
-$bg-tertiary: #f5f0e8;
+$bg-primary: #FAFAFA;
+$bg-secondary: #FFFFFF;
+$bg-tertiary: #F1F5F9;
 
 // Border colors
-$border-light: #e5e0d8;
-$border-medium: #c4bfb6;
-$border-dark: #2d2d2d;
+$border-light: #E2E8F0;
+$border-medium: #CBD5E1;
+$border-dark: #94A3B8;
 
 // Spacing
 $spacing-xs: 4px;
@@ -38,31 +42,29 @@ $spacing-md: 16px;
 $spacing-lg: 24px;
 $spacing-xl: 32px;
 
-// Wobbly border-radius
-$radius-wobbly: 255px 15px 225px 15px / 15px 225px 15px 255px;
-$radius-wobbly-md: 15px 225px 15px 255px / 255px 15px 225px 15px;
-$radius-wobbly-sm: 185px 10px 155px 10px / 10px 155px 10px 185px;
-$radius-sm: 4px;
+// Border radius
+$radius-sm: 6px;
 $radius-md: 8px;
 $radius-lg: 12px;
 $radius-xl: 16px;
+$radius-2xl: 24px;
+$radius-full: 9999px;
 
-// Hard offset shadows
-$shadow-hard: 4px 4px 0px 0px #2d2d2d;
-$shadow-hard-lg: 8px 8px 0px 0px #2d2d2d;
-$shadow-hard-sm: 3px 3px 0px 0px rgba(45, 45, 45, 0.1);
-$shadow-hard-hover: 2px 2px 0px 0px #2d2d2d;
-$shadow-hard-accent: 4px 4px 0px 0px #ff4d4d;
-
-// Legacy shadows (kept for compat)
-$shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-$shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
-$shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
-$shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.15);
+// Shadows
+$shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+$shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+$shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.08);
+$shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1);
+$shadow-accent: 0 4px 14px rgba(0, 82, 255, 0.25);
+$shadow-accent-lg: 0 8px 24px rgba(0, 82, 255, 0.35);
 
 // Fonts
-$font-heading: 'Kalam', 'ZCOOL KuaiLe', 'PingFang SC', 'Microsoft YaHei', cursive;
-$font-body: 'Patrick Hand', 'PingFang SC', 'Microsoft YaHei', cursive;
+$font-display: 'Calistoga', Georgia, 'PingFang SC', 'Microsoft YaHei', serif;
+$font-body: 'Inter', 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;
+$font-mono: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+
+// Gradient
+$gradient-accent: linear-gradient(135deg, $accent, $accent-secondary);
 
 // Breakpoints
 $breakpoint-mobile: 768px;
