@@ -274,9 +274,9 @@ onMounted(() => {
 
 <style scoped lang="scss">
 .invitation-panel {
-  border-radius: 15px 225px 15px 255px / 255px 15px 225px 15px;
-  border: 2px solid #2d2d2d;
-  box-shadow: 4px 4px 0px 0px #2d2d2d;
+  border-radius: 12px;
+  border: 1px solid #E2E8F0;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
 
   :deep(.el-card__header) {
     padding: 10px 14px;
@@ -294,8 +294,8 @@ onMounted(() => {
     .title {
       font-size: 14px;
       font-weight: 600;
-      color: #2d2d2d;
-      font-family: 'Kalam', 'ZCOOL KuaiLe', cursive;
+      color: #0F172A;
+      font-family: 'Calistoga', serif;
     }
   }
 
@@ -305,7 +305,7 @@ onMounted(() => {
 
       .code-label {
         font-size: 11px;
-        color: #e5e0d8;
+        color: #64748B;
         margin-bottom: 4px;
       }
 
@@ -314,17 +314,17 @@ onMounted(() => {
         align-items: center;
         gap: 6px;
         padding: 8px;
-        background: #fdfbf7;
-        border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
-        border: 1.5px dashed #2d5da1;
+        background: #FAFAFA;
+        border-radius: 12px;
+        border: 1px solid #0052FF;
 
         .code {
           flex: 1;
           font-size: 14px;
           font-weight: 600;
-          color: #2d5da1;
+          color: #0052FF;
           letter-spacing: 1.5px;
-          font-family: 'Patrick Hand', cursive;
+          font-family: 'Inter', sans-serif;
         }
       }
     }
@@ -334,7 +334,7 @@ onMounted(() => {
 
       .link-label {
         font-size: 11px;
-        color: #e5e0d8;
+        color: #64748B;
         margin-bottom: 4px;
       }
     }
@@ -350,9 +350,9 @@ onMounted(() => {
         align-items: center;
         gap: 8px;
         padding: 8px;
-        background: #fdfbf7;
-        border: 1px dashed #2d2d2d;
-        border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+        background: #FAFAFA;
+        border: 1px solid #E2E8F0;
+        border-radius: 12px;
 
         .stat-icon {
           width: 30px;
@@ -367,10 +367,10 @@ onMounted(() => {
         }
 
         &:nth-child(1) .stat-icon {
-          background: #2d5da1;
+          background: #0052FF;
         }
         &:nth-child(2) .stat-icon {
-          background: #ff4d4d;
+          background: #EF4444;
         }
 
         .stat-info {
@@ -381,12 +381,12 @@ onMounted(() => {
           .stat-value {
             font-size: 16px;
             font-weight: 600;
-            color: #2d2d2d;
+            color: #0F172A;
           }
 
           .stat-label {
             font-size: 10px;
-            color: #e5e0d8;
+            color: #64748B;
           }
         }
       }
@@ -400,7 +400,7 @@ onMounted(() => {
         margin-bottom: 6px;
         font-size: 13px;
         font-weight: 600;
-        color: #2d2d2d;
+        color: #0F172A;
       }
 
       .records-list {
@@ -417,7 +417,7 @@ onMounted(() => {
           }
 
           &:not(:last-child) {
-            border-bottom: 1px dashed #2d2d2d;
+            border-bottom: 1px solid #E2E8F0;
           }
 
           .record-avatar {
@@ -439,8 +439,8 @@ onMounted(() => {
             .record-name {
               font-size: 12px;
               font-weight: 500;
-              color: #2d2d2d;
-              font-family: 'Kalam', 'ZCOOL KuaiLe', cursive;
+              color: #0F172A;
+              font-family: 'Calistoga', serif;
             }
 
             .record-time {
@@ -475,7 +475,7 @@ onMounted(() => {
     }
 
     &:not(:last-child) {
-      border-bottom: 1px dashed #2d2d2d;
+      border-bottom: 1px solid #E2E8F0;
     }
 
     .record-avatar {
@@ -496,8 +496,8 @@ onMounted(() => {
         .record-name {
           font-size: 14px;
           font-weight: 600;
-          color: #2d2d2d;
-          font-family: 'Kalam', 'ZCOOL KuaiLe', cursive;
+          color: #0F172A;
+          font-family: 'Calistoga', serif;
         }
       }
 
@@ -511,7 +511,7 @@ onMounted(() => {
           align-items: center;
           gap: 4px;
           font-size: 12px;
-          color: #e5e0d8;
+          color: #64748B;
 
           .el-icon {
             font-size: 13px;
@@ -526,7 +526,7 @@ onMounted(() => {
           border-radius: 4px;
           font-size: 11px;
           font-weight: 500;
-          border: 1px dashed;
+          border: 1px solid;
 
           &.pending {
             background: #fef3c7;

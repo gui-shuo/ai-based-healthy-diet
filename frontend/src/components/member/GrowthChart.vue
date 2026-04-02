@@ -246,9 +246,9 @@ onBeforeUnmount(() => {
 
 <style scoped lang="scss">
 .growth-chart-card {
-  border-radius: 15px 225px 15px 255px / 255px 15px 225px 15px;
-  border: 2px solid #2d2d2d;
-  box-shadow: 4px 4px 0px 0px #2d2d2d;
+  border-radius: 12px;
+  border: 1px solid #E2E8F0;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
 
   :deep(.el-card__header) {
     padding: 12px 16px;
@@ -266,8 +266,8 @@ onBeforeUnmount(() => {
     .title {
       font-size: 15px;
       font-weight: 600;
-      color: #2d2d2d;
-      font-family: 'Kalam', 'ZCOOL KuaiLe', cursive;
+      color: #0F172A;
+      font-family: 'Calistoga', serif;
     }
   }
 
@@ -280,9 +280,9 @@ onBeforeUnmount(() => {
     grid-template-columns: repeat(3, 1fr);
     gap: 10px;
     padding: 12px;
-    background: #fdfbf7;
-    border: 1px dashed #2d2d2d;
-    border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+    background: #FAFAFA;
+    border: 1px solid #E2E8F0;
+    border-radius: 12px;
 
     .stat-item {
       text-align: center;
@@ -290,9 +290,9 @@ onBeforeUnmount(() => {
       .stat-label {
         display: block;
         font-size: 12px;
-        color: #e5e0d8;
+        color: #64748B;
         margin-bottom: 4px;
-        font-family: 'Patrick Hand', cursive;
+        font-family: 'Inter', sans-serif;
       }
 
       .stat-value {

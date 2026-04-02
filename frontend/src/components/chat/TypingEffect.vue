@@ -141,14 +141,14 @@ defineExpose({
 .content {
   white-space: pre-wrap;
   word-break: break-word;
-  font-family: 'Patrick Hand', cursive;
+  font-family: 'Inter', sans-serif;
 }
 
 .cursor {
   display: inline-block;
   width: 2px;
   height: 1em;
-  background-color: #2d2d2d;
+  background-color: #0F172A;
   margin-left: 2px;
   animation: blink 1s step-end infinite;
 }

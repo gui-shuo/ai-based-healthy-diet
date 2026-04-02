@@ -205,15 +205,15 @@ const uploadFile = async file => {
   .upload-area {
     width: 150px;
     height: 150px;
-    border: 3px dashed #2d2d2d;
-    border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+    border: 1px solid #E2E8F0;
+    border-radius: 50%;
     cursor: pointer;
     position: relative;
     overflow: hidden;
     transition: all 0.3s;
 
     &:hover {
-      border-color: #2d5da1;
+      border-color: #0052FF;
 
       .avatar-mask {
         opacity: 1;
@@ -221,8 +221,8 @@ const uploadFile = async file => {
     }
 
     &.is-dragover {
-      border-color: #2d5da1;
-      background: rgba(45, 93, 161, 0.05);
+      border-color: #0052FF;
+      background: rgba(0, 82, 255, 0.05);
     }
 
     .avatar-preview {
@@ -242,7 +242,7 @@ const uploadFile = async file => {
         left: 0;
         right: 0;
         bottom: 0;
-        background: rgba(45, 45, 45, 0.6);
+        background: rgba(15, 23, 42, 0.6);
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -269,17 +269,17 @@ const uploadFile = async file => {
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      color: #2d2d2d;
+      color: #0F172A;
 
       .icon-upload {
         font-size: 48px;
-        color: #2d5da1;
+        color: #0052FF;
         margin-bottom: 12px;
       }
 
       .upload-text {
         text-align: center;
-        font-family: 'Patrick Hand', cursive;
+        font-family: 'Inter', sans-serif;
 
         p {
           margin: 0;
@@ -288,7 +288,7 @@ const uploadFile = async file => {
 
           &.upload-hint {
             font-size: 12px;
-            color: #e5e0d8;
+            color: #64748B;
             margin-top: 4px;
           }
         }

@@ -151,9 +151,9 @@ onMounted(() => {
 
 <style scoped lang="scss">
 .sign-in-calendar {
-  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
-  border: 2px solid #2d2d2d;
-  box-shadow: 4px 4px 0px 0px #2d2d2d;
+  border-radius: 12px;
+  border: 1px solid #E2E8F0;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
 
   :deep(.el-card__header) {
     padding: 10px 14px;
@@ -171,13 +171,13 @@ onMounted(() => {
     .title {
       font-size: 14px;
       font-weight: 600;
-      color: #2d2d2d;
-      font-family: 'Kalam', 'ZCOOL KuaiLe', cursive;
+      color: #0F172A;
+      font-family: 'Calistoga', serif;
     }
 
     .month-label {
       font-size: 11px;
-      color: #e5e0d8;
+      color: #64748B;
     }
   }
 
@@ -187,7 +187,7 @@ onMounted(() => {
       align-items: center;
       justify-content: space-around;
       padding: 6px 0 8px;
-      border-bottom: 1px dashed #2d2d2d;
+      border-bottom: 1px solid #E2E8F0;
       margin-bottom: 8px;
 
       .stat-item {
@@ -199,19 +199,19 @@ onMounted(() => {
         .stat-num {
           font-size: 16px;
           font-weight: 700;
-          color: #ff4d4d;
+          color: #EF4444;
         }
 
         .stat-label {
           font-size: 10px;
-          color: #e5e0d8;
+          color: #64748B;
         }
       }
 
       .stat-divider {
         width: 1px;
         height: 20px;
-        background: #e5e0d8;
+        background: #F1F5F9;
       }
     }
 
@@ -224,7 +224,7 @@ onMounted(() => {
       .week-label {
         text-align: center;
         font-size: 10px;
-        color: #e5e0d8;
+        color: #64748B;
         padding: 1px 0;
         font-weight: 500;
       }
@@ -238,8 +238,8 @@ onMounted(() => {
         border-radius: 4px;
         font-size: 11px;
         color: #374151;
-        background: #fdfbf7;
-        border: 1px dashed #2d2d2d;
+        background: #FAFAFA;
+        border: 1px solid #E2E8F0;
         transition: all 0.2s;
 
         &.empty {
@@ -248,9 +248,9 @@ onMounted(() => {
         }
 
         &.signed {
-          background: #2d5da1;
+          background: #0052FF;
           color: white;
-          border-color: #2d2d2d;
+          border-color: #0F172A;
 
           .check-icon {
             position: absolute;
@@ -262,15 +262,15 @@ onMounted(() => {
         }
 
         &.today:not(.signed) {
-          border: 1.5px solid #ff4d4d;
-          color: #ff4d4d;
+          border: 1.5px solid #EF4444;
+          color: #EF4444;
           font-weight: 700;
-          background: #fdfbf7;
+          background: #FAFAFA;
         }
 
         &.future {
           color: #d1d5db;
-          background: #fdfbf7;
+          background: #FAFAFA;
         }
 
         .day-num {
@@ -288,10 +288,10 @@ onMounted(() => {
         width: 70%;
         font-size: 12px;
         font-weight: 600;
-        background: #2d5da1;
-        border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
-        border: 2px solid #2d2d2d;
-        box-shadow: 4px 4px 0px 0px #2d2d2d;
+        background: #0052FF;
+        border-radius: 12px;
+        border: 1px solid #E2E8F0;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
       }
     }
 
@@ -301,8 +301,8 @@ onMounted(() => {
       justify-content: center;
       gap: 4px;
       font-size: 10px;
-      color: #e5e0d8;
-      font-family: 'Patrick Hand', cursive;
+      color: #64748B;
+      font-family: 'Inter', sans-serif;
     }
   }
 }

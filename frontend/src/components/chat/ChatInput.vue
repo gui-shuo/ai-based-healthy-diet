@@ -207,8 +207,8 @@ defineExpose({
 <style scoped>
 .chat-input-container {
   padding: 16px 20px;
-  background: #fdfbf7;
-  border-top: 2px dashed #2d2d2d;
+  background: #FAFAFA;
+  border-top: 1px solid #E2E8F0;
   position: relative;
 }
 
@@ -224,22 +224,22 @@ defineExpose({
 
 .message-input :deep(.el-textarea__inner) {
   padding: 12px 16px;
-  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
-  border: 2px solid #2d2d2d;
+  border-radius: 12px;
+  border: 1px solid #E2E8F0;
   transition: all 0.3s;
   font-size: 14px;
   line-height: 1.5;
-  font-family: 'Patrick Hand', cursive;
-  background: #fdfbf7;
+  font-family: 'Inter', sans-serif;
+  background: #FAFAFA;
 }
 
 .message-input :deep(.el-textarea__inner):focus {
-  border-color: #2d5da1;
-  box-shadow: 4px 4px 0px 0px #2d2d2d;
+  border-color: #0052FF;
+  box-shadow: 0 4px 14px rgba(0, 82, 255, 0.25);
 }
 
 .message-input :deep(.el-textarea__inner):disabled {
-  background-color: #fdfbf7;
+  background-color: #FAFAFA;
   cursor: not-allowed;
 }
 
@@ -247,9 +247,9 @@ defineExpose({
 .selected-file {
   margin-top: 12px;
   padding: 12px 16px;
-  background: #e5e0d8;
-  border-radius: 185px 10px 155px 10px / 10px 155px 10px 185px;
-  border: 1px dashed #2d2d2d;
+  background: #F1F5F9;
+  border-radius: 12px;
+  border: 1px solid #E2E8F0;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -264,21 +264,21 @@ defineExpose({
 }
 
 .file-icon {
-  color: #2d5da1;
+  color: #0052FF;
   font-size: 20px;
 }
 
 .file-name {
   font-size: 14px;
-  color: #2d2d2d;
+  color: #0F172A;
   font-weight: 500;
-  font-family: 'Patrick Hand', cursive;
+  font-family: 'Inter', sans-serif;
 }
 
 .file-size {
   font-size: 12px;
-  color: #2d2d2d;
-  font-family: 'Patrick Hand', cursive;
+  color: #0F172A;
+  font-family: 'Inter', sans-serif;
 }
 
 /* 字数统计 */
@@ -287,15 +287,15 @@ defineExpose({
   bottom: 24px;
   right: 80px;
   font-size: 12px;
-  color: #2d2d2d;
-  background: #fdfbf7;
+  color: #0F172A;
+  background: #FAFAFA;
   padding: 2px 8px;
-  border-radius: 185px 10px 155px 10px / 10px 155px 10px 185px;
-  font-family: 'Patrick Hand', cursive;
+  border-radius: 12px;
+  font-family: 'Inter', sans-serif;
 }
 
 .char-count.warning {
-  color: #ff4d4d;
+  color: #EF4444;
 }
 
 /* 动画 */

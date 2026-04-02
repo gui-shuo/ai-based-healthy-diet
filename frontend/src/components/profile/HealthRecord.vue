@@ -519,34 +519,34 @@ onMounted(fetchProfile)
   text-align: center;
   padding: 60px 20px;
   .empty-illustration { font-size: 80px; margin-bottom: 16px; }
-  h2 { font-size: 22px; color: #2d2d2d; margin: 0 0 12px; font-family: 'Kalam', 'ZCOOL KuaiLe', cursive; }
-  p { color: #e5e0d8; line-height: 1.8; margin-bottom: 28px; }
+  h2 { font-size: 22px; color: #0F172A; margin: 0 0 12px; font-family: 'Calistoga', serif; }
+  p { color: #64748B; line-height: 1.8; margin-bottom: 28px; }
 }
 
 /* ===== 仪表盘 ===== */
 .dash-header {
   display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;
-  h2 { margin: 0; font-size: 22px; color: #2d2d2d; font-family: 'Kalam', 'ZCOOL KuaiLe', cursive; }
+  h2 { margin: 0; font-size: 22px; color: #0F172A; font-family: 'Calistoga', serif; }
 }
 
 .bmi-dashboard {
   display: flex; align-items: center; gap: 28px;
-  background: #fdfbf7;
-  border: 2px solid #2d2d2d;
-  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+  background: #FAFAFA;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
   padding: 28px; margin-bottom: 24px;
-  box-shadow: 4px 4px 0px 0px #2d2d2d;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
 }
 
 .bmi-gauge {
   .gauge-circle {
     width: 110px; height: 110px; border-radius: 50%; display: flex; flex-direction: column;
-    align-items: center; justify-content: center; background: #fdfbf7;
-    box-shadow: 4px 4px 0px 0px #2d2d2d; border: 4px solid #2d2d2d;
+    align-items: center; justify-content: center; background: #FAFAFA;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1); border: 4px solid #E2E8F0;
     .gauge-value { font-size: 32px; font-weight: 700; line-height: 1.1; }
-    .gauge-label { font-size: 13px; color: #e5e0d8; }
+    .gauge-label { font-size: 13px; color: #64748B; }
   }
-  &.underweight .gauge-circle { border-color: #e5e0d8; .gauge-value { color: #e5e0d8; } }
+  &.underweight .gauge-circle { border-color: #64748B; .gauge-value { color: #64748B; } }
   &.normal .gauge-circle { border-color: #67c23a; .gauge-value { color: #67c23a; } }
   &.overweight .gauge-circle { border-color: #e6a23c; .gauge-value { color: #e6a23c; } }
   &.obese .gauge-circle { border-color: #f56c6c; .gauge-value { color: #f56c6c; } }
@@ -554,7 +554,7 @@ onMounted(fetchProfile)
 
 .bmi-detail {
   flex: 1;
-  .bmi-advice { margin-top: 10px; color: #2d2d2d; font-size: 14px; line-height: 1.6; }
+  .bmi-advice { margin-top: 10px; color: #0F172A; font-size: 14px; line-height: 1.6; }
 }
 
 .stat-cards {
@@ -562,40 +562,40 @@ onMounted(fetchProfile)
 }
 
 .stat-card {
-  background: #fdfbf7; border-radius: 185px 10px 155px 10px / 10px 155px 10px 185px; padding: 18px 14px; text-align: center;
-  border: 2px solid #2d2d2d; box-shadow: 4px 4px 0px 0px #2d2d2d; transition: transform 0.2s;
+  background: #FAFAFA; border-radius: 12px; padding: 18px 14px; text-align: center;
+  border: 1px solid #E2E8F0; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1); transition: transform 0.2s;
   &:hover { transform: translateY(-2px); }
   .stat-icon { font-size: 28px; margin-bottom: 6px; }
-  .stat-value { font-size: 22px; font-weight: 700; color: #2d2d2d; }
-  .stat-label { font-size: 12px; color: #e5e0d8; margin-top: 4px; }
+  .stat-value { font-size: 22px; font-weight: 700; color: #0F172A; }
+  .stat-label { font-size: 12px; color: #64748B; margin-top: 4px; }
 }
 
 .tag-section {
-  background: #fdfbf7; border-radius: 15px 225px 15px 255px / 255px 15px 225px 15px; padding: 20px; margin-bottom: 20px;
-  border: 2px dashed #2d2d2d;
+  background: #FAFAFA; border-radius: 12px; padding: 20px; margin-bottom: 20px;
+  border: 1px solid #E2E8F0;
 }
 
 .tag-group {
   margin-bottom: 16px;
   &:last-child { margin-bottom: 0; }
-  h4 { font-size: 14px; color: #2d2d2d; margin: 0 0 10px; font-family: 'Kalam', 'ZCOOL KuaiLe', cursive; }
+  h4 { font-size: 14px; color: #0F172A; margin: 0 0 10px; font-family: 'Calistoga', serif; }
   .tags { display: flex; flex-wrap: wrap; gap: 8px; }
 }
 
 .activity-display {
-  background: #fdfbf7; border-radius: 185px 10px 155px 10px / 10px 155px 10px 185px; padding: 20px;
-  border: 2px dashed #2d2d2d;
-  h4 { font-size: 14px; color: #2d2d2d; margin: 0 0 14px; font-family: 'Kalam', 'ZCOOL KuaiLe', cursive; }
+  background: #FAFAFA; border-radius: 12px; padding: 20px;
+  border: 1px solid #E2E8F0;
+  h4 { font-size: 14px; color: #0F172A; margin: 0 0 14px; font-family: 'Calistoga', serif; }
 }
 
 .activity-bar {
   display: flex; gap: 6px;
   .activity-segment {
-    flex: 1; height: 32px; border-radius: 8px; background: #e5e0d8;
+    flex: 1; height: 32px; border-radius: 8px; background: #F1F5F9;
     display: flex; align-items: center; justify-content: center; transition: all 0.3s;
     .segment-label { font-size: 12px; color: #c0c4cc; }
     &.active {
-      background: #2d5da1;
+      background: #0052FF;
       .segment-label { color: white; font-weight: 600; }
     }
   }
@@ -604,25 +604,25 @@ onMounted(fetchProfile)
 /* ===== 向导 ===== */
 .wizard-header {
   text-align: center; margin-bottom: 8px;
-  h2 { margin: 0 0 8px; font-size: 22px; color: #2d2d2d; font-family: 'Kalam', 'ZCOOL KuaiLe', cursive; }
-  .wizard-subtitle { color: #e5e0d8; font-size: 14px; margin: 0; }
+  h2 { margin: 0 0 8px; font-size: 22px; color: #0F172A; font-family: 'Calistoga', serif; }
+  .wizard-subtitle { color: #64748B; font-size: 14px; margin: 0; }
 }
 
 .step-bar {
   display: flex; justify-content: space-between; position: relative; padding: 20px 0 30px; margin: 0 20px;
   .step-line {
-    position: absolute; top: 34px; left: 30px; right: 30px; height: 3px; background: #e5e0d8; border-radius: 2px; z-index: 0;
-    .step-line-fill { height: 100%; background: #2d5da1; border-radius: 2px; transition: width 0.4s ease; }
+    position: absolute; top: 34px; left: 30px; right: 30px; height: 3px; background: #F1F5F9; border-radius: 2px; z-index: 0;
+    .step-line-fill { height: 100%; background: #0052FF; border-radius: 2px; transition: width 0.4s ease; }
   }
   .step-dot {
     display: flex; flex-direction: column; align-items: center; z-index: 1; cursor: default;
     .dot {
-      width: 32px; height: 32px; border-radius: 50%; background: #e5e0d8; color: #e5e0d8;
+      width: 32px; height: 32px; border-radius: 50%; background: #F1F5F9; color: #64748B;
       display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600;
       transition: all 0.3s;
     }
-    .step-name { font-size: 12px; color: #e5e0d8; margin-top: 6px; }
-    &.active .dot { background: #2d5da1; color: white; box-shadow: 4px 4px 0px 0px rgba(45,45,45,0.1); }
+    .step-name { font-size: 12px; color: #64748B; margin-top: 6px; }
+    &.active .dot { background: #0052FF; color: white; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1); }
     &.done { cursor: pointer;
       .dot { background: #67c23a; color: white; }
       .step-name { color: #67c23a; }
@@ -636,12 +636,12 @@ onMounted(fetchProfile)
 .gender-select {
   display: flex; gap: 16px; justify-content: center; margin-bottom: 24px;
   .gender-card {
-    width: 140px; padding: 24px 16px; border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px; text-align: center; cursor: pointer;
-    border: 2px solid #2d2d2d; background: #fdfbf7; transition: all 0.3s; display: flex; flex-direction: column; align-items: center; gap: 8px;
+    width: 140px; padding: 24px 16px; border-radius: 12px; text-align: center; cursor: pointer;
+    border: 1px solid #E2E8F0; background: #FAFAFA; transition: all 0.3s; display: flex; flex-direction: column; align-items: center; gap: 8px;
     .gender-icon { font-size: 40px; }
-    span:last-child { font-size: 15px; color: #2d2d2d; font-weight: 500; }
-    &:hover { border-color: #2d2d2d; background: #fdfbf7; }
-    &.selected { border-color: #2d5da1; background: #fff9c4; box-shadow: 4px 4px 0px 0px #2d2d2d; }
+    span:last-child { font-size: 15px; color: #0F172A; font-weight: 500; }
+    &:hover { border-color: #0F172A; background: #FAFAFA; }
+    &.selected { border-color: #0052FF; background: #fff9c4; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1); }
   }
 }
 
@@ -650,23 +650,23 @@ onMounted(fetchProfile)
   display: flex; gap: 16px; margin-bottom: 16px;
   &.two-col .input-card { flex: 1; }
   .input-card {
-    flex: 1; background: #fdfbf7; border-radius: 12px; padding: 14px 16px; border: 1px dashed #2d2d2d;
-    label { display: block; font-size: 13px; color: #2d2d2d; font-weight: 500; margin-bottom: 8px;
-      .optional { color: #e5e0d8; font-weight: 400; }
+    flex: 1; background: #FAFAFA; border-radius: 12px; padding: 14px 16px; border: 1px solid #E2E8F0;
+    label { display: block; font-size: 13px; color: #0F172A; font-weight: 500; margin-bottom: 8px;
+      .optional { color: #64748B; font-weight: 400; }
     }
-    .input-hint { font-size: 12px; color: #e5e0d8; margin-top: 4px; }
+    .input-hint { font-size: 12px; color: #64748B; margin-top: 4px; }
   }
 }
 
 /* BMI preview */
 .bmi-preview {
   display: flex; align-items: center; justify-content: center; gap: 12px;
-  padding: 12px; border-radius: 10px; margin-top: 8px; background: #fdfbf7;
+  padding: 12px; border-radius: 10px; margin-top: 8px; background: #FAFAFA;
   &.normal { background: rgba(103,194,58,0.08); }
   &.underweight { background: rgba(144,147,153,0.08); }
   &.overweight { background: rgba(230,162,60,0.08); }
   &.obese { background: rgba(245,108,108,0.08); }
-  .preview-bmi { font-size: 16px; font-weight: 600; color: #2d2d2d; }
+  .preview-bmi { font-size: 16px; font-weight: 600; color: #0F172A; }
 }
 
 /* Activity cards */
@@ -674,37 +674,37 @@ onMounted(fetchProfile)
   display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 24px;
   .activity-card {
     flex: 1; min-width: 120px; padding: 16px 10px; border-radius: 14px; text-align: center; cursor: pointer;
-    border: 2px solid #e5e0d8; transition: all 0.3s; display: flex; flex-direction: column; align-items: center; gap: 4px;
+    border: 1px solid #E2E8F0; transition: all 0.3s; display: flex; flex-direction: column; align-items: center; gap: 4px;
     .activity-emoji { font-size: 28px; }
-    .activity-name { font-size: 14px; font-weight: 600; color: #2d2d2d; }
-    .activity-desc { font-size: 11px; color: #e5e0d8; line-height: 1.3; }
-    &:hover { border-color: #2d2d2d; }
-    &.selected { border-color: #2d5da1; background: rgba(45,93,161,0.06); box-shadow: 4px 4px 0px 0px rgba(45,45,45,0.1); }
+    .activity-name { font-size: 14px; font-weight: 600; color: #0F172A; }
+    .activity-desc { font-size: 11px; color: #64748B; line-height: 1.3; }
+    &:hover { border-color: #0F172A; }
+    &.selected { border-color: #0052FF; background: rgba(0, 82, 255,0.06); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1); }
   }
 }
 
 /* Chip groups */
 .chip-title {
-  font-size: 15px; color: #2d2d2d; margin: 0 0 12px; font-weight: 600; font-family: 'Kalam', 'ZCOOL KuaiLe', cursive;
-  .chip-hint { font-size: 12px; color: #e5e0d8; font-weight: 400; margin-left: 8px; }
+  font-size: 15px; color: #0F172A; margin: 0 0 12px; font-weight: 600; font-family: 'Calistoga', serif;
+  .chip-hint { font-size: 12px; color: #64748B; font-weight: 400; margin-left: 8px; }
 }
 
 .chip-group {
   display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 24px;
   .chip {
-    padding: 8px 18px; border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px; font-size: 14px; cursor: pointer;
-    border: 2px solid #2d2d2d; color: #2d2d2d; background: #fdfbf7; transition: all 0.25s; user-select: none;
-    &:hover { border-color: #2d2d2d; background: #fdfbf7; }
-    &.selected { border-color: #2d5da1; color: #2d5da1; background: #fdfbf7; font-weight: 500; }
-    &.warning.selected { border-color: #ff4d4d; color: #ff4d4d; background: #fdfbf7; }
-    &.info.selected { border-color: #e5e0d8; color: #2d2d2d; background: rgba(144,147,153,0.08); }
+    padding: 8px 18px; border-radius: 12px; font-size: 14px; cursor: pointer;
+    border: 1px solid #E2E8F0; color: #0F172A; background: #FAFAFA; transition: all 0.25s; user-select: none;
+    &:hover { border-color: #0F172A; background: #FAFAFA; }
+    &.selected { border-color: #0052FF; color: #0052FF; background: #FAFAFA; font-weight: 500; }
+    &.warning.selected { border-color: #EF4444; color: #EF4444; background: #FAFAFA; }
+    &.info.selected { border-color: #64748B; color: #0F172A; background: rgba(144,147,153,0.08); }
   }
 }
 
 /* Wizard footer */
 .wizard-footer {
   display: flex; justify-content: center; gap: 12px; padding: 20px 0 10px;
-  border-top: 1px dashed #2d2d2d; margin-top: 10px;
+  border-top: 1px solid #E2E8F0; margin-top: 10px;
 }
 
 /* ===== 响应式 ===== */

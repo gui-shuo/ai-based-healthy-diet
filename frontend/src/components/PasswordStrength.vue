@@ -109,18 +109,18 @@ const strengthTips = computed(() => {
 
   .strength-bar {
     height: 6px;
-    background-color: #e5e0d8;
-    border: 1px solid #2d2d2d;
-    border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+    background-color: #64748B;
+    border: 1px solid #E2E8F0;
+    border-radius: 12px;
     overflow: hidden;
 
     .strength-fill {
       height: 100%;
       transition: all 0.3s ease;
-      border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+      border-radius: 12px;
 
       &.strength-weak {
-        background-color: #ff4d4d;
+        background-color: #EF4444;
       }
 
       &.strength-medium {
@@ -132,7 +132,7 @@ const strengthTips = computed(() => {
       }
 
       &.strength-very-strong {
-        background-color: #2d5da1;
+        background-color: #0052FF;
       }
     }
   }
@@ -142,12 +142,12 @@ const strengthTips = computed(() => {
     justify-content: space-between;
     align-items: center;
     margin-top: 4px;
-    font-family: 'Patrick Hand', cursive;
+    font-family: 'Inter', sans-serif;
     font-size: 12px;
 
     span {
       &.strength-weak {
-        color: #ff4d4d;
+        color: #EF4444;
       }
 
       &.strength-medium {
@@ -159,12 +159,12 @@ const strengthTips = computed(() => {
       }
 
       &.strength-very-strong {
-        color: #2d5da1;
+        color: #0052FF;
       }
     }
 
     .strength-tips {
-      color: #2d2d2d;
+      color: #0F172A;
       opacity: 0.6;
     }
   }

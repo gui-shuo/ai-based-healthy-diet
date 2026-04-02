@@ -132,8 +132,8 @@ const handleDelete = async () => {
     h2 {
       margin: 0;
       font-size: 22px;
-      color: #ff4d4d;
-      font-family: 'Kalam', 'ZCOOL KuaiLe', cursive;
+      color: #EF4444;
+      font-family: 'Calistoga', serif;
     }
   }
 }
@@ -142,14 +142,14 @@ const handleDelete = async () => {
   margin: 20px 0;
   padding-left: 0;
   list-style: none;
-  color: #2d2d2d;
+  color: #0F172A;
   line-height: 2;
-  font-family: 'Patrick Hand', cursive;
+  font-family: 'Inter', sans-serif;
 
   li {
     font-size: 14px;
     padding-left: 16px;
-    border-left: 2px dashed #ff4d4d;
+    border-left: 2px solid #EF4444;
     margin-bottom: 4px;
   }
 }
@@ -157,10 +157,10 @@ const handleDelete = async () => {
 .confirm-section {
   .confirm-tip {
     font-size: 15px;
-    color: #2d2d2d;
+    color: #0F172A;
     font-weight: 600;
     margin-bottom: 16px;
-    font-family: 'Kalam', 'ZCOOL KuaiLe', cursive;
+    font-family: 'Calistoga', serif;
   }
 }
 
@@ -169,7 +169,7 @@ const handleDelete = async () => {
 }
 
 :deep(.el-checkbox__label) {
-  color: #e5e0d8;
+  color: #64748B;
   font-size: 13px;
 }
 </style>

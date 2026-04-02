@@ -177,9 +177,9 @@ const handleRemove = () => {
   .upload-area {
     width: 100%;
     min-height: 200px;
-    border: 3px dashed #2d2d2d;
-    border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
-    background: #fdfbf7;
+    border: 1px solid #E2E8F0;
+    border-radius: 12px;
+    background: #FAFAFA;
     cursor: pointer;
     transition: all 0.3s;
     overflow: hidden;
@@ -187,7 +187,7 @@ const handleRemove = () => {
 
     &:hover,
     &.is-dragover {
-      border-color: #2d5da1;
+      border-color: #0052FF;
       background: #fff9c4;
     }
 
@@ -203,17 +203,17 @@ const handleRemove = () => {
       align-items: center;
       justify-content: center;
       height: 200px;
-      color: #e5e0d8;
+      color: #64748B;
 
       .upload-icon {
         font-size: 48px;
         margin-bottom: 16px;
-        color: #2d5da1;
+        color: #0052FF;
       }
 
       .upload-text {
         text-align: center;
-        font-family: 'Patrick Hand', cursive;
+        font-family: 'Inter', sans-serif;
 
         p {
           margin: 4px 0;
@@ -221,7 +221,7 @@ const handleRemove = () => {
 
         .upload-tip {
           font-size: 12px;
-          color: #e5e0d8;
+          color: #64748B;
         }
       }
     }
@@ -249,8 +249,8 @@ const handleRemove = () => {
         justify-content: center;
         width: 100%;
         height: 100%;
-        background: #fdfbf7;
-        color: #e5e0d8;
+        background: #FAFAFA;
+        color: #64748B;
 
         .el-icon {
           font-size: 48px;

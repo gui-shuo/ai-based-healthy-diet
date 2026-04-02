@@ -385,8 +385,8 @@ const handleClose = () => {
     margin-bottom: 20px;
 
     .cropper-canvas {
-      border: 2px solid #2d2d2d;
-      border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+      border: 1px solid #E2E8F0;
+      border-radius: 12px;
       cursor: move;
     }
   }
@@ -402,16 +402,16 @@ const handleClose = () => {
 
       span {
         font-size: 14px;
-        color: #2d2d2d;
+        color: #0F172A;
         min-width: 55px;
-        font-family: 'Patrick Hand', cursive;
+        font-family: 'Inter', sans-serif;
       }
 
       .scale-label {
         min-width: 50px;
         text-align: right;
         font-size: 12px;
-        color: #e5e0d8;
+        color: #64748B;
       }
     }
   }
@@ -421,14 +421,14 @@ const handleClose = () => {
 
     .preview-title {
       font-size: 14px;
-      color: #2d2d2d;
+      color: #0F172A;
       margin-bottom: 12px;
-      font-family: 'Kalam', 'ZCOOL KuaiLe', cursive;
+      font-family: 'Calistoga', serif;
     }
 
     .preview-canvas {
-      border: 2px solid #2d2d2d;
-      border-radius: 15px 225px 15px 255px / 255px 15px 225px 15px;
+      border: 1px solid #E2E8F0;
+      border-radius: 12px;
     }
   }
 }

@@ -167,20 +167,20 @@ const handleReset = () => {
   .change-header {
     margin-bottom: 32px;
     padding-bottom: 20px;
-    border-bottom: 2px dashed #2d2d2d;
+    border-bottom: 1px solid #E2E8F0;
 
     .title {
       font-size: 24px;
       font-weight: 600;
-      color: #2d2d2d;
+      color: #0F172A;
       margin: 0;
-      font-family: 'Kalam', 'ZCOOL KuaiLe', cursive;
+      font-family: 'Calistoga', serif;
     }
   }
 
   .change-form {
     max-width: 600px;
-    border-left: 3px solid #2d5da1;
+    border-left: 3px solid #0052FF;
     padding-left: 20px;
 
     :deep(.el-form-item) {
@@ -195,10 +195,10 @@ const handleReset = () => {
 
     .password-hint {
       font-size: 12px;
-      color: #e5e0d8;
+      color: #64748B;
       margin-top: 4px;
       line-height: 1.5;
-      font-family: 'Patrick Hand', cursive;
+      font-family: 'Inter', sans-serif;
     }
 
     :deep(.el-button) {

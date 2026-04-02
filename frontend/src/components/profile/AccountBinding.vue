@@ -160,13 +160,13 @@ onMounted(loadBindInfo)
 .section-title {
   font-size: 22px;
   font-weight: 600;
-  color: #2d2d2d;
+  color: #0F172A;
   margin: 0 0 8px;
-  font-family: 'Kalam', 'ZCOOL KuaiLe', cursive;
+  font-family: 'Calistoga', serif;
 }
 
 .section-desc {
-  color: #e5e0d8;
+  color: #64748B;
   font-size: 14px;
   margin: 0 0 24px;
   line-height: 1.6;
@@ -184,14 +184,14 @@ onMounted(loadBindInfo)
   align-items: center;
   justify-content: space-between;
   padding: 16px 20px;
-  background: #fdfbf7;
-  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
-  border: 2px solid #2d2d2d;
+  background: #FAFAFA;
+  border-radius: 12px;
+  border: 1px solid #E2E8F0;
   transition: all 0.2s;
 
   &:hover {
-    border-color: #2d2d2d;
-    box-shadow: 4px 4px 0px 0px #2d2d2d;
+    border-color: #0F172A;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
   }
 }
 
@@ -209,18 +209,18 @@ onMounted(loadBindInfo)
   align-items: center;
   justify-content: center;
   font-size: 24px;
-  border: 1px dashed #2d2d2d;
+  border: 1px solid #E2E8F0;
 }
 
-.email-icon { background: #fdfbf7; }
-.wechat-icon { background: #fdfbf7; }
-.qq-icon { background: #fdfbf7; }
+.email-icon { background: #FAFAFA; }
+.wechat-icon { background: #FAFAFA; }
+.qq-icon { background: #FAFAFA; }
 
 .bind-name {
   font-weight: 600;
   font-size: 15px;
-  color: #2d2d2d;
-  font-family: 'Kalam', 'ZCOOL KuaiLe', cursive;
+  color: #0F172A;
+  font-family: 'Calistoga', serif;
 }
 
 .bind-status {

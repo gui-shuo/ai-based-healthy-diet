@@ -285,13 +285,13 @@ onMounted(fetchAddresses)
       font-size: 22px;
       font-weight: 700;
       margin: 0;
-      font-family: 'Kalam', 'ZCOOL KuaiLe', cursive;
-      color: #2d2d2d;
+      font-family: 'Calistoga', serif;
+      color: #0F172A;
     }
   }
 
   .section-desc {
-    color: #e5e0d8;
+    color: #64748B;
     font-size: 14px;
     margin: 0 0 20px;
   }
@@ -302,20 +302,20 @@ onMounted(fetchAddresses)
 }
 
 .address-card {
-  background: #fdfbf7;
-  border: 2px solid #2d2d2d;
-  border-radius: 15px 225px 15px 255px / 255px 15px 225px 15px;
+  background: #FAFAFA;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
   padding: 16px 20px;
   margin-bottom: 12px;
   transition: all 0.3s;
 
   &:hover {
-    box-shadow: 4px 4px 0px 0px #2d2d2d;
-    border-color: #2d2d2d;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+    border-color: #0F172A;
   }
 
   &.default {
-    border-color: #2d5da1;
+    border-color: #0052FF;
     background: #fff9c4;
   }
 
@@ -329,17 +329,17 @@ onMounted(fetchAddresses)
       .receiver-name {
         font-weight: 600;
         font-size: 16px;
-        font-family: 'Kalam', 'ZCOOL KuaiLe', cursive;
+        font-family: 'Calistoga', serif;
       }
 
       .receiver-phone {
-        color: #2d2d2d;
+        color: #0F172A;
         font-size: 14px;
       }
     }
 
     .card-address {
-      color: #2d2d2d;
+      color: #0F172A;
       font-size: 14px;
       line-height: 1.5;
     }
@@ -349,7 +349,7 @@ onMounted(fetchAddresses)
     margin-top: 12px;
     display: flex;
     gap: 4px;
-    border-top: 1px dashed #2d2d2d;
+    border-top: 1px solid #E2E8F0;
     padding-top: 10px;
   }
 }

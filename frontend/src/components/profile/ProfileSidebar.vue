@@ -110,10 +110,10 @@ const handleSelect = index => {
 
 <style scoped lang="scss">
 .profile-sidebar {
-  background: #fdfbf7;
-  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
-  border: 2px solid #2d2d2d;
-  box-shadow: 4px 4px 0px 0px #2d2d2d;
+  background: #FAFAFA;
+  border-radius: 12px;
+  border: 1px solid #E2E8F0;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -125,7 +125,7 @@ const handleSelect = index => {
 .user-card {
   padding: 32px 24px;
   text-align: center;
-  background: #2d5da1;
+  background: #0052FF;
   color: white;
 
   .avatar-wrapper {
@@ -134,8 +134,8 @@ const handleSelect = index => {
     margin-bottom: 16px;
 
     .avatar {
-      border: 3px dashed rgba(255, 255, 255, 0.8);
-      box-shadow: 4px 4px 0px 0px rgba(0, 0, 0, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
     }
 
     .avatar-btn {
@@ -143,12 +143,12 @@ const handleSelect = index => {
       bottom: 0;
       right: 0;
       background: white;
-      color: #2d5da1;
+      color: #0052FF;
       border: none;
-      box-shadow: 3px 3px 0px 0px rgba(45,45,45,0.1);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
 
       &:hover {
-        background: #e5e0d8;
+        background: #F1F5F9;
       }
     }
   }
@@ -157,7 +157,7 @@ const handleSelect = index => {
     font-size: 20px;
     font-weight: 600;
     margin: 0 0 8px 0;
-    font-family: 'Kalam', 'ZCOOL KuaiLe', cursive;
+    font-family: 'Calistoga', serif;
   }
 
   .role {
@@ -177,17 +177,17 @@ const handleSelect = index => {
     font-size: 15px;
     padding: 0 24px;
     margin: 4px 12px;
-    border-radius: 185px 10px 155px 10px / 10px 155px 10px 185px;
+    border-radius: 12px;
     transition: all 0.3s;
 
     &:hover {
-      background: #fdfbf7;
+      background: #FAFAFA;
     }
 
     &.is-active {
-      background: #2d5da1;
+      background: #0052FF;
       color: white;
-      box-shadow: 4px 4px 0px 0px #2d2d2d;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
 
       .el-icon {
         color: white;
@@ -195,10 +195,10 @@ const handleSelect = index => {
     }
 
     &.danger-menu-item {
-      color: #ff4d4d;
+      color: #EF4444;
 
       .el-icon {
-        color: #ff4d4d;
+        color: #EF4444;
       }
 
       &:hover {
@@ -206,7 +206,7 @@ const handleSelect = index => {
       }
 
       &.is-active {
-        background: #ff4d4d;
+        background: #EF4444;
         color: white;
 
         .el-icon {
@@ -224,16 +224,16 @@ const handleSelect = index => {
 
 .sidebar-footer {
   padding: 20px;
-  border-top: 1px dashed #2d2d2d;
+  border-top: 1px solid #E2E8F0;
 
   .back-btn {
     width: 100%;
     height: 44px;
     font-size: 15px;
-    background: #2d5da1;
+    background: #0052FF;
     border: none;
-    border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
-    box-shadow: 4px 4px 0px 0px #2d2d2d;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
 
     &:hover {
       opacity: 0.9;

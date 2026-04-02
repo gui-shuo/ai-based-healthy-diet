@@ -222,9 +222,9 @@ const getTagType = limit => {
 
 <style scoped lang="scss">
 .level-comparison-table {
-  border-radius: 185px 10px 155px 10px / 10px 155px 10px 185px;
-  border: 2px solid #2d2d2d;
-  box-shadow: 4px 4px 0px 0px #2d2d2d;
+  border-radius: 12px;
+  border: 1px solid #E2E8F0;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
 
   .card-header {
     display: flex;
@@ -234,8 +234,8 @@ const getTagType = limit => {
     .title {
       font-size: 18px;
       font-weight: 600;
-      color: #2d2d2d;
-      font-family: 'Kalam', 'ZCOOL KuaiLe', cursive;
+      color: #0F172A;
+      font-family: 'Calistoga', serif;
     }
   }
 
@@ -244,10 +244,10 @@ const getTagType = limit => {
 
     :deep(.el-table) {
       tr {
-        border-bottom: 1px dashed #2d2d2d;
+        border-bottom: 1px solid #E2E8F0;
       }
       td {
-        border-bottom: 1px dashed #2d2d2d;
+        border-bottom: 1px solid #E2E8F0;
       }
     }
 
@@ -259,8 +259,8 @@ const getTagType = limit => {
       .level-badge {
         width: 36px;
         height: 36px;
-        border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
-        border: 2px solid #2d2d2d;
+        border-radius: 12px;
+        border: 1px solid #E2E8F0;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -276,7 +276,7 @@ const getTagType = limit => {
         .level-name {
           font-size: 14px;
           font-weight: 600;
-          color: #2d2d2d;
+          color: #0F172A;
         }
       }
     }
@@ -284,7 +284,7 @@ const getTagType = limit => {
     .growth-value {
       font-size: 16px;
       font-weight: 600;
-      color: #2d5da1;
+      color: #0052FF;
     }
 
     .benefits-preview {
@@ -302,7 +302,7 @@ const getTagType = limit => {
 
   .upgrade-hint {
     :deep(.el-alert) {
-      border: 1px dashed #2d2d2d;
+      border: 1px solid #E2E8F0;
     }
 
     .alert-content {
@@ -311,7 +311,7 @@ const getTagType = limit => {
       align-items: center;
 
       strong {
-        color: #2d5da1;
+        color: #0052FF;
         font-size: 18px;
         margin: 0 4px;
       }

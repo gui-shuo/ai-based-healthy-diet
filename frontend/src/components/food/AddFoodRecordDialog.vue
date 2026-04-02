@@ -348,8 +348,8 @@ const handleClose = () => {
     margin: 0 0 16px 0;
     font-size: 15px;
     font-weight: 600;
-    color: #2d2d2d;
-    font-family: 'Kalam', 'ZCOOL KuaiLe', cursive;
+    color: #0F172A;
+    font-family: 'Calistoga', serif;
   }
 
   .food-name-input {
@@ -367,9 +367,9 @@ const handleClose = () => {
   }
 
   .nutrition-panel {
-    background: #fdfbf7;
-    border: 2px dashed #2d2d2d;
-    border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+    background: #FAFAFA;
+    border: 1px solid #E2E8F0;
+    border-radius: 12px;
     padding: 20px;
     height: 100%;
 
@@ -378,7 +378,7 @@ const handleClose = () => {
       justify-content: space-between;
       align-items: center;
       margin-bottom: 16px;
-      border-bottom: 1px dashed #2d2d2d;
+      border-bottom: 1px solid #E2E8F0;
       padding-bottom: 12px;
 
       .form-section-title { margin: 0; }

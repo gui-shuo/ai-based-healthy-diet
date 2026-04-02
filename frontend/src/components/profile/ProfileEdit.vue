@@ -315,14 +315,14 @@ onUnmounted(() => {
   .edit-header {
     margin-bottom: 32px;
     padding-bottom: 20px;
-    border-bottom: 2px dashed #2d2d2d;
+    border-bottom: 1px solid #E2E8F0;
 
     .title {
       font-size: 24px;
       font-weight: 600;
-      color: #2d2d2d;
+      color: #0F172A;
       margin: 0;
-      font-family: 'Kalam', 'ZCOOL KuaiLe', cursive;
+      font-family: 'Calistoga', serif;
     }
   }
 
@@ -336,8 +336,8 @@ onUnmounted(() => {
     :deep(.el-input) {
       .el-input__inner {
         height: 44px;
-        border-radius: 185px 10px 155px 10px / 10px 155px 10px 185px;
-        border-color: #2d2d2d;
+        border-radius: 12px;
+        border-color: #0F172A;
       }
     }
 
@@ -359,9 +359,9 @@ onUnmounted(() => {
 
     .current-phone {
       font-size: 15px;
-      color: #2d2d2d;
+      color: #0F172A;
       font-weight: 500;
-      font-family: 'Patrick Hand', cursive;
+      font-family: 'Inter', sans-serif;
     }
   }
 
@@ -369,7 +369,7 @@ onUnmounted(() => {
     display: flex;
     gap: 12px;
     width: 100%;
-    font-family: 'Patrick Hand', cursive;
+    font-family: 'Inter', sans-serif;
 
     .el-input {
       flex: 1;
