@@ -141,9 +141,6 @@ public class UserController {
             HttpServletRequest httpRequest) {
         Long userId = getUserIdFromToken(httpRequest);
         String password = body.get("password");
-        if (password == null || password.isBlank()) {
-            return ApiResponse.error(400, "请输入密码确认注销");
-        }
         userService.deleteAccount(userId, password);
         ApiResponse<Void> response = ApiResponse.success();
         response.setMessage("账号已注销");

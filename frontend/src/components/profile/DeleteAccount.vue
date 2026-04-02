@@ -27,9 +27,10 @@
       <el-divider />
 
       <div class="confirm-section">
-        <p class="confirm-tip">请输入登录密码以确认注销：</p>
+        <p class="confirm-tip" v-if="needPassword">请输入登录密码以确认注销：</p>
+        <p class="confirm-tip" v-else>请确认注销操作：</p>
         <el-form @submit.prevent="handleDelete">
-          <el-form-item>
+          <el-form-item v-if="needPassword">
             <el-input
               v-model="password"
               type="password"
@@ -49,7 +50,7 @@
               type="danger"
               size="large"
               :loading="loading"
-              :disabled="!confirmed || !password"
+              :disabled="!confirmed || (needPassword && !password)"
               @click="handleDelete"
             >
               确认注销账号
@@ -62,7 +63,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { WarningFilled, Lock } from '@element-plus/icons-vue'
@@ -75,8 +76,11 @@ const password = ref('')
 const confirmed = ref(false)
 const loading = ref(false)
 
+// OAuth-only用户（无邮箱）无需密码验证
+const needPassword = computed(() => !!authStore.user?.email)
+
 const handleDelete = async () => {
-  if (!confirmed.value || !password.value) return
+  if (!confirmed.value || (needPassword.value && !password.value)) return
 
   try {
     await ElMessageBox.confirm(

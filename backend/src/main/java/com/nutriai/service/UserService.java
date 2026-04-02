@@ -291,9 +291,15 @@ public class UserService {
             throw new BusinessException(403, "管理员账号不允许通过此方式注销");
         }
 
-        // 验证密码
-        if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new BusinessException(400, "密码验证失败，请输入正确的登录密码");
+        // 验证身份：有邮箱的用户需要密码验证，OAuth-only用户（无邮箱）跳过密码验证
+        boolean isOAuthOnly = user.getEmail() == null || user.getEmail().isBlank();
+        if (!isOAuthOnly) {
+            if (password == null || password.isBlank()) {
+                throw new BusinessException(400, "请输入密码确认注销");
+            }
+            if (!passwordEncoder.matches(password, user.getPassword())) {
+                throw new BusinessException(400, "密码验证失败，请输入正确的登录密码");
+            }
         }
 
         log.warn("用户请求注销账号: userId={}, email={}", userId, user.getEmail());

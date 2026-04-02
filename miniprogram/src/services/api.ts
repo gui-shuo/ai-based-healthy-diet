@@ -19,6 +19,7 @@ export const userApi = {
   updateProfile: (data: any) => request({ url: '/user/profile', method: 'PUT', data }),
   uploadAvatar: (filePath: string) => uploadFile({ url: '/user/avatar', filePath, name: 'file' }),
   changePassword: (data: any) => request({ url: '/user/password', method: 'PUT', data }),
+  deleteAccount: (password: string) => request({ url: '/user/delete-account', method: 'POST', data: { password } }),
   sendEmailCode: () => request({ url: '/user/email-code/send', method: 'POST' }),
   changePhone: (data: any) => request({ url: '/user/phone', method: 'PUT', data })
 }

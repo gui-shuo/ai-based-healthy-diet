@@ -110,9 +110,10 @@
       </view>
     </view>
 
-    <!-- Logout -->
+    <!-- Logout & Delete Account -->
     <view class="logout-wrap">
       <button class="btn-logout" @tap="handleLogout">退出登录</button>
+      <button class="btn-delete-account" @tap="handleDeleteAccount">注销账号</button>
     </view>
 
     <!-- Change Password Dialog -->
@@ -155,6 +156,37 @@
       </view>
     </view>
 
+    <!-- Delete Account Dialog -->
+    <view v-if="showDeleteDialog" class="dialog-mask" @tap.self="showDeleteDialog = false">
+      <view class="dialog delete-dialog">
+        <view class="dialog-title danger-title">⚠️ 注销账号</view>
+        <view class="delete-warning">
+          <text class="warning-text">注销后以下数据将被永久删除且无法恢复：</text>
+          <text class="warning-item">• 个人资料、健康档案</text>
+          <text class="warning-item">• AI对话记录、饮食计划</text>
+          <text class="warning-item">• 社区帖子、订单记录</text>
+          <text class="warning-item">• 所有其他关联数据</text>
+        </view>
+        <view v-if="needPassword" class="input-group">
+          <text class="label">输入登录密码确认</text>
+          <input v-model="deletePassword" type="password" placeholder="请输入当前登录密码" />
+        </view>
+        <view class="delete-checkbox" @tap="deleteConfirmed = !deleteConfirmed">
+          <text :class="['checkbox-icon', { checked: deleteConfirmed }]">{{ deleteConfirmed ? '☑' : '☐' }}</text>
+          <text class="checkbox-text">我已了解数据将被永久删除且无法恢复</text>
+        </view>
+        <view class="dialog-actions">
+          <button class="btn-dialog-cancel" @tap="showDeleteDialog = false">取消</button>
+          <button
+            class="btn-delete-confirm"
+            :disabled="!deleteConfirmed || (needPassword && !deletePassword)"
+            :loading="deleting"
+            @tap="confirmDeleteAccount"
+          >确认注销</button>
+        </view>
+      </view>
+    </view>
+
     <view class="safe-bottom"></view>
   </view>
 </template>
@@ -171,8 +203,12 @@ const userStore = useUserStore()
 const showEditProfile = ref(false)
 const showPasswordDialog = ref(false)
 const showAboutDialog = ref(false)
+const showDeleteDialog = ref(false)
 const saving = ref(false)
 const changingPwd = ref(false)
+const deleting = ref(false)
+const deletePassword = ref('')
+const deleteConfirmed = ref(false)
 const memberInfo = ref<any>({})
 
 const genderOptions = ['保密', '男', '女']
@@ -320,6 +356,45 @@ function handleLogout() {
     content: '确定要退出登录吗？',
     success: (res) => {
       if (res.confirm) userStore.logout()
+    }
+  })
+}
+
+// OAuth-only用户（无邮箱）无需密码验证
+const needPassword = computed(() => !!(userStore.userInfo as any)?.email)
+
+function handleDeleteAccount() {
+  deletePassword.value = ''
+  deleteConfirmed.value = false
+  showDeleteDialog.value = true
+}
+
+async function confirmDeleteAccount() {
+  if (!deleteConfirmed.value) return
+  if (needPassword.value && !deletePassword.value) return
+
+  uni.showModal({
+    title: '最终确认',
+    content: '此操作不可撤销！确定要永久注销您的账号吗？',
+    confirmText: '确认注销',
+    confirmColor: '#ee0a24',
+    success: async (res) => {
+      if (!res.confirm) return
+      deleting.value = true
+      try {
+        const result = await userApi.deleteAccount(deletePassword.value || '')
+        if (result.code === 200) {
+          uni.showToast({ title: '账号已注销', icon: 'success' })
+          showDeleteDialog.value = false
+          setTimeout(() => userStore.logout(), 1500)
+        } else {
+          uni.showToast({ title: result.message || '注销失败', icon: 'none' })
+        }
+      } catch (e: any) {
+        uni.showToast({ title: e?.message || '注销失败', icon: 'none' })
+      } finally {
+        deleting.value = false
+      }
     }
   })
 }
@@ -516,6 +591,89 @@ onShow(() => {
 }
 
 .btn-logout::after {
+  border: none;
+}
+
+.btn-delete-account {
+  background: #fff;
+  color: #999;
+  border: 2rpx solid #ddd;
+  border-radius: 44rpx;
+  height: 88rpx;
+  line-height: 88rpx;
+  font-size: 28rpx;
+  text-align: center;
+  margin-top: 16rpx;
+}
+
+.btn-delete-account::after {
+  border: none;
+}
+
+.delete-dialog {
+  .danger-title {
+    color: #ee0a24;
+  }
+}
+
+.delete-warning {
+  background: #fff7f7;
+  border-radius: 12rpx;
+  padding: 24rpx;
+  margin-bottom: 24rpx;
+}
+
+.warning-text {
+  display: block;
+  font-size: 26rpx;
+  color: #ee0a24;
+  font-weight: 600;
+  margin-bottom: 12rpx;
+}
+
+.warning-item {
+  display: block;
+  font-size: 24rpx;
+  color: #666;
+  line-height: 1.8;
+}
+
+.delete-checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: 12rpx;
+  margin: 20rpx 0;
+  padding: 0 4rpx;
+}
+
+.checkbox-icon {
+  font-size: 36rpx;
+  color: #ccc;
+  &.checked { color: #ee0a24; }
+}
+
+.checkbox-text {
+  font-size: 24rpx;
+  color: #666;
+  flex: 1;
+  line-height: 1.6;
+}
+
+.btn-delete-confirm {
+  flex: 1;
+  background: #ee0a24;
+  color: #fff;
+  border: none;
+  border-radius: 40rpx;
+  height: 80rpx;
+  line-height: 80rpx;
+  font-size: 28rpx;
+  &[disabled] {
+    opacity: 0.5;
+  }
+}
+
+.btn-delete-confirm::after {
   border: none;
 }
 
