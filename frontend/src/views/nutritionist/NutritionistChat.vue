@@ -408,15 +408,15 @@ function formatMsgTime(ts) {
   display: flex;
   height: calc(100vh - 48px);
   margin: -24px;
-  background: #fdfbf7;
-  font-family: 'Patrick Hand', cursive;
+  background: #FAFAFA;
+  font-family: 'Inter', sans-serif;
 }
 
 // Left sidebar
 .conv-sidebar {
   width: 320px;
-  background: #fdfbf7;
-  border-right: 2px dashed #2d2d2d;
+  background: #FFFFFF;
+  border-right: 1px solid #E2E8F0;
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
@@ -424,7 +424,7 @@ function formatMsgTime(ts) {
 
 .conv-search {
   padding: 12px;
-  border-bottom: 2px dashed #e5e0d8;
+  border-bottom: 1px solid #E2E8F0;
 }
 
 .conv-list {
@@ -434,11 +434,11 @@ function formatMsgTime(ts) {
 
 .no-conv {
   text-align: center;
-  color: #2d2d2d;
+  color: #0F172A;
   padding: 40px 20px;
   font-size: 14px;
-  font-family: 'Patrick Hand', cursive;
-  opacity: 0.6;
+  font-family: 'Inter', sans-serif;
+  opacity: 0.5;
 }
 
 .conv-item {
@@ -447,18 +447,18 @@ function formatMsgTime(ts) {
   gap: 12px;
   padding: 14px 16px;
   cursor: pointer;
-  border-bottom: 1px dashed #e5e0d8;
-  transition: background 0.15s;
+  border-bottom: 1px solid #E2E8F0;
+  transition: background 0.2s;
 
-  &:hover { background: #e5e0d8; }
-  &.active { background: #fff9c4; border-left: 3px solid #2d5da1; }
+  &:hover { background: #F1F5F9; }
+  &.active { background: #F1F5F9; border-left: 3px solid #0052FF; }
 
   .conv-avatar {
-    background: #2d5da1;
-    color: #fdfbf7;
+    background: linear-gradient(135deg, #0052FF, #4D7CFF);
+    color: #FFFFFF;
     font-weight: 600;
     flex-shrink: 0;
-    border: 2px solid #2d2d2d;
+    border: none;
   }
 
   .conv-info {
@@ -475,20 +475,20 @@ function formatMsgTime(ts) {
   .conv-name {
     font-size: 14px;
     font-weight: 500;
-    color: #2d2d2d;
+    color: #0F172A;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
     max-width: 160px;
-    font-family: 'Patrick Hand', cursive;
+    font-family: 'Inter', sans-serif;
   }
 
   .conv-time {
     font-size: 11px;
-    color: #2d2d2d;
-    opacity: 0.5;
+    color: #0F172A;
+    opacity: 0.4;
     flex-shrink: 0;
-    font-family: 'Patrick Hand', cursive;
+    font-family: 'Inter', sans-serif;
   }
 
   .conv-bottom {
@@ -500,13 +500,13 @@ function formatMsgTime(ts) {
 
   .conv-preview {
     font-size: 12px;
-    color: #2d2d2d;
+    color: #0F172A;
     opacity: 0.5;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
     flex: 1;
-    font-family: 'Patrick Hand', cursive;
+    font-family: 'Inter', sans-serif;
   }
 
   .conv-tag { flex-shrink: 0; }
@@ -518,13 +518,13 @@ function formatMsgTime(ts) {
   display: flex;
   flex-direction: column;
   min-width: 0;
-  background: #fdfbf7;
+  background: #FAFAFA;
 }
 
 .chat-header {
   padding: 14px 20px;
-  background: #fdfbf7;
-  border-bottom: 2px dashed #2d2d2d;
+  background: #FFFFFF;
+  border-bottom: 1px solid #E2E8F0;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -534,7 +534,7 @@ function formatMsgTime(ts) {
     display: flex;
     align-items: center;
     gap: 10px;
-    h3 { margin: 0; font-size: 16px; color: #2d2d2d; font-family: 'Kalam', cursive; }
+    h3 { margin: 0; font-size: 16px; color: #0F172A; font-family: 'Calistoga', cursive; }
   }
 }
 
@@ -542,7 +542,7 @@ function formatMsgTime(ts) {
   flex: 1;
   overflow-y: auto;
   padding: 20px;
-  background: #fdfbf7;
+  background: #FAFAFA;
 
   .system-msg {
     text-align: center;
@@ -551,25 +551,25 @@ function formatMsgTime(ts) {
 
   .system-bubble {
     display: inline-block;
-    background: #e5e0d8;
-    color: #2d2d2d;
+    background: #F1F5F9;
+    color: #0F172A;
     padding: 6px 16px;
-    border-radius: 185px 10px 155px 10px / 10px 155px 10px 185px;
+    border-radius: 12px;
     font-size: 12px;
-    border: 1px dashed #2d2d2d;
-    font-family: 'Patrick Hand', cursive;
+    border: 1px solid #E2E8F0;
+    font-family: 'Inter', sans-serif;
 
     .system-label {
       font-weight: 600;
-      color: #2d5da1;
+      color: #0052FF;
       margin-right: 6px;
-      font-family: 'Kalam', cursive;
+      font-family: 'Inter', sans-serif;
     }
 
     &.completed {
-      background: #fff9c4;
-      color: #2d2d2d;
-      border-color: #2d2d2d;
+      background: #F1F5F9;
+      color: #0F172A;
+      border-color: #E2E8F0;
     }
   }
 
@@ -582,23 +582,23 @@ function formatMsgTime(ts) {
     &.msg-self {
       flex-direction: row-reverse;
       .msg-bubble {
-        background: #2d5da1;
-        color: #fdfbf7;
-        border: 2px solid #2d2d2d;
-        border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
-        box-shadow: 3px 3px 0px 0px rgba(45,45,45,0.1);
-        .msg-time { color: rgba(253,251,247,0.7); }
+        background: linear-gradient(135deg, #0052FF, #4D7CFF);
+        color: #FFFFFF;
+        border: none;
+        border-radius: 16px 16px 4px 16px;
+        box-shadow: 0 2px 8px rgba(0, 82, 255, 0.2);
+        .msg-time { color: rgba(255, 255, 255, 0.7); }
       }
     }
 
     &.msg-other {
       .msg-bubble {
-        background: #fdfbf7;
-        color: #2d2d2d;
-        border: 2px solid #2d2d2d;
-        border-radius: 15px 225px 15px 255px / 255px 15px 225px 15px;
-        box-shadow: 3px 3px 0px 0px rgba(45,45,45,0.1);
-        .msg-time { color: #2d2d2d; opacity: 0.5; }
+        background: #FFFFFF;
+        color: #0F172A;
+        border: 1px solid #E2E8F0;
+        border-radius: 16px 16px 16px 4px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        .msg-time { color: #0F172A; opacity: 0.4; }
       }
     }
   }
@@ -607,22 +607,22 @@ function formatMsgTime(ts) {
     flex-shrink: 0;
     font-weight: 600;
     font-size: 13px;
-    border: 2px solid #2d2d2d;
-    &.avatar-self { background: #2d5da1; color: #fdfbf7; }
-    &.avatar-other { background: #e5e0d8; color: #2d2d2d; }
+    border: none;
+    &.avatar-self { background: linear-gradient(135deg, #0052FF, #4D7CFF); color: #FFFFFF; }
+    &.avatar-other { background: #F1F5F9; color: #0F172A; }
   }
 
   .msg-bubble {
     max-width: 60%;
     padding: 12px 16px;
-    .msg-text { font-size: 14px; line-height: 1.7; white-space: pre-wrap; word-break: break-word; font-family: 'Patrick Hand', cursive; }
-    .msg-time { font-size: 11px; text-align: right; margin-top: 6px; font-family: 'Patrick Hand', cursive; }
+    .msg-text { font-size: 14px; line-height: 1.7; white-space: pre-wrap; word-break: break-word; font-family: 'Inter', sans-serif; }
+    .msg-time { font-size: 11px; text-align: right; margin-top: 6px; font-family: 'Inter', sans-serif; }
   }
 }
 
 .chat-input {
-  background: #fdfbf7;
-  border-top: 2px dashed #2d2d2d;
+  background: #FFFFFF;
+  border-top: 1px solid #E2E8F0;
   padding: 12px 16px;
   flex-shrink: 0;
 
@@ -630,7 +630,7 @@ function formatMsgTime(ts) {
     display: flex;
     justify-content: flex-end;
     margin-bottom: 6px;
-    .input-tip { font-size: 11px; color: #2d2d2d; opacity: 0.5; font-family: 'Patrick Hand', cursive; }
+    .input-tip { font-size: 11px; color: #0F172A; opacity: 0.4; font-family: 'Inter', sans-serif; }
   }
 
   .input-actions {
@@ -640,11 +640,11 @@ function formatMsgTime(ts) {
   }
 
   :deep(.el-textarea__inner) {
-    border-radius: 15px 225px 15px 255px / 255px 15px 225px 15px;
-    border: 2px solid #2d2d2d;
-    background: #fdfbf7;
-    font-family: 'Patrick Hand', cursive;
-    &:focus { box-shadow: 0 0 0 1px #2d5da1; }
+    border-radius: 12px;
+    border: 1px solid #E2E8F0;
+    background: #FAFAFA;
+    font-family: 'Inter', sans-serif;
+    &:focus { box-shadow: 0 0 0 2px rgba(0, 82, 255, 0.15); border-color: #0052FF; }
   }
 }
 
@@ -653,14 +653,14 @@ function formatMsgTime(ts) {
   display: flex;
   justify-content: center;
   align-items: center;
-  background: #fdfbf7;
+  background: #FAFAFA;
 
   .no-selection-content {
     text-align: center;
-    color: #2d2d2d;
+    color: #0F172A;
     .no-icon { font-size: 64px; margin-bottom: 16px; }
-    h3 { color: #2d2d2d; margin: 0 0 8px; font-family: 'Kalam', cursive; }
-    p { margin: 0; font-size: 14px; font-family: 'Patrick Hand', cursive; opacity: 0.6; }
+    h3 { color: #0F172A; margin: 0 0 8px; font-family: 'Calistoga', cursive; }
+    p { margin: 0; font-size: 14px; font-family: 'Inter', sans-serif; opacity: 0.5; }
   }
 }
 </style>

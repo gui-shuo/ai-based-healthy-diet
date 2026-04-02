@@ -141,7 +141,7 @@ onMounted(() => {
   max-width: 1200px;
   margin: 0 auto;
   padding: 24px;
-  font-family: 'Patrick Hand', cursive;
+  font-family: 'Inter', sans-serif;
 }
 
 .page-header {
@@ -152,16 +152,16 @@ onMounted(() => {
 .page-header h1 {
   font-size: 32px;
   font-weight: 600;
-  color: #2d2d2d;
+  color: #0F172A;
   margin-bottom: 8px;
-  font-family: 'Kalam', cursive;
+  font-family: 'Calistoga', cursive;
 }
 
 .subtitle {
   font-size: 16px;
-  color: #2d2d2d;
-  opacity: 0.6;
-  font-family: 'Patrick Hand', cursive;
+  color: #0F172A;
+  opacity: 0.5;
+  font-family: 'Inter', sans-serif;
 }
 
 .announcements-list {
@@ -169,53 +169,48 @@ onMounted(() => {
 }
 
 .announcement-card {
-  background: #fdfbf7;
-  border-radius: 15px 225px 15px 255px / 255px 15px 225px 15px;
+  background: #FFFFFF;
+  border-radius: 16px;
   padding: 24px;
   margin-bottom: 20px;
-  box-shadow: 4px 4px 0px 0px #2d2d2d;
-  border: 2px solid #2d2d2d;
-  transition: all 0.15s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  border: 1px solid #E2E8F0;
+  transition: all 0.2s ease;
   position: relative;
 }
 
-/* tack decoration */
 .announcement-card::before {
-  content: '📌';
-  position: absolute;
-  top: -10px;
-  right: 24px;
-  font-size: 22px;
-  transform: rotate(15deg);
-  filter: drop-shadow(1px 1px 0px rgba(45,45,45,0.3));
+  display: none;
 }
 
 .announcement-card:hover {
-  box-shadow: 2px 2px 0px 0px #2d2d2d;
-  transform: translate(2px, 2px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
 }
 
 .announcement-card.type-WARNING {
-  background: #fff9c4;
+  background: #FFFFFF;
+  border-left: 3px solid #f59e0b;
 }
 
 .announcement-card.type-ERROR {
-  background: #fdfbf7;
-  border-color: #ff4d4d;
-  box-shadow: 4px 4px 0px 0px #ff4d4d;
+  background: #FFFFFF;
+  border-color: #E2E8F0;
+  border-left: 3px solid #ef4444;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .announcement-card.type-ERROR:hover {
-  box-shadow: 2px 2px 0px 0px #ff4d4d;
-  transform: translate(2px, 2px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
 }
 
 .announcement-card.type-ERROR::before {
-  content: '🚨';
+  display: none;
 }
 
 .announcement-card.type-WARNING::before {
-  content: '⚠️';
+  display: none;
 }
 
 .card-header {
@@ -235,9 +230,9 @@ onMounted(() => {
 .title {
   font-size: 20px;
   font-weight: 600;
-  color: #2d2d2d;
+  color: #0F172A;
   margin: 0;
-  font-family: 'Kalam', cursive;
+  font-family: 'Calistoga', cursive;
 }
 
 .header-right {
@@ -247,9 +242,9 @@ onMounted(() => {
 
 .date {
   font-size: 14px;
-  color: #2d2d2d;
-  opacity: 0.5;
-  font-family: 'Patrick Hand', cursive;
+  color: #0F172A;
+  opacity: 0.4;
+  font-family: 'Inter', sans-serif;
 }
 
 .card-content {
@@ -259,10 +254,10 @@ onMounted(() => {
 .content {
   font-size: 15px;
   line-height: 1.8;
-  color: #2d2d2d;
+  color: #0F172A;
   white-space: pre-wrap;
   word-break: break-word;
-  font-family: 'Patrick Hand', cursive;
+  font-family: 'Inter', sans-serif;
 }
 
 .card-footer {
@@ -270,11 +265,11 @@ onMounted(() => {
   align-items: center;
   gap: 8px;
   padding-top: 16px;
-  border-top: 2px dashed #e5e0d8;
-  color: #2d2d2d;
+  border-top: 1px solid #E2E8F0;
+  color: #0F172A;
   font-size: 14px;
-  opacity: 0.6;
-  font-family: 'Patrick Hand', cursive;
+  opacity: 0.5;
+  font-family: 'Inter', sans-serif;
 }
 
 .validity {
@@ -288,7 +283,6 @@ onMounted(() => {
   justify-content: center;
 }
 
-/* 响应式设计 */
 @media (max-width: 768px) {
   .announcements-page {
     padding: 16px;

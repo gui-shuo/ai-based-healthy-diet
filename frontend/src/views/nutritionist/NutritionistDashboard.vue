@@ -128,7 +128,7 @@ function formatDate(dt) {
 <style scoped lang="scss">
 .dashboard {
   max-width: 960px;
-  font-family: 'Patrick Hand', cursive;
+  font-family: 'Inter', sans-serif;
 }
 
 .profile-summary {
@@ -137,14 +137,14 @@ function formatDate(dt) {
   align-items: center;
   margin-bottom: 24px;
   padding: 20px 24px;
-  background: #2d5da1;
-  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
-  border: 2px solid #2d2d2d;
-  box-shadow: 4px 4px 0px 0px #2d2d2d;
-  color: #fdfbf7;
+  background: linear-gradient(135deg, #0052FF, #4D7CFF);
+  border-radius: 16px;
+  border: none;
+  box-shadow: 0 4px 14px 0 rgba(0, 82, 255, 0.25);
+  color: #FFFFFF;
 
-  h2 { margin: 0 0 4px; font-size: 20px; font-family: 'Kalam', cursive; }
-  .profile-subtitle { margin: 0; font-size: 13px; opacity: 0.85; font-family: 'Patrick Hand', cursive; }
+  h2 { margin: 0 0 4px; font-size: 20px; font-family: 'Calistoga', cursive; }
+  .profile-subtitle { margin: 0; font-size: 13px; opacity: 0.85; font-family: 'Inter', sans-serif; }
 
   .profile-stats {
     display: flex;
@@ -153,8 +153,8 @@ function formatDate(dt) {
 
   .mini-stat {
     text-align: center;
-    .label { display: block; font-size: 12px; opacity: 0.8; font-family: 'Patrick Hand', cursive; }
-    .value { display: block; font-size: 20px; font-weight: 700; margin-top: 2px; font-family: 'Kalam', cursive; }
+    .label { display: block; font-size: 12px; opacity: 0.8; font-family: 'Inter', sans-serif; }
+    .value { display: block; font-size: 20px; font-weight: 700; margin-top: 2px; font-family: 'Calistoga', cursive; }
   }
 }
 
@@ -167,14 +167,14 @@ function formatDate(dt) {
 
 .stat-card {
   text-align: center;
-  border: 2px solid #2d2d2d;
-  box-shadow: 4px 4px 0px 0px #2d2d2d;
-  transition: all 0.15s ease;
-  background: #fdfbf7;
+  border: 1px solid #E2E8F0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+  background: #FFFFFF;
 
   &:hover {
-    box-shadow: 2px 2px 0px 0px #2d2d2d;
-    transform: translate(2px, 2px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
   }
 
   :deep(.el-card__body) {
@@ -182,13 +182,13 @@ function formatDate(dt) {
   }
 
   .stat-icon { font-size: 28px; margin-bottom: 8px; }
-  .stat-num { font-size: 28px; font-weight: 700; color: #2d5da1; font-family: 'Kalam', cursive; }
-  .stat-label { font-size: 13px; color: #2d2d2d; margin-top: 4px; font-family: 'Patrick Hand', cursive; }
+  .stat-num { font-size: 28px; font-weight: 700; color: #0052FF; font-family: 'Calistoga', cursive; }
+  .stat-label { font-size: 13px; color: #0F172A; margin-top: 4px; font-family: 'Inter', sans-serif; }
 }
 
 :deep(.el-card) {
-  border-radius: 15px 225px 15px 255px / 255px 15px 225px 15px;
-  overflow: visible;
+  border-radius: 16px;
+  overflow: hidden;
 }
 
 .section {
@@ -197,7 +197,7 @@ function formatDate(dt) {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 16px;
-    h3 { margin: 0; font-size: 18px; color: #2d2d2d; font-family: 'Kalam', cursive; }
+    h3 { margin: 0; font-size: 18px; color: #0F172A; font-family: 'Calistoga', cursive; }
   }
 }
 
@@ -209,14 +209,14 @@ function formatDate(dt) {
 
 .order-card {
   cursor: pointer;
-  transition: all 0.15s ease;
-  border: 2px solid #2d2d2d;
-  box-shadow: 3px 3px 0px 0px rgba(45,45,45,0.1);
-  background: #fdfbf7;
+  transition: all 0.2s ease;
+  border: 1px solid #E2E8F0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  background: #FFFFFF;
 
   &:hover {
-    box-shadow: 1px 1px 0px 0px rgba(45,45,45,0.1);
-    transform: translate(2px, 2px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
   }
 
   .order-info {
@@ -229,15 +229,15 @@ function formatDate(dt) {
     display: flex;
     align-items: center;
     gap: 8px;
-    strong { font-size: 15px; font-family: 'Patrick Hand', cursive; color: #2d2d2d; }
+    strong { font-size: 15px; font-family: 'Inter', sans-serif; color: #0F172A; }
   }
 
   .order-meta {
     margin: 6px 0 0;
-    color: #2d2d2d;
+    color: #0F172A;
     font-size: 12px;
-    font-family: 'Patrick Hand', cursive;
-    opacity: 0.7;
+    font-family: 'Inter', sans-serif;
+    opacity: 0.6;
   }
 }
 </style>

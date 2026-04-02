@@ -158,8 +158,8 @@ function handleLogout() {
 .nutritionist-layout {
   display: flex;
   min-height: 100vh;
-  background: #fdfbf7;
-  font-family: 'Patrick Hand', cursive;
+  background: #FAFAFA;
+  font-family: 'Inter', sans-serif;
 }
 
 .approval-state-container {
@@ -167,21 +167,21 @@ function handleLogout() {
   display: flex;
   justify-content: center;
   align-items: center;
-  background: #fdfbf7;
+  background: #FAFAFA;
 }
 
 .approval-card {
   text-align: center;
-  background: #fdfbf7;
+  background: #FFFFFF;
   padding: 48px;
-  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
-  box-shadow: 4px 4px 0px 0px #2d2d2d;
-  border: 2px solid #2d2d2d;
+  border-radius: 16px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  border: 1px solid #E2E8F0;
   max-width: 480px;
 
   .state-icon { font-size: 64px; margin-bottom: 16px; }
-  h2 { color: #2d2d2d; margin: 0 0 12px; font-size: 22px; font-family: 'Kalam', cursive; }
-  p { color: #2d2d2d; margin: 0 0 20px; line-height: 1.6; font-size: 14px; font-family: 'Patrick Hand', cursive; }
+  h2 { color: #0F172A; margin: 0 0 12px; font-size: 22px; font-family: 'Calistoga', cursive; }
+  p { color: #0F172A; margin: 0 0 20px; line-height: 1.6; font-size: 14px; font-family: 'Inter', sans-serif; }
 
   .approval-actions {
     display: flex;
@@ -193,8 +193,8 @@ function handleLogout() {
 
 .sidebar {
   width: 240px;
-  background: #fdfbf7;
-  border-right: 2px dashed #2d2d2d;
+  background: #FFFFFF;
+  border-right: 1px solid #E2E8F0;
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
@@ -204,19 +204,19 @@ function handleLogout() {
     display: flex;
     align-items: center;
     gap: 12px;
-    border-bottom: 2px dashed #e5e0d8;
-    background: #fdfbf7;
+    border-bottom: 1px solid #E2E8F0;
+    background: #FFFFFF;
 
     .n-avatar {
-      background: #2d5da1;
-      color: #fdfbf7;
+      background: linear-gradient(135deg, #0052FF, #4D7CFF);
+      color: #FFFFFF;
       font-weight: 600;
-      border: 2px solid #2d2d2d;
+      border: none;
     }
 
     .profile-info {
-      h3 { margin: 0; font-size: 16px; font-weight: 600; color: #2d2d2d; font-family: 'Kalam', cursive; }
-      p { margin: 2px 0 0; font-size: 12px; color: #2d2d2d; font-family: 'Patrick Hand', cursive; }
+      h3 { margin: 0; font-size: 16px; font-weight: 600; color: #0F172A; font-family: 'Calistoga', cursive; }
+      p { margin: 2px 0 0; font-size: 12px; color: #0F172A; opacity: 0.6; font-family: 'Inter', sans-serif; }
     }
   }
 
@@ -225,35 +225,37 @@ function handleLogout() {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 2px dashed #e5e0d8;
+    border-bottom: 1px solid #E2E8F0;
     font-size: 14px;
-    color: #2d2d2d;
-    font-family: 'Patrick Hand', cursive;
+    color: #0F172A;
+    font-family: 'Inter', sans-serif;
   }
 
   .sidebar-menu {
     border-right: none;
     flex: 1;
     background: transparent;
-    font-family: 'Patrick Hand', cursive;
+    font-family: 'Inter', sans-serif;
 
     :deep(.el-menu-item) {
-      font-family: 'Patrick Hand', cursive;
-      color: #2d2d2d;
+      font-family: 'Inter', sans-serif;
+      color: #0F172A;
+      border-radius: 8px;
+      margin: 2px 8px;
       &.is-active {
-        color: #2d5da1;
-        background: #e5e0d8;
-        border-right: 3px solid #2d5da1;
+        color: #0052FF;
+        background: #F1F5F9;
+        border-right: 3px solid #0052FF;
       }
       &:hover {
-        background: #e5e0d8;
+        background: #F1F5F9;
       }
     }
   }
 
   .sidebar-footer {
     padding: 12px 16px;
-    border-top: 2px dashed #e5e0d8;
+    border-top: 1px solid #E2E8F0;
     display: flex;
     flex-direction: column;
     gap: 4px;
@@ -268,6 +270,6 @@ function handleLogout() {
   flex: 1;
   padding: 24px;
   overflow-y: auto;
-  background: #fdfbf7;
+  background: #FAFAFA;
 }
 </style>

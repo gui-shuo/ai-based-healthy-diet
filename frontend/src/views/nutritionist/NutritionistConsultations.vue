@@ -94,37 +94,38 @@ function formatDate(dt) {
 
 <style scoped lang="scss">
 .consultations-page {
-  font-family: 'Patrick Hand', cursive;
+  font-family: 'Inter', sans-serif;
 
   h2 {
     margin: 0 0 20px;
     font-size: 22px;
-    font-family: 'Kalam', cursive;
-    color: #2d2d2d;
+    font-family: 'Calistoga', cursive;
+    color: #0F172A;
   }
 }
 
 :deep(.el-table) {
-  background: #fdfbf7;
-  border: 2px solid #2d2d2d;
-  border-radius: 15px 225px 15px 255px / 255px 15px 225px 15px;
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 16px;
   overflow: hidden;
-  font-family: 'Patrick Hand', cursive;
+  font-family: 'Inter', sans-serif;
 
   th.el-table__cell {
-    background: #e5e0d8 !important;
-    color: #2d2d2d;
-    font-family: 'Kalam', cursive;
-    border-bottom: 2px dashed #2d2d2d !important;
+    background: #F1F5F9 !important;
+    color: #0F172A;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    border-bottom: 1px solid #E2E8F0 !important;
   }
 
   td.el-table__cell {
-    border-bottom: 1px dashed #e5e0d8 !important;
-    color: #2d2d2d;
+    border-bottom: 1px solid #E2E8F0 !important;
+    color: #0F172A;
   }
 
   tr:hover > td.el-table__cell {
-    background: #fff9c4 !important;
+    background: #F1F5F9 !important;
   }
 
   &::before,
@@ -134,6 +135,6 @@ function formatDate(dt) {
 }
 
 :deep(.el-pagination) {
-  font-family: 'Patrick Hand', cursive;
+  font-family: 'Inter', sans-serif;
 }
 </style>

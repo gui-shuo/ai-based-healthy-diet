@@ -55,33 +55,25 @@ import { ArrowLeft } from '@element-plus/icons-vue'
 <style scoped lang="scss">
 .legal-page {
   min-height: 100vh;
-  background: #e5e0d8;
+  background: #FAFAFA;
   padding: 40px 20px;
-  font-family: 'Patrick Hand', cursive;
+  font-family: 'Inter', sans-serif;
 }
 .legal-card {
   max-width: 800px;
   margin: 0 auto;
-  background: #fdfbf7;
-  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+  background: #FFFFFF;
+  border-radius: 16px;
   padding: 40px;
-  box-shadow: 4px 4px 0px 0px #2d2d2d;
-  border: 2px solid #2d2d2d;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  border: 1px solid #E2E8F0;
   position: relative;
-  // notebook lines effect
-  background-image: repeating-linear-gradient(
-    transparent,
-    transparent 31px,
-    #e5e0d8 31px,
-    #e5e0d8 32px
-  );
-  background-position: 0 40px;
 
-  h1 { font-size: 28px; margin-bottom: 8px; font-family: 'Kalam', cursive; color: #2d2d2d; }
-  h2 { font-size: 18px; margin: 24px 0 12px; color: #2d2d2d; font-family: 'Kalam', cursive; border-bottom: 2px dashed #e5e0d8; padding-bottom: 6px; }
-  p, li { font-size: 14px; line-height: 1.8; color: #2d2d2d; font-family: 'Patrick Hand', cursive; }
+  h1 { font-size: 28px; margin-bottom: 8px; font-family: 'Calistoga', cursive; color: #0F172A; }
+  h2 { font-size: 18px; margin: 24px 0 12px; color: #0F172A; font-family: 'Calistoga', cursive; border-bottom: 1px solid #E2E8F0; padding-bottom: 6px; }
+  p, li { font-size: 14px; line-height: 1.8; color: #0F172A; font-family: 'Inter', sans-serif; }
   ol { padding-left: 20px; }
-  .update-date { color: #2d2d2d; opacity: 0.5; font-size: 13px; margin-bottom: 24px; font-family: 'Patrick Hand', cursive; }
-  a { color: #2d5da1; text-decoration: none; &:hover { text-decoration: underline; } }
+  .update-date { color: #0F172A; opacity: 0.5; font-size: 13px; margin-bottom: 24px; font-family: 'Inter', sans-serif; }
+  a { color: #0052FF; text-decoration: none; &:hover { text-decoration: underline; } }
 }
 </style>
