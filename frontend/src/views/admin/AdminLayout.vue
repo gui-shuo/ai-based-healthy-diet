@@ -160,7 +160,7 @@ onMounted(() => {
 .admin-layout {
   height: 100vh;
   overflow: hidden;
-  font-family: 'Patrick Hand', 'Kalam', cursive, sans-serif;
+  font-family: 'Inter', sans-serif;
 }
 
 .el-container {
@@ -168,16 +168,9 @@ onMounted(() => {
 }
 
 .admin-aside {
-  background: #fdfbf7;
-  color: #2d2d2d;
-  border-right: 2.5px solid #2d2d2d;
-  border-image: repeating-linear-gradient(
-    180deg,
-    #2d2d2d 0px,
-    #2d2d2d 8px,
-    transparent 8px,
-    transparent 12px
-  ) 1;
+  background: #FFFFFF;
+  color: #0F172A;
+  border-right: 1px solid #E2E8F0;
 }
 
 .logo {
@@ -185,49 +178,49 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #fff9c4;
-  border-bottom: 2px dashed #e5e0d8;
+  background: #FFFFFF;
+  border-bottom: 1px solid #E2E8F0;
 }
 
 .logo h2 {
-  color: #2d2d2d;
+  color: #0F172A;
   margin: 0;
   font-size: 20px;
-  font-family: 'ZCOOL KuaiLe', 'Kalam', cursive;
-  letter-spacing: 1px;
+  font-family: 'Calistoga', serif;
+  letter-spacing: 0.5px;
 }
 
 .admin-menu {
   border: none;
-  background: #fdfbf7;
+  background: #FFFFFF;
 }
 
 .admin-menu :deep(.el-menu-item) {
-  color: #2d2d2d;
-  font-family: 'Patrick Hand', cursive, sans-serif;
-  font-size: 15px;
+  color: #0F172A;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
   border-radius: 0;
   margin: 2px 8px;
   transition: all 0.2s;
 }
 
 .admin-menu :deep(.el-menu-item:hover) {
-  color: #2d2d2d;
-  background: rgba(229, 224, 216, 0.45);
-  border-radius: 6px;
+  color: #0052FF;
+  background: #F1F5F9;
+  border-radius: 8px;
 }
 
 .admin-menu :deep(.el-menu-item.is-active) {
-  color: #2d2d2d;
-  font-weight: 700;
-  background: rgba(255, 77, 77, 0.08);
-  border-left: 3.5px solid #ff4d4d;
-  border-radius: 0 6px 6px 0;
+  color: #0052FF;
+  font-weight: 600;
+  background: rgba(0, 82, 255, 0.06);
+  border-left: 3px solid #0052FF;
+  border-radius: 0 8px 8px 0;
 }
 
 .admin-header {
-  background: #fdfbf7;
-  border-bottom: 2px dashed #e5e0d8;
+  background: #FFFFFF;
+  border-bottom: 1px solid #E2E8F0;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -241,13 +234,13 @@ onMounted(() => {
 }
 
 .username {
-  color: #2d2d2d;
+  color: #0F172A;
   font-size: 14px;
-  font-family: 'Patrick Hand', cursive;
+  font-family: 'Inter', sans-serif;
 }
 
 .admin-main {
-  background: #fdfbf7;
+  background: #FAFAFA;
   padding: 24px;
   overflow-y: auto;
 }

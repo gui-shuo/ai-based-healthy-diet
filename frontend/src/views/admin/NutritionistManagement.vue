@@ -406,15 +406,15 @@ onMounted(() => {
 
 <style scoped lang="scss">
 .nutritionist-management {
-  font-family: 'Patrick Hand', cursive, sans-serif;
+  font-family: 'Inter', sans-serif;
   .tab-badge { margin-left: 6px; }
 
   .toolbar-card {
     margin-bottom: 16px;
-    border: 2px solid #2d2d2d;
-    border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
-    box-shadow: 3px 3px 0px 0px rgba(45,45,45,0.1);
-    background: #fdfbf7;
+    border: 1px solid #E2E8F0;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    background: #FFFFFF;
     .toolbar {
       display: flex;
       justify-content: space-between;
@@ -422,23 +422,23 @@ onMounted(() => {
     }
   }
   .list-card {
-    border: 2px solid #2d2d2d;
-    border-radius: 15px 225px 15px 255px / 255px 15px 225px 15px;
-    box-shadow: 4px 4px 0px 0px #2d2d2d;
-    background: #fdfbf7;
+    border: 1px solid #E2E8F0;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+    background: #FFFFFF;
 
     :deep(.el-table th.el-table__cell) {
-      background: #fff9c4;
-      color: #2d2d2d;
-      font-family: 'Kalam', cursive;
+      background: #F1F5F9;
+      color: #0F172A;
+      font-family: 'Inter', sans-serif;
       font-weight: 600;
-      border-bottom: 2.5px solid #2d2d2d;
+      border-bottom: 1px solid #E2E8F0;
     }
     :deep(.el-table td.el-table__cell) {
-      border-bottom: 1.5px dashed #e5e0d8;
+      border-bottom: 1px solid #E2E8F0;
     }
     :deep(.el-table--striped .el-table__body tr.el-table__row--striped td.el-table__cell) {
-      background: rgba(253, 251, 247, 0.6);
+      background: #FAFAFA;
     }
   }
   .pagination {
@@ -455,10 +455,10 @@ onMounted(() => {
 }
 
 .pending-card {
-  border: 2px solid #2d2d2d;
-  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
-  box-shadow: 4px 4px 0px 0px #2d2d2d;
-  background: #fdfbf7;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  background: #FFFFFF;
 
   .pending-header {
     display: flex;
@@ -467,10 +467,10 @@ onMounted(() => {
     margin-bottom: 16px;
 
     .pending-avatar {
-      background: linear-gradient(135deg, #0d9488, #065f46);
+      background: linear-gradient(135deg, #0052FF, #4D7CFF);
       color: #fff;
       font-weight: 600;
-      border: 2px solid #2d2d2d;
+      border: 2px solid #E2E8F0;
     }
 
     .pending-info {
@@ -480,24 +480,24 @@ onMounted(() => {
         display: flex;
         align-items: center;
         gap: 8px;
-        font-family: 'Kalam', cursive;
-        color: #2d2d2d;
+        font-family: 'Inter', sans-serif;
+        color: #0F172A;
       }
-      p { margin: 0; color: #2d2d2d; opacity: 0.6; font-size: 13px; }
+      p { margin: 0; color: #0F172A; opacity: 0.6; font-size: 13px; }
     }
   }
 
   .pending-details {
     margin-bottom: 16px;
-    border: 1.5px dashed #e5e0d8;
+    border: 1px solid #E2E8F0;
     border-radius: 8px;
   }
 
   .cert-section {
     margin-bottom: 16px;
     padding-top: 16px;
-    border-top: 1.5px dashed #e5e0d8;
-    .cert-label { font-size: 13px; color: #2d2d2d; opacity: 0.6; margin: 0 0 8px; }
+    border-top: 1px solid #E2E8F0;
+    .cert-label { font-size: 13px; color: #0F172A; opacity: 0.6; margin: 0 0 8px; }
     .cert-images {
       display: flex;
       gap: 8px;
@@ -507,7 +507,7 @@ onMounted(() => {
       width: 120px;
       height: 90px;
       border-radius: 8px;
-      border: 2px solid #2d2d2d;
+      border: 1px solid #E2E8F0;
       cursor: pointer;
     }
     .cert-img-error {
@@ -516,12 +516,12 @@ onMounted(() => {
       display: flex;
       align-items: center;
       justify-content: center;
-      background: #fdfbf7;
-      color: #2d2d2d;
+      background: #FAFAFA;
+      color: #0F172A;
       opacity: 0.5;
       font-size: 12px;
       border-radius: 8px;
-      border: 1.5px dashed #e5e0d8;
+      border: 1px solid #E2E8F0;
     }
   }
 
@@ -530,7 +530,7 @@ onMounted(() => {
     gap: 12px;
     justify-content: flex-end;
     padding-top: 12px;
-    border-top: 1.5px dashed #e5e0d8;
+    border-top: 1px solid #E2E8F0;
   }
 }
 </style>

@@ -208,46 +208,46 @@ onMounted(() => {
 <style scoped>
 .ai-logs {
   padding: 0;
-  font-family: 'Patrick Hand', cursive, sans-serif;
+  font-family: 'Inter', sans-serif;
 }
 
 .page-title {
   margin: 0 0 24px 0;
   font-size: 24px;
   font-weight: 600;
-  color: #2d2d2d;
-  font-family: 'ZCOOL KuaiLe', 'Kalam', cursive;
+  color: #0F172A;
+  font-family: 'Calistoga', serif;
 }
 
 .search-card {
   margin-bottom: 16px;
-  border: 2px solid #2d2d2d;
-  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
-  box-shadow: 3px 3px 0px 0px rgba(45,45,45,0.1);
-  background: #fdfbf7;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  background: #FFFFFF;
 }
 
 .ai-logs > :deep(.el-card:nth-child(3)) {
-  border: 2px solid #2d2d2d;
-  border-radius: 15px 225px 15px 255px / 255px 15px 225px 15px;
-  box-shadow: 4px 4px 0px 0px #2d2d2d;
-  background: #fdfbf7;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  background: #FFFFFF;
 }
 
 .ai-logs :deep(.el-table th.el-table__cell) {
-  background: #fff9c4;
-  color: #2d2d2d;
-  font-family: 'Kalam', cursive;
+  background: #F1F5F9;
+  color: #0F172A;
+  font-family: 'Inter', sans-serif;
   font-weight: 600;
-  border-bottom: 2.5px solid #2d2d2d;
+  border-bottom: 1px solid #E2E8F0;
 }
 
 .ai-logs :deep(.el-table td.el-table__cell) {
-  border-bottom: 1.5px dashed #e5e0d8;
+  border-bottom: 1px solid #E2E8F0;
 }
 
 .ai-logs :deep(.el-table--striped .el-table__body tr.el-table__row--striped td.el-table__cell) {
-  background: rgba(253, 251, 247, 0.6);
+  background: #FAFAFA;
 }
 
 .pagination {
@@ -260,11 +260,11 @@ onMounted(() => {
   max-height: 200px;
   overflow-y: auto;
   padding: 8px;
-  background: #fdfbf7;
-  border: 1.5px dashed #e5e0d8;
-  border-radius: 4px;
+  background: #FAFAFA;
+  border: 1px solid #E2E8F0;
+  border-radius: 8px;
   white-space: pre-wrap;
   word-break: break-word;
-  color: #2d2d2d;
+  color: #0F172A;
 }
 </style>

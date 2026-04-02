@@ -235,7 +235,7 @@ onMounted(loadVersions)
 <style scoped>
 .version-management {
   padding: 0;
-  font-family: 'Patrick Hand', cursive, sans-serif;
+  font-family: 'Inter', sans-serif;
 }
 
 .page-header {
@@ -248,31 +248,31 @@ onMounted(loadVersions)
 .page-header h2 {
   margin: 0;
   font-size: 20px;
-  color: #2d2d2d;
-  font-family: 'ZCOOL KuaiLe', 'Kalam', cursive;
+  color: #0F172A;
+  font-family: 'Calistoga', serif;
 }
 
 .version-management :deep(.el-table) {
-  border: 2px solid #2d2d2d;
-  border-radius: 15px 225px 15px 255px / 255px 15px 225px 15px;
-  box-shadow: 4px 4px 0px 0px #2d2d2d;
-  background: #fdfbf7;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  background: #FFFFFF;
   overflow: hidden;
 }
 
 .version-management :deep(.el-table th.el-table__cell) {
-  background: #fff9c4;
-  color: #2d2d2d;
-  font-family: 'Kalam', cursive;
+  background: #F1F5F9;
+  color: #0F172A;
+  font-family: 'Inter', sans-serif;
   font-weight: 600;
-  border-bottom: 2.5px solid #2d2d2d;
+  border-bottom: 1px solid #E2E8F0;
 }
 
 .version-management :deep(.el-table td.el-table__cell) {
-  border-bottom: 1.5px dashed #e5e0d8;
+  border-bottom: 1px solid #E2E8F0;
 }
 
 .version-management :deep(.el-table--striped .el-table__body tr.el-table__row--striped td.el-table__cell) {
-  background: rgba(253, 251, 247, 0.6);
+  background: #FAFAFA;
 }
 </style>

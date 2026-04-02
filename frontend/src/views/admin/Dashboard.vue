@@ -447,7 +447,7 @@ onUnmounted(() => {
 <style scoped lang="scss">
 .dashboard {
   padding: 0;
-  font-family: 'Patrick Hand', cursive, sans-serif;
+  font-family: 'Inter', sans-serif;
 }
 
 /* 欢迎区域 */
@@ -458,13 +458,13 @@ onUnmounted(() => {
       margin: 0 0 4px;
       font-size: 22px;
       font-weight: 600;
-      color: #2d2d2d;
-      font-family: 'ZCOOL KuaiLe', 'Kalam', cursive;
+      color: #0F172A;
+      font-family: 'Calistoga', serif;
     }
     p {
       margin: 0;
       font-size: 13px;
-      color: #2d2d2d;
+      color: #0F172A;
       opacity: 0.6;
     }
   }
@@ -481,22 +481,17 @@ onUnmounted(() => {
 .stat-card {
   position: relative;
   overflow: hidden;
-  border: 2.5px solid #2d2d2d;
-  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+  border: none;
+  border-radius: 16px;
   padding: 20px;
   color: #fff;
   cursor: pointer;
-  box-shadow: 4px 4px 0px 0px #2d2d2d;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
   transition: transform 0.25s, box-shadow 0.25s;
 
-  &:nth-child(1) { transform: rotate(-0.6deg); }
-  &:nth-child(2) { transform: rotate(0.5deg); }
-  &:nth-child(3) { transform: rotate(-0.4deg); }
-  &:nth-child(4) { transform: rotate(0.7deg); }
-
   &:hover {
-    transform: translateY(-3px) rotate(0deg);
-    box-shadow: 8px 8px 0px 0px #2d2d2d;
+    transform: translateY(-3px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
   }
 
   .stat-card-bg {
@@ -518,14 +513,14 @@ onUnmounted(() => {
       font-weight: 700;
       line-height: 1.2;
       letter-spacing: -0.5px;
-      font-family: 'Kalam', cursive;
+      font-family: 'Inter', sans-serif;
     }
     .stat-label {
       display: block;
       font-size: 13px;
       opacity: 0.85;
       margin-top: 2px;
-      font-family: 'Patrick Hand', cursive;
+      font-family: 'Inter', sans-serif;
     }
   }
 
@@ -553,10 +548,10 @@ onUnmounted(() => {
   }
 }
 
-.stat-users { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-.stat-chats { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
-.stat-ai { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
-.stat-active { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+.stat-users { background: linear-gradient(135deg, #0052FF 0%, #4D7CFF 100%); }
+.stat-chats { background: linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%); }
+.stat-ai { background: linear-gradient(135deg, #0891b2 0%, #22d3ee 100%); }
+.stat-active { background: linear-gradient(135deg, #059669 0%, #34d399 100%); }
 
 /* 图表区域 */
 .chart-row {
@@ -564,14 +559,14 @@ onUnmounted(() => {
 }
 
 .chart-card {
-  border: 2px solid #2d2d2d;
-  border-radius: 15px 225px 15px 255px / 255px 15px 225px 15px;
-  box-shadow: 3px 3px 0px 0px rgba(45,45,45,0.1);
-  background: #fdfbf7;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  background: #FFFFFF;
 
   :deep(.el-card__header) {
     padding: 14px 20px;
-    border-bottom: 2px dashed #e5e0d8;
+    border-bottom: 1px solid #E2E8F0;
   }
   :deep(.el-card__body) {
     padding: 12px 16px;
@@ -589,15 +584,14 @@ onUnmounted(() => {
     gap: 8px;
     font-size: 15px;
     font-weight: 600;
-    color: #2d2d2d;
-    font-family: 'Kalam', cursive;
+    color: #0F172A;
+    font-family: 'Inter', sans-serif;
 
     .title-dot {
       width: 8px;
       height: 8px;
       border-radius: 50%;
       display: inline-block;
-      border: 1.5px solid #2d2d2d;
     }
   }
 }
@@ -619,8 +613,8 @@ onUnmounted(() => {
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      border-bottom: 1.5px dashed #e5e0d8;
-      border-right: 1.5px dashed #e5e0d8;
+      border-bottom: 1px solid #E2E8F0;
+      border-right: 1px solid #E2E8F0;
       padding: 12px;
 
       &:nth-child(even) { border-right: none; }
@@ -629,16 +623,16 @@ onUnmounted(() => {
       .info-value {
         font-size: 22px;
         font-weight: 700;
-        color: #2d2d2d;
+        color: #0F172A;
         line-height: 1.3;
-        font-family: 'Kalam', cursive;
+        font-family: 'Inter', sans-serif;
       }
       .info-label {
         font-size: 12px;
-        color: #2d2d2d;
+        color: #0F172A;
         opacity: 0.55;
         margin-top: 4px;
-        font-family: 'Patrick Hand', cursive;
+        font-family: 'Inter', sans-serif;
       }
     }
   }

@@ -413,51 +413,51 @@ onMounted(() => {
 .system-config {
   padding: 0;
   position: relative;
-  font-family: 'Patrick Hand', cursive, sans-serif;
+  font-family: 'Inter', sans-serif;
 }
 
 .page-title {
   margin: 0 0 24px 0;
   font-size: 24px;
   font-weight: 600;
-  color: #2d2d2d;
-  font-family: 'ZCOOL KuaiLe', 'Kalam', cursive;
+  color: #0F172A;
+  font-family: 'Calistoga', serif;
 }
 
 .category-card {
   margin-bottom: 16px;
-  border: 2px solid #2d2d2d;
-  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
-  box-shadow: 3px 3px 0px 0px rgba(45,45,45,0.1);
-  background: #fdfbf7;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  background: #FFFFFF;
 }
 
 .config-card {
   margin-bottom: 16px;
-  border: 2px solid #2d2d2d;
-  border-radius: 15px 225px 15px 255px / 255px 15px 225px 15px;
-  box-shadow: 4px 4px 0px 0px #2d2d2d;
-  background: #fdfbf7;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  background: #FFFFFF;
 }
 
 .config-card :deep(.el-card__header) {
-  border-bottom: 2px dashed #e5e0d8;
+  border-bottom: 1px solid #E2E8F0;
 }
 
 .config-card :deep(.el-table th.el-table__cell) {
-  background: #fff9c4;
-  color: #2d2d2d;
-  font-family: 'Kalam', cursive;
+  background: #F1F5F9;
+  color: #0F172A;
+  font-family: 'Inter', sans-serif;
   font-weight: 600;
-  border-bottom: 2.5px solid #2d2d2d;
+  border-bottom: 1px solid #E2E8F0;
 }
 
 .config-card :deep(.el-table td.el-table__cell) {
-  border-bottom: 1.5px dashed #e5e0d8;
+  border-bottom: 1px solid #E2E8F0;
 }
 
 .config-card :deep(.el-table--striped .el-table__body tr.el-table__row--striped td.el-table__cell) {
-  background: rgba(253, 251, 247, 0.6);
+  background: #FAFAFA;
 }
 
 .card-header {
@@ -466,14 +466,14 @@ onMounted(() => {
   align-items: center;
   font-weight: 600;
   font-size: 16px;
-  color: #2d2d2d;
-  font-family: 'Kalam', cursive;
+  color: #0F172A;
+  font-family: 'Inter', sans-serif;
 }
 
 .form-tip {
   margin-left: 8px;
   font-size: 12px;
-  color: #2d2d2d;
+  color: #0F172A;
   opacity: 0.5;
 }
 
@@ -481,8 +481,8 @@ onMounted(() => {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  color: #2d2d2d;
+  color: #0F172A;
   opacity: 0.5;
-  font-family: monospace;
+  font-family: 'JetBrains Mono', monospace;
 }
 </style>

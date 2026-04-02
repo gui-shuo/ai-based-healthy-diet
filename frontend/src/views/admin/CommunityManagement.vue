@@ -208,40 +208,40 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.community-mgmt { display: flex; flex-direction: column; gap: 16px; font-family: 'Patrick Hand', cursive, sans-serif; }
+.community-mgmt { display: flex; flex-direction: column; gap: 16px; font-family: 'Inter', sans-serif; }
 .stat-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
 .stat-cards :deep(.el-card) {
   text-align: center;
-  border: 2px solid #2d2d2d;
-  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
-  box-shadow: 3px 3px 0px 0px rgba(45,45,45,0.1);
-  background: #fdfbf7;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  background: #FFFFFF;
 }
-.stat-value { font-size: 28px; font-weight: 700; color: #2d2d2d; font-family: 'Kalam', cursive; }
-.stat-label { font-size: 13px; color: #2d2d2d; opacity: 0.55; margin-top: 4px; }
-.filter-card :deep(.el-card__body) { background: #fdfbf7; }
-.filter-card { border: 2px solid #2d2d2d; border-radius: 185px 10px 155px 10px / 10px 155px 10px 185px; box-shadow: 3px 3px 0px 0px rgba(45,45,45,0.1); }
+.stat-value { font-size: 28px; font-weight: 700; color: #0F172A; font-family: 'Inter', sans-serif; }
+.stat-label { font-size: 13px; color: #0F172A; opacity: 0.55; margin-top: 4px; }
+.filter-card :deep(.el-card__body) { background: #FFFFFF; }
+.filter-card { border: 1px solid #E2E8F0; border-radius: 12px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); }
 .filter-card .filter-row { display: flex; gap: 12px; align-items: center; }
 
 .community-mgmt > :deep(.el-card:last-of-type) {
-  border: 2px solid #2d2d2d;
-  border-radius: 15px 225px 15px 255px / 255px 15px 225px 15px;
-  box-shadow: 4px 4px 0px 0px #2d2d2d;
-  background: #fdfbf7;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  background: #FFFFFF;
 }
 
 .community-mgmt :deep(.el-table th.el-table__cell) {
-  background: #fff9c4;
-  color: #2d2d2d;
-  font-family: 'Kalam', cursive;
+  background: #F1F5F9;
+  color: #0F172A;
+  font-family: 'Inter', sans-serif;
   font-weight: 600;
-  border-bottom: 2.5px solid #2d2d2d;
+  border-bottom: 1px solid #E2E8F0;
 }
 .community-mgmt :deep(.el-table td.el-table__cell) {
-  border-bottom: 1.5px dashed #e5e0d8;
+  border-bottom: 1px solid #E2E8F0;
 }
 .community-mgmt :deep(.el-table--striped .el-table__body tr.el-table__row--striped td.el-table__cell) {
-  background: rgba(253, 251, 247, 0.6);
+  background: #FAFAFA;
 }
 
 .content-cell {
