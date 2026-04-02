@@ -45,7 +45,21 @@ onMounted(async () => {
     const stateStr = String(state || '')
     let response
 
-    // 绑定模式：用户已登录，将QQ绑定到当前账号
+    // H5 绑定模式：将code传回H5由H5端完成绑定（H5有自己的auth token）
+    if (stateStr.startsWith('h5_bind')) {
+      const bindProvider = stateStr.replace('h5_bind_', '') || provider
+      statusMsg.value = '正在绑定账号...'
+      const h5Base = window.location.origin + '/h5/'
+      const params = new URLSearchParams({
+        action: 'bind',
+        code: String(code),
+        provider: bindProvider
+      })
+      window.location.href = `${h5Base}#/pages/auth/social-callback?${params.toString()}`
+      return
+    }
+
+    // Web 绑定模式：用户已登录，将QQ绑定到当前账号
     if (stateStr === 'bind') {
       if (provider === 'qq') {
         statusMsg.value = '正在绑定QQ账号...'

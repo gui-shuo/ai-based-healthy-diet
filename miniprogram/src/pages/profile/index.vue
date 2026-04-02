@@ -182,12 +182,13 @@
             <view class="phone-row">
               <input class="form-input flex-1" v-model="profileForm.phone" type="number" placeholder="请输入手机号" maxlength="11" :adjust-position="true" />
               <view v-if="(userStore.userInfo as any)?.email" class="send-code-btn" @tap="handleSendEmailCode">
-                {{ smsCooldown > 0 ? `${smsCooldown}s` : '验证码' }}
+                {{ smsCooldown > 0 ? `${smsCooldown}s` : '发送验证码' }}
               </view>
             </view>
-            <view v-if="showPhoneCode" class="form-group" style="margin-top: 16rpx;">
-              <input class="form-input" v-model="profileForm.emailCode" type="number" placeholder="请输入邮箱验证码" maxlength="6" />
-            </view>
+          </view>
+          <view v-if="showPhoneCode" class="form-group">
+            <text class="form-label">邮箱验证码</text>
+            <input class="form-input" v-model="profileForm.emailCode" type="number" placeholder="请输入邮箱验证码" maxlength="6" :adjust-position="true" />
           </view>
           <button class="btn-primary sheet-save-btn" :loading="saving" @tap="saveProfile">保存修改</button>
         </scroll-view>

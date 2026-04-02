@@ -176,6 +176,10 @@ public class SocialAuthService {
         Map<String, Object> userInfoResp = callApi(userInfoUrl, "QQ用户信息");
         String nickname = (String) userInfoResp.getOrDefault("nickname", "QQ用户");
         String avatar = (String) userInfoResp.getOrDefault("figureurl_qq_2", "");
+        // Ensure avatar URL uses HTTPS for mixed-content safety
+        if (avatar != null && avatar.startsWith("http://")) {
+            avatar = avatar.replaceFirst("http://", "https://");
+        }
 
         // 4. 查找或创建用户
         User user = userRepository.findByQqOpenId(openId).orElse(null);

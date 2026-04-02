@@ -17,13 +17,50 @@ import { ref } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import { useUserStore } from '@/stores/user'
 import { setToken, setRefreshToken } from '@/utils/request'
+import { socialAuthApi } from '@/services/api'
 
 const loading = ref(true)
 const error = ref(false)
 const statusMsg = ref('正在处理登录...')
 const userStore = useUserStore()
 
+async function handleBind(code: string, provider: string) {
+  statusMsg.value = '正在绑定账号...'
+  try {
+    let res: any
+    if (provider === 'qq') {
+      res = await socialAuthApi.bindQq(code)
+    } else if (provider === 'wechat') {
+      res = await socialAuthApi.bindWechat?.(code)
+    }
+    if (res?.code === 200) {
+      loading.value = false
+      uni.showToast({ title: '绑定成功', icon: 'success' })
+      setTimeout(() => {
+        uni.navigateTo({ url: '/pages/profile/account-binding' })
+      }, 800)
+    } else {
+      throw new Error(res?.message || '绑定失败')
+    }
+  } catch (e: any) {
+    error.value = true
+    loading.value = false
+    statusMsg.value = e?.message || '绑定失败'
+  }
+}
+
 onLoad((options: any) => {
+  const action = options?.action
+  const code = options?.code
+  const provider = options?.provider
+
+  // Handle bind callback from web frontend redirect
+  if (action === 'bind' && code) {
+    handleBind(code, provider || 'qq')
+    return
+  }
+
+  // Handle login callback
   const token = options?.token
   const refreshToken = options?.refreshToken
 

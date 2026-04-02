@@ -592,12 +592,19 @@ async function loadSignInCalendar() {
     const res = await memberApi.getSignInCalendar({ year: currentYear, month: currentMonth })
     if (res.code === 200) {
       signInInfo.value = res.data || {}
-      const dates: string[] = res.data?.signedDates || []
-      // Extract day numbers from date strings
-      signedDays.value = dates.map((d: string) => {
-        const parts = d.split('-')
-        return parseInt(parts[parts.length - 1], 10)
-      }).filter((n: number) => !isNaN(n))
+      // Backend returns List<Integer> (day numbers) directly
+      if (Array.isArray(res.data)) {
+        signedDays.value = (res.data as number[]).filter((n: number) => !isNaN(n))
+      } else if (res.data?.signedDates) {
+        // Fallback: date strings like "2026-04-01"
+        const dates: string[] = res.data.signedDates || []
+        signedDays.value = dates.map((d: string) => {
+          const parts = d.split('-')
+          return parseInt(parts[parts.length - 1], 10)
+        }).filter((n: number) => !isNaN(n))
+      } else {
+        signedDays.value = []
+      }
     }
   } catch {}
 }
@@ -662,14 +669,21 @@ async function handleSignIn() {
   if (todaySigned.value) return
   try {
     const res = await memberApi.signIn()
-    if (res.code === 200) {
+    if (res.code === 200 && res.data > 0) {
       uni.showToast({ title: '签到成功！+10成长值', icon: 'success' })
       signedDays.value = [...signedDays.value, todayDay]
       loadSignInCalendar()
       loadGrowthRecords()
       loadMemberInfo()
+    } else if (res.code === 200 && res.data === 0) {
+      uni.showToast({ title: '今日已签到', icon: 'none' })
+      if (!signedDays.value.includes(todayDay)) {
+        signedDays.value = [...signedDays.value, todayDay]
+      }
     }
-  } catch {}
+  } catch (e: any) {
+    uni.showToast({ title: e?.message || '签到失败，请稍后重试', icon: 'none' })
+  }
 }
 
 // ========== VIP Purchase ==========
