@@ -179,26 +179,27 @@ onReachBottom(() => {
 </script>
 
 <style scoped>
-.page { min-height: 100vh; background: #f5f5f5; }
+.page { min-height: 100vh; background: #fdfbf7; font-family: 'Patrick Hand', cursive; }
 
 .tab-bar {
   display: flex;
-  background: #fff;
+  background: #fdfbf7;
   position: sticky;
   top: 0;
   z-index: 10;
-  border-bottom: 1rpx solid #eee;
+  border-bottom: 2rpx dashed #e5e0d8;
 }
 .tab-item {
   flex: 1;
   text-align: center;
   padding: 24rpx 0;
   font-size: 28rpx;
-  color: #666;
+  color: #2d2d2d;
   position: relative;
+  font-family: 'Patrick Hand', cursive;
 }
 .tab-item.active {
-  color: #07c160;
+  color: #ff4d4d;
   font-weight: 600;
 }
 .tab-item.active::after {
@@ -209,7 +210,7 @@ onReachBottom(() => {
   transform: translateX(-50%);
   width: 60rpx;
   height: 4rpx;
-  background: #07c160;
+  background: #ff4d4d;
   border-radius: 2rpx;
 }
 
@@ -220,60 +221,73 @@ onReachBottom(() => {
   padding: 120rpx 0;
 }
 .empty-icon { font-size: 80rpx; margin-bottom: 20rpx; }
-.empty-text { font-size: 28rpx; color: #999; margin-bottom: 30rpx; }
-.btn-shop { width: 240rpx; height: 72rpx; font-size: 28rpx; border-radius: 36rpx; }
+.empty-text { font-size: 28rpx; color: #2d2d2d; margin-bottom: 30rpx; }
+.btn-shop {
+  width: 240rpx;
+  height: 72rpx;
+  font-size: 28rpx;
+  border-radius: 18rpx 12rpx 16rpx 10rpx;
+  background: #ff4d4d;
+  color: #fff;
+  border: 2rpx solid #2d2d2d;
+  box-shadow: 3px 3px 0px 0px rgba(45,45,45,0.1);
+  font-family: 'Patrick Hand', cursive;
+}
 
 .order-list { padding: 20rpx 24rpx; }
 
 .order-card {
   background: #fff;
-  border-radius: 16rpx;
+  border-radius: 12rpx 18rpx 14rpx 20rpx;
   padding: 24rpx;
   margin-bottom: 20rpx;
-  box-shadow: 0 2rpx 12rpx rgba(0,0,0,0.04);
+  border: 2rpx solid #2d2d2d;
+  box-shadow: 4px 4px 0px 0px #2d2d2d;
 }
 
 .order-header { margin-bottom: 20rpx; }
-.order-no { font-size: 24rpx; }
-.order-status { font-size: 24rpx; font-weight: 600; }
-.status-pending { color: #ff976a; }
-.status-active { color: #07c160; }
-.status-done { color: #999; }
-.status-cancelled { color: #ccc; }
+.order-no { font-size: 24rpx; color: #2d2d2d; opacity: 0.6; }
+.order-status { font-size: 24rpx; font-weight: 600; font-family: 'Kalam', cursive; }
+.status-pending { color: #ff4d4d; }
+.status-active { color: #2d5da1; }
+.status-done { color: #2d2d2d; opacity: 0.5; }
+.status-cancelled { color: #e5e0d8; }
 
 .order-item {
   padding: 12rpx 0;
-  border-bottom: 1rpx solid #f5f5f5;
+  border-bottom: 2rpx dashed #e5e0d8;
   gap: 20rpx;
 }
 .order-item:last-child { border-bottom: none; }
 .item-img {
   width: 140rpx;
   height: 140rpx;
-  border-radius: 8rpx;
-  background: #f5f5f5;
+  border-radius: 8rpx 12rpx 10rpx 14rpx;
+  background: #fdfbf7;
+  border: 2rpx solid #2d2d2d;
   flex-shrink: 0;
 }
 .item-info { min-width: 0; }
 .item-name {
   font-size: 28rpx;
-  color: #333;
+  color: #2d2d2d;
   display: block;
   margin-bottom: 8rpx;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  font-family: 'Patrick Hand', cursive;
 }
-.item-spec { display: block; margin-bottom: 8rpx; }
-.item-price { font-size: 28rpx; color: #ee0a24; font-weight: 600; }
-.item-qty { font-size: 24rpx; }
+.item-spec { display: block; margin-bottom: 8rpx; color: #2d2d2d; opacity: 0.6; }
+.item-price { font-size: 28rpx; color: #ff4d4d; font-weight: 600; font-family: 'Kalam', cursive; }
+.item-qty { font-size: 24rpx; color: #2d2d2d; opacity: 0.6; }
 
 .order-footer {
   margin-top: 16rpx;
   padding-top: 16rpx;
-  border-top: 1rpx solid #f5f5f5;
+  border-top: 2rpx dashed #e5e0d8;
 }
-.total-price { font-size: 32rpx; color: #ee0a24; font-weight: 700; }
+.total-price { font-size: 32rpx; color: #ff4d4d; font-weight: 700; font-family: 'Kalam', cursive; }
 
 .order-actions {
   margin-top: 16rpx;
@@ -283,13 +297,22 @@ onReachBottom(() => {
 .btn-small {
   font-size: 24rpx;
   padding: 12rpx 32rpx;
-  border-radius: 30rpx;
+  border-radius: 14rpx 10rpx 16rpx 12rpx;
   line-height: 1.4;
   height: auto;
   min-height: 0;
+  border: 2rpx solid #2d2d2d;
+  font-family: 'Patrick Hand', cursive;
 }
-.btn-pay { background: #07c160; color: #fff; }
-.btn-confirm { background: #fff; color: #07c160; border: 2rpx solid #07c160; }
+.btn-pay {
+  background: #ff4d4d;
+  color: #fff;
+  box-shadow: 3px 3px 0px 0px rgba(45,45,45,0.1);
+}
+.btn-confirm {
+  background: #fdfbf7;
+  color: #ff4d4d;
+}
 
-.no-more { text-align: center; padding: 30rpx 0; }
+.no-more { text-align: center; padding: 30rpx 0; color: #2d2d2d; opacity: 0.5; }
 </style>

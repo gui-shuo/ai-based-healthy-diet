@@ -427,22 +427,24 @@ onShow(() => {
 <style scoped lang="scss">
 .page {
   min-height: 100vh;
-  background: #f5f5f5;
+  background: #fdfbf7;
   padding-bottom: 30rpx;
+  font-family: 'Patrick Hand', cursive;
 }
 
 /* VIP Banner */
 .vip-banner {
   padding: 40rpx 30rpx;
   color: #fff;
+  border-bottom: 3rpx solid #2d2d2d;
 
   &.vip-active {
-    background: linear-gradient(135deg, #d4a248, #b8860b, #c89632);
+    background: #d4a248;
     padding-bottom: 30rpx;
   }
 
   &.vip-inactive {
-    background: linear-gradient(135deg, #07c160, #06ad56);
+    background: #ff4d4d;
   }
 }
 
@@ -470,6 +472,7 @@ onShow(() => {
 .vip-plan-name {
   font-size: 34rpx;
   font-weight: 700;
+  font-family: 'Kalam', cursive;
 }
 
 .vip-tag-badge {
@@ -478,8 +481,10 @@ onShow(() => {
   font-size: 20rpx;
   font-weight: 700;
   padding: 4rpx 14rpx;
-  border-radius: 8rpx;
+  border-radius: 4rpx 8rpx 6rpx 10rpx;
   letter-spacing: 2rpx;
+  border: 2rpx solid rgba(255, 255, 255, 0.5);
+  font-family: 'Kalam', cursive;
 }
 
 .vip-username {
@@ -493,9 +498,10 @@ onShow(() => {
   display: flex;
   justify-content: space-between;
   background: rgba(255, 255, 255, 0.15);
-  border-radius: 16rpx;
+  border-radius: 10rpx 16rpx 12rpx 18rpx;
   padding: 20rpx 24rpx;
   margin-bottom: 20rpx;
+  border: 2rpx dashed rgba(255, 255, 255, 0.4);
 }
 
 .vip-detail-item {
@@ -513,9 +519,10 @@ onShow(() => {
 .vip-detail-val {
   font-size: 28rpx;
   font-weight: 600;
+  font-family: 'Kalam', cursive;
 
   &.accent {
-    color: #ffe082;
+    color: #fff9c4;
   }
 }
 
@@ -535,11 +542,12 @@ onShow(() => {
   background: rgba(255, 255, 255, 0.25);
   border-radius: 6rpx;
   overflow: hidden;
+  border: 1rpx solid rgba(255, 255, 255, 0.3);
 }
 
 .progress-bar-fill {
   height: 100%;
-  background: #ffe082;
+  background: #fff9c4;
   border-radius: 6rpx;
   transition: width 0.5s;
 }
@@ -548,6 +556,7 @@ onShow(() => {
   font-size: 36rpx;
   font-weight: 700;
   margin-bottom: 10rpx;
+  font-family: 'Kalam', cursive;
 }
 
 .vip-hint {
@@ -559,10 +568,11 @@ onShow(() => {
 /* Card */
 .card {
   background: #fff;
-  border-radius: 16rpx;
+  border-radius: 12rpx 18rpx 14rpx 20rpx;
   margin: 20rpx 24rpx;
   padding: 30rpx;
-  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
+  border: 2rpx solid #2d2d2d;
+  box-shadow: 4px 4px 0px 0px #2d2d2d;
 }
 
 .card-title {
@@ -571,6 +581,7 @@ onShow(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  font-family: 'Kalam', cursive;
 }
 
 /* Sign-In */
@@ -588,7 +599,8 @@ onShow(() => {
 
   .day-label {
     font-size: 24rpx;
-    color: #999;
+    color: #2d2d2d;
+    opacity: 0.6;
     margin-bottom: 10rpx;
   }
 
@@ -599,19 +611,21 @@ onShow(() => {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #f5f5f5;
+    background: #fdfbf7;
     font-size: 28rpx;
-    color: #ccc;
+    color: #e5e0d8;
+    border: 2rpx dashed #e5e0d8;
   }
 
   &.signed .day-dot {
-    background: #07c160;
+    background: #ff4d4d;
     color: #fff;
+    border: 2rpx solid #2d2d2d;
   }
 
   &.today .day-dot {
-    border: 2rpx solid #07c160;
-    color: #07c160;
+    border: 2rpx solid #ff4d4d;
+    color: #ff4d4d;
   }
 }
 
@@ -619,11 +633,17 @@ onShow(() => {
   height: 80rpx;
   line-height: 80rpx;
   font-size: 30rpx;
-  border-radius: 40rpx;
+  border-radius: 18rpx 12rpx 16rpx 14rpx;
+  background: #ff4d4d;
+  color: #fff;
+  border: 2rpx solid #2d2d2d;
+  box-shadow: 3px 3px 0px 0px rgba(45,45,45,0.1);
+  font-family: 'Patrick Hand', cursive;
 
   &[disabled] {
-    background: #ccc !important;
+    background: #e5e0d8 !important;
     opacity: 0.7;
+    box-shadow: none;
   }
 }
 
@@ -638,20 +658,23 @@ onShow(() => {
   flex: 1 1 calc(33.33% - 16rpx);
   min-width: 180rpx;
   max-width: calc(50% - 8rpx);
-  border: 2rpx solid #eee;
-  border-radius: 16rpx;
+  border: 2rpx solid #2d2d2d;
+  border-radius: 10rpx 16rpx 12rpx 18rpx;
   padding: 24rpx 16rpx;
   text-align: center;
   position: relative;
   transition: all 0.2s;
+  background: #fff;
 
   &.selected {
-    border-color: #07c160;
-    background: #f0faf4;
+    border-color: #ff4d4d;
+    background: rgba(255, 77, 77, 0.05);
+    box-shadow: 3px 3px 0px 0px #ff4d4d;
   }
 
   &.recommended {
-    border-color: #ff976a;
+    border-color: #ff4d4d;
+    border-width: 3rpx;
   }
 }
 
@@ -659,22 +682,26 @@ onShow(() => {
   position: absolute;
   top: -2rpx;
   right: -2rpx;
-  background: #ff976a;
+  background: #ff4d4d;
   color: #fff;
   font-size: 20rpx;
   padding: 4rpx 14rpx;
   border-radius: 0 16rpx 0 12rpx;
+  font-family: 'Patrick Hand', cursive;
+  border-left: 2rpx solid #2d2d2d;
+  border-bottom: 2rpx solid #2d2d2d;
 }
 
 .plan-name {
   font-size: 26rpx;
   font-weight: 600;
   margin-bottom: 12rpx;
-  color: #333;
+  color: #2d2d2d;
+  font-family: 'Kalam', cursive;
 }
 
 .plan-price {
-  color: #ee0a24;
+  color: #ff4d4d;
   margin-bottom: 6rpx;
 }
 
@@ -685,24 +712,27 @@ onShow(() => {
 .price-value {
   font-size: 44rpx;
   font-weight: 700;
+  font-family: 'Kalam', cursive;
 }
 
 .plan-original {
   font-size: 22rpx;
-  color: #999;
+  color: #2d2d2d;
+  opacity: 0.5;
   text-decoration: line-through;
   margin-bottom: 6rpx;
 }
 
 .plan-daily {
   font-size: 22rpx;
-  color: #07c160;
+  color: #ff4d4d;
+  font-family: 'Patrick Hand', cursive;
 }
 
 .plan-features {
   margin-top: 24rpx;
   padding-top: 20rpx;
-  border-top: 1rpx solid #eee;
+  border-top: 2rpx dashed #e5e0d8;
 }
 
 .feature-item {
@@ -710,12 +740,14 @@ onShow(() => {
   align-items: center;
   gap: 10rpx;
   font-size: 26rpx;
-  color: #666;
+  color: #2d2d2d;
+  opacity: 0.7;
   padding: 8rpx 0;
+  font-family: 'Patrick Hand', cursive;
 }
 
 .feature-check {
-  color: #07c160;
+  color: #ff4d4d;
   font-weight: 700;
 }
 
@@ -723,7 +755,7 @@ onShow(() => {
 .growth-chart {
   margin-bottom: 24rpx;
   padding-bottom: 16rpx;
-  border-bottom: 1rpx solid #f0f0f0;
+  border-bottom: 2rpx dashed #e5e0d8;
 }
 
 .chart-bars {
@@ -744,25 +776,28 @@ onShow(() => {
 
 .chart-bar-val {
   font-size: 20rpx;
-  color: #07c160;
+  color: #ff4d4d;
   font-weight: 600;
+  font-family: 'Kalam', cursive;
 }
 
 .chart-bar {
   width: 40rpx;
   min-height: 8rpx;
-  background: linear-gradient(180deg, #07c160, #06ad56);
-  border-radius: 6rpx 6rpx 0 0;
+  background: #ff4d4d;
+  border-radius: 4rpx 6rpx 0 0;
+  border: 1rpx solid #2d2d2d;
   transition: height 0.3s;
 
   &.negative {
-    background: linear-gradient(180deg, #ee0a24, #d32f2f);
+    background: #2d5da1;
   }
 }
 
 .chart-bar-label {
   font-size: 20rpx;
-  color: #999;
+  color: #2d2d2d;
+  opacity: 0.6;
   white-space: nowrap;
 }
 
@@ -774,7 +809,7 @@ onShow(() => {
 
 .growth-item {
   padding: 16rpx 0;
-  border-bottom: 1rpx solid #f5f5f5;
+  border-bottom: 2rpx dashed #e5e0d8;
 
   &:last-child {
     border-bottom: none;
@@ -783,54 +818,64 @@ onShow(() => {
 
 .growth-desc {
   font-size: 28rpx;
-  color: #333;
+  color: #2d2d2d;
   display: block;
+  font-family: 'Patrick Hand', cursive;
 }
 
 .growth-time {
   display: block;
   margin-top: 6rpx;
+  color: #2d2d2d;
+  opacity: 0.5;
 }
 
 .growth-points {
   font-size: 32rpx;
   font-weight: 700;
+  font-family: 'Kalam', cursive;
 }
 
 /* Invitation */
 .invite-code-box {
-  background: #f7f8fa;
-  border-radius: 12rpx;
+  background: #fff9c4;
+  border-radius: 8rpx 14rpx 10rpx 16rpx;
   padding: 24rpx;
+  border: 2rpx dashed #2d2d2d;
 }
 
 .invite-code {
   font-size: 36rpx;
   font-weight: 700;
-  color: #07c160;
+  color: #ff4d4d;
   margin-top: 8rpx;
   letter-spacing: 4rpx;
+  font-family: 'Kalam', cursive;
 }
 
 .btn-small {
   font-size: 24rpx;
   padding: 10rpx 24rpx;
-  border-radius: 30rpx;
+  border-radius: 14rpx 10rpx 16rpx 12rpx;
   line-height: 1.4;
   height: auto;
   min-height: 0;
+  border: 2rpx solid #2d2d2d;
+  font-family: 'Patrick Hand', cursive;
 }
 
 .btn-outline-sm {
-  background: #fff;
-  color: #07c160;
-  border: 2rpx solid #07c160;
+  background: #fdfbf7;
+  color: #ff4d4d;
+  border: 2rpx solid #2d2d2d;
+  box-shadow: 2px 2px 0px 0px rgba(45,45,45,0.1);
 }
 
 .invite-record {
   padding: 14rpx 0;
-  border-bottom: 1rpx solid #f5f5f5;
+  border-bottom: 2rpx dashed #e5e0d8;
   font-size: 28rpx;
+  color: #2d2d2d;
 
   &:last-child {
     border-bottom: none;
@@ -851,7 +896,7 @@ onShow(() => {
   align-items: center;
   gap: 20rpx;
   padding: 18rpx 0;
-  border-bottom: 1rpx solid #f5f5f5;
+  border-bottom: 2rpx dashed #e5e0d8;
 
   &:last-child {
     border-bottom: none;
@@ -860,6 +905,14 @@ onShow(() => {
 
 .benefit-icon {
   font-size: 44rpx;
+  width: 72rpx;
+  height: 72rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff9c4;
+  border-radius: 14rpx 10rpx 16rpx 12rpx;
+  border: 2rpx solid #2d2d2d;
 }
 
 .benefit-info {
@@ -869,14 +922,30 @@ onShow(() => {
 .benefit-name {
   font-size: 28rpx;
   font-weight: 600;
-  color: #333;
+  color: #2d2d2d;
   display: block;
+  font-family: 'Kalam', cursive;
 }
 
 .benefit-desc {
   display: block;
   margin-top: 4rpx;
+  color: #2d2d2d;
+  opacity: 0.6;
 }
+
+/* Override global button style for this page */
+.btn-primary {
+  background: #ff4d4d;
+  color: #fff;
+  border: 2rpx solid #2d2d2d;
+  border-radius: 18rpx 12rpx 16rpx 14rpx;
+  box-shadow: 3px 3px 0px 0px rgba(45,45,45,0.1);
+  font-family: 'Patrick Hand', cursive;
+}
+
+.text-primary { color: #ff4d4d !important; }
+.text-danger { color: #ff4d4d !important; }
 
 .empty-state {
   text-align: center;
@@ -891,7 +960,8 @@ onShow(() => {
 
 .empty-text {
   font-size: 28rpx;
-  color: #999;
+  color: #2d2d2d;
+  opacity: 0.6;
 }
 
 .safe-bottom {

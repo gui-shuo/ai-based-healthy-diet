@@ -417,15 +417,17 @@ onShow(() => {
 <style scoped lang="scss">
 .page {
   min-height: 100vh;
-  background: #f5f5f5;
+  background: #fdfbf7;
   padding-bottom: 30rpx;
+  font-family: 'Patrick Hand', cursive;
 }
 
 .user-header {
-  background: linear-gradient(135deg, #07c160, #06ad56);
+  background: #ff4d4d;
   padding: 50rpx 30rpx 40rpx;
   display: flex;
   align-items: center;
+  border-bottom: 3rpx solid #2d2d2d;
 }
 
 .avatar-wrap {
@@ -437,7 +439,7 @@ onShow(() => {
   width: 120rpx;
   height: 120rpx;
   border-radius: 50%;
-  border: 4rpx solid rgba(255, 255, 255, 0.6);
+  border: 3rpx solid #2d2d2d;
 }
 
 .avatar-edit {
@@ -468,15 +470,18 @@ onShow(() => {
   font-size: 36rpx;
   font-weight: 700;
   color: #fff;
+  font-family: 'Kalam', cursive;
 }
 
 .vip-badge-tag {
-  background: linear-gradient(135deg, #d4a248, #b8860b);
-  color: #fff;
+  background: #2d2d2d;
+  color: #fff9c4;
   font-size: 20rpx;
   padding: 4rpx 12rpx;
-  border-radius: 6rpx;
+  border-radius: 4rpx 8rpx 6rpx 10rpx;
   font-weight: 600;
+  border: 2rpx solid #2d2d2d;
+  font-family: 'Kalam', cursive;
 }
 
 .username {
@@ -490,15 +495,18 @@ onShow(() => {
   font-size: 26rpx;
   background: rgba(255, 255, 255, 0.2);
   padding: 10rpx 24rpx;
-  border-radius: 30rpx;
+  border-radius: 14rpx 10rpx 16rpx 12rpx;
+  border: 2rpx solid rgba(255, 255, 255, 0.5);
+  font-family: 'Patrick Hand', cursive;
 }
 
 .card {
   background: #fff;
-  border-radius: 16rpx;
+  border-radius: 12rpx 18rpx 14rpx 20rpx;
   margin: 20rpx 24rpx;
   padding: 10rpx 0;
-  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
+  border: 2rpx solid #2d2d2d;
+  box-shadow: 4px 4px 0px 0px #2d2d2d;
 }
 
 .edit-section {
@@ -506,15 +514,17 @@ onShow(() => {
 }
 
 .edit-section .input-group {
-  background: #f7f8fa;
-  border-radius: 12rpx;
+  background: #fdfbf7;
+  border-radius: 8rpx 12rpx 10rpx 14rpx;
   padding: 16rpx 24rpx;
   margin-bottom: 16rpx;
+  border: 2rpx solid #e5e0d8;
 }
 
 .edit-section .input-group .label {
   font-size: 24rpx;
-  color: #999;
+  color: #2d2d2d;
+  opacity: 0.6;
   margin-bottom: 6rpx;
   display: block;
 }
@@ -522,21 +532,27 @@ onShow(() => {
 .edit-section .input-group input {
   height: 48rpx;
   font-size: 28rpx;
+  font-family: 'Patrick Hand', cursive;
 }
 
 .picker-value {
   height: 48rpx;
   line-height: 48rpx;
   font-size: 28rpx;
-  color: #333;
+  color: #2d2d2d;
 }
 
 .save-btn {
   margin-top: 10rpx;
   height: 80rpx;
   line-height: 80rpx;
-  border-radius: 40rpx;
+  border-radius: 18rpx 12rpx 16rpx 14rpx;
   font-size: 30rpx;
+  background: #ff4d4d;
+  color: #fff;
+  border: 2rpx solid #2d2d2d;
+  box-shadow: 3px 3px 0px 0px rgba(45,45,45,0.1);
+  font-family: 'Patrick Hand', cursive;
 }
 
 .menu-card {
@@ -547,7 +563,7 @@ onShow(() => {
   display: flex;
   align-items: center;
   padding: 30rpx;
-  border-bottom: 1rpx solid #f5f5f5;
+  border-bottom: 2rpx dashed #e5e0d8;
   position: relative;
 
   &:last-child {
@@ -555,7 +571,7 @@ onShow(() => {
   }
 
   &:active {
-    background: #f9f9f9;
+    background: #fdfbf7;
   }
 }
 
@@ -567,12 +583,13 @@ onShow(() => {
 .menu-text {
   flex: 1;
   font-size: 28rpx;
-  color: #333;
+  color: #2d2d2d;
+  font-family: 'Patrick Hand', cursive;
 }
 
 .menu-arrow {
   font-size: 32rpx;
-  color: #ccc;
+  color: #e5e0d8;
 }
 
 .logout-wrap {
@@ -580,14 +597,16 @@ onShow(() => {
 }
 
 .btn-logout {
-  background: #fff;
-  color: #ee0a24;
-  border: 2rpx solid #ee0a24;
-  border-radius: 44rpx;
+  background: #fdfbf7;
+  color: #ff4d4d;
+  border: 2rpx solid #2d2d2d;
+  border-radius: 18rpx 14rpx 20rpx 12rpx;
   height: 88rpx;
   line-height: 88rpx;
   font-size: 30rpx;
   text-align: center;
+  box-shadow: 4px 4px 0px 0px #2d2d2d;
+  font-family: 'Patrick Hand', cursive;
 }
 
 .btn-logout::after {
@@ -595,15 +614,17 @@ onShow(() => {
 }
 
 .btn-delete-account {
-  background: #fff;
-  color: #999;
-  border: 2rpx solid #ddd;
-  border-radius: 44rpx;
+  background: #fdfbf7;
+  color: #2d2d2d;
+  border: 2rpx dashed #2d2d2d;
+  border-radius: 18rpx 14rpx 20rpx 12rpx;
   height: 88rpx;
   line-height: 88rpx;
   font-size: 28rpx;
   text-align: center;
   margin-top: 16rpx;
+  font-family: 'Patrick Hand', cursive;
+  opacity: 0.6;
 }
 
 .btn-delete-account::after {
@@ -612,29 +633,32 @@ onShow(() => {
 
 .delete-dialog {
   .danger-title {
-    color: #ee0a24;
+    color: #ff4d4d;
   }
 }
 
 .delete-warning {
-  background: #fff7f7;
-  border-radius: 12rpx;
+  background: #fff9c4;
+  border-radius: 8rpx 12rpx 10rpx 14rpx;
   padding: 24rpx;
   margin-bottom: 24rpx;
+  border: 2rpx dashed #ff4d4d;
 }
 
 .warning-text {
   display: block;
   font-size: 26rpx;
-  color: #ee0a24;
+  color: #ff4d4d;
   font-weight: 600;
   margin-bottom: 12rpx;
+  font-family: 'Kalam', cursive;
 }
 
 .warning-item {
   display: block;
   font-size: 24rpx;
-  color: #666;
+  color: #2d2d2d;
+  opacity: 0.7;
   line-height: 1.8;
 }
 
@@ -648,26 +672,28 @@ onShow(() => {
 
 .checkbox-icon {
   font-size: 36rpx;
-  color: #ccc;
-  &.checked { color: #ee0a24; }
+  color: #e5e0d8;
+  &.checked { color: #ff4d4d; }
 }
 
 .checkbox-text {
   font-size: 24rpx;
-  color: #666;
+  color: #2d2d2d;
+  opacity: 0.7;
   flex: 1;
   line-height: 1.6;
 }
 
 .btn-delete-confirm {
   flex: 1;
-  background: #ee0a24;
+  background: #ff4d4d;
   color: #fff;
-  border: none;
-  border-radius: 40rpx;
+  border: 2rpx solid #2d2d2d;
+  border-radius: 18rpx 12rpx 16rpx 14rpx;
   height: 80rpx;
   line-height: 80rpx;
   font-size: 28rpx;
+  font-family: 'Patrick Hand', cursive;
   &[disabled] {
     opacity: 0.5;
   }
@@ -692,10 +718,12 @@ onShow(() => {
 }
 
 .dialog {
-  background: #fff;
-  border-radius: 20rpx;
+  background: #fdfbf7;
+  border-radius: 12rpx 20rpx 16rpx 22rpx;
   width: 600rpx;
   padding: 40rpx;
+  border: 2rpx solid #2d2d2d;
+  box-shadow: 6px 6px 0px 0px #2d2d2d;
 }
 
 .dialog-title {
@@ -703,19 +731,22 @@ onShow(() => {
   font-weight: 700;
   text-align: center;
   margin-bottom: 30rpx;
-  color: #333;
+  color: #2d2d2d;
+  font-family: 'Kalam', cursive;
 }
 
 .dialog .input-group {
-  background: #f7f8fa;
-  border-radius: 12rpx;
+  background: #fff;
+  border-radius: 8rpx 12rpx 10rpx 14rpx;
   padding: 16rpx 24rpx;
   margin-bottom: 16rpx;
+  border: 2rpx solid #e5e0d8;
 }
 
 .dialog .input-group .label {
   font-size: 24rpx;
-  color: #999;
+  color: #2d2d2d;
+  opacity: 0.6;
   margin-bottom: 6rpx;
   display: block;
 }
@@ -723,6 +754,7 @@ onShow(() => {
 .dialog .input-group input {
   height: 48rpx;
   font-size: 28rpx;
+  font-family: 'Patrick Hand', cursive;
 }
 
 .dialog-actions {
@@ -733,13 +765,14 @@ onShow(() => {
 
 .btn-dialog-cancel {
   flex: 1;
-  background: #f5f5f5;
-  color: #666;
-  border: none;
-  border-radius: 40rpx;
+  background: #e5e0d8;
+  color: #2d2d2d;
+  border: 2rpx solid #2d2d2d;
+  border-radius: 18rpx 12rpx 16rpx 14rpx;
   height: 80rpx;
   line-height: 80rpx;
   font-size: 28rpx;
+  font-family: 'Patrick Hand', cursive;
 }
 
 .btn-dialog-cancel::after {
@@ -748,13 +781,15 @@ onShow(() => {
 
 .btn-dialog-confirm {
   flex: 1;
-  background: linear-gradient(135deg, #07c160, #06ad56);
+  background: #ff4d4d;
   color: #fff;
-  border: none;
-  border-radius: 40rpx;
+  border: 2rpx solid #2d2d2d;
+  border-radius: 18rpx 12rpx 16rpx 14rpx;
   height: 80rpx;
   line-height: 80rpx;
   font-size: 28rpx;
+  font-family: 'Patrick Hand', cursive;
+  box-shadow: 3px 3px 0px 0px rgba(45,45,45,0.1);
 }
 
 .btn-dialog-confirm::after {
@@ -785,16 +820,21 @@ onShow(() => {
 .about-name {
   font-size: 32rpx;
   font-weight: 700;
-  color: #333;
+  color: #2d2d2d;
+  font-family: 'Kalam', cursive;
 }
 
 .about-version {
   margin-top: 8rpx;
+  color: #2d2d2d;
+  opacity: 0.6;
 }
 
 .about-desc {
   line-height: 1.8;
   text-align: center;
+  color: #2d2d2d;
+  opacity: 0.7;
 }
 
 .safe-bottom {
