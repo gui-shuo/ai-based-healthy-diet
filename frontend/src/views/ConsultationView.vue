@@ -406,14 +406,18 @@ function formatDate(dt) {
 </script>
 
 <style scoped lang="scss">
+@use '@/styles/variables.scss' as *;
+
 .consultation-view {
   min-height: 100vh;
-  background: #f5f7fa;
+  background: $paper;
+  font-family: $font-body;
 }
 
 .top-nav {
   background: #fff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  border-bottom: 2.5px solid $pencil;
+  box-shadow: 0 4px 0px 0px rgba(45, 45, 45, 0.08);
   position: sticky;
   top: 0;
   z-index: 100;
@@ -435,9 +439,10 @@ function formatDate(dt) {
   }
 
   .page-title {
-    font-size: 18px;
+    font-size: 20px;
+    font-family: $font-heading;
     font-weight: 600;
-    color: #1f2937;
+    color: $pencil;
     margin: 0;
   }
 }
@@ -455,21 +460,23 @@ function formatDate(dt) {
 
   h2 {
     font-size: 28px;
+    font-family: $font-heading;
     font-weight: 700;
-    color: #1f2937;
+    color: $pencil;
     margin-bottom: 8px;
   }
 
   .section-desc {
-    color: #6b7280;
+    color: $text-secondary;
     font-size: 15px;
+    font-family: $font-body;
   }
 }
 
 .nutritionist-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
+  gap: 24px;
 
   @media (max-width: 960px) {
     grid-template-columns: repeat(2, 1fr);
@@ -479,12 +486,34 @@ function formatDate(dt) {
   }
 }
 
+// Hand-drawn profile card with tack decoration
 .nutritionist-card {
-  border-radius: 12px;
-  transition: transform 0.2s;
+  border-radius: $radius-wobbly;
+  border: 2.5px solid $pencil !important;
+  box-shadow: $shadow-hard-sm;
+  transition: box-shadow 0.2s, transform 0.2s;
+  position: relative;
+  overflow: visible;
+
+  // Tack decoration
+  &::before {
+    content: '';
+    position: absolute;
+    top: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 14px;
+    height: 14px;
+    background: $accent;
+    border: 2px solid $pencil;
+    border-radius: 50%;
+    box-shadow: 1px 1px 0px 0px rgba(45, 45, 45, 0.3);
+    z-index: 1;
+  }
 
   &:hover {
-    transform: translateY(-4px);
+    box-shadow: $shadow-hard;
+    transform: translateY(-3px) rotate(-0.5deg);
   }
 
   .n-header {
@@ -495,20 +524,25 @@ function formatDate(dt) {
   }
 
   .n-avatar {
-    background: linear-gradient(135deg, #0d9488, #065f46);
+    background: $ink;
     color: #fff;
-    font-weight: 600;
+    font-weight: 700;
+    font-family: $font-heading;
+    border: 2px solid $pencil;
   }
 
   .n-name {
     font-size: 18px;
-    font-weight: 600;
+    font-family: $font-heading;
+    font-weight: 700;
+    color: $pencil;
     margin: 0 0 4px;
   }
 
   .n-title {
-    color: #6b7280;
+    color: $text-secondary;
     font-size: 13px;
+    font-family: $font-body;
     margin: 0 0 8px;
   }
 
@@ -520,8 +554,9 @@ function formatDate(dt) {
   }
 
   .n-intro {
-    color: #4b5563;
+    color: $pencil;
     font-size: 13px;
+    font-family: $font-body;
     line-height: 1.5;
     margin: 0 0 12px;
     display: -webkit-box;
@@ -535,14 +570,16 @@ function formatDate(dt) {
     justify-content: space-between;
     margin-bottom: 16px;
     padding: 10px 0;
-    border-top: 1px solid #f3f4f6;
-    border-bottom: 1px solid #f3f4f6;
+    border-top: 2px dashed $muted;
+    border-bottom: 2px dashed $muted;
 
     .stat {
       text-align: center;
       .stat-value {
         font-size: 15px;
-        font-weight: 600;
+        font-weight: 700;
+        font-family: $font-heading;
+        color: $pencil;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -550,7 +587,8 @@ function formatDate(dt) {
       }
       .stat-label {
         font-size: 12px;
-        color: #9ca3af;
+        color: $text-secondary;
+        font-family: $font-body;
         display: block;
         margin-top: 2px;
       }
@@ -564,12 +602,14 @@ function formatDate(dt) {
 
     .fee-label {
       font-size: 12px;
-      color: #9ca3af;
+      color: $text-secondary;
+      font-family: $font-body;
     }
     .fee-value {
       font-size: 20px;
       font-weight: 700;
-      color: #f56c6c;
+      font-family: $font-heading;
+      color: $accent;
     }
   }
 }
@@ -580,7 +620,25 @@ function formatDate(dt) {
 }
 
 .active-card {
-  border-radius: 12px;
+  border-radius: $radius-wobbly-md !important;
+  border: 2.5px solid $pencil !important;
+  box-shadow: $shadow-hard;
+  background: $sticky !important;
+  position: relative;
+
+  // Tape decoration
+  &::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    left: 50%;
+    transform: translateX(-50%) rotate(-2deg);
+    width: 80px;
+    height: 22px;
+    background: rgba(255, 249, 196, 0.85);
+    border: 1.5px solid $muted;
+    z-index: 1;
+  }
 
   .active-info {
     display: flex;
@@ -588,9 +646,11 @@ function formatDate(dt) {
     gap: 16px;
 
     .n-avatar {
-      background: linear-gradient(135deg, #0d9488, #065f46);
+      background: $ink;
       color: #fff;
-      font-weight: 600;
+      font-weight: 700;
+      font-family: $font-heading;
+      border: 2px solid $pencil;
     }
 
     .active-detail {
@@ -599,43 +659,52 @@ function formatDate(dt) {
       h3 {
         margin: 0 0 4px;
         font-size: 18px;
-        font-weight: 600;
+        font-family: $font-heading;
+        font-weight: 700;
+        color: $pencil;
       }
 
       .active-desc {
         margin: 8px 0 0;
-        color: #6b7280;
+        color: $text-secondary;
         font-size: 13px;
+        font-family: $font-body;
       }
     }
   }
 }
 
-// === 预约表单 ===
+// === 预约表单 (sketchy inputs) ===
 .consult-form {
   .consult-info {
     display: flex;
     align-items: center;
     gap: 12px;
     padding: 16px;
-    background: #f9fafb;
-    border-radius: 8px;
+    background: $paper;
+    border: 2px solid $pencil;
+    border-radius: $radius-wobbly-sm;
+    box-shadow: $shadow-hard-sm;
     margin-bottom: 20px;
 
     h4 {
       margin: 0;
       font-size: 16px;
+      font-family: $font-heading;
+      color: $pencil;
     }
     p {
       margin: 0;
-      color: #6b7280;
+      color: $text-secondary;
       font-size: 13px;
+      font-family: $font-body;
     }
     .consult-fee {
       margin-left: auto;
       font-size: 22px;
       font-weight: 700;
-      color: #f56c6c;
+      font-family: $font-heading;
+      color: $accent;
     }
   }
 }

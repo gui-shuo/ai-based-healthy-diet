@@ -338,11 +338,14 @@ function formatMsgTime(ts) {
 </script>
 
 <style scoped lang="scss">
+@use '@/styles/variables.scss' as *;
+
 .chat-view {
   height: 100vh;
   display: flex;
   flex-direction: column;
-  background: #f5f7fa;
+  background: $paper;
+  font-family: $font-body;
 }
 
 .chat-header {
@@ -352,7 +355,8 @@ function formatMsgTime(ts) {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  border-bottom: 2.5px solid $pencil;
+  box-shadow: 0 4px 0px 0px rgba(45, 45, 45, 0.08);
   flex-shrink: 0;
   z-index: 10;
 
@@ -369,15 +373,19 @@ function formatMsgTime(ts) {
 
     h3 {
       margin: 0;
-      font-size: 16px;
-      font-weight: 600;
+      font-size: 17px;
+      font-family: $font-heading;
+      font-weight: 700;
+      color: $pencil;
     }
   }
 
   .n-avatar {
-    background: linear-gradient(135deg, #0d9488, #065f46);
+    background: $ink;
     color: #fff;
-    font-weight: 600;
+    font-weight: 700;
+    font-family: $font-heading;
+    border: 2px solid $pencil;
   }
 }
 
@@ -399,20 +407,27 @@ function formatMsgTime(ts) {
   }
 
   .desc-msg {
-    background: #fff;
-    border-radius: 12px;
+    background: $sticky;
+    border: 2px solid $pencil;
+    border-radius: $radius-wobbly-sm;
+    box-shadow: $shadow-hard-sm;
     padding: 14px 18px;
     margin-bottom: 20px;
-    border: 1px solid #e5e7eb;
+    position: relative;
+    transform: rotate(-0.5deg);
 
     .desc-label {
       font-size: 12px;
-      color: #9ca3af;
+      color: $text-secondary;
+      font-family: $font-body;
       margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
     .desc-content {
       font-size: 14px;
-      color: #374151;
+      color: $pencil;
+      font-family: $font-body;
       line-height: 1.6;
     }
   }
@@ -424,9 +439,11 @@ function formatMsgTime(ts) {
     &.msg-user {
       justify-content: flex-end;
       .msg-bubble {
-        background: #0d9488;
+        background: $ink;
         color: #fff;
-        border-radius: 18px 18px 4px 18px;
+        border: 2px solid $pencil;
+        border-radius: 255px 15px 15px 225px / 15px 225px 255px 15px;
+        box-shadow: $shadow-hard-sm;
         .msg-time { color: rgba(255,255,255,0.7); }
       }
     }
@@ -435,10 +452,36 @@ function formatMsgTime(ts) {
       justify-content: flex-start;
       .msg-bubble {
         background: #fff;
-        color: #1f2937;
-        border-radius: 18px 18px 18px 4px;
-        border: 1px solid #e5e7eb;
-        .msg-time { color: #9ca3af; }
+        color: $pencil;
+        border: 2px solid $pencil;
+        border-radius: 15px 255px 225px 15px / 225px 15px 15px 255px;
+        box-shadow: $shadow-hard-sm;
+        position: relative;
+        .msg-time { color: $text-secondary; }
+
+        // Speech bubble pointer
+        &::before {
+          content: '';
+          position: absolute;
+          left: -9px;
+          top: 14px;
+          width: 0;
+          height: 0;
+          border-top: 7px solid transparent;
+          border-bottom: 7px solid transparent;
+          border-right: 9px solid $pencil;
+        }
+        &::after {
+          content: '';
+          position: absolute;
+          left: -6px;
+          top: 14px;
+          width: 0;
+          height: 0;
+          border-top: 7px solid transparent;
+          border-bottom: 7px solid transparent;
+          border-right: 9px solid #fff;
+        }
       }
     }
 
@@ -448,12 +491,14 @@ function formatMsgTime(ts) {
 
       .msg-content {
         font-size: 14px;
+        font-family: $font-body;
         line-height: 1.7;
         white-space: pre-wrap;
         word-break: break-word;
       }
       .msg-time {
         font-size: 11px;
+        font-family: $font-body;
         text-align: right;
         margin-top: 6px;
       }
@@ -464,7 +509,8 @@ function formatMsgTime(ts) {
 .chat-footer {
   background: #fff;
   padding: 16px 20px;
-  box-shadow: 0 -2px 8px rgba(0,0,0,0.06);
+  border-top: 2.5px solid $pencil;
+  box-shadow: 0 -3px 0px 0px rgba(45, 45, 45, 0.05);
   flex-shrink: 0;
   max-width: 900px;
   width: 100%;
@@ -478,7 +524,8 @@ function formatMsgTime(ts) {
 
     .input-tip {
       font-size: 12px;
-      color: #9ca3af;
+      color: $text-secondary;
+      font-family: $font-body;
     }
   }
 }
@@ -487,5 +534,6 @@ function formatMsgTime(ts) {
   background: #fff;
   padding: 20px;
   flex-shrink: 0;
+  border-top: 2px dashed $muted;
 }
 </style>
