@@ -968,30 +968,35 @@ onUnmounted(() => {
   height: 100vh;
   display: flex;
   flex-direction: column;
-  background: #f5f7fa;
+  background: #fdfbf7;
+  font-family: 'Patrick Hand', cursive;
 }
 
 /* 顶部标题栏 */
 .chat-header {
   height: 60px;
-  background: white;
-  border-bottom: 1px solid #e4e7ed;
+  background: #fff;
+  border-bottom: 2px solid #2d2d2d;
   padding: 0 24px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   flex-shrink: 0;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  box-shadow: 4px 4px 0px 0px #2d2d2d;
+  position: relative;
+  z-index: 20;
 }
 
 .disclaimer-bar {
-  background: #fff3cd;
-  color: #856404;
+  background: #fff9c4;
+  color: #2d2d2d;
   font-size: 12px;
   text-align: center;
   padding: 6px 16px;
   flex-shrink: 0;
-  a { color: #409eff; margin-left: 4px; }
+  border-bottom: 2px dashed #e5e0d8;
+  font-family: 'Patrick Hand', cursive;
+  a { color: #2d5da1; margin-left: 4px; text-decoration: underline wavy; }
 }
 
 .header-left {
@@ -1003,15 +1008,16 @@ onUnmounted(() => {
 .header-title {
   font-size: 20px;
   font-weight: 600;
-  color: #303133;
+  color: #2d2d2d;
   margin: 0;
   display: flex;
   align-items: center;
   gap: 8px;
+  font-family: 'Kalam', 'ZCOOL KuaiLe', cursive;
 }
 
 .title-icon {
-  color: #409eff;
+  color: #2d5da1;
   font-size: 24px;
 }
 
@@ -1039,8 +1045,9 @@ onUnmounted(() => {
 .setting-tip {
   display: block;
   font-size: 12px;
-  color: #909399;
+  color: #5a5a5a;
   margin-top: 4px;
+  font-family: 'Patrick Hand', cursive;
 }
 
 /* 历史记录列表 */
@@ -1051,16 +1058,20 @@ onUnmounted(() => {
 
 .history-item {
   padding: 16px;
-  border: 1px solid #e4e7ed;
-  border-radius: 8px;
+  border: 2px solid #2d2d2d;
+  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
   margin-bottom: 12px;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: 3px 3px 0px 0px #2d2d2d;
+  background: #fff;
 }
 
 .history-item:hover {
-  border-color: #409eff;
-  background: #f0f9ff;
+  border-color: #2d5da1;
+  background: #fdfbf7;
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0px 0px #2d2d2d;
 }
 
 .history-header {
@@ -1072,16 +1083,17 @@ onUnmounted(() => {
 
 .history-title {
   font-weight: 600;
-  color: #303133;
+  color: #2d2d2d;
+  font-family: 'Kalam', 'ZCOOL KuaiLe', cursive;
 }
 
 .history-time {
   font-size: 12px;
-  color: #909399;
+  color: #5a5a5a;
 }
 
 .history-preview {
-  color: #606266;
+  color: #5a5a5a;
   font-size: 14px;
   margin-bottom: 8px;
   overflow: hidden;
@@ -1102,14 +1114,20 @@ onUnmounted(() => {
 
 .favorite-item {
   padding: 16px;
-  border: 1px solid #e4e7ed;
-  border-radius: 8px;
+  border: 2px solid #e5e0d8;
+  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
   margin-bottom: 12px;
-  background: white;
+  background: #fff9c4;
+  box-shadow: 3px 3px 0px 0px #2d2d2d;
+  transform: rotate(-0.5deg);
+}
+
+.favorite-item:nth-child(even) {
+  transform: rotate(0.5deg);
 }
 
 .favorite-content {
-  color: #303133;
+  color: #2d2d2d;
   line-height: 1.6;
   margin-bottom: 12px;
 }
@@ -1119,12 +1137,12 @@ onUnmounted(() => {
   justify-content: space-between;
   align-items: center;
   padding-top: 12px;
-  border-top: 1px solid #f0f0f0;
+  border-top: 2px dashed #e5e0d8;
 }
 
 .favorite-time {
   font-size: 12px;
-  color: #909399;
+  color: #5a5a5a;
 }
 
 .favorite-actions {
@@ -1149,21 +1167,23 @@ onUnmounted(() => {
 </style>
 
 <style lang="scss">
-// 删除确认框样式（全局 - 简洁风格）
+// 删除确认框样式（全局 - 手绘风格）
 .el-message-box.ai-chat-delete-confirm {
   width: 440px !important;
   max-width: 90vw !important;
-  border-radius: 8px !important;
+  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px !important;
   padding: 0 !important;
-  background: #ffffff !important;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12) !important;
+  background: #fdfbf7 !important;
+  box-shadow: 6px 6px 0px 0px #2d2d2d !important;
+  border: 2px solid #2d2d2d !important;
   overflow: hidden !important;
+  font-family: 'Patrick Hand', cursive !important;
 
   .el-message-box__header {
     position: relative !important;
     padding: 20px 20px 16px 20px !important;
-    background: #ffffff !important;
-    border-bottom: none !important;
+    background: #fdfbf7 !important;
+    border-bottom: 2px dashed #e5e0d8 !important;
     display: flex !important;
     align-items: center !important;
     justify-content: space-between !important;
@@ -1172,7 +1192,8 @@ onUnmounted(() => {
   .el-message-box__title {
     font-size: 18px !important;
     font-weight: 600 !important;
-    color: #1f2937 !important;
+    color: #2d2d2d !important;
+    font-family: 'Kalam', 'ZCOOL KuaiLe', cursive !important;
     flex: 1 !important;
     line-height: 24px !important;
   }
@@ -1188,21 +1209,21 @@ onUnmounted(() => {
     flex-shrink: 0 !important;
 
     .el-message-box__close {
-      color: rgba(0, 0, 0, 0.45) !important;
+      color: #5a5a5a !important;
       font-size: 16px !important;
       width: 20px !important;
       height: 20px !important;
       line-height: 20px !important;
 
       &:hover {
-        color: rgba(0, 0, 0, 0.75) !important;
+        color: #2d2d2d !important;
       }
     }
   }
 
   .el-message-box__content {
     padding: 8px 20px 20px !important;
-    background: #ffffff !important;
+    background: #fdfbf7 !important;
   }
 
   .el-message-box__container {
@@ -1215,16 +1236,17 @@ onUnmounted(() => {
       flex-shrink: 0 !important;
 
       &.el-message-box-icon--warning {
-        color: #f59e0b !important;
+        color: #ff4d4d !important;
       }
     }
   }
 
   .el-message-box__message {
-    color: #4b5563 !important;
+    color: #5a5a5a !important;
     font-size: 14px !important;
     line-height: 1.6 !important;
     padding-left: 4px !important;
+    font-family: 'Patrick Hand', cursive !important;
 
     p {
       margin: 0 !important;
@@ -1234,7 +1256,7 @@ onUnmounted(() => {
 
   .el-message-box__btns {
     padding: 0 20px 20px !important;
-    background: #ffffff !important;
+    background: #fdfbf7 !important;
     display: flex !important;
     justify-content: flex-end !important;
     gap: 12px !important;
@@ -1243,39 +1265,45 @@ onUnmounted(() => {
     .el-button {
       margin: 0 !important;
       padding: 10px 24px !important;
-      border-radius: 6px !important;
+      border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px !important;
       font-size: 14px !important;
       font-weight: 500 !important;
-      transition: all 0.2s ease !important;
+      font-family: 'Patrick Hand', cursive !important;
+      transition: transform 0.15s ease, box-shadow 0.15s ease !important;
       min-width: 90px !important;
+      border: 2px solid #2d2d2d !important;
 
       &.el-button--primary {
-        background: #ef4444 !important;
-        border-color: #ef4444 !important;
+        background: #ff4d4d !important;
+        border-color: #2d2d2d !important;
         color: #ffffff !important;
-        box-shadow: 0 2px 4px rgba(239, 68, 68, 0.2) !important;
+        box-shadow: 3px 3px 0px 0px #2d2d2d !important;
 
         &:hover {
-          background: #dc2626 !important;
-          border-color: #dc2626 !important;
-          box-shadow: 0 4px 8px rgba(239, 68, 68, 0.3) !important;
+          background: #e04343 !important;
+          border-color: #2d2d2d !important;
+          box-shadow: 1px 1px 0px 0px #2d2d2d !important;
+          transform: translate(2px, 2px) !important;
         }
 
         &:active {
-          background: #b91c1c !important;
-          border-color: #b91c1c !important;
+          background: #cc3b3b !important;
+          border-color: #2d2d2d !important;
         }
       }
 
       &.el-button--default {
-        background: #ffffff !important;
-        border-color: #d1d5db !important;
-        color: #6b7280 !important;
+        background: #fdfbf7 !important;
+        border-color: #2d2d2d !important;
+        color: #5a5a5a !important;
+        box-shadow: 3px 3px 0px 0px #2d2d2d !important;
 
         &:hover {
-          color: #374151 !important;
-          border-color: #9ca3af !important;
-          background: #f9fafb !important;
+          color: #2d2d2d !important;
+          border-color: #2d2d2d !important;
+          background: #fff !important;
+          box-shadow: 1px 1px 0px 0px #2d2d2d !important;
+          transform: translate(2px, 2px) !important;
         }
       }
     }

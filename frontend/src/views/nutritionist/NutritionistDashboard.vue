@@ -128,6 +128,7 @@ function formatDate(dt) {
 <style scoped lang="scss">
 .dashboard {
   max-width: 960px;
+  font-family: 'Patrick Hand', cursive;
 }
 
 .profile-summary {
@@ -136,12 +137,14 @@ function formatDate(dt) {
   align-items: center;
   margin-bottom: 24px;
   padding: 20px 24px;
-  background: linear-gradient(135deg, #0d9488, #065f46);
-  border-radius: 16px;
-  color: #fff;
+  background: #2d5da1;
+  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+  border: 2px solid #2d2d2d;
+  box-shadow: 4px 4px 0px 0px #2d2d2d;
+  color: #fdfbf7;
 
-  h2 { margin: 0 0 4px; font-size: 20px; }
-  .profile-subtitle { margin: 0; font-size: 13px; opacity: 0.85; }
+  h2 { margin: 0 0 4px; font-size: 20px; font-family: 'Kalam', cursive; }
+  .profile-subtitle { margin: 0; font-size: 13px; opacity: 0.85; font-family: 'Patrick Hand', cursive; }
 
   .profile-stats {
     display: flex;
@@ -150,8 +153,8 @@ function formatDate(dt) {
 
   .mini-stat {
     text-align: center;
-    .label { display: block; font-size: 12px; opacity: 0.8; }
-    .value { display: block; font-size: 20px; font-weight: 700; margin-top: 2px; }
+    .label { display: block; font-size: 12px; opacity: 0.8; font-family: 'Patrick Hand', cursive; }
+    .value { display: block; font-size: 20px; font-weight: 700; margin-top: 2px; font-family: 'Kalam', cursive; }
   }
 }
 
@@ -164,13 +167,28 @@ function formatDate(dt) {
 
 .stat-card {
   text-align: center;
-  border-radius: 12px;
-  border: none;
-  transition: transform 0.2s;
-  &:hover { transform: translateY(-2px); }
+  border: 2px solid #2d2d2d;
+  box-shadow: 4px 4px 0px 0px #2d2d2d;
+  transition: all 0.15s ease;
+  background: #fdfbf7;
+
+  &:hover {
+    box-shadow: 2px 2px 0px 0px #2d2d2d;
+    transform: translate(2px, 2px);
+  }
+
+  :deep(.el-card__body) {
+    border-radius: 0;
+  }
+
   .stat-icon { font-size: 28px; margin-bottom: 8px; }
-  .stat-num { font-size: 28px; font-weight: 700; color: #0d9488; }
-  .stat-label { font-size: 13px; color: #6b7280; margin-top: 4px; }
+  .stat-num { font-size: 28px; font-weight: 700; color: #2d5da1; font-family: 'Kalam', cursive; }
+  .stat-label { font-size: 13px; color: #2d2d2d; margin-top: 4px; font-family: 'Patrick Hand', cursive; }
+}
+
+:deep(.el-card) {
+  border-radius: 15px 225px 15px 255px / 255px 15px 225px 15px;
+  overflow: visible;
 }
 
 .section {
@@ -179,7 +197,7 @@ function formatDate(dt) {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 16px;
-    h3 { margin: 0; font-size: 18px; color: #1f2937; }
+    h3 { margin: 0; font-size: 18px; color: #2d2d2d; font-family: 'Kalam', cursive; }
   }
 }
 
@@ -190,10 +208,16 @@ function formatDate(dt) {
 }
 
 .order-card {
-  border-radius: 12px;
   cursor: pointer;
-  transition: all 0.2s;
-  &:hover { box-shadow: 0 4px 16px rgba(13, 148, 136, 0.15); }
+  transition: all 0.15s ease;
+  border: 2px solid #2d2d2d;
+  box-shadow: 3px 3px 0px 0px rgba(45,45,45,0.1);
+  background: #fdfbf7;
+
+  &:hover {
+    box-shadow: 1px 1px 0px 0px rgba(45,45,45,0.1);
+    transform: translate(2px, 2px);
+  }
 
   .order-info {
     display: flex;
@@ -205,13 +229,15 @@ function formatDate(dt) {
     display: flex;
     align-items: center;
     gap: 8px;
-    strong { font-size: 15px; }
+    strong { font-size: 15px; font-family: 'Patrick Hand', cursive; color: #2d2d2d; }
   }
 
   .order-meta {
     margin: 6px 0 0;
-    color: #9ca3af;
+    color: #2d2d2d;
     font-size: 12px;
+    font-family: 'Patrick Hand', cursive;
+    opacity: 0.7;
   }
 }
 </style>

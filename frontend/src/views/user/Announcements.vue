@@ -141,6 +141,7 @@ onMounted(() => {
   max-width: 1200px;
   margin: 0 auto;
   padding: 24px;
+  font-family: 'Patrick Hand', cursive;
 }
 
 .page-header {
@@ -151,13 +152,16 @@ onMounted(() => {
 .page-header h1 {
   font-size: 32px;
   font-weight: 600;
-  color: #262626;
+  color: #2d2d2d;
   margin-bottom: 8px;
+  font-family: 'Kalam', cursive;
 }
 
 .subtitle {
   font-size: 16px;
-  color: #8c8c8c;
+  color: #2d2d2d;
+  opacity: 0.6;
+  font-family: 'Patrick Hand', cursive;
 }
 
 .announcements-list {
@@ -165,26 +169,53 @@ onMounted(() => {
 }
 
 .announcement-card {
-  background: #ffffff;
-  border-radius: 12px;
+  background: #fdfbf7;
+  border-radius: 15px 225px 15px 255px / 255px 15px 225px 15px;
   padding: 24px;
   margin-bottom: 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  transition: all 0.3s ease;
-  border-left: 4px solid #1890ff;
+  box-shadow: 4px 4px 0px 0px #2d2d2d;
+  border: 2px solid #2d2d2d;
+  transition: all 0.15s ease;
+  position: relative;
+}
+
+/* tack decoration */
+.announcement-card::before {
+  content: '📌';
+  position: absolute;
+  top: -10px;
+  right: 24px;
+  font-size: 22px;
+  transform: rotate(15deg);
+  filter: drop-shadow(1px 1px 0px rgba(45,45,45,0.3));
 }
 
 .announcement-card:hover {
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
-  transform: translateY(-2px);
+  box-shadow: 2px 2px 0px 0px #2d2d2d;
+  transform: translate(2px, 2px);
 }
 
 .announcement-card.type-WARNING {
-  border-left-color: #faad14;
+  background: #fff9c4;
 }
 
 .announcement-card.type-ERROR {
-  border-left-color: #ff4d4f;
+  background: #fdfbf7;
+  border-color: #ff4d4d;
+  box-shadow: 4px 4px 0px 0px #ff4d4d;
+}
+
+.announcement-card.type-ERROR:hover {
+  box-shadow: 2px 2px 0px 0px #ff4d4d;
+  transform: translate(2px, 2px);
+}
+
+.announcement-card.type-ERROR::before {
+  content: '🚨';
+}
+
+.announcement-card.type-WARNING::before {
+  content: '⚠️';
 }
 
 .card-header {
@@ -204,8 +235,9 @@ onMounted(() => {
 .title {
   font-size: 20px;
   font-weight: 600;
-  color: #262626;
+  color: #2d2d2d;
   margin: 0;
+  font-family: 'Kalam', cursive;
 }
 
 .header-right {
@@ -215,7 +247,9 @@ onMounted(() => {
 
 .date {
   font-size: 14px;
-  color: #8c8c8c;
+  color: #2d2d2d;
+  opacity: 0.5;
+  font-family: 'Patrick Hand', cursive;
 }
 
 .card-content {
@@ -225,9 +259,10 @@ onMounted(() => {
 .content {
   font-size: 15px;
   line-height: 1.8;
-  color: #595959;
+  color: #2d2d2d;
   white-space: pre-wrap;
   word-break: break-word;
+  font-family: 'Patrick Hand', cursive;
 }
 
 .card-footer {
@@ -235,9 +270,11 @@ onMounted(() => {
   align-items: center;
   gap: 8px;
   padding-top: 16px;
-  border-top: 1px solid #f0f0f0;
-  color: #8c8c8c;
+  border-top: 2px dashed #e5e0d8;
+  color: #2d2d2d;
   font-size: 14px;
+  opacity: 0.6;
+  font-family: 'Patrick Hand', cursive;
 }
 
 .validity {

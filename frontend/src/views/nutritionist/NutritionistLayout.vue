@@ -158,7 +158,8 @@ function handleLogout() {
 .nutritionist-layout {
   display: flex;
   min-height: 100vh;
-  background: #f0fdf4;
+  background: #fdfbf7;
+  font-family: 'Patrick Hand', cursive;
 }
 
 .approval-state-container {
@@ -166,20 +167,21 @@ function handleLogout() {
   display: flex;
   justify-content: center;
   align-items: center;
-  background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+  background: #fdfbf7;
 }
 
 .approval-card {
   text-align: center;
-  background: #fff;
+  background: #fdfbf7;
   padding: 48px;
-  border-radius: 16px;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+  box-shadow: 4px 4px 0px 0px #2d2d2d;
+  border: 2px solid #2d2d2d;
   max-width: 480px;
 
   .state-icon { font-size: 64px; margin-bottom: 16px; }
-  h2 { color: #1f2937; margin: 0 0 12px; font-size: 22px; }
-  p { color: #6b7280; margin: 0 0 20px; line-height: 1.6; font-size: 14px; }
+  h2 { color: #2d2d2d; margin: 0 0 12px; font-size: 22px; font-family: 'Kalam', cursive; }
+  p { color: #2d2d2d; margin: 0 0 20px; line-height: 1.6; font-size: 14px; font-family: 'Patrick Hand', cursive; }
 
   .approval-actions {
     display: flex;
@@ -191,8 +193,8 @@ function handleLogout() {
 
 .sidebar {
   width: 240px;
-  background: #fff;
-  border-right: 1px solid #d1fae5;
+  background: #fdfbf7;
+  border-right: 2px dashed #2d2d2d;
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
@@ -202,18 +204,19 @@ function handleLogout() {
     display: flex;
     align-items: center;
     gap: 12px;
-    border-bottom: 1px solid #d1fae5;
-    background: linear-gradient(180deg, #f0fdf4, #fff);
+    border-bottom: 2px dashed #e5e0d8;
+    background: #fdfbf7;
 
     .n-avatar {
-      background: linear-gradient(135deg, #0d9488, #065f46);
-      color: #fff;
+      background: #2d5da1;
+      color: #fdfbf7;
       font-weight: 600;
+      border: 2px solid #2d2d2d;
     }
 
     .profile-info {
-      h3 { margin: 0; font-size: 16px; font-weight: 600; color: #065f46; }
-      p { margin: 2px 0 0; font-size: 12px; color: #6b7280; }
+      h3 { margin: 0; font-size: 16px; font-weight: 600; color: #2d2d2d; font-family: 'Kalam', cursive; }
+      p { margin: 2px 0 0; font-size: 12px; color: #2d2d2d; font-family: 'Patrick Hand', cursive; }
     }
   }
 
@@ -222,26 +225,35 @@ function handleLogout() {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid #d1fae5;
+    border-bottom: 2px dashed #e5e0d8;
     font-size: 14px;
-    color: #6b7280;
+    color: #2d2d2d;
+    font-family: 'Patrick Hand', cursive;
   }
 
   .sidebar-menu {
     border-right: none;
     flex: 1;
+    background: transparent;
+    font-family: 'Patrick Hand', cursive;
 
     :deep(.el-menu-item) {
+      font-family: 'Patrick Hand', cursive;
+      color: #2d2d2d;
       &.is-active {
-        color: #0d9488;
-        background: #f0fdf4;
+        color: #2d5da1;
+        background: #e5e0d8;
+        border-right: 3px solid #2d5da1;
+      }
+      &:hover {
+        background: #e5e0d8;
       }
     }
   }
 
   .sidebar-footer {
     padding: 12px 16px;
-    border-top: 1px solid #d1fae5;
+    border-top: 2px dashed #e5e0d8;
     display: flex;
     flex-direction: column;
     gap: 4px;
@@ -256,5 +268,6 @@ function handleLogout() {
   flex: 1;
   padding: 24px;
   overflow-y: auto;
+  background: #fdfbf7;
 }
 </style>

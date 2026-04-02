@@ -92,9 +92,48 @@ function formatDate(dt) {
 }
 </script>
 
-<style scoped>
-.consultations-page h2 {
-  margin: 0 0 20px;
-  font-size: 22px;
+<style scoped lang="scss">
+.consultations-page {
+  font-family: 'Patrick Hand', cursive;
+
+  h2 {
+    margin: 0 0 20px;
+    font-size: 22px;
+    font-family: 'Kalam', cursive;
+    color: #2d2d2d;
+  }
+}
+
+:deep(.el-table) {
+  background: #fdfbf7;
+  border: 2px solid #2d2d2d;
+  border-radius: 15px 225px 15px 255px / 255px 15px 225px 15px;
+  overflow: hidden;
+  font-family: 'Patrick Hand', cursive;
+
+  th.el-table__cell {
+    background: #e5e0d8 !important;
+    color: #2d2d2d;
+    font-family: 'Kalam', cursive;
+    border-bottom: 2px dashed #2d2d2d !important;
+  }
+
+  td.el-table__cell {
+    border-bottom: 1px dashed #e5e0d8 !important;
+    color: #2d2d2d;
+  }
+
+  tr:hover > td.el-table__cell {
+    background: #fff9c4 !important;
+  }
+
+  &::before,
+  .el-table__inner-wrapper::before {
+    display: none;
+  }
+}
+
+:deep(.el-pagination) {
+  font-family: 'Patrick Hand', cursive;
 }
 </style>

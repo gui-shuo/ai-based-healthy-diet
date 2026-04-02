@@ -262,8 +262,9 @@ onBeforeUnmount(() => {
 <style scoped lang="scss">
 .food-record-container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #fdfbf7;
   padding: 0 24px 40px;
+  font-family: 'Patrick Hand', cursive;
 }
 
 .food-record-layout {
@@ -277,25 +278,28 @@ onBeforeUnmount(() => {
   align-items: center;
   gap: 16px;
   padding: 16px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  border-bottom: 2px dashed #e5e0d8;
   margin-bottom: 24px;
 
   :deep(.el-button) {
-    color: rgba(255, 255, 255, 0.85);
-    &:hover { color: #fff; }
+    color: #2d2d2d;
+    font-family: 'Patrick Hand', cursive;
+    &:hover { color: #2d5da1; }
   }
 }
 
 .topbar-title h2 {
   font-size: 24px;
   margin: 0;
-  color: #fff;
+  color: #2d2d2d;
+  font-family: 'Kalam', 'ZCOOL KuaiLe', cursive;
 }
 
 .topbar-title p {
   font-size: 13px;
-  color: rgba(255, 255, 255, 0.7);
+  color: #5a5a5a;
   margin: 2px 0 0 0;
+  font-family: 'Patrick Hand', cursive;
 }
 
 /* 两栏主布局 */
@@ -319,9 +323,11 @@ onBeforeUnmount(() => {
   gap: 16px;
   margin-bottom: 20px;
   padding: 16px 20px;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  background: #fff;
+  border: 2px solid #2d2d2d;
+  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+  box-shadow: 4px 4px 0px 0px #2d2d2d;
+  font-family: 'Patrick Hand', cursive;
 }
 
 .toolbar-filters {
@@ -369,21 +375,23 @@ onBeforeUnmount(() => {
 </style>
 
 <style lang="scss">
-// 删除确认框样式（全局 - 简洁风格）
+// 删除确认框样式（全局 - 手绘风格）
 .el-message-box.food-delete-confirm {
   width: 440px !important;
   max-width: 90vw !important;
-  border-radius: 8px !important;
+  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px !important;
   padding: 0 !important;
-  background: #ffffff !important;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12) !important;
+  background: #fdfbf7 !important;
+  box-shadow: 6px 6px 0px 0px #2d2d2d !important;
+  border: 2px solid #2d2d2d !important;
   overflow: hidden !important;
+  font-family: 'Patrick Hand', cursive !important;
 
   .el-message-box__header {
     position: relative !important;
     padding: 20px 50px 16px 20px !important;
-    background: #ffffff !important;
-    border-bottom: none !important;
+    background: #fdfbf7 !important;
+    border-bottom: 2px dashed #e5e0d8 !important;
     display: flex !important;
     align-items: center !important;
   }
@@ -391,7 +399,8 @@ onBeforeUnmount(() => {
   .el-message-box__title {
     font-size: 18px !important;
     font-weight: 600 !important;
-    color: #1f2937 !important;
+    color: #2d2d2d !important;
+    font-family: 'Kalam', 'ZCOOL KuaiLe', cursive !important;
     flex: 1 !important;
     line-height: 1.4 !important;
   }
@@ -406,21 +415,21 @@ onBeforeUnmount(() => {
     margin: 0 !important;
 
     .el-message-box__close {
-      color: rgba(0, 0, 0, 0.45) !important;
+      color: #5a5a5a !important;
       font-size: 16px !important;
       width: 20px !important;
       height: 20px !important;
       line-height: 20px !important;
 
       &:hover {
-        color: rgba(0, 0, 0, 0.75) !important;
+        color: #2d2d2d !important;
       }
     }
   }
 
   .el-message-box__content {
     padding: 8px 20px 20px !important;
-    background: #ffffff !important;
+    background: #fdfbf7 !important;
   }
 
   .el-message-box__container {
@@ -433,16 +442,17 @@ onBeforeUnmount(() => {
       flex-shrink: 0 !important;
 
       &.el-message-box-icon--warning {
-        color: #f59e0b !important;
+        color: #ff4d4d !important;
       }
     }
   }
 
   .el-message-box__message {
-    color: #4b5563 !important;
+    color: #5a5a5a !important;
     font-size: 14px !important;
     line-height: 1.6 !important;
     padding-left: 4px !important;
+    font-family: 'Patrick Hand', cursive !important;
 
     p {
       margin: 0 !important;
@@ -452,7 +462,7 @@ onBeforeUnmount(() => {
 
   .el-message-box__btns {
     padding: 0 20px 20px !important;
-    background: #ffffff !important;
+    background: #fdfbf7 !important;
     display: flex !important;
     justify-content: flex-end !important;
     gap: 12px !important;
@@ -461,39 +471,45 @@ onBeforeUnmount(() => {
     .el-button {
       margin: 0 !important;
       padding: 10px 24px !important;
-      border-radius: 6px !important;
+      border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px !important;
       font-size: 14px !important;
       font-weight: 500 !important;
-      transition: all 0.2s ease !important;
+      font-family: 'Patrick Hand', cursive !important;
+      transition: transform 0.15s ease, box-shadow 0.15s ease !important;
       min-width: 90px !important;
+      border: 2px solid #2d2d2d !important;
 
       &.el-button--primary {
-        background: #ef4444 !important;
-        border-color: #ef4444 !important;
+        background: #ff4d4d !important;
+        border-color: #2d2d2d !important;
         color: #ffffff !important;
-        box-shadow: 0 2px 4px rgba(239, 68, 68, 0.2) !important;
+        box-shadow: 3px 3px 0px 0px #2d2d2d !important;
 
         &:hover {
-          background: #dc2626 !important;
-          border-color: #dc2626 !important;
-          box-shadow: 0 4px 8px rgba(239, 68, 68, 0.3) !important;
+          background: #e04343 !important;
+          border-color: #2d2d2d !important;
+          box-shadow: 1px 1px 0px 0px #2d2d2d !important;
+          transform: translate(2px, 2px) !important;
         }
 
         &:active {
-          background: #b91c1c !important;
-          border-color: #b91c1c !important;
+          background: #cc3b3b !important;
+          border-color: #2d2d2d !important;
         }
       }
 
       &.el-button--default {
-        background: #ffffff !important;
-        border-color: #d1d5db !important;
-        color: #6b7280 !important;
+        background: #fdfbf7 !important;
+        border-color: #2d2d2d !important;
+        color: #5a5a5a !important;
+        box-shadow: 3px 3px 0px 0px #2d2d2d !important;
 
         &:hover {
-          color: #374151 !important;
-          border-color: #9ca3af !important;
-          background: #f9fafb !important;
+          color: #2d2d2d !important;
+          border-color: #2d2d2d !important;
+          background: #fff !important;
+          box-shadow: 1px 1px 0px 0px #2d2d2d !important;
+          transform: translate(2px, 2px) !important;
         }
       }
     }

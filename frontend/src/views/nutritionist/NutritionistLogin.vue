@@ -154,24 +154,26 @@ const handleLogin = async () => {
   display: flex;
   justify-content: center;
   align-items: center;
-  background: linear-gradient(135deg, #0d9488 0%, #065f46 50%, #134e4a 100%);
+  background: #e5e0d8;
+  font-family: 'Patrick Hand', cursive;
 }
 
 .nut-login-card {
   width: 100%;
   max-width: 420px;
-  background: #fff;
-  border-radius: 16px;
+  background: #fdfbf7;
+  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
   padding: 40px 36px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  box-shadow: 4px 4px 0px 0px #2d2d2d;
+  border: 2px solid #2d2d2d;
 }
 
 .nut-login-header {
   text-align: center;
   margin-bottom: 32px;
   .logo-icon { font-size: 48px; }
-  h1 { font-size: 24px; color: #0d9488; margin: 8px 0 4px; font-weight: 700; }
-  .subtitle { color: #6b7280; font-size: 14px; margin: 0; }
+  h1 { font-size: 24px; color: #2d2d2d; margin: 8px 0 4px; font-weight: 700; font-family: 'Kalam', cursive; }
+  .subtitle { color: #2d2d2d; font-size: 14px; margin: 0; font-family: 'Patrick Hand', cursive; }
 }
 
 .captcha-row {
@@ -182,21 +184,29 @@ const handleLogin = async () => {
 
 .captcha-img {
   height: 40px;
-  border-radius: 4px;
-  border: 1px solid #dcdfe6;
+  border-radius: 185px 10px 155px 10px / 10px 155px 10px 185px;
+  border: 2px solid #2d2d2d;
   cursor: pointer;
   &:hover { opacity: 0.8; }
 }
 
-.remember-me { margin-bottom: 20px; }
+.remember-me { margin-bottom: 20px; font-family: 'Patrick Hand', cursive; }
 
 .login-btn {
   width: 100%;
   height: 44px;
   font-size: 16px;
-  background: linear-gradient(135deg, #0d9488, #065f46);
-  border: none;
-  &:hover { background: linear-gradient(135deg, #0f766e, #064e3b); }
+  font-family: 'Patrick Hand', cursive;
+  background: #2d5da1;
+  border: 2px solid #2d2d2d;
+  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+  box-shadow: 3px 3px 0px 0px #2d2d2d;
+  transition: all 0.15s ease;
+  &:hover {
+    background: #2d5da1;
+    box-shadow: 1px 1px 0px 0px #2d2d2d;
+    transform: translate(2px, 2px);
+  }
 }
 
 .login-footer {
@@ -204,16 +214,24 @@ const handleLogin = async () => {
   justify-content: space-between;
   margin-top: 20px;
   font-size: 14px;
+  font-family: 'Patrick Hand', cursive;
 
   a {
-    color: #0d9488;
+    color: #2d5da1;
     text-decoration: none;
     font-weight: 500;
     &:hover { text-decoration: underline; }
   }
 
-  .user-link { color: #6b7280; font-weight: 400; }
+  .user-link { color: #2d2d2d; font-weight: 400; }
 }
 
-:deep(.el-form-item__label) { font-weight: 500; }
+:deep(.el-form-item__label) { font-weight: 500; font-family: 'Kalam', cursive; color: #2d2d2d; }
+:deep(.el-input__wrapper) {
+  border-radius: 185px 10px 155px 10px / 10px 155px 10px 185px;
+  border: 2px solid #2d2d2d !important;
+  box-shadow: none !important;
+  background: #fdfbf7;
+  font-family: 'Patrick Hand', cursive;
+}
 </style>

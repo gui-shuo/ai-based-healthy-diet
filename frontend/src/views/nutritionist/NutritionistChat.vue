@@ -408,14 +408,15 @@ function formatMsgTime(ts) {
   display: flex;
   height: calc(100vh - 48px);
   margin: -24px;
-  background: #f0fdf4;
+  background: #fdfbf7;
+  font-family: 'Patrick Hand', cursive;
 }
 
 // Left sidebar
 .conv-sidebar {
   width: 320px;
-  background: #fff;
-  border-right: 1px solid #d1fae5;
+  background: #fdfbf7;
+  border-right: 2px dashed #2d2d2d;
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
@@ -423,7 +424,7 @@ function formatMsgTime(ts) {
 
 .conv-search {
   padding: 12px;
-  border-bottom: 1px solid #f3f4f6;
+  border-bottom: 2px dashed #e5e0d8;
 }
 
 .conv-list {
@@ -433,9 +434,11 @@ function formatMsgTime(ts) {
 
 .no-conv {
   text-align: center;
-  color: #9ca3af;
+  color: #2d2d2d;
   padding: 40px 20px;
   font-size: 14px;
+  font-family: 'Patrick Hand', cursive;
+  opacity: 0.6;
 }
 
 .conv-item {
@@ -444,17 +447,18 @@ function formatMsgTime(ts) {
   gap: 12px;
   padding: 14px 16px;
   cursor: pointer;
-  border-bottom: 1px solid #f9fafb;
+  border-bottom: 1px dashed #e5e0d8;
   transition: background 0.15s;
 
-  &:hover { background: #f0fdf4; }
-  &.active { background: #d1fae5; }
+  &:hover { background: #e5e0d8; }
+  &.active { background: #fff9c4; border-left: 3px solid #2d5da1; }
 
   .conv-avatar {
-    background: linear-gradient(135deg, #6ee7b7, #34d399);
-    color: #065f46;
+    background: #2d5da1;
+    color: #fdfbf7;
     font-weight: 600;
     flex-shrink: 0;
+    border: 2px solid #2d2d2d;
   }
 
   .conv-info {
@@ -471,17 +475,20 @@ function formatMsgTime(ts) {
   .conv-name {
     font-size: 14px;
     font-weight: 500;
-    color: #1f2937;
+    color: #2d2d2d;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
     max-width: 160px;
+    font-family: 'Patrick Hand', cursive;
   }
 
   .conv-time {
     font-size: 11px;
-    color: #9ca3af;
+    color: #2d2d2d;
+    opacity: 0.5;
     flex-shrink: 0;
+    font-family: 'Patrick Hand', cursive;
   }
 
   .conv-bottom {
@@ -493,11 +500,13 @@ function formatMsgTime(ts) {
 
   .conv-preview {
     font-size: 12px;
-    color: #9ca3af;
+    color: #2d2d2d;
+    opacity: 0.5;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
     flex: 1;
+    font-family: 'Patrick Hand', cursive;
   }
 
   .conv-tag { flex-shrink: 0; }
@@ -509,12 +518,13 @@ function formatMsgTime(ts) {
   display: flex;
   flex-direction: column;
   min-width: 0;
+  background: #fdfbf7;
 }
 
 .chat-header {
   padding: 14px 20px;
-  background: #fff;
-  border-bottom: 1px solid #d1fae5;
+  background: #fdfbf7;
+  border-bottom: 2px dashed #2d2d2d;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -524,7 +534,7 @@ function formatMsgTime(ts) {
     display: flex;
     align-items: center;
     gap: 10px;
-    h3 { margin: 0; font-size: 16px; color: #065f46; }
+    h3 { margin: 0; font-size: 16px; color: #2d2d2d; font-family: 'Kalam', cursive; }
   }
 }
 
@@ -532,6 +542,7 @@ function formatMsgTime(ts) {
   flex: 1;
   overflow-y: auto;
   padding: 20px;
+  background: #fdfbf7;
 
   .system-msg {
     text-align: center;
@@ -540,21 +551,25 @@ function formatMsgTime(ts) {
 
   .system-bubble {
     display: inline-block;
-    background: #f3f4f6;
-    color: #6b7280;
+    background: #e5e0d8;
+    color: #2d2d2d;
     padding: 6px 16px;
-    border-radius: 12px;
+    border-radius: 185px 10px 155px 10px / 10px 155px 10px 185px;
     font-size: 12px;
+    border: 1px dashed #2d2d2d;
+    font-family: 'Patrick Hand', cursive;
 
     .system-label {
       font-weight: 600;
-      color: #0d9488;
+      color: #2d5da1;
       margin-right: 6px;
+      font-family: 'Kalam', cursive;
     }
 
     &.completed {
-      background: #d1fae5;
-      color: #065f46;
+      background: #fff9c4;
+      color: #2d2d2d;
+      border-color: #2d2d2d;
     }
   }
 
@@ -567,20 +582,23 @@ function formatMsgTime(ts) {
     &.msg-self {
       flex-direction: row-reverse;
       .msg-bubble {
-        background: #0d9488;
-        color: #fff;
-        border-radius: 16px 4px 16px 16px;
-        .msg-time { color: rgba(255,255,255,0.7); }
+        background: #2d5da1;
+        color: #fdfbf7;
+        border: 2px solid #2d2d2d;
+        border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+        box-shadow: 3px 3px 0px 0px rgba(45,45,45,0.1);
+        .msg-time { color: rgba(253,251,247,0.7); }
       }
     }
 
     &.msg-other {
       .msg-bubble {
-        background: #fff;
-        color: #1f2937;
-        border: 1px solid #e5e7eb;
-        border-radius: 4px 16px 16px 16px;
-        .msg-time { color: #9ca3af; }
+        background: #fdfbf7;
+        color: #2d2d2d;
+        border: 2px solid #2d2d2d;
+        border-radius: 15px 225px 15px 255px / 255px 15px 225px 15px;
+        box-shadow: 3px 3px 0px 0px rgba(45,45,45,0.1);
+        .msg-time { color: #2d2d2d; opacity: 0.5; }
       }
     }
   }
@@ -589,21 +607,22 @@ function formatMsgTime(ts) {
     flex-shrink: 0;
     font-weight: 600;
     font-size: 13px;
-    &.avatar-self { background: linear-gradient(135deg, #0d9488, #065f46); color: #fff; }
-    &.avatar-other { background: linear-gradient(135deg, #6ee7b7, #34d399); color: #065f46; }
+    border: 2px solid #2d2d2d;
+    &.avatar-self { background: #2d5da1; color: #fdfbf7; }
+    &.avatar-other { background: #e5e0d8; color: #2d2d2d; }
   }
 
   .msg-bubble {
     max-width: 60%;
     padding: 12px 16px;
-    .msg-text { font-size: 14px; line-height: 1.7; white-space: pre-wrap; word-break: break-word; }
-    .msg-time { font-size: 11px; text-align: right; margin-top: 6px; }
+    .msg-text { font-size: 14px; line-height: 1.7; white-space: pre-wrap; word-break: break-word; font-family: 'Patrick Hand', cursive; }
+    .msg-time { font-size: 11px; text-align: right; margin-top: 6px; font-family: 'Patrick Hand', cursive; }
   }
 }
 
 .chat-input {
-  background: #fff;
-  border-top: 1px solid #d1fae5;
+  background: #fdfbf7;
+  border-top: 2px dashed #2d2d2d;
   padding: 12px 16px;
   flex-shrink: 0;
 
@@ -611,7 +630,7 @@ function formatMsgTime(ts) {
     display: flex;
     justify-content: flex-end;
     margin-bottom: 6px;
-    .input-tip { font-size: 11px; color: #9ca3af; }
+    .input-tip { font-size: 11px; color: #2d2d2d; opacity: 0.5; font-family: 'Patrick Hand', cursive; }
   }
 
   .input-actions {
@@ -621,8 +640,11 @@ function formatMsgTime(ts) {
   }
 
   :deep(.el-textarea__inner) {
-    border-radius: 8px;
-    &:focus { box-shadow: 0 0 0 1px #0d9488; }
+    border-radius: 15px 225px 15px 255px / 255px 15px 225px 15px;
+    border: 2px solid #2d2d2d;
+    background: #fdfbf7;
+    font-family: 'Patrick Hand', cursive;
+    &:focus { box-shadow: 0 0 0 1px #2d5da1; }
   }
 }
 
@@ -631,13 +653,14 @@ function formatMsgTime(ts) {
   display: flex;
   justify-content: center;
   align-items: center;
+  background: #fdfbf7;
 
   .no-selection-content {
     text-align: center;
-    color: #9ca3af;
+    color: #2d2d2d;
     .no-icon { font-size: 64px; margin-bottom: 16px; }
-    h3 { color: #6b7280; margin: 0 0 8px; }
-    p { margin: 0; font-size: 14px; }
+    h3 { color: #2d2d2d; margin: 0 0 8px; font-family: 'Kalam', cursive; }
+    p { margin: 0; font-size: 14px; font-family: 'Patrick Hand', cursive; opacity: 0.6; }
   }
 }
 </style>
