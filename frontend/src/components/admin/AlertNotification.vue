@@ -314,6 +314,7 @@ onUnmounted(() => {
 <style scoped>
 .alert-notification {
   display: inline-block;
+  font-family: 'Patrick Hand', cursive, sans-serif;
 }
 
 .alert-badge {
@@ -327,16 +328,18 @@ onUnmounted(() => {
 
 .alert-item {
   padding: 16px;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1.5px dashed #e5e0d8;
   transition: background-color 0.3s;
+  background: #fdfbf7;
 }
 
 .alert-item:hover {
-  background-color: #f5f5f5;
+  background-color: rgba(229, 224, 216, 0.3);
 }
 
 .alert-item.unread {
-  background-color: #e6f7ff;
+  background-color: #fff9c4;
+  border-left: 3px solid #ff4d4d;
 }
 
 .alert-header {
@@ -348,19 +351,22 @@ onUnmounted(() => {
 
 .alert-time {
   font-size: 12px;
-  color: #999;
+  color: #2d2d2d;
+  opacity: 0.45;
 }
 
 .alert-title {
   font-size: 14px;
-  font-weight: 500;
-  color: #262626;
+  font-weight: 600;
+  color: #2d2d2d;
   margin-bottom: 4px;
+  font-family: 'Kalam', cursive;
 }
 
 .alert-content {
   font-size: 13px;
-  color: #666;
+  color: #2d2d2d;
+  opacity: 0.7;
   margin-bottom: 8px;
   line-height: 1.5;
 }

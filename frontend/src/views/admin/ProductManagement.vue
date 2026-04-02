@@ -289,9 +289,14 @@ onMounted(fetchList)
 
 <style scoped lang="scss">
 .product-management {
+  font-family: 'Patrick Hand', cursive, sans-serif;
+
   .toolbar-card {
     margin-bottom: 16px;
-    border-radius: 12px;
+    border: 2px solid #2d2d2d;
+    border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+    box-shadow: 3px 3px 0px 0px rgba(45,45,45,0.1);
+    background: #fdfbf7;
     .toolbar {
       display: flex;
       justify-content: space-between;
@@ -303,7 +308,24 @@ onMounted(fetchList)
     }
   }
   .list-card {
-    border-radius: 12px;
+    border: 2px solid #2d2d2d;
+    border-radius: 15px 225px 15px 255px / 255px 15px 225px 15px;
+    box-shadow: 4px 4px 0px 0px #2d2d2d;
+    background: #fdfbf7;
+
+    :deep(.el-table th.el-table__cell) {
+      background: #fff9c4;
+      color: #2d2d2d;
+      font-family: 'Kalam', cursive;
+      font-weight: 600;
+      border-bottom: 2.5px solid #2d2d2d;
+    }
+    :deep(.el-table td.el-table__cell) {
+      border-bottom: 1.5px dashed #e5e0d8;
+    }
+    :deep(.el-table--striped .el-table__body tr.el-table__row--striped td.el-table__cell) {
+      background: rgba(253, 251, 247, 0.6);
+    }
   }
   .pagination {
     display: flex;

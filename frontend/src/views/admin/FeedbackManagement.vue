@@ -339,6 +339,8 @@ onMounted(() => {
 
 <style scoped lang="scss">
 .feedback-management {
+  font-family: 'Patrick Hand', cursive, sans-serif;
+
   .stats-row {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -350,9 +352,10 @@ onMounted(() => {
       align-items: center;
       gap: 14px;
       padding: 18px 20px;
-      background: #fff;
-      border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      background: #fdfbf7;
+      border: 2px solid #2d2d2d;
+      border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+      box-shadow: 3px 3px 0px 0px rgba(45,45,45,0.1);
       border-left: 4px solid var(--accent);
 
       .stat-icon {
@@ -366,12 +369,14 @@ onMounted(() => {
         .stat-value {
           font-size: 24px;
           font-weight: 700;
-          color: #1f2937;
+          color: #2d2d2d;
+          font-family: 'Kalam', cursive;
         }
 
         .stat-label {
           font-size: 12px;
-          color: #6b7280;
+          color: #2d2d2d;
+          opacity: 0.55;
         }
       }
     }
@@ -379,7 +384,10 @@ onMounted(() => {
 
   .filter-card {
     margin-bottom: 16px;
-    border-radius: 12px;
+    border: 2px solid #2d2d2d;
+    border-radius: 185px 10px 155px 10px / 10px 155px 10px 185px;
+    box-shadow: 3px 3px 0px 0px rgba(45,45,45,0.1);
+    background: #fdfbf7;
 
     .filter-row {
       display: flex;
@@ -393,20 +401,38 @@ onMounted(() => {
   }
 
   .list-card {
-    border-radius: 12px;
+    border: 2px solid #2d2d2d;
+    border-radius: 15px 225px 15px 255px / 255px 15px 225px 15px;
+    box-shadow: 4px 4px 0px 0px #2d2d2d;
+    background: #fdfbf7;
+
+    :deep(.el-table th.el-table__cell) {
+      background: #fff9c4;
+      color: #2d2d2d;
+      font-family: 'Kalam', cursive;
+      font-weight: 600;
+      border-bottom: 2.5px solid #2d2d2d;
+    }
+    :deep(.el-table td.el-table__cell) {
+      border-bottom: 1.5px dashed #e5e0d8;
+    }
+    :deep(.el-table--striped .el-table__body tr.el-table__row--striped td.el-table__cell) {
+      background: rgba(253, 251, 247, 0.6);
+    }
 
     .cell-title {
-      color: #1f2937;
+      color: #2d2d2d;
       font-weight: 500;
       cursor: pointer;
 
       &:hover {
-        color: #409eff;
+        color: #2d5da1;
       }
     }
 
     .cell-user {
-      color: #6b7280;
+      color: #2d2d2d;
+      opacity: 0.6;
       font-size: 13px;
     }
   }
@@ -426,36 +452,40 @@ onMounted(() => {
     .detail-section-title {
       font-size: 14px;
       font-weight: 600;
-      color: #1f2937;
+      color: #2d2d2d;
       margin-bottom: 8px;
       padding-left: 10px;
-      border-left: 3px solid #67c23a;
+      border-left: 3px solid #ff4d4d;
+      font-family: 'Kalam', cursive;
     }
 
     .detail-text {
-      background: #f9fafb;
+      background: #fdfbf7;
       padding: 14px;
+      border: 1.5px dashed #e5e0d8;
       border-radius: 8px;
       font-size: 14px;
       line-height: 1.8;
-      color: #4b5563;
+      color: #2d2d2d;
       white-space: pre-wrap;
     }
 
     &.reply-section {
-      background: #f0fdf4;
+      background: #fdfbf7;
       padding: 14px;
       border-radius: 10px;
-      border: 1px solid #bbf7d0;
+      border: 2px dashed #e5e0d8;
 
       .reply-text {
         background: #fff;
+        border: 1px solid #e5e0d8;
       }
 
       .reply-time {
         margin-top: 8px;
         font-size: 12px;
-        color: #9ca3af;
+        color: #2d2d2d;
+        opacity: 0.45;
       }
     }
   }
@@ -468,7 +498,8 @@ onMounted(() => {
     align-items: center;
     gap: 8px;
     padding: 10px 14px;
-    background: #f9fafb;
+    background: #fff9c4;
+    border: 1.5px dashed #e5e0d8;
     border-radius: 8px;
     margin-bottom: 14px;
 
@@ -479,7 +510,7 @@ onMounted(() => {
     .reply-title {
       font-size: 14px;
       font-weight: 500;
-      color: #1f2937;
+      color: #2d2d2d;
     }
   }
 
@@ -489,7 +520,8 @@ onMounted(() => {
     gap: 10px;
     margin-top: 14px;
     font-size: 14px;
-    color: #6b7280;
+    color: #2d2d2d;
+    opacity: 0.7;
   }
 
   .template-bar {
@@ -500,7 +532,8 @@ onMounted(() => {
 
     .template-label {
       font-size: 13px;
-      color: #6b7280;
+      color: #2d2d2d;
+      opacity: 0.6;
       white-space: nowrap;
     }
   }
@@ -511,11 +544,12 @@ onMounted(() => {
     gap: 6px;
     margin-top: 12px;
     font-size: 12px;
-    color: #9ca3af;
+    color: #2d2d2d;
+    opacity: 0.45;
 
     .el-icon {
       font-size: 14px;
-      color: #a0aec0;
+      color: #e5e0d8;
     }
   }
 }

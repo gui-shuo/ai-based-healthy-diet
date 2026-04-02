@@ -208,17 +208,46 @@ onMounted(() => {
 <style scoped>
 .ai-logs {
   padding: 0;
+  font-family: 'Patrick Hand', cursive, sans-serif;
 }
 
 .page-title {
   margin: 0 0 24px 0;
   font-size: 24px;
-  font-weight: 500;
-  color: #262626;
+  font-weight: 600;
+  color: #2d2d2d;
+  font-family: 'ZCOOL KuaiLe', 'Kalam', cursive;
 }
 
 .search-card {
   margin-bottom: 16px;
+  border: 2px solid #2d2d2d;
+  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+  box-shadow: 3px 3px 0px 0px rgba(45,45,45,0.1);
+  background: #fdfbf7;
+}
+
+.ai-logs > :deep(.el-card:nth-child(3)) {
+  border: 2px solid #2d2d2d;
+  border-radius: 15px 225px 15px 255px / 255px 15px 225px 15px;
+  box-shadow: 4px 4px 0px 0px #2d2d2d;
+  background: #fdfbf7;
+}
+
+.ai-logs :deep(.el-table th.el-table__cell) {
+  background: #fff9c4;
+  color: #2d2d2d;
+  font-family: 'Kalam', cursive;
+  font-weight: 600;
+  border-bottom: 2.5px solid #2d2d2d;
+}
+
+.ai-logs :deep(.el-table td.el-table__cell) {
+  border-bottom: 1.5px dashed #e5e0d8;
+}
+
+.ai-logs :deep(.el-table--striped .el-table__body tr.el-table__row--striped td.el-table__cell) {
+  background: rgba(253, 251, 247, 0.6);
 }
 
 .pagination {
@@ -231,9 +260,11 @@ onMounted(() => {
   max-height: 200px;
   overflow-y: auto;
   padding: 8px;
-  background: #f5f5f5;
+  background: #fdfbf7;
+  border: 1.5px dashed #e5e0d8;
   border-radius: 4px;
   white-space: pre-wrap;
   word-break: break-word;
+  color: #2d2d2d;
 }
 </style>

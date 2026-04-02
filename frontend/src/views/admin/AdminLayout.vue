@@ -160,6 +160,7 @@ onMounted(() => {
 .admin-layout {
   height: 100vh;
   overflow: hidden;
+  font-family: 'Patrick Hand', 'Kalam', cursive, sans-serif;
 }
 
 .el-container {
@@ -167,8 +168,16 @@ onMounted(() => {
 }
 
 .admin-aside {
-  background: #001529;
-  color: #fff;
+  background: #fdfbf7;
+  color: #2d2d2d;
+  border-right: 2.5px solid #2d2d2d;
+  border-image: repeating-linear-gradient(
+    180deg,
+    #2d2d2d 0px,
+    #2d2d2d 8px,
+    transparent 8px,
+    transparent 12px
+  ) 1;
 }
 
 .logo {
@@ -176,37 +185,49 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #002140;
+  background: #fff9c4;
+  border-bottom: 2px dashed #e5e0d8;
 }
 
 .logo h2 {
-  color: #fff;
+  color: #2d2d2d;
   margin: 0;
   font-size: 20px;
+  font-family: 'ZCOOL KuaiLe', 'Kalam', cursive;
+  letter-spacing: 1px;
 }
 
 .admin-menu {
   border: none;
-  background: #001529;
+  background: #fdfbf7;
 }
 
 .admin-menu :deep(.el-menu-item) {
-  color: rgba(255, 255, 255, 0.65);
+  color: #2d2d2d;
+  font-family: 'Patrick Hand', cursive, sans-serif;
+  font-size: 15px;
+  border-radius: 0;
+  margin: 2px 8px;
+  transition: all 0.2s;
 }
 
 .admin-menu :deep(.el-menu-item:hover) {
-  color: #fff;
-  background: rgba(255, 255, 255, 0.1);
+  color: #2d2d2d;
+  background: rgba(229, 224, 216, 0.45);
+  border-radius: 6px;
 }
 
 .admin-menu :deep(.el-menu-item.is-active) {
-  color: #fff;
-  background: #1890ff;
+  color: #2d2d2d;
+  font-weight: 700;
+  background: rgba(255, 77, 77, 0.08);
+  border-left: 3.5px solid #ff4d4d;
+  border-radius: 0 6px 6px 0;
 }
 
 .admin-header {
-  background: #fff;
-  border-bottom: 1px solid #f0f0f0;
+  background: #fdfbf7;
+  border-bottom: 2px dashed #e5e0d8;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -220,12 +241,13 @@ onMounted(() => {
 }
 
 .username {
-  color: #666;
+  color: #2d2d2d;
   font-size: 14px;
+  font-family: 'Patrick Hand', cursive;
 }
 
 .admin-main {
-  background: #f0f2f5;
+  background: #fdfbf7;
   padding: 24px;
   overflow-y: auto;
 }

@@ -285,24 +285,55 @@ onMounted(() => {
 <style scoped>
 .announcement-management {
   padding: 0;
+  font-family: 'Patrick Hand', cursive, sans-serif;
 }
 
 .page-title {
   margin: 0 0 24px 0;
   font-size: 24px;
-  font-weight: 500;
-  color: #262626;
+  font-weight: 600;
+  color: #2d2d2d;
+  font-family: 'ZCOOL KuaiLe', 'Kalam', cursive;
+}
+
+.announcement-management > :deep(.el-card) {
+  border: 2px solid #2d2d2d;
+  border-radius: 15px 225px 15px 255px / 255px 15px 225px 15px;
+  box-shadow: 4px 4px 0px 0px #2d2d2d;
+  background: #fdfbf7;
+}
+
+.announcement-management :deep(.el-card__header) {
+  border-bottom: 2px dashed #e5e0d8;
+}
+
+.announcement-management :deep(.el-table th.el-table__cell) {
+  background: #fff9c4;
+  color: #2d2d2d;
+  font-family: 'Kalam', cursive;
+  font-weight: 600;
+  border-bottom: 2.5px solid #2d2d2d;
+}
+
+.announcement-management :deep(.el-table td.el-table__cell) {
+  border-bottom: 1.5px dashed #e5e0d8;
+}
+
+.announcement-management :deep(.el-table--striped .el-table__body tr.el-table__row--striped td.el-table__cell) {
+  background: rgba(253, 251, 247, 0.6);
 }
 
 .card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  font-family: 'Kalam', cursive;
 }
 
 .form-tip {
   margin-left: 8px;
   font-size: 12px;
-  color: #909399;
+  color: #2d2d2d;
+  opacity: 0.5;
 }
 </style>

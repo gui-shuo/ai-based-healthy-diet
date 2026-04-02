@@ -447,6 +447,7 @@ onUnmounted(() => {
 <style scoped lang="scss">
 .dashboard {
   padding: 0;
+  font-family: 'Patrick Hand', cursive, sans-serif;
 }
 
 /* 欢迎区域 */
@@ -457,12 +458,14 @@ onUnmounted(() => {
       margin: 0 0 4px;
       font-size: 22px;
       font-weight: 600;
-      color: #1a1a2e;
+      color: #2d2d2d;
+      font-family: 'ZCOOL KuaiLe', 'Kalam', cursive;
     }
     p {
       margin: 0;
       font-size: 13px;
-      color: #8c8c8c;
+      color: #2d2d2d;
+      opacity: 0.6;
     }
   }
 }
@@ -478,15 +481,22 @@ onUnmounted(() => {
 .stat-card {
   position: relative;
   overflow: hidden;
-  border-radius: 14px;
+  border: 2.5px solid #2d2d2d;
+  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
   padding: 20px;
   color: #fff;
   cursor: pointer;
+  box-shadow: 4px 4px 0px 0px #2d2d2d;
   transition: transform 0.25s, box-shadow 0.25s;
 
+  &:nth-child(1) { transform: rotate(-0.6deg); }
+  &:nth-child(2) { transform: rotate(0.5deg); }
+  &:nth-child(3) { transform: rotate(-0.4deg); }
+  &:nth-child(4) { transform: rotate(0.7deg); }
+
   &:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    transform: translateY(-3px) rotate(0deg);
+    box-shadow: 8px 8px 0px 0px #2d2d2d;
   }
 
   .stat-card-bg {
@@ -508,12 +518,14 @@ onUnmounted(() => {
       font-weight: 700;
       line-height: 1.2;
       letter-spacing: -0.5px;
+      font-family: 'Kalam', cursive;
     }
     .stat-label {
       display: block;
       font-size: 13px;
       opacity: 0.85;
       margin-top: 2px;
+      font-family: 'Patrick Hand', cursive;
     }
   }
 
@@ -530,6 +542,7 @@ onUnmounted(() => {
       padding: 2px 8px;
       border-radius: 10px;
       font-weight: 500;
+      border: 1px solid rgba(255,255,255,0.3);
       &.up { background: rgba(255, 255, 255, 0.25); }
       &.warn { background: rgba(255, 200, 50, 0.3); }
       &.neutral { background: rgba(255, 255, 255, 0.15); }
@@ -551,11 +564,14 @@ onUnmounted(() => {
 }
 
 .chart-card {
-  border-radius: 14px;
+  border: 2px solid #2d2d2d;
+  border-radius: 15px 225px 15px 255px / 255px 15px 225px 15px;
+  box-shadow: 3px 3px 0px 0px rgba(45,45,45,0.1);
+  background: #fdfbf7;
 
   :deep(.el-card__header) {
     padding: 14px 20px;
-    border-bottom: 1px solid #f5f5f5;
+    border-bottom: 2px dashed #e5e0d8;
   }
   :deep(.el-card__body) {
     padding: 12px 16px;
@@ -573,13 +589,15 @@ onUnmounted(() => {
     gap: 8px;
     font-size: 15px;
     font-weight: 600;
-    color: #333;
+    color: #2d2d2d;
+    font-family: 'Kalam', cursive;
 
     .title-dot {
       width: 8px;
       height: 8px;
       border-radius: 50%;
       display: inline-block;
+      border: 1.5px solid #2d2d2d;
     }
   }
 }
@@ -601,8 +619,8 @@ onUnmounted(() => {
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      border-bottom: 1px solid #f5f5f5;
-      border-right: 1px solid #f5f5f5;
+      border-bottom: 1.5px dashed #e5e0d8;
+      border-right: 1.5px dashed #e5e0d8;
       padding: 12px;
 
       &:nth-child(even) { border-right: none; }
@@ -611,13 +629,16 @@ onUnmounted(() => {
       .info-value {
         font-size: 22px;
         font-weight: 700;
-        color: #333;
+        color: #2d2d2d;
         line-height: 1.3;
+        font-family: 'Kalam', cursive;
       }
       .info-label {
         font-size: 12px;
-        color: #8c8c8c;
+        color: #2d2d2d;
+        opacity: 0.55;
         margin-top: 4px;
+        font-family: 'Patrick Hand', cursive;
       }
     }
   }
