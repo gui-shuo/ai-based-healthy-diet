@@ -29,6 +29,8 @@ public class AdminConfigService {
     private final SystemConfigRepository configRepository;
     private final SystemAnnouncementRepository announcementRepository;
     private final UserRepository userRepository;
+    private final DynamicConfigService dynamicConfigService;
+    private final com.nutriai.config.AIConfig aiConfig;
     
     /**
      * 获取所有配置
@@ -67,6 +69,11 @@ public class AdminConfigService {
         
         config.setConfigValue(value);
         configRepository.save(config);
+        dynamicConfigService.invalidate(key);
+        // AI相关配置变更时清除模型缓存
+        if (key.startsWith("ai.")) {
+            aiConfig.clearModelCache();
+        }
         
         log.info("更新系统配置: key={}, value={}", key, value);
     }
@@ -90,6 +97,10 @@ public class AdminConfigService {
                 .build();
         
         config = configRepository.save(config);
+        dynamicConfigService.invalidate(dto.getConfigKey());
+        if (dto.getConfigKey().startsWith("ai.")) {
+            aiConfig.clearModelCache();
+        }
         log.info("创建系统配置: key={}", dto.getConfigKey());
         
         return convertConfigToDTO(config);
@@ -104,6 +115,10 @@ public class AdminConfigService {
                 .orElseThrow(() -> new RuntimeException("配置不存在"));
         
         configRepository.delete(config);
+        dynamicConfigService.invalidate(key);
+        if (key.startsWith("ai.")) {
+            aiConfig.clearModelCache();
+        }
         log.info("删除系统配置: key={}", key);
     }
     

@@ -351,9 +351,10 @@ public class DietPlanService {
         CompletableFuture<String> future = new CompletableFuture<>();
         StringBuilder sb = new StringBuilder();
         
-        // 使用专用的饮食计划模型（doubao速度快3-5倍）
-        StreamingChatLanguageModel model = aiConfig.getStreamingChatModel(dietPlanModel, 0.7, maxTokens);
-        log.info("使用饮食计划模型: {}, maxTokens: {}", dietPlanModel, maxTokens);
+        // 使用专用的饮食计划模型（从数据库配置读取，优先于环境变量）
+        String effectiveModel = aiConfig.getEffectiveDietPlanModel();
+        StreamingChatLanguageModel model = aiConfig.getStreamingChatModel(effectiveModel, 0.7, maxTokens);
+        log.info("使用饮食计划模型: {}, maxTokens: {}", effectiveModel, maxTokens);
         
         model.generate(prompt, new StreamingResponseHandler<AiMessage>() {
             @Override

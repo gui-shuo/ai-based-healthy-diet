@@ -52,7 +52,7 @@ public class AIStreamingService {
                             Consumer<Throwable> onError) {
         
         // 使用默认值
-        String actualModel = model != null ? model : aiConfig.getModelName();
+        String actualModel = model != null ? model : aiConfig.getEffectiveModelName();
         Double actualTemperature = temperature != null ? temperature : 0.7;
         Integer actualMaxTokens = maxTokens != null ? maxTokens : 2000;
         Boolean actualKeepContext = keepContext != null ? keepContext : true;

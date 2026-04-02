@@ -5,11 +5,14 @@ import dev.langchain4j.model.chat.ChatLanguageModel;
 import dev.langchain4j.model.chat.StreamingChatLanguageModel;
 import dev.langchain4j.model.openai.OpenAiChatModel;
 import dev.langchain4j.model.openai.OpenAiStreamingChatModel;
+import com.nutriai.service.DynamicConfigService;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 
 import java.time.Duration;
 import java.util.concurrent.ConcurrentHashMap;
@@ -27,6 +30,10 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 @Configuration
 public class AIConfig {
+
+    @Lazy
+    @Autowired
+    private DynamicConfigService dynamicConfig;
 
     @Value("${ai.api-key:}")
     @Getter
@@ -60,6 +67,38 @@ public class AIConfig {
     @Getter
     private Integer timeout;
 
+    // ─── 动态配置读取（DB 优先 > @Value 兜底）───
+
+    /** 获取当前生效的模型名 */
+    public String getEffectiveModelName() {
+        return dynamicConfig.getString("ai.model", "ai.model-name", modelName);
+    }
+
+    /** 获取当前生效的饮食计划模型名 */
+    public String getEffectiveDietPlanModel() {
+        return dynamicConfig.getString("ai.diet_plan_model", "ai.diet-plan-model", dietPlanModel);
+    }
+
+    /** 获取当前生效的最大Token */
+    public int getEffectiveMaxTokens() {
+        return dynamicConfig.getInt("ai.max_tokens", "ai.max-tokens", maxTokens);
+    }
+
+    /** 获取当前生效的温度 */
+    public double getEffectiveTemperature() {
+        return dynamicConfig.getDouble("ai.temperature", null, temperature);
+    }
+
+    /** 获取当前生效的 top-p */
+    public double getEffectiveTopP() {
+        return dynamicConfig.getDouble("ai.top_p", null, topP);
+    }
+
+    /** 获取当前生效的超时 */
+    public int getEffectiveTimeout() {
+        return dynamicConfig.getInt("ai.timeout", null, timeout);
+    }
+
     private final ConcurrentHashMap<String, ChatLanguageModel> chatModelCache = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, StreamingChatLanguageModel> streamingModelCache = new ConcurrentHashMap<>();
 
@@ -76,9 +115,9 @@ public class AIConfig {
     }
 
     public ChatLanguageModel getChatModel(String model, Double temp, Integer tokens) {
-        String actualModel = model != null ? model : modelName;
-        Double actualTemp = temp != null ? temp : temperature;
-        Integer actualTokens = tokens != null ? tokens : maxTokens;
+        String actualModel = model != null ? model : getEffectiveModelName();
+        Double actualTemp = temp != null ? temp : getEffectiveTemperature();
+        Integer actualTokens = tokens != null ? tokens : getEffectiveMaxTokens();
         String cacheKey = actualModel + ":" + actualTemp + ":" + actualTokens;
         return chatModelCache.computeIfAbsent(cacheKey, k -> {
             log.info("创建ChatLanguageModel: model={}, temp={}, tokens={}", actualModel, actualTemp, actualTokens);
@@ -87,14 +126,21 @@ public class AIConfig {
     }
 
     public StreamingChatLanguageModel getStreamingChatModel(String model, Double temp, Integer tokens) {
-        String actualModel = model != null ? model : modelName;
-        Double actualTemp = temp != null ? temp : temperature;
-        Integer actualTokens = tokens != null ? tokens : maxTokens;
+        String actualModel = model != null ? model : getEffectiveModelName();
+        Double actualTemp = temp != null ? temp : getEffectiveTemperature();
+        Integer actualTokens = tokens != null ? tokens : getEffectiveMaxTokens();
         String cacheKey = actualModel + ":" + actualTemp + ":" + actualTokens;
         return streamingModelCache.computeIfAbsent(cacheKey, k -> {
             log.info("创建StreamingChatLanguageModel: model={}, temp={}, tokens={}", actualModel, actualTemp, actualTokens);
             return buildStreamingChatModel(actualModel, actualTemp, actualTokens);
         });
+    }
+
+    /** 清除模型缓存（配置更改后调用） */
+    public void clearModelCache() {
+        chatModelCache.clear();
+        streamingModelCache.clear();
+        log.info("AI模型缓存已清除");
     }
 
     private ChatLanguageModel buildChatModel(String model, Double temp, Integer tokens) {
@@ -103,9 +149,9 @@ public class AIConfig {
                 .apiKey(getEffectiveKey())
                 .modelName(model)
                 .temperature(temp)
-                .topP(topP)
+                .topP(getEffectiveTopP())
                 .maxTokens(tokens)
-                .timeout(Duration.ofSeconds(timeout))
+                .timeout(Duration.ofSeconds(getEffectiveTimeout()))
                 .tokenizer(new SimpleEstimateTokenizer())
                 .build();
     }
@@ -116,24 +162,30 @@ public class AIConfig {
                 .apiKey(getEffectiveKey())
                 .modelName(model)
                 .temperature(temp)
-                .topP(topP)
+                .topP(getEffectiveTopP())
                 .maxTokens(tokens)
-                .timeout(Duration.ofSeconds(timeout))
+                .timeout(Duration.ofSeconds(getEffectiveTimeout()))
                 .tokenizer(new SimpleEstimateTokenizer())
                 .build();
     }
 
     private String getEffectiveKey() {
-        String effectiveKey = (apiKey != null && !apiKey.isEmpty()) ? apiKey : "not-configured";
-        if ("not-configured".equals(effectiveKey)) {
-            log.warn("⚠️ AI API Key未配置！请设置环境变量: AI_API_KEY");
+        String key = dynamicConfig != null
+                ? dynamicConfig.getString("ai.api_key", "ai.api-key", apiKey)
+                : apiKey;
+        if (key == null || key.isEmpty()) {
+            log.warn("⚠️ AI API Key未配置！请在管理后台系统配置或环境变量中设置");
+            return "not-configured";
         }
-        return effectiveKey;
+        return key;
     }
 
     private String getEffectiveUrl() {
-        if (apiUrl != null && !apiUrl.isEmpty()) {
-            return apiUrl;
+        String url = dynamicConfig != null
+                ? dynamicConfig.getString("ai.base_url", "ai.base-url", apiUrl)
+                : apiUrl;
+        if (url != null && !url.isEmpty()) {
+            return url;
         }
         return "https://dashscope.aliyuncs.com/compatible-mode/v1";
     }

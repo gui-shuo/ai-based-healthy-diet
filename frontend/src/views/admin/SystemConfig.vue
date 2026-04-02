@@ -8,12 +8,19 @@
         <el-tab-pane label="全部配置" name="all" />
         <el-tab-pane label="AI配置" name="AI" />
         <el-tab-pane label="系统配置" name="系统" />
-        <el-tab-pane label="用户配置" name="用户" />
-        <el-tab-pane label="安全配置" name="安全" />
-        <el-tab-pane label="通知配置" name="通知" />
+        <el-tab-pane label="存储服务" name="存储" />
         <el-tab-pane label="食物识别" name="食物识别" />
+        <el-tab-pane label="邮件配置" name="邮件" />
+        <el-tab-pane label="社交登录" name="社交登录" />
+        <el-tab-pane label="即时通信" name="即时通信" />
+        <el-tab-pane label="跨域配置" name="跨域" />
+        <el-tab-pane label="安全配置" name="安全" />
+        <el-tab-pane label="用户配置" name="用户" />
+        <el-tab-pane label="通知配置" name="通知" />
         <el-tab-pane label="营养师" name="营养师" />
         <el-tab-pane label="饮食计划" name="饮食计划" />
+        <el-tab-pane label="数据库" name="数据库" />
+        <el-tab-pane label="Redis" name="Redis" />
       </el-tabs>
     </el-card>
 
@@ -30,14 +37,28 @@
       </template>
       <el-table :data="configList" stripe>
         <el-table-column prop="configKey" label="配置键" width="250" />
-        <el-table-column prop="configValue" label="配置值" width="200">
+        <el-table-column prop="configValue" label="配置值" min-width="200">
           <template #default="{ row }">
             <el-tag
               v-if="row.configType === 'boolean'"
               :type="row.configValue === 'true' ? 'success' : 'info'"
             >
-              {{ row.configValue }}
+              {{ row.configValue === 'true' ? '开启' : '关闭' }}
             </el-tag>
+            <template v-else-if="isSensitiveKey(row.configKey)">
+              <span v-if="!row._revealed" class="sensitive-value">
+                {{ maskValue(row.configValue) }}
+                <el-button link size="small" @click="row._revealed = true">
+                  <el-icon><View /></el-icon>
+                </el-button>
+              </span>
+              <span v-else>
+                {{ row.configValue }}
+                <el-button link size="small" @click="row._revealed = false">
+                  <el-icon><Hide /></el-icon>
+                </el-button>
+              </span>
+            </template>
             <span v-else>{{ row.configValue }}</span>
           </template>
         </el-table-column>
@@ -168,12 +189,19 @@
           <el-select v-model="editForm.category" style="width: 100%">
             <el-option label="AI配置" value="AI" />
             <el-option label="系统配置" value="系统" />
-            <el-option label="用户配置" value="用户" />
-            <el-option label="安全配置" value="安全" />
-            <el-option label="通知配置" value="通知" />
+            <el-option label="存储服务" value="存储" />
             <el-option label="食物识别" value="食物识别" />
+            <el-option label="邮件配置" value="邮件" />
+            <el-option label="社交登录" value="社交登录" />
+            <el-option label="即时通信" value="即时通信" />
+            <el-option label="跨域配置" value="跨域" />
+            <el-option label="安全配置" value="安全" />
+            <el-option label="用户配置" value="用户" />
+            <el-option label="通知配置" value="通知" />
             <el-option label="营养师" value="营养师" />
             <el-option label="饮食计划" value="饮食计划" />
+            <el-option label="数据库" value="数据库" />
+            <el-option label="Redis" value="Redis" />
           </el-select>
         </el-form-item>
 
@@ -193,7 +221,7 @@
 <script setup>
 import { ref, reactive, onMounted, computed } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Check, Close, Plus } from '@element-plus/icons-vue'
+import { Check, Close, Plus, View, Hide } from '@element-plus/icons-vue'
 import {
   getConfigOptions,
   getAllConfigs,
@@ -233,6 +261,14 @@ const rules = {
   configValue: [{ required: true, message: '请输入配置值', trigger: 'blur' }],
   configType: [{ required: true, message: '请选择类型', trigger: 'change' }],
   category: [{ required: true, message: '请选择分类', trigger: 'change' }]
+}
+
+// 敏感字段检测
+const sensitivePatterns = ['secret', 'password', 'api_key', 'app_key', 'authorization']
+const isSensitiveKey = key => sensitivePatterns.some(p => key.toLowerCase().includes(p))
+const maskValue = value => {
+  if (!value || value.length <= 4) return '••••••••'
+  return value.slice(0, 3) + '••••••' + value.slice(-3)
 }
 
 // 加载配置选项
@@ -406,5 +442,13 @@ onMounted(() => {
   margin-left: 8px;
   font-size: 12px;
   color: #909399;
+}
+
+.sensitive-value {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #909399;
+  font-family: monospace;
 }
 </style>
