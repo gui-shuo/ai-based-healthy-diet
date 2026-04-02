@@ -152,14 +152,14 @@
           <text class="sheet-title">编辑资料</text>
           <text class="sheet-close" @tap="showEditSheet = false">✕</text>
         </view>
-        <scroll-view scroll-y class="sheet-body">
+        <scroll-view scroll-y class="sheet-body" :scroll-into-view="''" :enable-flex="true">
           <view class="form-group">
             <text class="form-label">昵称</text>
-            <input class="form-input" v-model="profileForm.nickname" placeholder="请输入昵称" maxlength="20" />
+            <input class="form-input" v-model="profileForm.nickname" placeholder="请输入昵称" maxlength="20" :adjust-position="true" />
           </view>
           <view class="form-group">
             <text class="form-label">个人简介</text>
-            <textarea class="form-textarea" v-model="profileForm.bio" placeholder="介绍一下自己" maxlength="200" />
+            <textarea class="form-textarea" v-model="profileForm.bio" placeholder="介绍一下自己" maxlength="200" :adjust-position="true" auto-height />
           </view>
           <view class="form-group">
             <text class="form-label">性别</text>
@@ -175,12 +175,12 @@
           </view>
           <view class="form-group">
             <text class="form-label">邮箱</text>
-            <input class="form-input" v-model="profileForm.email" type="text" placeholder="请输入邮箱" />
+            <input class="form-input" v-model="profileForm.email" type="text" placeholder="请输入邮箱" :adjust-position="true" />
           </view>
           <view class="form-group">
             <text class="form-label">手机号</text>
             <view class="phone-row">
-              <input class="form-input flex-1" v-model="profileForm.phone" type="number" placeholder="请输入手机号" maxlength="11" />
+              <input class="form-input flex-1" v-model="profileForm.phone" type="number" placeholder="请输入手机号" maxlength="11" :adjust-position="true" />
               <view v-if="(userStore.userInfo as any)?.email" class="send-code-btn" @tap="handleSendEmailCode">
                 {{ smsCooldown > 0 ? `${smsCooldown}s` : '验证码' }}
               </view>
@@ -943,7 +943,6 @@ onUnmounted(() => {
 .form-group {
   margin-bottom: 24rpx;
   width: 100%;
-  overflow: hidden;
 }
 
 .form-label {
@@ -963,9 +962,12 @@ onUnmounted(() => {
   color: $foreground;
   width: 100%;
   max-width: 100%;
+  min-height: 80rpx;
   box-sizing: border-box;
   font-family: 'Inter', sans-serif;
-  overflow: hidden;
+  display: block;
+  position: relative;
+  z-index: 1;
 }
 
 .form-textarea {
@@ -980,6 +982,9 @@ onUnmounted(() => {
   min-height: 120rpx;
   box-sizing: border-box;
   font-family: 'Inter', sans-serif;
+  display: block;
+  position: relative;
+  z-index: 1;
 }
 
 .form-hint {
