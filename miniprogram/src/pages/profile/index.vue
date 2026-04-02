@@ -14,72 +14,36 @@
             <view v-if="isVip" class="vip-badge-tag">VIP</view>
           </view>
           <text class="username">@{{ userStore.userInfo?.username }}</text>
+          <text class="user-bio" v-if="(userStore.userInfo as any)?.bio">{{ (userStore.userInfo as any).bio }}</text>
         </view>
-        <view class="edit-btn" @tap="showEditProfile = !showEditProfile">
-          {{ showEditProfile ? '收起' : '编辑' }}
-        </view>
+        <view class="edit-btn" @tap="openEditSheet">编辑资料</view>
       </view>
 
       <!-- Quick Stats Row -->
       <view class="stats-row">
-        <view class="stat-item" @tap="navigateTo('/pages/food-records/index')">
-          <text class="stat-value">{{ userStore.userInfo?.age || '-' }}</text>
-          <text class="stat-label">年龄</text>
+        <view class="stat-item">
+          <text class="stat-value">{{ (userStore.userInfo as any)?.email ? '✓' : '-' }}</text>
+          <text class="stat-label">邮箱</text>
         </view>
         <view class="stat-divider" />
         <view class="stat-item">
-          <text class="stat-value">{{ userStore.userInfo?.height ? userStore.userInfo.height + 'cm' : '-' }}</text>
-          <text class="stat-label">身高</text>
-        </view>
-        <view class="stat-divider" />
-        <view class="stat-item">
-          <text class="stat-value">{{ userStore.userInfo?.weight ? userStore.userInfo.weight + 'kg' : '-' }}</text>
-          <text class="stat-label">体重</text>
+          <text class="stat-value">{{ maskedPhone || '-' }}</text>
+          <text class="stat-label">手机</text>
         </view>
         <view class="stat-divider" />
         <view class="stat-item">
           <text class="stat-value">{{ isVip ? 'VIP' : '普通' }}</text>
           <text class="stat-label">等级</text>
         </view>
+        <view class="stat-divider" />
+        <view class="stat-item">
+          <text class="stat-value">{{ joinDays }}</text>
+          <text class="stat-label">加入天数</text>
+        </view>
       </view>
     </view>
 
-    <!-- Profile Edit Section -->
-    <view v-if="showEditProfile" class="card edit-section">
-      <view class="input-group">
-        <text class="label">昵称</text>
-        <input v-model="profileForm.nickname" placeholder="请输入昵称" maxlength="20" />
-      </view>
-      <view class="input-group">
-        <text class="label">邮箱</text>
-        <input v-model="profileForm.email" type="text" placeholder="请输入邮箱" />
-      </view>
-      <view class="input-group">
-        <text class="label">性别</text>
-        <picker :range="genderOptions" :value="genderIndex" @change="onGenderChange">
-          <view class="picker-value">{{ genderOptions[genderIndex] || '请选择' }}</view>
-        </picker>
-      </view>
-      <view class="input-group">
-        <text class="label">年龄</text>
-        <input v-model="profileForm.age" type="number" placeholder="请输入年龄" />
-      </view>
-      <view class="input-group">
-        <text class="label">身高 (cm)</text>
-        <input v-model="profileForm.height" type="digit" placeholder="请输入身高" />
-      </view>
-      <view class="input-group">
-        <text class="label">体重 (kg)</text>
-        <input v-model="profileForm.weight" type="digit" placeholder="请输入体重" />
-      </view>
-      <view class="input-group">
-        <text class="label">手机号</text>
-        <input v-model="profileForm.phone" type="number" placeholder="请输入手机号" maxlength="11" />
-      </view>
-      <button class="btn-primary save-btn" :loading="saving" @tap="saveProfile">保存修改</button>
-    </view>
-
-    <!-- Menu List - Primary -->
+    <!-- Menu List - Services -->
     <view class="section-label">我的服务</view>
     <view class="card menu-card">
       <view class="menu-item" @tap="navigateTo('/pages/food-records/index')">
@@ -94,6 +58,13 @@
           <text class="menu-icon">📋</text>
         </view>
         <text class="menu-text">我的饮食计划</text>
+        <text class="menu-arrow">›</text>
+      </view>
+      <view class="menu-item" @tap="navigateTo('/pages/profile/health-record')">
+        <view class="menu-icon-wrap" style="background: rgba(16,185,129,0.1)">
+          <text class="menu-icon">💪</text>
+        </view>
+        <text class="menu-text">体质档案</text>
         <text class="menu-arrow">›</text>
       </view>
       <view class="menu-item" @tap="navigateTo('/pages/profile/my-posts')">
@@ -121,7 +92,7 @@
         <view class="menu-icon-wrap" style="background: rgba(59,130,246,0.1)">
           <text class="menu-icon">📍</text>
         </view>
-        <text class="menu-text">我的地址</text>
+        <text class="menu-text">收货地址</text>
         <text class="menu-arrow">›</text>
       </view>
     </view>
@@ -134,9 +105,12 @@
           <text class="menu-icon">🔗</text>
         </view>
         <text class="menu-text">账号绑定</text>
-        <text class="menu-arrow">›</text>
+        <view class="menu-badge-row">
+          <text class="menu-badge" v-if="bindSummary">{{ bindSummary }}</text>
+          <text class="menu-arrow">›</text>
+        </view>
       </view>
-      <view class="menu-item" @tap="showPasswordDialog = true">
+      <view class="menu-item" @tap="showPasswordSheet = true">
         <view class="menu-icon-wrap" style="background: rgba(239,68,68,0.1)">
           <text class="menu-icon">🔒</text>
         </view>
@@ -150,160 +124,289 @@
         <text class="menu-text">意见反馈</text>
         <text class="menu-arrow">›</text>
       </view>
-      <view class="menu-item" @tap="showAboutDialog = true">
+      <view class="menu-item" @tap="showAboutSheet = true">
         <view class="menu-icon-wrap" style="background: rgba(16,185,129,0.1)">
           <text class="menu-icon">ℹ️</text>
         </view>
         <text class="menu-text">关于我们</text>
         <text class="menu-arrow">›</text>
       </view>
+      <view class="menu-item" @tap="showDeleteSheet = true">
+        <view class="menu-icon-wrap" style="background: rgba(239,68,68,0.08)">
+          <text class="menu-icon">⚠️</text>
+        </view>
+        <text class="menu-text danger-text">注销账号</text>
+        <text class="menu-arrow">›</text>
+      </view>
     </view>
 
-    <!-- Logout & Delete Account -->
+    <!-- Logout -->
     <view class="logout-wrap">
       <button class="btn-logout" @tap="handleLogout">退出登录</button>
-      <button class="btn-delete-account" @tap="handleDeleteAccount">注销账号</button>
     </view>
 
-    <!-- Change Password Dialog -->
-    <view v-if="showPasswordDialog" class="dialog-mask" @tap.self="showPasswordDialog = false">
-      <view class="dialog">
-        <view class="dialog-title">修改密码</view>
-        <view class="input-group">
-          <text class="label">旧密码</text>
-          <input v-model="passwordForm.oldPassword" type="password" placeholder="请输入旧密码" />
+    <!-- ========== Bottom Sheet: Edit Profile ========== -->
+    <view v-if="showEditSheet" class="sheet-mask" @tap.self="showEditSheet = false">
+      <view class="sheet">
+        <view class="sheet-header">
+          <text class="sheet-title">编辑资料</text>
+          <text class="sheet-close" @tap="showEditSheet = false">✕</text>
         </view>
-        <view class="input-group">
-          <text class="label">新密码</text>
-          <input v-model="passwordForm.newPassword" type="password" placeholder="请输入新密码" />
-        </view>
-        <view class="input-group">
-          <text class="label">确认新密码</text>
-          <input v-model="passwordForm.confirmPassword" type="password" placeholder="请再次输入新密码" />
-        </view>
-        <view class="dialog-actions">
-          <button class="btn-dialog-cancel" @tap="showPasswordDialog = false">取消</button>
-          <button class="btn-dialog-confirm" :loading="changingPwd" @tap="changePassword">确认</button>
-        </view>
+        <scroll-view scroll-y class="sheet-body">
+          <view class="form-group">
+            <text class="form-label">昵称</text>
+            <input class="form-input" v-model="profileForm.nickname" placeholder="请输入昵称" maxlength="20" />
+          </view>
+          <view class="form-group">
+            <text class="form-label">个人简介</text>
+            <textarea class="form-textarea" v-model="profileForm.bio" placeholder="介绍一下自己" maxlength="200" />
+          </view>
+          <view class="form-group">
+            <text class="form-label">性别</text>
+            <view class="gender-row">
+              <view
+                v-for="(opt, idx) in genderOptions"
+                :key="idx"
+                class="gender-chip"
+                :class="{ active: profileForm.gender === genderValueMap[idx] }"
+                @tap="profileForm.gender = genderValueMap[idx]"
+              >{{ opt }}</view>
+            </view>
+          </view>
+          <view class="form-group">
+            <text class="form-label">邮箱</text>
+            <input class="form-input" v-model="profileForm.email" type="text" placeholder="请输入邮箱" />
+          </view>
+          <view class="form-group">
+            <text class="form-label">手机号</text>
+            <view class="phone-row">
+              <input class="form-input flex-1" v-model="profileForm.phone" type="number" placeholder="请输入手机号" maxlength="11" />
+              <view v-if="(userStore.userInfo as any)?.email" class="send-code-btn" @tap="handleSendEmailCode">
+                {{ smsCooldown > 0 ? `${smsCooldown}s` : '验证码' }}
+              </view>
+            </view>
+            <view v-if="showPhoneCode" class="form-group" style="margin-top: 16rpx;">
+              <input class="form-input" v-model="profileForm.emailCode" type="number" placeholder="请输入邮箱验证码" maxlength="6" />
+            </view>
+          </view>
+          <button class="btn-primary sheet-save-btn" :loading="saving" @tap="saveProfile">保存修改</button>
+        </scroll-view>
       </view>
     </view>
 
-    <!-- About Dialog -->
-    <view v-if="showAboutDialog" class="dialog-mask" @tap.self="showAboutDialog = false">
-      <view class="dialog about-dialog">
-        <view class="dialog-title">关于我们</view>
-        <view class="about-content">
+    <!-- ========== Bottom Sheet: Change Password ========== -->
+    <view v-if="showPasswordSheet" class="sheet-mask" @tap.self="showPasswordSheet = false">
+      <view class="sheet">
+        <view class="sheet-header">
+          <text class="sheet-title">修改密码</text>
+          <text class="sheet-close" @tap="showPasswordSheet = false">✕</text>
+        </view>
+        <scroll-view scroll-y class="sheet-body">
+          <view class="form-group">
+            <text class="form-label">原密码</text>
+            <input class="form-input" v-model="passwordForm.oldPassword" type="password" placeholder="请输入原密码" />
+          </view>
+          <view class="form-group">
+            <text class="form-label">新密码</text>
+            <input class="form-input" v-model="passwordForm.newPassword" type="password" placeholder="8-20位，含大小写字母和数字" />
+            <view v-if="passwordForm.newPassword" class="pwd-strength">
+              <view class="pwd-bar">
+                <view class="pwd-bar-fill" :class="pwdStrengthClass" :style="{ width: pwdStrengthPercent + '%' }" />
+              </view>
+              <text class="pwd-strength-text" :class="pwdStrengthClass">{{ pwdStrengthLabel }}</text>
+            </view>
+            <text class="form-hint">密码需包含大小写字母、数字，长度8-20位</text>
+          </view>
+          <view class="form-group">
+            <text class="form-label">确认新密码</text>
+            <input class="form-input" v-model="passwordForm.confirmPassword" type="password" placeholder="请再次输入新密码" />
+          </view>
+          <button class="btn-primary sheet-save-btn" :loading="changingPwd" @tap="changePassword">确认修改</button>
+        </scroll-view>
+      </view>
+    </view>
+
+    <!-- ========== Bottom Sheet: About ========== -->
+    <view v-if="showAboutSheet" class="sheet-mask" @tap.self="showAboutSheet = false">
+      <view class="sheet sheet-sm">
+        <view class="sheet-header">
+          <text class="sheet-title">关于我们</text>
+          <text class="sheet-close" @tap="showAboutSheet = false">✕</text>
+        </view>
+        <view class="sheet-body about-body">
           <view class="about-logo">🥗</view>
           <text class="about-name">NutriAI 饮食规划助手</text>
-          <text class="about-version text-sm text-secondary">Version 1.0.0</text>
-          <text class="about-desc text-sm text-secondary mt-20">
+          <text class="about-version">Version 1.0.0</text>
+          <text class="about-desc">
             NutriAI 是一款基于人工智能的饮食管理应用，为您提供个性化的饮食计划、
-            智能食物识别、营养师咨询等专业服务，助您实现生活目标。
+            智能食物识别、营养师咨询等专业服务，助您实现健康生活目标。
           </text>
+          <button class="btn-primary sheet-save-btn" @tap="showAboutSheet = false">知道了</button>
         </view>
-        <button class="btn-dialog-confirm full-btn" @tap="showAboutDialog = false">知道了</button>
       </view>
     </view>
 
-    <!-- Delete Account Dialog -->
-    <view v-if="showDeleteDialog" class="dialog-mask" @tap.self="showDeleteDialog = false">
-      <view class="dialog delete-dialog">
-        <view class="dialog-title danger-title">⚠️ 注销账号</view>
-        <view class="delete-warning">
-          <text class="warning-text">注销后以下数据将被永久删除且无法恢复：</text>
-          <text class="warning-item">• 个人资料、饮食档案</text>
-          <text class="warning-item">• AI对话记录、饮食计划</text>
-          <text class="warning-item">• 社区帖子、订单记录</text>
-          <text class="warning-item">• 所有其他关联数据</text>
+    <!-- ========== Bottom Sheet: Delete Account ========== -->
+    <view v-if="showDeleteSheet" class="sheet-mask" @tap.self="showDeleteSheet = false">
+      <view class="sheet">
+        <view class="sheet-header">
+          <text class="sheet-title danger-color">⚠️ 注销账号</text>
+          <text class="sheet-close" @tap="showDeleteSheet = false">✕</text>
         </view>
-        <view v-if="needPassword" class="input-group">
-          <text class="label">输入登录密码确认</text>
-          <input v-model="deletePassword" type="password" placeholder="请输入当前登录密码" />
-        </view>
-        <view class="delete-checkbox" @tap="deleteConfirmed = !deleteConfirmed">
-          <text :class="['checkbox-icon', { checked: deleteConfirmed }]">{{ deleteConfirmed ? '☑' : '☐' }}</text>
-          <text class="checkbox-text">我已了解数据将被永久删除且无法恢复</text>
-        </view>
-        <view class="dialog-actions">
-          <button class="btn-dialog-cancel" @tap="showDeleteDialog = false">取消</button>
+        <scroll-view scroll-y class="sheet-body">
+          <view class="delete-warning">
+            <text class="warning-text">注销后以下数据将被永久删除且无法恢复：</text>
+            <text class="warning-item">• 个人资料、头像、饮食档案</text>
+            <text class="warning-item">• AI对话记录、收藏内容</text>
+            <text class="warning-item">• 饮食计划、饮食记录</text>
+            <text class="warning-item">• 食物识别历史</text>
+            <text class="warning-item">• 社区帖子、评论、点赞</text>
+            <text class="warning-item">• 订单记录、会员信息</text>
+            <text class="warning-item">• QQ/微信绑定关系</text>
+            <text class="warning-item">• 所有其他关联数据</text>
+          </view>
+          <view v-if="needPassword" class="form-group">
+            <text class="form-label">输入登录密码确认</text>
+            <input class="form-input" v-model="deletePassword" type="password" placeholder="请输入当前登录密码" />
+          </view>
+          <view class="delete-checkbox" @tap="deleteConfirmed = !deleteConfirmed">
+            <text :class="['checkbox-icon', { checked: deleteConfirmed }]">{{ deleteConfirmed ? '☑' : '☐' }}</text>
+            <text class="checkbox-text">我已了解注销后所有数据将被永久删除且无法恢复</text>
+          </view>
           <button
-            class="btn-delete-confirm"
+            class="btn-danger sheet-save-btn"
             :disabled="!deleteConfirmed || (needPassword && !deletePassword)"
             :loading="deleting"
             @tap="confirmDeleteAccount"
-          >确认注销</button>
-        </view>
+          >确认注销账号</button>
+        </scroll-view>
       </view>
     </view>
 
-    <view class="safe-bottom"></view>
+    <view class="safe-bottom" />
   </view>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, reactive } from 'vue'
+import { ref, computed, reactive, onUnmounted } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
 import { useUserStore } from '@/stores/user'
-import { userApi, memberApi } from '@/services/api'
+import { userApi, memberApi, socialAuthApi } from '@/services/api'
 import { checkLogin, defaultAvatar } from '@/utils/common'
 
 const userStore = useUserStore()
 
-const showEditProfile = ref(false)
-const showPasswordDialog = ref(false)
-const showAboutDialog = ref(false)
-const showDeleteDialog = ref(false)
+// --- Sheet visibility ---
+const showEditSheet = ref(false)
+const showPasswordSheet = ref(false)
+const showAboutSheet = ref(false)
+const showDeleteSheet = ref(false)
+
+// --- Loading states ---
 const saving = ref(false)
 const changingPwd = ref(false)
 const deleting = ref(false)
-const deletePassword = ref('')
-const deleteConfirmed = ref(false)
 const memberInfo = ref<any>({})
 
+// --- Binding summary ---
+const bindSummary = ref('')
+
+// --- Profile edit ---
 const genderOptions = ['保密', '男', '女']
-const genderMap: Record<string, number> = { '': 0, 'SECRET': 0, 'MALE': 1, 'FEMALE': 2 }
 const genderValueMap = ['SECRET', 'MALE', 'FEMALE']
-const genderIndex = ref(0)
 
 const profileForm = reactive({
   nickname: '',
   email: '',
+  bio: '',
   gender: 'SECRET',
-  age: '',
-  height: '',
-  weight: '',
-  phone: ''
+  phone: '',
+  emailCode: ''
 })
 
+const showPhoneCode = ref(false)
+const smsCooldown = ref(0)
+const smsSending = ref(false)
+let cooldownTimer: ReturnType<typeof setInterval> | null = null
+
+// --- Password change ---
 const passwordForm = reactive({
   oldPassword: '',
   newPassword: '',
   confirmPassword: ''
 })
 
+// --- Delete account ---
+const deletePassword = ref('')
+const deleteConfirmed = ref(false)
+
+// --- Computed ---
 const isVip = computed(() => {
   const info = memberInfo.value
   return info.vipLevel && info.vipLevel !== 'NORMAL' && info.vipExpiry && new Date(info.vipExpiry) > new Date()
 })
 
+const maskedPhone = computed(() => {
+  const p = (userStore.userInfo as any)?.phone
+  if (!p || p.length < 7) return p || ''
+  return p.substring(0, 3) + '****' + p.substring(7)
+})
+
+const joinDays = computed(() => {
+  const created = (userStore.userInfo as any)?.createdAt
+  if (!created) return '-'
+  const diff = Date.now() - new Date(created).getTime()
+  return Math.max(1, Math.floor(diff / 86400000))
+})
+
+const needPassword = computed(() => !!(userStore.userInfo as any)?.email)
+
+// Password strength
+const pwdStrengthLevel = computed(() => {
+  const p = passwordForm.newPassword
+  if (!p) return 0
+  let score = 0
+  if (p.length >= 8) score++
+  if (/[a-z]/.test(p)) score++
+  if (/[A-Z]/.test(p)) score++
+  if (/\d/.test(p)) score++
+  if (/[@$!%*?&]/.test(p)) score++
+  return score
+})
+
+const pwdStrengthPercent = computed(() => (pwdStrengthLevel.value / 5) * 100)
+const pwdStrengthClass = computed(() => {
+  const l = pwdStrengthLevel.value
+  if (l <= 1) return 'weak'
+  if (l <= 3) return 'medium'
+  return 'strong'
+})
+const pwdStrengthLabel = computed(() => {
+  const l = pwdStrengthLevel.value
+  if (l <= 1) return '弱'
+  if (l <= 3) return '中'
+  return '强'
+})
+
+// --- Init form ---
 function initProfileForm() {
   const u = userStore.userInfo as any
   if (!u) return
   profileForm.nickname = u.nickname || ''
   profileForm.email = u.email || ''
+  profileForm.bio = u.bio || ''
   profileForm.gender = u.gender || 'SECRET'
-  profileForm.age = u.age ? String(u.age) : ''
-  profileForm.height = u.height ? String(u.height) : ''
-  profileForm.weight = u.weight ? String(u.weight) : ''
   profileForm.phone = u.phone || ''
-  genderIndex.value = genderMap[u.gender] ?? 0
+  profileForm.emailCode = ''
+  showPhoneCode.value = false
 }
 
-function onGenderChange(e: any) {
-  genderIndex.value = e.detail.value
-  profileForm.gender = genderValueMap[e.detail.value]
+function openEditSheet() {
+  initProfileForm()
+  showEditSheet.value = true
 }
 
+// --- Avatar upload ---
 async function changeAvatar() {
   uni.chooseImage({
     count: 1,
@@ -330,6 +433,34 @@ async function changeAvatar() {
   })
 }
 
+// --- Send email verification code for phone change ---
+async function handleSendEmailCode() {
+  if (smsCooldown.value > 0 || smsSending.value) return
+  smsSending.value = true
+  try {
+    const res = await userApi.sendEmailCode()
+    if (res.code === 200) {
+      uni.showToast({ title: '验证码已发送到邮箱', icon: 'success' })
+      showPhoneCode.value = true
+      smsCooldown.value = 60
+      cooldownTimer = setInterval(() => {
+        smsCooldown.value--
+        if (smsCooldown.value <= 0 && cooldownTimer) {
+          clearInterval(cooldownTimer)
+          cooldownTimer = null
+        }
+      }, 1000)
+    } else {
+      uni.showToast({ title: (res as any).message || '发送失败', icon: 'none' })
+    }
+  } catch (e: any) {
+    uni.showToast({ title: e?.message || '发送失败', icon: 'none' })
+  } finally {
+    smsSending.value = false
+  }
+}
+
+// --- Save profile ---
 async function saveProfile() {
   if (!profileForm.nickname.trim()) {
     uni.showToast({ title: '请输入昵称', icon: 'none' })
@@ -340,21 +471,33 @@ async function saveProfile() {
     const data: any = {
       nickname: profileForm.nickname.trim(),
       gender: profileForm.gender,
-      email: profileForm.email?.trim() || undefined,
-      phone: profileForm.phone || undefined
+      bio: profileForm.bio?.trim() || undefined,
+      email: profileForm.email?.trim() || undefined
     }
-    if (profileForm.age) data.age = Number(profileForm.age)
-    if (profileForm.height) data.height = Number(profileForm.height)
-    if (profileForm.weight) data.weight = Number(profileForm.weight)
-
     const res = await userApi.updateProfile(data)
-    if (res.code === 200) {
-      uni.showToast({ title: '保存成功', icon: 'success' })
-      userStore.fetchUserInfo()
-      showEditProfile.value = false
-    } else {
-      uni.showToast({ title: res.message || '保存失败', icon: 'none' })
+    if (res.code !== 200) {
+      uni.showToast({ title: (res as any).message || '保存失败', icon: 'none' })
+      saving.value = false
+      return
     }
+
+    // If phone changed and we have a verification code, update phone separately
+    const currentPhone = (userStore.userInfo as any)?.phone || ''
+    if (profileForm.phone && profileForm.phone !== currentPhone && profileForm.emailCode) {
+      try {
+        const phoneRes = await userApi.changePhone({
+          newPhone: profileForm.phone,
+          emailCode: profileForm.emailCode
+        })
+        if (phoneRes.code !== 200) {
+          uni.showToast({ title: (phoneRes as any).message || '手机号修改失败', icon: 'none' })
+        }
+      } catch {}
+    }
+
+    uni.showToast({ title: '保存成功', icon: 'success' })
+    userStore.fetchUserInfo()
+    showEditSheet.value = false
   } catch {
     uni.showToast({ title: '保存失败', icon: 'none' })
   } finally {
@@ -362,14 +505,19 @@ async function saveProfile() {
   }
 }
 
+// --- Change password with validation matching web ---
 async function changePassword() {
   const { oldPassword, newPassword, confirmPassword } = passwordForm
   if (!oldPassword || !newPassword || !confirmPassword) {
     uni.showToast({ title: '请填写完整信息', icon: 'none' })
     return
   }
-  if (newPassword.length < 6) {
-    uni.showToast({ title: '新密码至少6位', icon: 'none' })
+  if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,20}$/.test(newPassword)) {
+    uni.showToast({ title: '密码需8-20位含大小写字母和数字', icon: 'none' })
+    return
+  }
+  if (newPassword === oldPassword) {
+    uni.showToast({ title: '新密码不能与原密码相同', icon: 'none' })
     return
   }
   if (newPassword !== confirmPassword) {
@@ -378,15 +526,16 @@ async function changePassword() {
   }
   changingPwd.value = true
   try {
-    const res = await userApi.changePassword({ oldPassword, newPassword })
+    const res = await userApi.changePassword({ oldPassword, newPassword, confirmPassword })
     if (res.code === 200) {
-      uni.showToast({ title: '密码修改成功', icon: 'success' })
-      showPasswordDialog.value = false
+      uni.showToast({ title: '密码修改成功，请重新登录', icon: 'success' })
+      showPasswordSheet.value = false
       passwordForm.oldPassword = ''
       passwordForm.newPassword = ''
       passwordForm.confirmPassword = ''
+      setTimeout(() => userStore.logout(), 1500)
     } else {
-      uni.showToast({ title: res.message || '修改失败', icon: 'none' })
+      uni.showToast({ title: (res as any).message || '修改失败', icon: 'none' })
     }
   } catch {
     uni.showToast({ title: '修改失败', icon: 'none' })
@@ -395,10 +544,12 @@ async function changePassword() {
   }
 }
 
+// --- Navigation ---
 function navigateTo(url: string) {
   uni.navigateTo({ url })
 }
 
+// --- Logout ---
 function handleLogout() {
   uni.showModal({
     title: '提示',
@@ -409,15 +560,7 @@ function handleLogout() {
   })
 }
 
-// OAuth-only用户（无邮箱）无需密码验证
-const needPassword = computed(() => !!(userStore.userInfo as any)?.email)
-
-function handleDeleteAccount() {
-  deletePassword.value = ''
-  deleteConfirmed.value = false
-  showDeleteDialog.value = true
-}
-
+// --- Delete account ---
 async function confirmDeleteAccount() {
   if (!deleteConfirmed.value) return
   if (needPassword.value && !deletePassword.value) return
@@ -434,10 +577,10 @@ async function confirmDeleteAccount() {
         const result = await userApi.deleteAccount(deletePassword.value || '')
         if (result.code === 200) {
           uni.showToast({ title: '账号已注销', icon: 'success' })
-          showDeleteDialog.value = false
+          showDeleteSheet.value = false
           setTimeout(() => userStore.logout(), 1500)
         } else {
-          uni.showToast({ title: result.message || '注销失败', icon: 'none' })
+          uni.showToast({ title: (result as any).message || '注销失败', icon: 'none' })
         }
       } catch (e: any) {
         uni.showToast({ title: e?.message || '注销失败', icon: 'none' })
@@ -448,6 +591,22 @@ async function confirmDeleteAccount() {
   })
 }
 
+// --- Load binding summary ---
+async function loadBindSummary() {
+  try {
+    const res = await socialAuthApi.getBindInfo()
+    if (res.code === 200 && res.data) {
+      const parts: string[] = []
+      if (res.data.wechatBound) parts.push('微信')
+      if (res.data.qqBound) parts.push('QQ')
+      bindSummary.value = parts.length ? parts.join(' · ') + ' 已绑定' : '未绑定'
+    }
+  } catch {
+    bindSummary.value = ''
+  }
+}
+
+// --- Load member info ---
 async function loadMemberInfo() {
   try {
     const res = await memberApi.getInfo()
@@ -455,11 +614,19 @@ async function loadMemberInfo() {
   } catch {}
 }
 
+// --- Lifecycle ---
 onShow(() => {
   if (!checkLogin()) return
   userStore.fetchUserInfo()
   loadMemberInfo()
+  loadBindSummary()
   initProfileForm()
+  deletePassword.value = ''
+  deleteConfirmed.value = false
+})
+
+onUnmounted(() => {
+  if (cooldownTimer) clearInterval(cooldownTimer)
 })
 </script>
 
@@ -471,10 +638,12 @@ onShow(() => {
   font-family: 'Inter', sans-serif;
 }
 
+/* ============ Header ============ */
 .user-header {
   position: relative;
   overflow: hidden;
 }
+
 .header-bg {
   position: absolute;
   top: 0; left: 0; right: 0;
@@ -482,6 +651,7 @@ onShow(() => {
   background: $gradient-accent;
   border-radius: 0 0 40rpx 40rpx;
 }
+
 .header-inner {
   position: relative;
   padding: 48rpx 32rpx 24rpx;
@@ -489,53 +659,10 @@ onShow(() => {
   align-items: center;
 }
 
-/* Stats Row */
-.stats-row {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-  background: rgba(255,255,255,0.15);
-  margin: 0 24rpx 24rpx;
-  padding: 24rpx 16rpx;
-  border-radius: $radius-xl;
-  backdrop-filter: blur(8px);
-}
-.stat-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  flex: 1;
-}
-.stat-value {
-  font-size: 28rpx;
-  font-weight: 700;
-  color: #fff;
-  font-family: 'JetBrains Mono', monospace;
-}
-.stat-label {
-  font-size: 22rpx;
-  color: rgba(255,255,255,0.75);
-  margin-top: 4rpx;
-}
-.stat-divider {
-  width: 1rpx;
-  height: 40rpx;
-  background: rgba(255,255,255,0.25);
-}
-
-/* Section Label */
-.section-label {
-  font-size: 26rpx;
-  font-weight: 600;
-  color: $muted-foreground;
-  padding: 24rpx 32rpx 8rpx;
-  font-family: 'Inter', sans-serif;
-}
-
 .avatar-wrap {
   position: relative;
   margin-right: 24rpx;
+  flex-shrink: 0;
 }
 
 .avatar {
@@ -547,12 +674,10 @@ onShow(() => {
 
 .avatar-edit {
   position: absolute;
-  bottom: 0;
-  right: 0;
+  bottom: 0; right: 0;
   background: rgba(0, 0, 0, 0.4);
   border-radius: $radius-full;
-  width: 36rpx;
-  height: 36rpx;
+  width: 36rpx; height: 36rpx;
   font-size: 20rpx;
   display: flex;
   align-items: center;
@@ -599,6 +724,16 @@ onShow(() => {
   font-size: 24rpx;
 }
 
+.user-bio {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 22rpx;
+  display: block;
+  margin-top: 6rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .edit-btn {
   color: #fff;
   font-size: 24rpx;
@@ -608,60 +743,63 @@ onShow(() => {
   border: 2rpx solid rgba(255, 255, 255, 0.3);
   font-family: 'Inter', sans-serif;
   flex-shrink: 0;
+  white-space: nowrap;
+}
+
+/* ============ Stats Row ============ */
+.stats-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  background: rgba(255, 255, 255, 0.15);
+  margin: 0 24rpx 24rpx;
+  padding: 24rpx 16rpx;
+  border-radius: $radius-xl;
+  backdrop-filter: blur(8px);
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+}
+
+.stat-value {
+  font-size: 26rpx;
+  font-weight: 700;
+  color: #fff;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.stat-label {
+  font-size: 22rpx;
+  color: rgba(255, 255, 255, 0.75);
+  margin-top: 4rpx;
+}
+
+.stat-divider {
+  width: 1rpx;
+  height: 40rpx;
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* ============ Sections ============ */
+.section-label {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: $muted-foreground;
+  padding: 24rpx 32rpx 8rpx;
+  font-family: 'Inter', sans-serif;
 }
 
 .card {
   background: $card;
   border-radius: $radius-xl;
   margin: 8rpx 24rpx 0;
-  padding: 10rpx 0;
   border: 1rpx solid $border;
   box-shadow: $shadow-sm;
-}
-
-.edit-section {
-  padding: 30rpx;
-}
-
-.edit-section .input-group {
-  background: $muted;
-  border-radius: $radius-lg;
-  padding: 16rpx 24rpx;
-  margin-bottom: 16rpx;
-  border: 1rpx solid $border;
-}
-
-.edit-section .input-group .label {
-  font-size: 24rpx;
-  color: $muted-foreground;
-  margin-bottom: 6rpx;
-  display: block;
-}
-
-.edit-section .input-group input {
-  height: 48rpx;
-  font-size: 28rpx;
-  font-family: 'Inter', sans-serif;
-}
-
-.picker-value {
-  height: 48rpx;
-  line-height: 48rpx;
-  font-size: 28rpx;
-  color: $foreground;
-}
-
-.save-btn {
-  margin-top: 10rpx;
-  height: 80rpx;
-  line-height: 80rpx;
-  border-radius: $radius-xl;
-  font-size: 30rpx;
-  background: $accent;
-  color: #fff;
-  border: none;
-  box-shadow: $shadow-accent;
-  font-family: 'Inter', sans-serif;
 }
 
 .menu-card {
@@ -672,21 +810,15 @@ onShow(() => {
   display: flex;
   align-items: center;
   padding: 26rpx 28rpx;
-  border-bottom: 1rpx solid rgba(226,232,240,0.6);
+  border-bottom: 1rpx solid rgba(226, 232, 240, 0.6);
   position: relative;
 
-  &:last-child {
-    border-bottom: none;
-  }
-
-  &:active {
-    background: $muted;
-  }
+  &:last-child { border-bottom: none; }
+  &:active { background: $muted; }
 }
 
 .menu-icon-wrap {
-  width: 64rpx;
-  height: 64rpx;
+  width: 64rpx; height: 64rpx;
   border-radius: $radius-lg;
   display: flex;
   align-items: center;
@@ -695,9 +827,7 @@ onShow(() => {
   flex-shrink: 0;
 }
 
-.menu-icon {
-  font-size: 32rpx;
-}
+.menu-icon { font-size: 32rpx; }
 
 .menu-text {
   flex: 1;
@@ -706,11 +836,28 @@ onShow(() => {
   font-family: 'Inter', sans-serif;
 }
 
+.danger-text { color: $uni-error; }
+
+.menu-badge-row {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.menu-badge {
+  font-size: 22rpx;
+  color: $accent;
+  background: rgba(16, 185, 129, 0.08);
+  padding: 4rpx 12rpx;
+  border-radius: $radius-full;
+}
+
 .menu-arrow {
   font-size: 32rpx;
   color: $border;
 }
 
+/* ============ Logout ============ */
 .logout-wrap {
   padding: 40rpx 24rpx 20rpx;
 }
@@ -728,33 +875,216 @@ onShow(() => {
   font-family: 'Inter', sans-serif;
 }
 
-.btn-logout::after {
-  border: none;
+.btn-logout::after { border: none; }
+
+/* ============ Bottom Sheet ============ */
+.sheet-mask {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(15, 23, 42, 0.5);
+  z-index: 999;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
 }
 
-.btn-delete-account {
+.sheet {
   background: $card;
+  border-radius: $radius-2xl $radius-2xl 0 0;
+  width: 100%;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  animation: sheetUp 0.3s ease;
+}
+
+.sheet-sm {
+  max-height: 60vh;
+}
+
+@keyframes sheetUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.sheet-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 32rpx 32rpx 20rpx;
+  border-bottom: 1rpx solid $border;
+  flex-shrink: 0;
+}
+
+.sheet-title {
+  font-size: 34rpx;
+  font-weight: 700;
+  color: $foreground;
+  font-family: 'Calistoga', cursive;
+}
+
+.sheet-close {
+  font-size: 36rpx;
   color: $muted-foreground;
+  padding: 8rpx;
+}
+
+.sheet-body {
+  padding: 24rpx 32rpx;
+  padding-bottom: calc(24rpx + env(safe-area-inset-bottom));
+  overflow-y: auto;
+  flex: 1;
+}
+
+/* ============ Form controls ============ */
+.form-group {
+  margin-bottom: 24rpx;
+}
+
+.form-label {
+  display: block;
+  font-size: 24rpx;
+  color: $muted-foreground;
+  margin-bottom: 10rpx;
+  font-weight: 500;
+}
+
+.form-input {
+  background: $muted;
   border: 1rpx solid $border;
-  border-radius: $radius-xl;
-  height: 88rpx;
-  line-height: 88rpx;
+  border-radius: $radius-lg;
+  padding: 20rpx 24rpx;
   font-size: 28rpx;
-  text-align: center;
-  margin-top: 16rpx;
+  color: $foreground;
+  width: 100%;
+  box-sizing: border-box;
   font-family: 'Inter', sans-serif;
 }
 
-.btn-delete-account::after {
-  border: none;
+.form-textarea {
+  background: $muted;
+  border: 1rpx solid $border;
+  border-radius: $radius-lg;
+  padding: 20rpx 24rpx;
+  font-size: 28rpx;
+  color: $foreground;
+  width: 100%;
+  min-height: 120rpx;
+  box-sizing: border-box;
+  font-family: 'Inter', sans-serif;
 }
 
-.delete-dialog {
-  .danger-title {
-    color: $uni-error;
+.form-hint {
+  display: block;
+  font-size: 22rpx;
+  color: $muted-foreground;
+  margin-top: 8rpx;
+}
+
+.gender-row {
+  display: flex;
+  gap: 16rpx;
+}
+
+.gender-chip {
+  flex: 1;
+  text-align: center;
+  padding: 16rpx 0;
+  border-radius: $radius-lg;
+  background: $muted;
+  border: 2rpx solid $border;
+  font-size: 28rpx;
+  color: $foreground;
+  transition: all 0.2s;
+
+  &.active {
+    background: rgba(16, 185, 129, 0.1);
+    border-color: $accent;
+    color: $accent;
+    font-weight: 600;
   }
 }
 
+.phone-row {
+  display: flex;
+  gap: 12rpx;
+  align-items: center;
+}
+
+.flex-1 { flex: 1; }
+
+.send-code-btn {
+  background: $accent;
+  color: #fff;
+  font-size: 24rpx;
+  padding: 16rpx 24rpx;
+  border-radius: $radius-lg;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Password strength */
+.pwd-strength {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  margin-top: 12rpx;
+}
+
+.pwd-bar {
+  flex: 1;
+  height: 8rpx;
+  background: $muted;
+  border-radius: 4rpx;
+  overflow: hidden;
+}
+
+.pwd-bar-fill {
+  height: 100%;
+  border-radius: 4rpx;
+  transition: width 0.3s, background 0.3s;
+  &.weak { background: $uni-error; }
+  &.medium { background: $uni-warning; }
+  &.strong { background: $uni-success; }
+}
+
+.pwd-strength-text {
+  font-size: 22rpx;
+  font-weight: 600;
+  &.weak { color: $uni-error; }
+  &.medium { color: $uni-warning; }
+  &.strong { color: $uni-success; }
+}
+
+/* Save button */
+.sheet-save-btn {
+  margin-top: 16rpx;
+  height: 88rpx;
+  line-height: 88rpx;
+  border-radius: $radius-xl;
+  font-size: 30rpx;
+  border: none;
+  font-family: 'Inter', sans-serif;
+  width: 100%;
+}
+
+.btn-primary {
+  background: $accent;
+  color: #fff;
+  box-shadow: $shadow-accent;
+}
+
+.btn-primary::after { border: none; }
+
+.btn-danger {
+  background: $uni-error;
+  color: #fff;
+  &[disabled] { opacity: 0.4; }
+}
+
+.btn-danger::after { border: none; }
+
+/* ============ Delete account ============ */
 .delete-warning {
   background: #FEF2F2;
   border-radius: $radius-lg;
@@ -769,7 +1099,6 @@ onShow(() => {
   color: $uni-error;
   font-weight: 600;
   margin-bottom: 12rpx;
-  font-family: 'Inter', sans-serif;
 }
 
 .warning-item {
@@ -785,7 +1114,6 @@ onShow(() => {
   align-items: flex-start;
   gap: 12rpx;
   margin: 20rpx 0;
-  padding: 0 4rpx;
 }
 
 .checkbox-icon {
@@ -802,129 +1130,14 @@ onShow(() => {
   line-height: 1.6;
 }
 
-.btn-delete-confirm {
-  flex: 1;
-  background: $uni-error;
-  color: #fff;
-  border: none;
-  border-radius: $radius-xl;
-  height: 80rpx;
-  line-height: 80rpx;
-  font-size: 28rpx;
-  font-family: 'Inter', sans-serif;
-  &[disabled] {
-    opacity: 0.4;
-  }
-}
+.danger-color { color: $uni-error; }
 
-.btn-delete-confirm::after {
-  border: none;
-}
-
-.dialog-mask {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(15, 23, 42, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 999;
-}
-
-.dialog {
-  background: $card;
-  border-radius: $radius-2xl;
-  width: 600rpx;
-  padding: 40rpx;
-  box-shadow: $shadow-lg;
-}
-
-.dialog-title {
-  font-size: 34rpx;
-  font-weight: 700;
-  text-align: center;
-  margin-bottom: 30rpx;
-  color: $foreground;
-  font-family: 'Calistoga', cursive;
-}
-
-.dialog .input-group {
-  background: $muted;
-  border-radius: $radius-lg;
-  padding: 16rpx 24rpx;
-  margin-bottom: 16rpx;
-  border: 1rpx solid $border;
-}
-
-.dialog .input-group .label {
-  font-size: 24rpx;
-  color: $muted-foreground;
-  margin-bottom: 6rpx;
-  display: block;
-}
-
-.dialog .input-group input {
-  height: 48rpx;
-  font-size: 28rpx;
-  font-family: 'Inter', sans-serif;
-}
-
-.dialog-actions {
-  display: flex;
-  gap: 20rpx;
-  margin-top: 20rpx;
-}
-
-.btn-dialog-cancel {
-  flex: 1;
-  background: $muted;
-  color: $foreground;
-  border: 1rpx solid $border;
-  border-radius: $radius-xl;
-  height: 80rpx;
-  line-height: 80rpx;
-  font-size: 28rpx;
-  font-family: 'Inter', sans-serif;
-}
-
-.btn-dialog-cancel::after {
-  border: none;
-}
-
-.btn-dialog-confirm {
-  flex: 1;
-  background: $accent;
-  color: #fff;
-  border: none;
-  border-radius: $radius-xl;
-  height: 80rpx;
-  line-height: 80rpx;
-  font-size: 28rpx;
-  font-family: 'Inter', sans-serif;
-  box-shadow: $shadow-accent;
-}
-
-.btn-dialog-confirm::after {
-  border: none;
-}
-
-.full-btn {
-  width: 100%;
-  margin-top: 20rpx;
-}
-
-.about-dialog {
-  text-align: center;
-}
-
-.about-content {
+/* ============ About ============ */
+.about-body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 20rpx 0;
+  text-align: center;
 }
 
 .about-logo {
@@ -941,15 +1154,18 @@ onShow(() => {
 
 .about-version {
   margin-top: 8rpx;
+  font-size: 24rpx;
   color: $muted-foreground;
 }
 
 .about-desc {
+  margin-top: 20rpx;
+  font-size: 26rpx;
   line-height: 1.8;
-  text-align: center;
   color: $muted-foreground;
 }
 
+/* ============ Safe area ============ */
 .safe-bottom {
   height: env(safe-area-inset-bottom);
 }

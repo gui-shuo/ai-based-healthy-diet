@@ -23,10 +23,34 @@ page {
   font-size: 28rpx;
   color: #0F172A;
   line-height: 1.6;
+  /* H5: ensure full width */
+  width: 100%;
+  min-width: 0;
+}
+
+/* H5: center content on wide screens */
+uni-page-body {
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
 }
 
 .container {
   padding: 20rpx 30rpx;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Two-column grid utility */
+.grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20rpx;
+}
+.grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20rpx;
 }
 
 /* Theme colors */
