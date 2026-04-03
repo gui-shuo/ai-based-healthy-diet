@@ -59,6 +59,19 @@ onMounted(async () => {
       return
     }
 
+    // APP 绑定模式：将code传回APP，由APP端完成绑定（APP有auth token）
+    if (stateStr.startsWith('app_bind')) {
+      const bindProvider = stateStr.replace('app_bind_', '') || provider
+      statusMsg.value = '正在返回APP...'
+      const params = new URLSearchParams({
+        action: 'bind',
+        code: String(code),
+        provider: bindProvider
+      })
+      window.location.href = `nutriai://callback?${params.toString()}`
+      return
+    }
+
     // Web 绑定模式：用户已登录，将QQ绑定到当前账号
     if (stateStr === 'bind') {
       if (provider === 'qq') {
@@ -91,7 +104,18 @@ onMounted(async () => {
     if (response.data.code === 200) {
       const loginData = response.data.data
 
-      // H5/APP redirect: pass token back to H5 app
+      // APP redirect: pass token back via URL scheme
+      if (stateStr.startsWith('app_')) {
+        const params = new URLSearchParams({
+          token: loginData.accessToken,
+          refreshToken: loginData.refreshToken || ''
+        })
+        statusMsg.value = '登录成功，正在返回APP...'
+        window.location.href = `nutriai://callback?${params.toString()}`
+        return
+      }
+
+      // H5 redirect: pass token back to H5 app
       if (stateStr.startsWith('h5_')) {
         const h5Base = window.location.origin + '/h5/'
         const params = new URLSearchParams({

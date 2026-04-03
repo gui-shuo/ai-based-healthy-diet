@@ -175,7 +175,11 @@ async function handleSocialLogin(provider: 'wechat' | 'qq') {
   }
   try {
     uni.showLoading({ title: '正在跳转...', mask: true })
-    const res = await socialAuthApi.getQqAuthUrl('h5_login') as any
+    let state = 'h5_login'
+    // #ifdef APP-PLUS
+    state = 'app_login'
+    // #endif
+    const res = await socialAuthApi.getQqAuthUrl(state) as any
     uni.hideLoading()
 
     if (res.code === 200 && res.data) {
@@ -185,7 +189,6 @@ async function handleSocialLogin(provider: 'wechat' | 'qq') {
       // #endif
       // #ifdef APP-PLUS
       plus.runtime.openURL(authUrl)
-      uni.showToast({ title: '请在浏览器中完成授权', icon: 'none', duration: 3000 })
       // #endif
     } else {
       uni.showToast({ title: res.message || '获取授权地址失败', icon: 'none' })

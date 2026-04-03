@@ -1,6 +1,7 @@
 package com.nutriai.controller;
 
 import com.nutriai.common.ApiResponse;
+import com.nutriai.config.AIConfig;
 import com.nutriai.entity.User;
 import com.nutriai.repository.UserRepository;
 import com.nutriai.service.AIService;
@@ -29,6 +30,7 @@ import java.util.Map;
 public class AIController {
     
     private final AIService aiService;
+    private final AIConfig aiConfig;
     private final UserRepository userRepository;
     private final OssService ossService;
     private final MemberPermissionService memberPermissionService;
@@ -119,7 +121,7 @@ public class AIController {
                 "message", response,
                 "timestamp", System.currentTimeMillis(),
                 "settings", Map.of(
-                    "model", chatRequest.getModel() != null ? chatRequest.getModel() : "qwen-max",
+                    "model", chatRequest.getModel() != null ? chatRequest.getModel() : aiConfig.getEffectiveModelName(),
                     "temperature", chatRequest.getTemperature() != null ? chatRequest.getTemperature() : 0.7,
                     "maxTokens", chatRequest.getMaxTokens() != null ? chatRequest.getMaxTokens() : 2000
                 )

@@ -91,7 +91,7 @@ public class AIService {
      */
     public String chat(Long userId, String userMessage, String model, Double temperature, Integer maxTokens, Boolean keepContext) {
         // 使用默认值
-        String actualModel = model != null ? model : "qwen-max";
+        String actualModel = model != null ? model : aiConfig.getEffectiveModelName();
         Double actualTemperature = temperature != null ? temperature : 0.7;
         Integer actualMaxTokens = maxTokens != null ? maxTokens : 2000;
         Boolean actualKeepContext = keepContext != null ? keepContext : true;

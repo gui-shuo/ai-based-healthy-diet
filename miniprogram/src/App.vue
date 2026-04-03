@@ -2,13 +2,60 @@
 import { onLaunch, onShow } from "@dcloudio/uni-app";
 import { useUserStore } from "@/stores/user";
 import { useAppStore } from "@/stores/app";
+import { setToken, setRefreshToken } from "@/utils/request";
 
-onLaunch(() => {
+onLaunch((options: any) => {
   const userStore = useUserStore();
   const appStore = useAppStore();
   userStore.restore();
   appStore.fetchConfig();
+
+  // #ifdef APP-PLUS
+  plus.globalEvent.addEventListener('newintent', () => {
+    const args = plus.runtime.arguments
+    if (args) handleSchemeUrl(args)
+  })
+  const launchArgs = plus.runtime.arguments
+  if (launchArgs) {
+    setTimeout(() => handleSchemeUrl(launchArgs), 500)
+  }
+  // #endif
 });
+
+// #ifdef APP-PLUS
+function handleSchemeUrl(url: string) {
+  try {
+    if (!url || !url.startsWith('nutriai://')) return
+    const urlObj = new URL(url.replace('nutriai://', 'https://nutriai.app/'))
+    const token = urlObj.searchParams.get('token')
+    const refreshToken = urlObj.searchParams.get('refreshToken')
+    const action = urlObj.searchParams.get('action')
+
+    if (action === 'bind') {
+      const bindCode = urlObj.searchParams.get('code')
+      const provider = urlObj.searchParams.get('provider')
+      if (bindCode && provider) {
+        // Navigate to social-callback page with bind params
+        uni.navigateTo({
+          url: `/pages/auth/social-callback?action=bind&code=${bindCode}&provider=${provider}`
+        })
+      }
+      return
+    }
+
+    if (token) {
+      setToken(token)
+      if (refreshToken) setRefreshToken(refreshToken)
+      const userStore = useUserStore()
+      userStore.restore()
+      userStore.fetchUserInfo()
+      uni.reLaunch({ url: '/pages/index/index' })
+    }
+  } catch (e) {
+    console.error('handleSchemeUrl error:', e)
+  }
+}
+// #endif
 
 onShow(() => {});
 </script>

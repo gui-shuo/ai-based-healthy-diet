@@ -48,7 +48,9 @@
                     "<uses-permission android:name=\"android.permission.READ_EXTERNAL_STORAGE\"/>",
                     "<uses-permission android:name=\"android.permission.WRITE_EXTERNAL_STORAGE\"/>"
                 ],
-                "minSdkVersion" : 21
+                "minSdkVersion" : 21,
+                "abiFilters" : ["armeabi-v7a", "arm64-v8a"],
+                "schemes" : "nutriai"
             },
             "icons" : {
                 "android" : {

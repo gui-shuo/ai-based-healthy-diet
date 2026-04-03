@@ -1,5 +1,6 @@
 package com.nutriai.config;
 
+import com.nutriai.service.DynamicConfigService;
 import com.qcloud.cos.COSClient;
 import com.qcloud.cos.ClientConfig;
 import com.qcloud.cos.auth.BasicCOSCredentials;
@@ -10,6 +11,7 @@ import com.qcloud.cos.model.CORSRule;
 import com.qcloud.cos.region.Region;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -39,6 +41,9 @@ public class CosConfig {
 
     @Value("${cors.allowed-origins:*}")
     private String allowedOrigins;
+
+    @Autowired(required = false)
+    private DynamicConfigService dynamicConfig;
 
     @Bean
     public COSClient cosClient() {
@@ -81,11 +86,16 @@ public class CosConfig {
     }
 
     /**
-     * 获取COS下载域名（优先使用自定义域名，用于APK等受限文件）
+     * 获取COS下载域名（优先使用DB配置的自定义域名）
      */
     public String getDownloadBaseUrl() {
-        if (customDomain != null && !customDomain.isBlank()) {
-            return "https://" + customDomain;
+        String domain = dynamicConfig != null
+                ? dynamicConfig.getString("cos.custom_domain", "tencent.cos.custom-domain", customDomain)
+                : customDomain;
+        if (domain != null && !domain.isBlank()) {
+            String d = domain.trim();
+            if (!d.startsWith("http")) d = "https://" + d;
+            return d;
         }
         return getCosBaseUrl();
     }

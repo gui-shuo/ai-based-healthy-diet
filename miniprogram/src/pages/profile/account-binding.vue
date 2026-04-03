@@ -163,7 +163,10 @@ async function handleBind(provider: 'wechat' | 'qq') {
   const loading = provider === 'wechat' ? bindingWechat : bindingQq
   loading.value = true
   try {
-    const state = `h5_bind_${provider}`
+    let state = `h5_bind_${provider}`
+    // #ifdef APP-PLUS
+    state = `app_bind_${provider}`
+    // #endif
     const res = provider === 'wechat'
       ? await socialAuthApi.getWechatAuthUrl(state) as any
       : await socialAuthApi.getQqAuthUrl(state) as any
@@ -174,7 +177,6 @@ async function handleBind(provider: 'wechat' | 'qq') {
       // #endif
       // #ifdef APP-PLUS
       plus.runtime.openURL(res.data)
-      uni.showToast({ title: '请在浏览器中完成绑定', icon: 'none', duration: 3000 })
       // #endif
     } else {
       uni.showToast({ title: res.message || '获取授权地址失败', icon: 'none' })
