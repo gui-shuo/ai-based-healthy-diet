@@ -390,7 +390,13 @@ a {
 }
 
 /* --- Message / Notification --- */
+/* Force ElMessage to stay at viewport top (fixes position in full-height pages) */
+body > .el-message {
+  position: fixed !important;
+}
+
 .el-message {
+  z-index: 99999 !important;
 }
 
 .el-notification {

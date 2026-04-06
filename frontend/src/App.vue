@@ -19,6 +19,8 @@ const isDark = computed(() => themeStore.isDark)
 <style>
 #app {
   min-height: 100vh;
+  max-height: 100vh;
+  overflow-y: auto;
   background-color: #FAFAFA;
   transition: background-color 0.3s ease;
   font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;
@@ -27,12 +29,11 @@ const isDark = computed(() => themeStore.isDark)
 /* 页面切换动画 */
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.2s ease, transform 0.2s ease;
+  transition: opacity 0.2s ease;
 }
 
 .fade-enter-from {
   opacity: 0;
-  transform: translateY(8px);
 }
 
 .fade-leave-to {

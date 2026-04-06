@@ -83,7 +83,6 @@ public class AIWebSocketHandler extends TextWebSocketHandler {
         }
         
         String payload = message.getPayload();
-        log.info("📨 收到WebSocket消息: userId={}, 消息长度={}", userId, payload.length());
         
         try {
             // 解析消息
@@ -93,6 +92,7 @@ public class AIWebSocketHandler extends TextWebSocketHandler {
             String type = (String) request.get("type");
             
             if ("chat".equals(type)) {
+                log.info("📨 收到AI对话消息: userId={}, 消息长度={}", userId, payload.length());
                 handleChatMessage(session, userId, request);
             } else if ("ping".equals(type)) {
                 handlePingMessage(session);
