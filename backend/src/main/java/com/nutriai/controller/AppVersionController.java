@@ -59,8 +59,11 @@ public class AppVersionController {
             @RequestParam Integer versionCode,
             @RequestParam(defaultValue = "android") String platform,
             @RequestParam(required = false) String description) {
+        // Upload file first (slow I/O, outside DB transaction)
+        String downloadUrl = appVersionService.uploadApkFile(file);
+        // Save version record (fast DB transaction)
         AppVersion version = appVersionService.createVersion(
-                versionName, versionCode, platform, description, file);
+                versionName, versionCode, platform, description, downloadUrl, file.getSize());
         return ApiResponse.success("版本上传成功", version);
     }
 

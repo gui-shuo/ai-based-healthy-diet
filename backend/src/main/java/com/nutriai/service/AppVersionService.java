@@ -22,14 +22,18 @@ public class AppVersionService {
     private final OssService ossService;
 
     /**
-     * 上传新版本
+     * 上传APK文件到COS（不开启事务，避免长时间占用DB连接）
+     */
+    public String uploadApkFile(MultipartFile file) {
+        return ossService.uploadApk(file);
+    }
+
+    /**
+     * 保存版本记录（短事务，仅DB操作）
      */
     @Transactional
     public AppVersion createVersion(String versionName, Integer versionCode, String platform,
-                                     String description, MultipartFile file) {
-        String downloadUrl = ossService.uploadApk(file);
-
-        // Clear previous latest flag
+                                     String description, String downloadUrl, long fileSize) {
         appVersionRepository.clearLatestByPlatform(platform);
 
         AppVersion version = AppVersion.builder()
@@ -38,7 +42,7 @@ public class AppVersionService {
                 .platform(platform)
                 .description(description)
                 .downloadUrl(downloadUrl)
-                .fileSize(file.getSize())
+                .fileSize(fileSize)
                 .isLatest(true)
                 .downloadCount(0)
                 .build();
