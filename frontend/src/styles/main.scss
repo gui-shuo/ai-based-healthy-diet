@@ -390,13 +390,52 @@ a {
 }
 
 /* --- Message / Notification --- */
-/* Force ElMessage to stay at viewport top (fixes position in full-height pages) */
-body > .el-message {
-  position: fixed !important;
+.el-message {
+  /* Center horizontally, position at top of viewport */
+  top: 20px !important;
+  border-radius: 12px !important;
+  padding: 12px 20px !important;
+  font-family: 'Inter', 'PingFang SC', sans-serif !important;
+  font-size: 14px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+  border: 1px solid rgba(0, 0, 0, 0.06) !important;
+  z-index: 99999 !important;
 }
 
-.el-message {
-  z-index: 99999 !important;
+.el-message--success {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(52, 211, 153, 0.08)) !important;
+  border-color: rgba(16, 185, 129, 0.2) !important;
+}
+
+.el-message--success .el-message__content {
+  color: #065F46 !important;
+}
+
+.el-message--error {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.08), rgba(248, 113, 113, 0.08)) !important;
+  border-color: rgba(239, 68, 68, 0.2) !important;
+}
+
+.el-message--error .el-message__content {
+  color: #991B1B !important;
+}
+
+.el-message--warning {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.08), rgba(251, 191, 36, 0.08)) !important;
+  border-color: rgba(245, 158, 11, 0.2) !important;
+}
+
+.el-message--warning .el-message__content {
+  color: #92400E !important;
+}
+
+.el-message--info {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(129, 140, 248, 0.08)) !important;
+  border-color: rgba(99, 102, 241, 0.2) !important;
+}
+
+.el-message--info .el-message__content {
+  color: #3730A3 !important;
 }
 
 .el-notification {

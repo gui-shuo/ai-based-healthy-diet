@@ -19,8 +19,6 @@ const isDark = computed(() => themeStore.isDark)
 <style>
 #app {
   min-height: 100vh;
-  max-height: 100vh;
-  overflow-y: auto;
   background-color: #FAFAFA;
   transition: background-color 0.3s ease;
   font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;

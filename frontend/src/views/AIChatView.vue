@@ -933,6 +933,11 @@ watch(
 
 // 生命周期
 onMounted(async () => {
+  // Reset body scroll to prevent ElMessage from appearing at wrong position
+  document.documentElement.scrollTop = 0
+  document.body.scrollTop = 0
+  document.body.style.overflow = 'hidden'
+
   loadSettings()
   loadHistoryList()
   document.addEventListener('keydown', handleKeydown)
@@ -948,6 +953,7 @@ onMounted(async () => {
 })
 
 onUnmounted(() => {
+  document.body.style.overflow = ''
   document.removeEventListener('keydown', handleKeydown)
   stopWaitingTimer()
   wsClient.close(false)
