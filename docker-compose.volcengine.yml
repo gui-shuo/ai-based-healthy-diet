@@ -110,7 +110,7 @@ services:
       - nutriai-network
 
   h5:
-    image: heyitshuo/nutriai-h5:v202604061920
+    image: heyitshuo/nutriai-h5:v202604062047
     container_name: nutriai-h5
     restart: always
     depends_on:
