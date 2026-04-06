@@ -1,6 +1,6 @@
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import App from './App.vue'
 import router from './router'
 
@@ -8,13 +8,34 @@ import router from './router'
 import './styles/main.scss'
 import 'element-plus/theme-chalk/dark/css-vars.css'
 
-// Patch ElMessage globally — all imports share the same object reference,
-// so every ElMessage call across all files will get showClose + grouping.
+// ---- Global ElMessage patch ----
+// Every call across all files gets showClose + grouping automatically.
 ;['success', 'error', 'warning', 'info'].forEach(type => {
   const orig = ElMessage[type]
   ElMessage[type] = (options) => {
     if (typeof options === 'string') options = { message: options }
     return orig({ showClose: true, grouping: true, offset: 0, ...options })
+  }
+})
+
+// ---- Global ElMessageBox patch ----
+// Every confirm/prompt/alert gets consistent styling + showClose.
+const msgBoxDefaults = {
+  showClose: true,
+  closeOnClickModal: false,
+  draggable: false,
+  customClass: 'nutriai-msgbox',
+  confirmButtonText: '确定',
+  cancelButtonText: '取消',
+}
+;['confirm', 'prompt', 'alert'].forEach(method => {
+  const orig = ElMessageBox[method]
+  ElMessageBox[method] = (message, title, options) => {
+    if (typeof title === 'object') {
+      options = title
+      title = ''
+    }
+    return orig(message, title, { ...msgBoxDefaults, ...options })
   }
 })
 
