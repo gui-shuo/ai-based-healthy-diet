@@ -136,7 +136,10 @@ export const socialAuthApi = {
   bindQq: (code: string, state = '') => request({ url: '/auth/social/bind/qq', method: 'POST', data: { code, state } }),
   bindQqToken: (accessToken: string) => request({ url: '/auth/social/bind/qq-token', method: 'POST', data: { access_token: accessToken } }),
   unbindWechat: () => request({ url: '/auth/social/unbind/wechat', method: 'DELETE' }),
-  unbindQq: () => request({ url: '/auth/social/unbind/qq', method: 'DELETE' })
+  unbindQq: () => request({ url: '/auth/social/unbind/qq', method: 'DELETE' }),
+  bindEmail: (email: string, code: string) => request({ url: '/auth/social/bind-email', method: 'POST', data: { email, code } }),
+  sendMergeCode: (email: string) => request({ url: '/auth/social/merge/send-code', method: 'POST', data: { email } }),
+  mergeToEmail: (email: string, code: string) => request({ url: '/auth/social/merge/confirm', method: 'POST', data: { email, code } }),
 }
 
 // ============ Announcements ============

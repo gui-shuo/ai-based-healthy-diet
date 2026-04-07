@@ -11,6 +11,7 @@ import com.nutriai.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +22,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 第三方社交登录服务
@@ -36,6 +38,12 @@ public class SocialAuthService {
     private final BCryptPasswordEncoder passwordEncoder;
     private final ObjectMapper objectMapper;
     private final DynamicConfigService dynamicConfigService;
+    private final RedisTemplate<String, Object> redisTemplate;
+    private final EmailService emailService;
+
+    private static final String MERGE_CODE_PREFIX = "merge:email:";
+    private static final String MERGE_RATE_PREFIX = "merge:rate:";
+    private static final int MERGE_CODE_EXPIRE_MINUTES = 5;
 
     // 微信开放平台（网页应用，区别于小程序）
     @Value("${social.wechat.app-id:}")
@@ -305,6 +313,7 @@ public class SocialAuthService {
     /**
      * QQ APP原生SDK绑定（使用access_token）
      * 存储到qq_app_open_id字段
+     * 也处理"补充APP openId"场景（已有web openId，缺app openId）
      */
     @Transactional
     @SuppressWarnings("unchecked")
@@ -313,7 +322,7 @@ public class SocialAuthService {
                 .orElseThrow(BusinessException.Auth::userNotFound);
 
         if (user.getQqAppOpenId() != null && !user.getQqAppOpenId().isBlank()) {
-            throw new BusinessException(400, "已绑定QQ账号（APP端），请先解绑");
+            throw new BusinessException(400, "APP端QQ已验证，无需重复操作");
         }
 
         // 用access_token获取OpenID
@@ -326,13 +335,21 @@ public class SocialAuthService {
             throw new BusinessException(500, "获取QQ openid失败");
         }
 
-        if (userRepository.findByQqAppOpenId(openId).isPresent()) {
+        // 检查此APP openId是否已被其他用户使用
+        var existingUser = userRepository.findByQqAppOpenId(openId);
+        if (existingUser.isPresent() && !existingUser.get().getId().equals(userId)) {
             throw new BusinessException(400, "该QQ号已绑定其他账号，请先注销该账号后再绑定");
         }
 
         user.setQqAppOpenId(openId);
         userRepository.save(user);
-        log.info("用户APP端绑定QQ: userId={}, appOpenId={}", userId, openId);
+
+        boolean wasSupplementary = user.getQqOpenId() != null && !user.getQqOpenId().isBlank();
+        if (wasSupplementary) {
+            log.info("用户补充APP端QQ验证: userId={}, appOpenId={}", userId, openId);
+        } else {
+            log.info("用户APP端绑定QQ: userId={}, appOpenId={}", userId, openId);
+        }
     }
 
     // ==================== 账号绑定 ====================
@@ -343,13 +360,17 @@ public class SocialAuthService {
     public SocialBindInfo getBindInfo(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(BusinessException.Auth::userNotFound);
-        boolean qqBound = (user.getQqOpenId() != null && !user.getQqOpenId().isBlank())
-                       || (user.getQqAppOpenId() != null && !user.getQqAppOpenId().isBlank());
+        boolean hasWebQq = user.getQqOpenId() != null && !user.getQqOpenId().isBlank();
+        boolean hasAppQq = user.getQqAppOpenId() != null && !user.getQqAppOpenId().isBlank();
+        boolean qqBound = hasWebQq || hasAppQq;
+        // 有web openId但缺app openId时，APP端需要补充验证
+        boolean qqNeedAppVerify = hasWebQq && !hasAppQq;
         return SocialBindInfo.builder()
                 .wechatBound(user.getWxOpenId() != null && !user.getWxOpenId().isBlank())
                 .wechatNickname(user.getWxOpenId() != null ? "已绑定" : null)
                 .qqBound(qqBound)
                 .qqNickname(qqBound ? "已绑定" : null)
+                .qqNeedAppVerify(qqNeedAppVerify)
                 .build();
     }
 
@@ -535,5 +556,139 @@ public class SocialAuthService {
             log.error("{}接口调用失败: url={}", label, url, e);
             throw new BusinessException(500, label + "登录服务暂时不可用");
         }
+    }
+
+    // ==================== 账号合并 ====================
+
+    /**
+     * 发送合并验证码到目标邮箱
+     * 当前用户（QQ注册的新账号）要合并到已有邮箱账号
+     */
+    public void sendMergeCode(Long currentUserId, String targetEmail) {
+        // 当前用户必须是QQ注册的（无邮箱）
+        User currentUser = userRepository.findById(currentUserId)
+                .orElseThrow(BusinessException.Auth::userNotFound);
+        if (currentUser.getEmail() != null && !currentUser.getEmail().isBlank()) {
+            throw new BusinessException(400, "您已绑定邮箱，无需合并");
+        }
+
+        // 目标邮箱必须已被占用
+        var targetOpt = userRepository.findByEmail(targetEmail);
+        if (targetOpt.isEmpty()) {
+            throw new BusinessException(400, "该邮箱未注册，请直接绑定邮箱");
+        }
+
+        // 频率限制
+        String rateLimitKey = MERGE_RATE_PREFIX + targetEmail;
+        if (Boolean.TRUE.equals(redisTemplate.hasKey(rateLimitKey))) {
+            throw new BusinessException(429, "发送过于频繁，请1分钟后重试");
+        }
+
+        // 生成验证码
+        StringBuilder code = new StringBuilder();
+        for (int i = 0; i < 6; i++) {
+            code.append((int) (Math.random() * 10));
+        }
+        String mergeCode = code.toString();
+
+        String redisKey = MERGE_CODE_PREFIX + targetEmail;
+        redisTemplate.opsForValue().set(redisKey, mergeCode, MERGE_CODE_EXPIRE_MINUTES, TimeUnit.MINUTES);
+        redisTemplate.opsForValue().set(rateLimitKey, "1", 1, TimeUnit.MINUTES);
+
+        try {
+            emailService.sendMergeCode(targetEmail, currentUser.getNickname() != null ? currentUser.getNickname() : currentUser.getUsername(), mergeCode);
+            log.info("账号合并验证码已发送: targetEmail={}, currentUserId={}", targetEmail, currentUserId);
+        } catch (Exception e) {
+            log.error("发送合并验证码失败: targetEmail={}", targetEmail, e);
+            redisTemplate.delete(redisKey);
+            throw new BusinessException(500, "验证码发送失败，请稍后重试");
+        }
+    }
+
+    /**
+     * 执行账号合并：将当前QQ账号的社交绑定迁移到目标邮箱账号
+     * 当前账号将被删除
+     */
+    @Transactional
+    public LoginResponse mergeToEmail(Long currentUserId, String targetEmail, String code, String ipAddress) {
+        // 验证code
+        String redisKey = MERGE_CODE_PREFIX + targetEmail;
+        String storedCode = (String) redisTemplate.opsForValue().get(redisKey);
+        if (storedCode == null || !storedCode.equals(code)) {
+            throw new BusinessException(400, "验证码错误或已过期");
+        }
+        redisTemplate.delete(redisKey);
+
+        User currentUser = userRepository.findById(currentUserId)
+                .orElseThrow(BusinessException.Auth::userNotFound);
+        User targetUser = userRepository.findByEmail(targetEmail)
+                .orElseThrow(() -> new BusinessException(400, "目标邮箱账号不存在"));
+
+        if (currentUser.getId().equals(targetUser.getId())) {
+            throw new BusinessException(400, "不能合并到自己的账号");
+        }
+
+        // 迁移QQ绑定信息到目标账号
+        if (currentUser.getQqOpenId() != null && !currentUser.getQqOpenId().isBlank()) {
+            if (targetUser.getQqOpenId() == null || targetUser.getQqOpenId().isBlank()) {
+                targetUser.setQqOpenId(currentUser.getQqOpenId());
+            }
+        }
+        if (currentUser.getQqAppOpenId() != null && !currentUser.getQqAppOpenId().isBlank()) {
+            if (targetUser.getQqAppOpenId() == null || targetUser.getQqAppOpenId().isBlank()) {
+                targetUser.setQqAppOpenId(currentUser.getQqAppOpenId());
+            }
+        }
+        if (currentUser.getWxOpenId() != null && !currentUser.getWxOpenId().isBlank()) {
+            if (targetUser.getWxOpenId() == null || targetUser.getWxOpenId().isBlank()) {
+                targetUser.setWxOpenId(currentUser.getWxOpenId());
+            }
+        }
+
+        // 清除当前用户的社交绑定再删除（避免唯一索引冲突）
+        currentUser.setQqOpenId(null);
+        currentUser.setQqAppOpenId(null);
+        currentUser.setWxOpenId(null);
+        userRepository.save(currentUser);
+        userRepository.flush();
+
+        // 保存目标用户
+        userRepository.save(targetUser);
+
+        // 删除当前QQ注册的临时账号
+        userRepository.delete(currentUser);
+
+        log.info("账号合并成功: sourceUserId={} -> targetUserId={}, targetEmail={}", currentUserId, targetUser.getId(), targetEmail);
+
+        return buildLoginResponse(targetUser, ipAddress);
+    }
+
+    /**
+     * 绑定邮箱（当前用户没有邮箱，给QQ注册的账号绑定邮箱）
+     */
+    @Transactional
+    public void bindEmail(Long userId, String email, String code) {
+        // 验证code (使用注册验证码前缀)
+        String redisKey = "register:email:" + email;
+        String storedCode = (String) redisTemplate.opsForValue().get(redisKey);
+        if (storedCode == null || !storedCode.equals(code)) {
+            throw new BusinessException(400, "验证码错误或已过期");
+        }
+        redisTemplate.delete(redisKey);
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(BusinessException.Auth::userNotFound);
+
+        if (user.getEmail() != null && !user.getEmail().isBlank()) {
+            throw new BusinessException(400, "已绑定邮箱");
+        }
+
+        if (userRepository.findByEmail(email).isPresent()) {
+            throw new BusinessException(409, "该邮箱已被其他账号使用，可选择账号合并");
+        }
+
+        user.setEmail(email);
+        userRepository.save(user);
+        log.info("用户绑定邮箱成功: userId={}, email={}", userId, email);
     }
 }

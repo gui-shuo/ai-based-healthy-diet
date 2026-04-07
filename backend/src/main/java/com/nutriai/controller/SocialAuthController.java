@@ -154,6 +154,59 @@ public class SocialAuthController {
         return ApiResponse.success("QQ已解绑", null);
     }
 
+    // ==================== 账号合并与邮箱绑定 ====================
+
+    /**
+     * 绑定邮箱（QQ注册的账号绑定邮箱）
+     */
+    @PostMapping("/bind-email")
+    public ApiResponse<Void> bindEmail(
+            @RequestBody Map<String, String> body,
+            HttpServletRequest request) {
+        Long userId = (Long) request.getAttribute("userId");
+        String email = body.get("email");
+        String code = body.get("code");
+        if (email == null || email.isBlank() || code == null || code.isBlank()) {
+            return ApiResponse.error(400, "邮箱和验证码不能为空");
+        }
+        socialAuthService.bindEmail(userId, email, code);
+        return ApiResponse.success("邮箱绑定成功", null);
+    }
+
+    /**
+     * 发送账号合并验证码
+     */
+    @PostMapping("/merge/send-code")
+    public ApiResponse<Void> sendMergeCode(
+            @RequestBody Map<String, String> body,
+            HttpServletRequest request) {
+        Long userId = (Long) request.getAttribute("userId");
+        String email = body.get("email");
+        if (email == null || email.isBlank()) {
+            return ApiResponse.error(400, "邮箱不能为空");
+        }
+        socialAuthService.sendMergeCode(userId, email);
+        return ApiResponse.success("验证码已发送", null);
+    }
+
+    /**
+     * 执行账号合并
+     */
+    @PostMapping("/merge/confirm")
+    public ApiResponse<LoginResponse> mergeToEmail(
+            @RequestBody Map<String, String> body,
+            HttpServletRequest request) {
+        Long userId = (Long) request.getAttribute("userId");
+        String email = body.get("email");
+        String code = body.get("code");
+        if (email == null || email.isBlank() || code == null || code.isBlank()) {
+            return ApiResponse.error(400, "邮箱和验证码不能为空");
+        }
+        String ip = getClientIp(request);
+        LoginResponse response = socialAuthService.mergeToEmail(userId, email, code, ip);
+        return ApiResponse.success("账号合并成功", response);
+    }
+
     private String getClientIp(HttpServletRequest request) {
         String ip = request.getHeader("X-Forwarded-For");
         if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {

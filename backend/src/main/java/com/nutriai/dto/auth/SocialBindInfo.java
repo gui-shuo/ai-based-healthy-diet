@@ -19,4 +19,7 @@ public class SocialBindInfo {
     
     private boolean qqBound;
     private String qqNickname;
+
+    /** APP端需要补充QQ验证（有web openId但缺app openId） */
+    private boolean qqNeedAppVerify;
 }
