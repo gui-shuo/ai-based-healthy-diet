@@ -97,4 +97,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
      * 根据QQ OpenID查找用户
      */
     Optional<User> findByQqOpenId(String qqOpenId);
+    
+    /**
+     * 根据QQ APP OpenID查找用户（移动应用）
+     */
+    Optional<User> findByQqAppOpenId(String qqAppOpenId);
 }

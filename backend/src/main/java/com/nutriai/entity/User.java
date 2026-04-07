@@ -71,6 +71,9 @@ public class User {
     @Column(name = "qq_open_id", unique = true, length = 100)
     private String qqOpenId;
     
+    @Column(name = "qq_app_open_id", unique = true, length = 100)
+    private String qqAppOpenId;
+    
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
     

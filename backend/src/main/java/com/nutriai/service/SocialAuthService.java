@@ -6,6 +6,7 @@ import com.nutriai.dto.auth.SocialBindInfo;
 import com.nutriai.entity.User;
 import com.nutriai.exception.BusinessException;
 import com.nutriai.repository.UserRepository;
+import com.nutriai.service.DynamicConfigService;
 import com.nutriai.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +35,7 @@ public class SocialAuthService {
     private final JwtUtil jwtUtil;
     private final BCryptPasswordEncoder passwordEncoder;
     private final ObjectMapper objectMapper;
+    private final DynamicConfigService dynamicConfigService;
 
     // 微信开放平台（网页应用，区别于小程序）
     @Value("${social.wechat.app-id:}")
@@ -133,20 +135,29 @@ public class SocialAuthService {
 
     // ==================== QQ OAuth2登录 ====================
 
-    /** 统一使用网站应用(QQ_WEB_ID)凭据，确保所有平台获得一致的openId */
-    private String getQqId(String state) {
-        return (qqWebId != null && !qqWebId.isBlank()) ? qqWebId : qqAppId;
+    /** Web端使用网站应用凭据 */
+    private String getQqWebId() {
+        return dynamicConfigService.getString("QQ_WEB_ID", qqWebId);
     }
 
-    private String getQqKey(String state) {
-        return (qqWebKey != null && !qqWebKey.isBlank()) ? qqWebKey : qqAppKey;
+    private String getQqWebKey() {
+        return dynamicConfigService.getString("QQ_WEB_KEY", qqWebKey);
+    }
+
+    /** APP端使用移动应用凭据 */
+    private String getQqAppId() {
+        return dynamicConfigService.getString("QQ_APP_ID", qqAppId);
+    }
+
+    private String getQqAppKey() {
+        return dynamicConfigService.getString("QQ_APP_KEY", qqAppKey);
     }
 
     /**
      * 获取QQ授权URL
      */
     public String getQqAuthUrl(String state) {
-        String clientId = getQqId(state);
+        String clientId = getQqWebId();
         if (clientId == null || clientId.isBlank()) {
             throw new BusinessException(500, "QQ互联配置未完成");
         }
@@ -165,8 +176,8 @@ public class SocialAuthService {
     @Transactional
     @SuppressWarnings("unchecked")
     public LoginResponse qqLogin(String code, String ipAddress, String state) {
-        String clientId = getQqId(state);
-        String clientSecret = getQqKey(state);
+        String clientId = getQqWebId();
+        String clientSecret = getQqWebKey();
         if (clientId == null || clientId.isBlank()) {
             throw new BusinessException(500, "QQ互联配置未完成，请联系管理员");
         }
@@ -228,6 +239,7 @@ public class SocialAuthService {
 
     /**
      * QQ APP原生SDK登录（使用access_token而非code）
+     * 使用QQ_APP_ID（移动应用），openId存储在qq_app_open_id字段
      */
     @Transactional
     @SuppressWarnings("unchecked")
@@ -244,7 +256,7 @@ public class SocialAuthService {
         String clientId = (String) openIdResp.get("client_id");
 
         // 2. 获取用户信息
-        String consumerKey = (clientId != null && !clientId.isBlank()) ? clientId : getQqId("app_");
+        String consumerKey = (clientId != null && !clientId.isBlank()) ? clientId : getQqAppId();
         String userInfoUrl = String.format(
             "https://graph.qq.com/user/get_user_info?access_token=%s&oauth_consumer_key=%s&openid=%s",
             accessToken, consumerKey, openId
@@ -256,28 +268,43 @@ public class SocialAuthService {
             avatar = avatar.replaceFirst("http://", "https://");
         }
 
-        // 3. 查找或创建用户
-        User user = userRepository.findByQqOpenId(openId).orElse(null);
-        if (user == null) {
-            String autoUsername = "qq_" + UUID.randomUUID().toString().substring(0, 12);
-            user = User.builder()
-                    .username(autoUsername)
-                    .password(passwordEncoder.encode(UUID.randomUUID().toString()))
-                    .qqOpenId(openId)
-                    .nickname(nickname)
-                    .avatar(avatar.isEmpty() ? null : avatar)
-                    .role("USER")
-                    .status("ACTIVE")
-                    .build();
-            userRepository.save(user);
-            log.info("QQ APP原生登录注册: openId={}, username={}", openId, autoUsername);
+        // 3. 先按APP openId查找，再按Web openId查找（双校验）
+        User user = userRepository.findByQqAppOpenId(openId).orElse(null);
+        if (user != null) {
+            log.info("QQ APP登录（APP openId匹配）: openId={}, userId={}, username={}", openId, user.getId(), user.getUsername());
+            return buildLoginResponse(user, ipAddress);
         }
+
+        // APP openId未匹配，尝试按web openId查找（不太可能匹配，但作为兜底）
+        user = userRepository.findByQqOpenId(openId).orElse(null);
+        if (user != null) {
+            // 同时存储APP openId
+            user.setQqAppOpenId(openId);
+            userRepository.save(user);
+            log.info("QQ APP登录（Web openId匹配，补充存储APP openId）: openId={}, userId={}", openId, user.getId());
+            return buildLoginResponse(user, ipAddress);
+        }
+
+        // 4. 未找到用户，注册新用户
+        String autoUsername = "qq_" + UUID.randomUUID().toString().substring(0, 12);
+        user = User.builder()
+                .username(autoUsername)
+                .password(passwordEncoder.encode(UUID.randomUUID().toString()))
+                .qqAppOpenId(openId)
+                .nickname(nickname)
+                .avatar(avatar.isEmpty() ? null : avatar)
+                .role("USER")
+                .status("ACTIVE")
+                .build();
+        userRepository.save(user);
+        log.info("QQ APP原生登录注册: appOpenId={}, username={}", openId, autoUsername);
 
         return buildLoginResponse(user, ipAddress);
     }
 
     /**
-     * QQ APP原生SDK绑定（使用access_token而非code）
+     * QQ APP原生SDK绑定（使用access_token）
+     * 存储到qq_app_open_id字段
      */
     @Transactional
     @SuppressWarnings("unchecked")
@@ -285,8 +312,8 @@ public class SocialAuthService {
         User user = userRepository.findById(userId)
                 .orElseThrow(BusinessException.Auth::userNotFound);
 
-        if (user.getQqOpenId() != null && !user.getQqOpenId().isBlank()) {
-            throw new BusinessException(400, "已绑定QQ账号，请先解绑");
+        if (user.getQqAppOpenId() != null && !user.getQqAppOpenId().isBlank()) {
+            throw new BusinessException(400, "已绑定QQ账号（APP端），请先解绑");
         }
 
         // 用access_token获取OpenID
@@ -299,13 +326,13 @@ public class SocialAuthService {
             throw new BusinessException(500, "获取QQ openid失败");
         }
 
-        if (userRepository.findByQqOpenId(openId).isPresent()) {
+        if (userRepository.findByQqAppOpenId(openId).isPresent()) {
             throw new BusinessException(400, "该QQ号已绑定其他账号，请先注销该账号后再绑定");
         }
 
-        user.setQqOpenId(openId);
+        user.setQqAppOpenId(openId);
         userRepository.save(user);
-        log.info("用户APP原生绑定QQ: userId={}, openId={}", userId, openId);
+        log.info("用户APP端绑定QQ: userId={}, appOpenId={}", userId, openId);
     }
 
     // ==================== 账号绑定 ====================
@@ -316,11 +343,13 @@ public class SocialAuthService {
     public SocialBindInfo getBindInfo(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(BusinessException.Auth::userNotFound);
+        boolean qqBound = (user.getQqOpenId() != null && !user.getQqOpenId().isBlank())
+                       || (user.getQqAppOpenId() != null && !user.getQqAppOpenId().isBlank());
         return SocialBindInfo.builder()
                 .wechatBound(user.getWxOpenId() != null && !user.getWxOpenId().isBlank())
                 .wechatNickname(user.getWxOpenId() != null ? "已绑定" : null)
-                .qqBound(user.getQqOpenId() != null && !user.getQqOpenId().isBlank())
-                .qqNickname(user.getQqOpenId() != null ? "已绑定" : null)
+                .qqBound(qqBound)
+                .qqNickname(qqBound ? "已绑定" : null)
                 .build();
     }
 
@@ -368,8 +397,8 @@ public class SocialAuthService {
     @Transactional
     @SuppressWarnings("unchecked")
     public void bindQq(Long userId, String code, String state) {
-        String clientId = getQqId(state);
-        String clientSecret = getQqKey(state);
+        String clientId = getQqWebId();
+        String clientSecret = getQqWebKey();
         if (clientId == null || clientId.isBlank()) {
             throw new BusinessException(500, "QQ互联配置未完成");
         }
@@ -430,6 +459,7 @@ public class SocialAuthService {
                 .orElseThrow(BusinessException.Auth::userNotFound);
         ensureHasOtherLogin(user, "qq");
         user.setQqOpenId(null);
+        user.setQqAppOpenId(null);
         userRepository.save(user);
         log.info("用户解绑QQ: userId={}", userId);
     }
@@ -442,7 +472,10 @@ public class SocialAuthService {
     private void ensureHasOtherLogin(User user, String unbinding) {
         boolean hasEmail = user.getEmail() != null && !user.getEmail().isBlank();
         boolean hasWechat = !"wechat".equals(unbinding) && user.getWxOpenId() != null && !user.getWxOpenId().isBlank();
-        boolean hasQq = !"qq".equals(unbinding) && user.getQqOpenId() != null && !user.getQqOpenId().isBlank();
+        boolean hasQq = !"qq".equals(unbinding) && (
+            (user.getQqOpenId() != null && !user.getQqOpenId().isBlank()) ||
+            (user.getQqAppOpenId() != null && !user.getQqAppOpenId().isBlank())
+        );
 
         if (!hasEmail && !hasWechat && !hasQq) {
             throw new BusinessException(400, "解绑失败：至少需要保留一种登录方式（邮箱/微信/QQ）");

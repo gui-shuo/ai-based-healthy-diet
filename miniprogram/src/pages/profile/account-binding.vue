@@ -165,16 +165,38 @@ async function handleBind(provider: 'wechat' | 'qq') {
 
   if (provider === 'qq') {
     // #ifdef APP-PLUS
-    // APP端：使用系统浏览器打开QQ OAuth绑定，通过深度链接返回
+    // APP端：使用原生QQ SDK绑定
     try {
-      const urlRes = await socialAuthApi.getQqAuthUrl('app_bind_qq') as any
-      if (urlRes.code !== 200 || !urlRes.data) {
-        uni.showToast({ title: urlRes.message || '获取授权地址失败', icon: 'none' })
+      const services = await new Promise<any[]>((resolve, reject) => {
+        plus.oauth.getServices((s: any[]) => resolve(s), (e: any) => reject(e))
+      })
+      const qqService = services.find((s: any) => s.id === 'qq')
+      if (!qqService) {
+        uni.showToast({ title: '当前设备不支持QQ登录', icon: 'none' })
         loading.value = false
         return
       }
-      plus.runtime.openURL(urlRes.data)
+
+      await new Promise<void>((resolve, reject) => {
+        qqService.login((result: any) => resolve(), (e: any) => reject(e))
+      })
+
+      const authResult = qqService.authResult
+      if (!authResult || !authResult.access_token) {
+        uni.showToast({ title: 'QQ授权失败', icon: 'none' })
+        loading.value = false
+        return
+      }
+
+      const res = await socialAuthApi.bindQqToken(authResult.access_token) as any
+      if (res.code === 200) {
+        uni.showToast({ title: '绑定成功', icon: 'success' })
+        bindInfo.qqBound = true
+      } else {
+        uni.showToast({ title: res.message || '绑定失败', icon: 'none' })
+      }
     } catch (e: any) {
+      console.error('QQ APP bind error:', e)
       uni.showToast({ title: 'QQ绑定失败，请稍后重试', icon: 'none' })
     }
     loading.value = false
