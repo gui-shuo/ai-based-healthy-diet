@@ -85,7 +85,7 @@ services:
       - nutriai-network
 
   h5:
-    image: heyitshuo/nutriai-h5:v202604071436
+    image: heyitshuo/nutriai-h5:v202604071700
     container_name: nutriai-h5
     restart: always
     depends_on:
