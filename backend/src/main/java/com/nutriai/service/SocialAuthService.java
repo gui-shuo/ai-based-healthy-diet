@@ -133,18 +133,12 @@ public class SocialAuthService {
 
     // ==================== QQ OAuth2登录 ====================
 
-    /** 根据state前缀选择QQ凭据：app_开头用移动应用凭据，其他用网站应用凭据 */
+    /** 统一使用网站应用(QQ_WEB_ID)凭据，确保所有平台获得一致的openId */
     private String getQqId(String state) {
-        if (state != null && state.startsWith("app_") && qqAppId != null && !qqAppId.isBlank()) {
-            return qqAppId;
-        }
         return (qqWebId != null && !qqWebId.isBlank()) ? qqWebId : qqAppId;
     }
 
     private String getQqKey(String state) {
-        if (state != null && state.startsWith("app_") && qqAppKey != null && !qqAppKey.isBlank()) {
-            return qqAppKey;
-        }
         return (qqWebKey != null && !qqWebKey.isBlank()) ? qqWebKey : qqAppKey;
     }
 

@@ -175,49 +175,16 @@ async function handleSocialLogin(provider: 'wechat' | 'qq') {
   }
 
   // #ifdef APP-PLUS
-  // APP端使用内嵌WebView进行QQ OAuth，使用和网页端相同的QQ_WEB_ID，保证openId一致
+  // APP端：使用系统浏览器打开QQ OAuth，授权后通过深度链接 nutriai://callback 返回APP
   try {
     uni.showLoading({ title: '正在跳转...', mask: true })
-    const urlRes = await socialAuthApi.getQqAuthUrl('login') as any
+    const urlRes = await socialAuthApi.getQqAuthUrl('app_login') as any
     uni.hideLoading()
     if (urlRes.code !== 200 || !urlRes.data) {
       uni.showToast({ title: urlRes.message || '获取授权地址失败', icon: 'none' })
       return
     }
-    const authUrl = urlRes.data
-    const redirectHost = 'nutriai.itshuo.me'
-    const wv = plus.webview.create(authUrl, 'qq-auth-login', {
-      titleNView: {
-        titleText: 'QQ登录',
-        backgroundColor: '#10B981',
-        titleColor: '#ffffff',
-        autoBackButton: true
-      },
-      backButtonAutoControl: 'close'
-    } as any)
-    let handled = false
-    const checkUrl = () => {
-      if (handled) return
-      try {
-        const url = wv.getURL()
-        if (url && url.includes(redirectHost) && url.includes('/auth/callback/') && url.includes('code=')) {
-          handled = true
-          const match = url.match(/[?&]code=([^&]+)/)
-          const stateMatch = url.match(/[?&]state=([^&]+)/)
-          const code = match ? decodeURIComponent(match[1]) : ''
-          const state = stateMatch ? decodeURIComponent(stateMatch[1]) : 'login'
-          wv.close('auto')
-          if (code) {
-            handleQqCodeLogin(code, state)
-          }
-        }
-      } catch {}
-    }
-    const pollTimer = setInterval(checkUrl, 300)
-    wv.addEventListener('close', () => {
-      clearInterval(pollTimer)
-    })
-    wv.show('slide-in-right')
+    plus.runtime.openURL(urlRes.data)
   } catch (e: any) {
     uni.hideLoading()
     uni.showToast({ title: 'QQ登录失败，请稍后重试', icon: 'none' })
@@ -240,25 +207,6 @@ async function handleSocialLogin(provider: 'wechat' | 'qq') {
     uni.showToast({ title: e?.message || '登录失败，请稍后重试', icon: 'none' })
   }
   // #endif
-}
-
-// APP端QQ授权码登录（和web端使用相同的code+web凭据）
-async function handleQqCodeLogin(code: string, state: string) {
-  try {
-    uni.showLoading({ title: '正在登录...', mask: true })
-    const res = await socialAuthApi.qqLogin(code, state) as any
-    uni.hideLoading()
-    if (res.code === 200 && res.data) {
-      userStore._saveLogin(res.data)
-      uni.showToast({ title: '登录成功', icon: 'success' })
-      setTimeout(() => uni.switchTab({ url: '/pages/index/index' }), 500)
-    } else {
-      uni.showToast({ title: res.message || 'QQ登录失败', icon: 'none' })
-    }
-  } catch (e: any) {
-    uni.hideLoading()
-    uni.showToast({ title: e?.message || '登录失败，请稍后重试', icon: 'none' })
-  }
 }
 
 function goTo(url: string) {
