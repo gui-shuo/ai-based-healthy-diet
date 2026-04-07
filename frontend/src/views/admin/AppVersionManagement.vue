@@ -76,12 +76,15 @@
       </el-form>
 
       <div v-if="uploadProgress > 0" style="margin-top: 10px;">
-        <el-progress :percentage="uploadProgress" :status="uploadProgress === 100 && !uploading ? 'success' : ''" />
-        <div v-if="uploadProgress === 100 && uploading" style="margin-top: 6px; color: #E6A23C; font-size: 13px;">
-          ⏳ 文件正在上传至云存储中，请耐心等待，完成后即可下载...
+        <el-progress :percentage="uploadProgress" :status="uploadPhase === 'done' ? 'success' : ''" :striped="uploadPhase === 'cloud'" :striped-flow="uploadPhase === 'cloud'" />
+        <div v-if="uploadPhase === 'browser'" style="margin-top: 6px; color: #909399; font-size: 13px;">
+          📤 正在上传文件... {{ Math.round(uploadProgress * 2) }}%
         </div>
-        <div v-else-if="uploadProgress < 100 && uploading" style="margin-top: 6px; color: #909399; font-size: 13px;">
-          📤 正在上传文件到服务器... {{ uploadProgress }}%
+        <div v-else-if="uploadPhase === 'cloud'" style="margin-top: 6px; color: #E6A23C; font-size: 13px;">
+          ☁️ 文件正在上传至云存储，请耐心等待（此过程较慢）...
+        </div>
+        <div v-else-if="uploadPhase === 'done'" style="margin-top: 6px; color: #67C23A; font-size: 13px;">
+          ✅ 上传完成，已可下载
         </div>
       </div>
 
@@ -121,6 +124,7 @@ const showEditDialog = ref(false)
 const uploading = ref(false)
 const saving = ref(false)
 const uploadProgress = ref(0)
+const uploadPhase = ref('')  // 'browser' | 'cloud' | 'done'
 
 const form = ref({
   versionName: '',
@@ -165,14 +169,33 @@ const submitUpload = async () => {
 
   uploading.value = true
   uploadProgress.value = 0
+  uploadPhase.value = 'browser'
+  let cloudProgressTimer = null
   try {
     await appVersionApi.upload(fd, (e) => {
-      uploadProgress.value = Math.round((e.loaded / e.total) * 100)
+      // 浏览器→服务器阶段占 0-50%
+      const pct = Math.round((e.loaded / e.total) * 50)
+      uploadProgress.value = pct
+      if (pct >= 50 && uploadPhase.value === 'browser') {
+        // 进入云存储上传阶段，模拟进度 50→95%
+        uploadPhase.value = 'cloud'
+        let cloudPct = 50
+        cloudProgressTimer = setInterval(() => {
+          if (cloudPct < 95) {
+            cloudPct += 1
+            uploadProgress.value = cloudPct
+          }
+        }, 2000)
+      }
     })
-    ElMessage.success('版本上传成功')
+    if (cloudProgressTimer) clearInterval(cloudProgressTimer)
+    uploadProgress.value = 100
+    uploadPhase.value = 'done'
+    ElMessage.success('版本上传成功，已可下载')
     showUploadDialog.value = false
     loadVersions()
   } catch (e) {
+    if (cloudProgressTimer) clearInterval(cloudProgressTimer)
     ElMessage.error('上传失败: ' + (e.response?.data?.message || e.message))
   } finally {
     uploading.value = false
@@ -182,6 +205,7 @@ const submitUpload = async () => {
 const resetForm = () => {
   form.value = { versionName: '', versionCode: 1, platform: 'android', description: '', file: null }
   uploadProgress.value = 0
+  uploadPhase.value = ''
 }
 
 const setLatest = async (row) => {
