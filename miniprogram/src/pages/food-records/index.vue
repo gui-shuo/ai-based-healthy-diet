@@ -294,6 +294,26 @@
               </view>
             </view>
 
+            <!-- Image Upload for Food Recognition -->
+            <view class="input-group">
+              <text class="label">📷 拍照识别</text>
+              <view class="photo-recognize-area">
+                <view v-if="!recognizeImage" class="photo-upload-btn flex-center" @tap="chooseRecognizeImage">
+                  <text class="photo-upload-icon">📷</text>
+                  <text class="photo-upload-text">拍照/选择图片识别食物</text>
+                </view>
+                <view v-else class="photo-preview-row">
+                  <image :src="recognizeImage" mode="aspectFill" class="photo-preview-img" />
+                  <view class="photo-actions">
+                    <button v-if="!recognizeLoading" class="btn-sm btn-accent" @tap="chooseRecognizeImage">重新选择</button>
+                    <text v-if="recognizeLoading" class="recognize-loading">🔍 识别中...</text>
+                    <button v-if="recognizeImage && !recognizeLoading" class="btn-sm btn-outline" @tap="clearRecognizeImage">清除</button>
+                  </view>
+                </view>
+                <text v-if="recognizeError" class="recognize-error">{{ recognizeError }}</text>
+              </view>
+            </view>
+
             <view class="input-group">
               <text class="label">食物名称</text>
               <input v-model="addForm.foodName" placeholder="请输入食物名称" />
@@ -385,6 +405,9 @@ const detailRecord = ref<FoodRecord | null>(null)
 const saving = ref(false)
 const isEditing = ref(false)
 const editingId = ref<number | null>(null)
+const recognizeImage = ref('')
+const recognizeLoading = ref(false)
+const recognizeError = ref('')
 const activeMealFilter = ref('ALL')
 
 const dailyGoal = reactive({
@@ -577,6 +600,8 @@ function editFromDetail() {
     carbs: String(r.carbohydrates || r.carbs || '')
   }
   showDetail.value = false
+  recognizeImage.value = ''
+  recognizeError.value = ''
   showAddDialog.value = true
 }
 
@@ -592,6 +617,8 @@ function openAddDialog(mealType: string) {
     fat: '',
     carbs: ''
   }
+  recognizeImage.value = ''
+  recognizeError.value = ''
   showAddDialog.value = true
 }
 
@@ -642,6 +669,53 @@ async function saveRecord() {
   } finally {
     saving.value = false
   }
+}
+
+function chooseRecognizeImage() {
+  uni.chooseImage({
+    count: 1,
+    sizeType: ['compressed'],
+    sourceType: ['album', 'camera'],
+    success: (res) => {
+      recognizeImage.value = res.tempFilePaths[0]
+      recognizeError.value = ''
+      doRecognize(res.tempFilePaths[0])
+    }
+  })
+}
+
+async function doRecognize(filePath: string) {
+  recognizeLoading.value = true
+  recognizeError.value = ''
+  try {
+    const res = await foodApi.photoRecognize(filePath)
+    if (res.code === 200 && res.data) {
+      const items = Array.isArray(res.data) ? res.data : (res.data.foods || res.data.results || [res.data])
+      if (items.length > 0) {
+        const item = items[0]
+        addForm.value.foodName = item.foodName || item.name || item.food_name || ''
+        if (item.calories || item.calory) addForm.value.calories = String(Math.round(item.calories || item.calory || 0))
+        if (item.protein) addForm.value.protein = String(Math.round(item.protein * 10) / 10)
+        if (item.fat) addForm.value.fat = String(Math.round(item.fat * 10) / 10)
+        if (item.carbohydrates || item.carbs) addForm.value.carbs = String(Math.round((item.carbohydrates || item.carbs) * 10) / 10)
+        if (item.portion || item.weight) addForm.value.amount = String(item.portion || item.weight || 100)
+        uni.showToast({ title: '识别成功，已自动填充', icon: 'none' })
+      } else {
+        recognizeError.value = '未能识别食物，请手动输入'
+      }
+    } else {
+      recognizeError.value = res.message || '识别失败，请手动输入'
+    }
+  } catch {
+    recognizeError.value = '识别失败，请检查网络后重试'
+  } finally {
+    recognizeLoading.value = false
+  }
+}
+
+function clearRecognizeImage() {
+  recognizeImage.value = ''
+  recognizeError.value = ''
 }
 
 // Swipe to delete
@@ -698,10 +772,12 @@ function drawRing(canvasId: string, percent: number, color: string) {
   const ctx = uni.createCanvasContext(canvasId)
   if (!ctx) return
 
-  const size = 50
-  const center = size
-  const radius = size - 8
-  const lineWidth = 6
+  // Calculate actual pixel size from rpx (100rpx canvas)
+  const sysInfo = uni.getSystemInfoSync()
+  const pxSize = Math.round(100 * sysInfo.windowWidth / 750)
+  const center = pxSize / 2
+  const lineWidth = Math.max(4, Math.round(pxSize * 0.12))
+  const radius = center - lineWidth - 2
   const startAngle = -Math.PI / 2
   const endAngle = startAngle + (Math.PI * 2 * Math.min(percent, 100)) / 100
 
@@ -1276,5 +1352,50 @@ watch(() => [stats.value.totalCalories, stats.value.totalProtein, stats.value.to
 }
 .btn-outline:active {
   background: $muted;
+}
+
+/* Photo Recognition in Add Dialog */
+.photo-recognize-area {
+  margin-top: 8rpx;
+}
+.photo-upload-btn {
+  flex-direction: column;
+  padding: 24rpx;
+  border: 2rpx dashed $border;
+  border-radius: 12rpx;
+  background: rgba($accent, 0.03);
+  gap: 8rpx;
+}
+.photo-upload-icon {
+  font-size: 40rpx;
+}
+.photo-upload-text {
+  font-size: 24rpx;
+  color: $muted-foreground;
+}
+.photo-preview-row {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+.photo-preview-img {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 12rpx;
+  object-fit: cover;
+}
+.photo-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+.recognize-loading {
+  font-size: 24rpx;
+  color: $accent;
+}
+.recognize-error {
+  font-size: 24rpx;
+  color: #EF4444;
+  margin-top: 8rpx;
 }
 </style>
