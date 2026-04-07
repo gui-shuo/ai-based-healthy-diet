@@ -433,6 +433,9 @@
               <text v-if="order.vipExpireAt" class="order-detail-text">VIP到期: {{ fmtDateTime(order.vipExpireAt) }}</text>
               <text class="order-detail-text">下单: {{ fmtDateTime(order.createdAt) }}</text>
             </view>
+            <view v-if="order.paymentStatus === 'PAID'" class="order-actions">
+              <button class="btn-sm btn-danger" :disabled="refundLoading" @tap="handleRefund(order)">模拟退款</button>
+            </view>
           </view>
         </view>
         <view v-else class="empty-state">
@@ -547,7 +550,12 @@ const remainingDays = computed(() => vipStatus.value.remainDays || 0)
 
 const invitationLink = computed(() => {
   if (!invitationCode.value) return ''
+  // #ifdef H5
   return `${window.location.origin}/register?code=${invitationCode.value}`
+  // #endif
+  // #ifndef H5
+  return `https://nutriai.itshuo.me/register?code=${invitationCode.value}`
+  // #endif
 })
 
 // ========== Benefits Comparison Data ==========
@@ -739,6 +747,33 @@ function startCountdown() {
 
 function clearCountdown() {
   if (countdownTimer) { clearInterval(countdownTimer); countdownTimer = null }
+}
+
+// ========== Refund ==========
+const refundLoading = ref(false)
+
+async function handleRefund(order: any) {
+  uni.showModal({
+    title: '确认退款',
+    content: `确定对订单 ${order.orderNo} 进行模拟退款？VIP权益将被回收。`,
+    success: async (r) => {
+      if (!r.confirm) return
+      refundLoading.value = true
+      try {
+        const res = await vipApi.simulateRefund(order.orderNo)
+        if (res.code === 200) {
+          uni.showToast({ title: '退款成功，VIP权益已回收', icon: 'none' })
+          refreshAll()
+        } else {
+          uni.showToast({ title: (res as any).message || '退款失败', icon: 'none' })
+        }
+      } catch {
+        uni.showToast({ title: '退款操作失败', icon: 'none' })
+      } finally {
+        refundLoading.value = false
+      }
+    }
+  })
 }
 
 // ========== Invitation ==========
@@ -2041,6 +2076,25 @@ onShow(() => {
 .order-detail-text {
   font-size: 22rpx;
   color: $muted-foreground;
+}
+
+.order-actions {
+  margin-top: 12rpx;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn-danger {
+  background: #EF4444;
+  color: #FFFFFF;
+  border: none;
+  font-size: 24rpx;
+  padding: 8rpx 24rpx;
+  border-radius: 8rpx;
+  line-height: 1.6;
+  &[disabled] {
+    opacity: 0.6;
+  }
 }
 
 /* ============ Shared ============ */

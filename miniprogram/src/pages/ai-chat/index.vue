@@ -117,7 +117,7 @@
     </scroll-view>
 
     <!-- Quick Actions (collapsible, above input) -->
-    <view class="quick-actions-area" :style="{ bottom: inputBaseHeight + 'px' }" v-if="showQuickActions">
+    <view class="quick-actions-area" :style="{ bottom: inputBaseHeight + 'px', height: quickActionsExpanded ? '320px' : '48px' }" v-if="showQuickActions">
       <view class="qa-header" @tap="quickActionsExpanded = !quickActionsExpanded">
         <text class="qa-title">💡 快捷操作</text>
         <text class="qa-toggle">{{ quickActionsExpanded ? '收起 ▲' : '展开 ▼' }}</text>
@@ -1314,14 +1314,17 @@ onUnmounted(() => {
   z-index: 99;
   background: $card;
   border-top: 1rpx solid $border;
-  max-height: 640rpx;
-  overflow-y: auto;
+  overflow: hidden;
+  box-sizing: border-box;
 }
 .qa-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12rpx 24rpx;
+  padding: 0 24rpx;
+  height: 48px;
+  min-height: 48px;
+  box-sizing: border-box;
 }
 .qa-title {
   font-size: 26rpx;
@@ -1332,7 +1335,12 @@ onUnmounted(() => {
   font-size: 22rpx;
   color: $accent;
 }
-.qa-sections { padding: 0 24rpx 12rpx; }
+.qa-sections {
+  padding: 0 24rpx 12rpx;
+  height: calc(100% - 48px);
+  overflow-y: auto;
+  box-sizing: border-box;
+}
 .qa-section { margin-bottom: 16rpx; }
 .qa-section-title {
   font-size: 24rpx;
