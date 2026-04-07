@@ -363,14 +363,15 @@ public class SocialAuthService {
         boolean hasWebQq = user.getQqOpenId() != null && !user.getQqOpenId().isBlank();
         boolean hasAppQq = user.getQqAppOpenId() != null && !user.getQqAppOpenId().isBlank();
         boolean qqBound = hasWebQq || hasAppQq;
-        // 有web openId但缺app openId时，APP端需要补充验证
         boolean qqNeedAppVerify = hasWebQq && !hasAppQq;
+        boolean qqNeedWebVerify = hasAppQq && !hasWebQq;
         return SocialBindInfo.builder()
                 .wechatBound(user.getWxOpenId() != null && !user.getWxOpenId().isBlank())
                 .wechatNickname(user.getWxOpenId() != null ? "已绑定" : null)
                 .qqBound(qqBound)
                 .qqNickname(qqBound ? "已绑定" : null)
                 .qqNeedAppVerify(qqNeedAppVerify)
+                .qqNeedWebVerify(qqNeedWebVerify)
                 .build();
     }
 
@@ -428,7 +429,7 @@ public class SocialAuthService {
                 .orElseThrow(BusinessException.Auth::userNotFound);
 
         if (user.getQqOpenId() != null && !user.getQqOpenId().isBlank()) {
-            throw new BusinessException(400, "已绑定QQ账号，请先解绑");
+            throw new BusinessException(400, "Web端QQ已验证，无需重复操作");
         }
 
         // 用code换取access_token
@@ -449,13 +450,21 @@ public class SocialAuthService {
             throw new BusinessException(500, "获取QQ openid失败");
         }
 
-        if (userRepository.findByQqOpenId(openId).isPresent()) {
+        // 检查此web openId是否已被其他用户使用
+        var existingUser = userRepository.findByQqOpenId(openId);
+        if (existingUser.isPresent() && !existingUser.get().getId().equals(userId)) {
             throw new BusinessException(400, "该QQ号已绑定其他账号，请先注销该账号后再绑定");
         }
 
         user.setQqOpenId(openId);
         userRepository.save(user);
-        log.info("用户绑定QQ成功: userId={}, openId={}", userId, openId);
+
+        boolean wasSupplementary = user.getQqAppOpenId() != null && !user.getQqAppOpenId().isBlank();
+        if (wasSupplementary) {
+            log.info("用户补充Web端QQ验证: userId={}, webOpenId={}", userId, openId);
+        } else {
+            log.info("用户绑定QQ成功: userId={}, openId={}", userId, openId);
+        }
     }
 
     /**

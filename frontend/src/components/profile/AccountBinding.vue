@@ -61,14 +61,32 @@
             </div>
           </div>
         </div>
-        <el-button v-if="!bindInfo.qqBound" type="primary" size="small" @click="handleBind('qq')">
-          绑定
-        </el-button>
-        <el-popconfirm v-else title="解绑后将无法使用QQ登录此账号，确定解绑？" @confirm="handleUnbind('qq')">
-          <template #reference>
-            <el-button type="danger" size="small" plain>解绑</el-button>
-          </template>
-        </el-popconfirm>
+        <template v-if="bindInfo.qqNeedWebVerify">
+          <el-button type="warning" size="small" @click="handleBind('qq')">
+            Web验证
+          </el-button>
+        </template>
+        <template v-else>
+          <el-button v-if="!bindInfo.qqBound" type="primary" size="small" @click="handleBind('qq')">
+            绑定
+          </el-button>
+          <el-popconfirm v-else title="解绑后将无法使用QQ登录此账号，确定解绑？" @confirm="handleUnbind('qq')">
+            <template #reference>
+              <el-button type="danger" size="small" plain>解绑</el-button>
+            </template>
+          </el-popconfirm>
+        </template>
+      </div>
+
+      <!-- QQ Web Verify Banner -->
+      <div v-if="bindInfo.qqNeedWebVerify" class="verify-banner">
+        <div class="verify-content">
+          <span class="verify-icon">🔐</span>
+          <div class="verify-text">
+            <div class="verify-title">需要Web端QQ验证</div>
+            <div class="verify-desc">首次在网页端使用，为了安全请点击上方"Web验证"按钮用QQ登录验证身份</div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -99,7 +117,8 @@ const userEmail = computed(() => authStore.user?.email)
 
 const bindInfo = reactive({
   wechatBound: false,
-  qqBound: false
+  qqBound: false,
+  qqNeedWebVerify: false
 })
 
 // 监听QQ绑定弹窗回调
@@ -124,6 +143,7 @@ const loadBindInfo = async () => {
     if (res.data?.code === 200 && res.data.data) {
       bindInfo.wechatBound = res.data.data.wechatBound
       bindInfo.qqBound = res.data.data.qqBound
+      bindInfo.qqNeedWebVerify = !!res.data.data.qqNeedWebVerify
     }
   } catch (e) {
     console.error('Failed to load bind info', e)
@@ -256,5 +276,38 @@ onMounted(loadBindInfo)
     font-size: 13px;
     line-height: 1.6;
   }
+}
+
+.verify-banner {
+  background: #FFF7ED;
+  border: 1px solid #FDBA74;
+  border-radius: 12px;
+  padding: 16px 20px;
+}
+
+.verify-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.verify-icon { font-size: 20px; }
+
+.verify-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.verify-title {
+  font-weight: 600;
+  font-size: 14px;
+  color: #C2410C;
+}
+
+.verify-desc {
+  font-size: 13px;
+  color: #9A3412;
+  line-height: 1.5;
 }
 </style>

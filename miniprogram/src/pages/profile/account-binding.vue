@@ -36,6 +36,20 @@
       </button>
     </view>
 
+    <!-- QQ Web Verify Banner (H5) -->
+    <view v-if="bindInfo.qqNeedWebVerify" class="card verify-banner">
+      <view class="verify-content">
+        <text class="verify-icon">🔐</text>
+        <view class="verify-text">
+          <text class="verify-title">需要Web端QQ验证</text>
+          <text class="verify-desc">首次在网页端使用，为了安全请点击下方按钮用QQ登录验证身份</text>
+        </view>
+      </view>
+      <button class="btn-verify" @tap="handleBind('qq')">
+        QQ验证
+      </button>
+    </view>
+
     <!-- Social Accounts -->
     <view class="card">
       <text class="section-title">🔗 第三方账号</text>
@@ -82,7 +96,7 @@
           </view>
         </view>
         <button
-          v-if="bindInfo.qqBound && !bindInfo.qqNeedAppVerify"
+          v-if="bindInfo.qqBound && !bindInfo.qqNeedAppVerify && !bindInfo.qqNeedWebVerify"
           class="btn-small btn-unbind"
           @tap="handleUnbind('qq')"
           :loading="unbindingQq"
@@ -93,7 +107,7 @@
           @tap="handleBind('qq')"
           :loading="bindingQq"
         >绑定</button>
-        <view v-else class="bind-tag tag-warn">需验证</view>
+        <view v-else-if="bindInfo.qqNeedAppVerify || bindInfo.qqNeedWebVerify" class="bind-tag tag-warn">需验证</view>
       </view>
     </view>
 
@@ -110,7 +124,7 @@
           <text class="summary-label">微信</text>
         </view>
         <view class="summary-item">
-          <text class="summary-dot" :class="bindInfo.qqBound && !bindInfo.qqNeedAppVerify ? 'dot-active' : bindInfo.qqNeedAppVerify ? 'dot-warn' : 'dot-inactive'" />
+          <text class="summary-dot" :class="bindInfo.qqBound && !bindInfo.qqNeedAppVerify && !bindInfo.qqNeedWebVerify ? 'dot-active' : (bindInfo.qqNeedAppVerify || bindInfo.qqNeedWebVerify) ? 'dot-warn' : 'dot-inactive'" />
           <text class="summary-label">QQ</text>
         </view>
       </view>
@@ -175,7 +189,8 @@ const userStore = useUserStore()
 const bindInfo = reactive({
   wechatBound: false,
   qqBound: false,
-  qqNeedAppVerify: false
+  qqNeedAppVerify: false,
+  qqNeedWebVerify: false
 })
 
 const bindingWechat = ref(false)
@@ -221,6 +236,7 @@ async function loadBindInfo() {
       bindInfo.wechatBound = !!res.data.wechatBound
       bindInfo.qqBound = !!res.data.qqBound
       bindInfo.qqNeedAppVerify = !!res.data.qqNeedAppVerify
+      bindInfo.qqNeedWebVerify = !!res.data.qqNeedWebVerify
     }
   } catch {}
 }

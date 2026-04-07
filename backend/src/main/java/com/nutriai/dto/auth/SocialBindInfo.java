@@ -22,4 +22,7 @@ public class SocialBindInfo {
 
     /** APP端需要补充QQ验证（有web openId但缺app openId） */
     private boolean qqNeedAppVerify;
+
+    /** Web端需要补充QQ验证（有app openId但缺web openId） */
+    private boolean qqNeedWebVerify;
 }
