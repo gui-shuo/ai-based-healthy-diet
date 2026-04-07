@@ -76,9 +76,12 @@
       </el-form>
 
       <div v-if="uploadProgress > 0" style="margin-top: 10px;">
-        <el-progress :percentage="uploadProgress" :status="uploadProgress === 100 ? 'success' : ''" />
+        <el-progress :percentage="uploadProgress" :status="uploadProgress === 100 && !uploading ? 'success' : ''" />
         <div v-if="uploadProgress === 100 && uploading" style="margin-top: 6px; color: #E6A23C; font-size: 13px;">
-          ⏳ 文件已上传到服务器，正在同步到云存储，请耐心等待...
+          ⏳ 文件正在上传至云存储中，请耐心等待，完成后即可下载...
+        </div>
+        <div v-else-if="uploadProgress < 100 && uploading" style="margin-top: 6px; color: #909399; font-size: 13px;">
+          📤 正在上传文件到服务器... {{ uploadProgress }}%
         </div>
       </div>
 

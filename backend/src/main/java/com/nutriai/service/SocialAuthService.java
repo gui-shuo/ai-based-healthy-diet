@@ -157,9 +157,11 @@ public class SocialAuthService {
             throw new BusinessException(500, "QQ互联配置未完成");
         }
         String encodedRedirect = URLEncoder.encode(qqRedirectUri, StandardCharsets.UTF_8);
+        // display=pc for web, display=mobile for H5/APP
+        String display = (state != null && (state.startsWith("h5_") || state.startsWith("app_"))) ? "mobile" : "pc";
         return String.format(
-            "https://graph.qq.com/oauth2.0/authorize?response_type=code&client_id=%s&redirect_uri=%s&state=%s&scope=get_user_info",
-            clientId, encodedRedirect, state
+            "https://graph.qq.com/oauth2.0/authorize?response_type=code&client_id=%s&redirect_uri=%s&state=%s&scope=get_user_info&display=%s",
+            clientId, encodedRedirect, state, display
         );
     }
 
