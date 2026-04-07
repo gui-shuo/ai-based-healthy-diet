@@ -22,31 +22,28 @@ public class CorsConfig {
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration config = new CorsConfiguration();
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         
-        // 允许的源（生产环境应通过配置限制）
+        // WebSocket端点：允许所有来源（APP原生WebSocket发送Origin:null）
+        CorsConfiguration wsConfig = new CorsConfiguration();
+        wsConfig.setAllowedOriginPatterns(List.of("*"));
+        wsConfig.setAllowedMethods(Arrays.asList("GET", "POST", "OPTIONS"));
+        wsConfig.setAllowedHeaders(List.of("*"));
+        wsConfig.setAllowCredentials(true);
+        source.registerCorsConfiguration("/ws/**", wsConfig);
+        
+        // 其他API端点：使用配置的允许来源
+        CorsConfiguration config = new CorsConfiguration();
         if ("*".equals(allowedOrigins)) {
             config.setAllowedOriginPatterns(List.of("*"));
         } else {
             config.setAllowedOriginPatterns(Arrays.asList(allowedOrigins.split(",")));
         }
-        
-        // 允许的请求方法
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        
-        // 允许的请求头
-        config.setAllowedHeaders(Arrays.asList("*"));
-        
-        // 允许携带凭证
+        config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
-        
-        // 预检请求的有效期（秒）
         config.setMaxAge(3600L);
-        
-        // 暴露的响应头
         config.setExposedHeaders(Arrays.asList("Authorization", "X-Request-ID"));
-        
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
         
         return source;
