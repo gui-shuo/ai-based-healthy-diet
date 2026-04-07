@@ -12,8 +12,12 @@ onLaunch((options: any) => {
 
   // #ifdef APP-PLUS
   plus.globalEvent.addEventListener('newintent', () => {
-    const args = plus.runtime.arguments
-    if (args) handleSchemeUrl(args)
+    // 延迟确保 plus.runtime.arguments 已更新
+    setTimeout(() => {
+      const args = plus.runtime.arguments
+      console.log('[App] newintent args:', args)
+      if (args) handleSchemeUrl(args)
+    }, 300)
   })
   const launchArgs = plus.runtime.arguments
   if (launchArgs) {
@@ -25,6 +29,7 @@ onLaunch((options: any) => {
 // #ifdef APP-PLUS
 function handleSchemeUrl(url: string) {
   try {
+    console.log('[App] handleSchemeUrl:', url)
     if (!url || !url.startsWith('nutriai://')) return
     const urlObj = new URL(url.replace('nutriai://', 'https://nutriai.app/'))
     const token = urlObj.searchParams.get('token')
@@ -35,7 +40,6 @@ function handleSchemeUrl(url: string) {
       const bindCode = urlObj.searchParams.get('code')
       const provider = urlObj.searchParams.get('provider')
       if (bindCode && provider) {
-        // Navigate to social-callback page with bind params
         uni.navigateTo({
           url: `/pages/auth/social-callback?action=bind&code=${bindCode}&provider=${provider}`
         })
@@ -44,15 +48,19 @@ function handleSchemeUrl(url: string) {
     }
 
     if (token) {
+      console.log('[App] 深度链接登录: token长度=', token.length)
       setToken(token)
       if (refreshToken) setRefreshToken(refreshToken)
       const userStore = useUserStore()
       userStore.restore()
       userStore.fetchUserInfo()
-      uni.reLaunch({ url: '/pages/index/index' })
+      uni.showToast({ title: '登录成功', icon: 'success' })
+      setTimeout(() => uni.reLaunch({ url: '/pages/index/index' }), 500)
+    } else {
+      console.warn('[App] 深度链接缺少token:', url)
     }
   } catch (e) {
-    console.error('handleSchemeUrl error:', e)
+    console.error('[App] handleSchemeUrl error:', e)
   }
 }
 // #endif

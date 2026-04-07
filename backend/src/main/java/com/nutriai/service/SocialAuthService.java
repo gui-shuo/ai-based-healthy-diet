@@ -219,6 +219,8 @@ public class SocialAuthService {
                     .build();
             userRepository.save(user);
             log.info("QQ用户自动注册: openId={}, username={}, platform={}", openId, autoUsername, state);
+        } else {
+            log.info("QQ用户登录: openId={}, userId={}, username={}, platform={}", openId, user.getId(), user.getUsername(), state);
         }
 
         return buildLoginResponse(user, ipAddress);

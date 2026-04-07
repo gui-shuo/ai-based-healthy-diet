@@ -41,6 +41,15 @@ onMounted(async () => {
     return
   }
 
+  // 防止浏览器刷新导致code重复使用
+  const codeKey = `qq_code_${code}`
+  if (sessionStorage.getItem(codeKey)) {
+    statusMsg.value = '正在返回...'
+    loading.value = false
+    return
+  }
+  sessionStorage.setItem(codeKey, '1')
+
   try {
     const stateStr = String(state || '')
     let response
