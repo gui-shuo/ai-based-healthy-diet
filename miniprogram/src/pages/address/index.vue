@@ -68,10 +68,12 @@
           </view>
           <view class="form-group">
             <text class="form-label">所在地区</text>
-            <view class="region-picker" @tap="openRegionPicker">
-              <text :class="{ 'placeholder-text': !regionText }">{{ regionText || '选择省/市/区' }}</text>
-              <text class="arrow">›</text>
-            </view>
+            <picker mode="region" :value="regionValue" @change="onRegionChange">
+              <view class="region-picker">
+                <text :class="{ 'placeholder-text': !regionText }">{{ regionText || '选择省/市/区' }}</text>
+                <text class="arrow">›</text>
+              </view>
+            </picker>
           </view>
           <view class="form-group">
             <text class="form-label">详细地址 <text class="required">*</text></text>
@@ -126,6 +128,7 @@ const editingId = ref<number | null>(null)
 const selectMode = ref(false)
 const selectedId = ref<number | null>(null)
 const regionText = ref('')
+const regionValue = ref<string[]>([])
 
 const labelOptions = ['家', '公司', '学校', '其他']
 
@@ -165,6 +168,7 @@ function openAddForm() {
   editingId.value = null
   form.value = { receiverName: '', receiverPhone: '', province: '', city: '', district: '', detailAddress: '', label: '', isDefault: false }
   regionText.value = ''
+  regionValue.value = []
   showForm.value = true
 }
 
@@ -181,17 +185,17 @@ function editAddress(addr: AddressItem) {
     isDefault: addr.isDefault
   }
   regionText.value = [addr.province, addr.city, addr.district].filter(Boolean).join(' ')
+  regionValue.value = [addr.province || '', addr.city || '', addr.district || '']
   showForm.value = true
 }
 
-function openRegionPicker() {
-  // @ts-ignore
-  uni.chooseLocation?.({
-    success: () => {},
-    fail: () => {}
-  })
-  // Use built-in region picker as fallback
-  // We provide a manual text approach since uni.chooseLocation requires map SDK
+function onRegionChange(e: any) {
+  const val = e.detail.value as string[]
+  regionValue.value = val
+  form.value.province = val[0] || ''
+  form.value.city = val[1] || ''
+  form.value.district = val[2] || ''
+  regionText.value = val.filter(Boolean).join(' ')
 }
 
 function selectAddress(addr: AddressItem) {
