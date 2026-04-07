@@ -12,21 +12,31 @@ onLaunch((options: any) => {
 
   // #ifdef APP-PLUS
   plus.globalEvent.addEventListener('newintent', () => {
-    // 延迟确保 plus.runtime.arguments 已更新
     setTimeout(() => {
       const args = plus.runtime.arguments
       console.log('[App] newintent args:', args)
-      if (args) handleSchemeUrl(args)
-    }, 300)
+      if (args && args.startsWith('nutriai://')) {
+        processSchemeUrl(args)
+      }
+    }, 500)
   })
   const launchArgs = plus.runtime.arguments
-  if (launchArgs) {
-    setTimeout(() => handleSchemeUrl(launchArgs), 500)
+  console.log('[App] launch args:', launchArgs)
+  if (launchArgs && launchArgs.startsWith('nutriai://')) {
+    setTimeout(() => processSchemeUrl(launchArgs), 800)
   }
   // #endif
 });
 
 // #ifdef APP-PLUS
+let lastProcessedSchemeUrl = ''
+
+function processSchemeUrl(url: string) {
+  if (!url || url === lastProcessedSchemeUrl) return
+  lastProcessedSchemeUrl = url
+  handleSchemeUrl(url)
+}
+
 function handleSchemeUrl(url: string) {
   try {
     console.log('[App] handleSchemeUrl:', url)
@@ -65,7 +75,17 @@ function handleSchemeUrl(url: string) {
 }
 // #endif
 
-onShow(() => {});
+onShow(() => {
+  // #ifdef APP-PLUS
+  // 从浏览器返回APP时再次检查深度链接（newintent可能丢失）
+  setTimeout(() => {
+    const args = plus.runtime.arguments
+    if (args && args.startsWith('nutriai://')) {
+      processSchemeUrl(args)
+    }
+  }, 600)
+  // #endif
+});
 </script>
 
 <style>

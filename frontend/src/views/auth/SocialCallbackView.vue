@@ -5,6 +5,11 @@
         <el-icon class="is-loading" :size="48"><Loading /></el-icon>
         <p class="font-sans">{{ statusMsg }}</p>
       </div>
+      <div v-else-if="appDeepLink" class="success-state">
+        <el-icon :size="48" color="#10B981"><CircleCheckFilled /></el-icon>
+        <p class="font-sans">{{ statusMsg }}</p>
+        <el-button v-if="showAppButton" type="primary" @click="openApp">点击返回APP</el-button>
+      </div>
       <div v-else-if="error" class="error-state">
         <el-icon :size="48" color="#EF4444"><CircleCloseFilled /></el-icon>
         <p class="font-sans">{{ statusMsg }}</p>
@@ -17,7 +22,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { Loading, CircleCloseFilled } from '@element-plus/icons-vue'
+import { Loading, CircleCloseFilled, CircleCheckFilled } from '@element-plus/icons-vue'
 import { useAuthStore } from '@/stores/auth'
 import { socialAuthApi } from '@/services/socialAuth'
 import { ElMessage } from 'element-plus'
@@ -29,6 +34,8 @@ const authStore = useAuthStore()
 const loading = ref(true)
 const error = ref(false)
 const statusMsg = ref('正在处理登录...')
+const appDeepLink = ref('')
+const showAppButton = ref(false)
 
 onMounted(async () => {
   const { code, state } = route.query
@@ -124,8 +131,17 @@ onMounted(async () => {
           token: loginData.accessToken,
           refreshToken: loginData.refreshToken || ''
         })
+        const deepLink = `nutriai://callback?${params.toString()}`
         statusMsg.value = '登录成功，正在返回APP...'
-        window.location.href = `nutriai://callback?${params.toString()}`
+        appDeepLink.value = deepLink
+        loading.value = false
+
+        // 尝试通过location跳转打开APP
+        window.location.href = deepLink
+        // 如果3秒后还在页面上，显示手动按钮
+        setTimeout(() => {
+          showAppButton.value = true
+        }, 3000)
         return
       }
 
@@ -168,6 +184,11 @@ onMounted(async () => {
 })
 
 const goLogin = () => router.push('/login')
+const openApp = () => {
+  if (appDeepLink.value) {
+    window.location.href = appDeepLink.value
+  }
+}
 </script>
 
 <style scoped>
@@ -189,14 +210,14 @@ const goLogin = () => router.push('/login')
   min-width: 360px;
 }
 
-.loading-state, .error-state {
+.loading-state, .error-state, .success-state {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 16px;
 }
 
-.loading-state p, .error-state p {
+.loading-state p, .error-state p, .success-state p {
   color: #0F172A;
   font-size: 16px;
 }
