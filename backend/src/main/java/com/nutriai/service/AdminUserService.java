@@ -1,9 +1,11 @@
 package com.nutriai.service;
 
 import com.nutriai.dto.admin.UserManagementDTO;
+import com.nutriai.entity.Nutritionist;
 import com.nutriai.entity.User;
 import com.nutriai.repository.AIChatHistoryRepository;
 import com.nutriai.repository.AIChatLogRepository;
+import com.nutriai.repository.NutritionistRepository;
 import com.nutriai.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,9 +16,11 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Optional;
 
 /**
  * 管理后台用户管理服务
@@ -27,6 +31,7 @@ import java.time.LocalTime;
 public class AdminUserService {
     
     private final UserRepository userRepository;
+    private final NutritionistRepository nutritionistRepository;
     private final AIChatLogRepository chatLogRepository;
     private final AIChatHistoryRepository chatHistoryRepository;
     
@@ -99,6 +104,7 @@ public class AdminUserService {
     
     /**
      * 更新用户角色 (支持多角色: USER,NUTRITIONIST 或 ADMIN,NUTRITIONIST)
+     * 授予营养师角色时自动创建/激活营养师档案，取消时自动停用
      */
     @Transactional
     public void updateUserRole(Long userId, String role) {
@@ -120,10 +126,48 @@ public class AdminUserService {
             }
         }
         
+        String oldRole = user.getRole();
+        boolean wasNutritionist = oldRole != null && oldRole.contains("NUTRITIONIST");
+        boolean isNutritionist = role != null && role.contains("NUTRITIONIST");
+        
         user.setRole(role);
         userRepository.save(user);
         
-        log.info("更新用户角色: userId={}, role={}", userId, role);
+        // 授予营养师角色：创建或激活营养师档案
+        if (isNutritionist && !wasNutritionist) {
+            Optional<Nutritionist> existing = nutritionistRepository.findByUserId(userId);
+            if (existing.isPresent()) {
+                Nutritionist n = existing.get();
+                n.setIsActive(true);
+                n.setApprovalStatus("APPROVED");
+                nutritionistRepository.save(n);
+                log.info("激活营养师档案: userId={}, nutritionistId={}", userId, n.getId());
+            } else {
+                Nutritionist n = Nutritionist.builder()
+                        .userId(userId)
+                        .name(user.getUsername())
+                        .title("初级营养师")
+                        .consultationFee(BigDecimal.ZERO)
+                        .isActive(true)
+                        .approvalStatus("APPROVED")
+                        .status("OFFLINE")
+                        .build();
+                nutritionistRepository.save(n);
+                log.info("创建营养师档案: userId={}, nutritionistId={}", userId, n.getId());
+            }
+        }
+        
+        // 取消营养师角色：停用营养师档案
+        if (!isNutritionist && wasNutritionist) {
+            nutritionistRepository.findByUserId(userId).ifPresent(n -> {
+                n.setIsActive(false);
+                n.setApprovalStatus("REJECTED");
+                nutritionistRepository.save(n);
+                log.info("停用营养师档案: userId={}, nutritionistId={}", userId, n.getId());
+            });
+        }
+        
+        log.info("更新用户角色: userId={}, oldRole={}, newRole={}", userId, oldRole, role);
     }
     
     /**
