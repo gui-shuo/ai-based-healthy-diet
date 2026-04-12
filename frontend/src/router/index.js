@@ -82,6 +82,18 @@ const routes = [
     meta: { requiresAuth: true, title: '咨询聊天室' }
   },
   {
+    path: '/recipes',
+    name: 'Recipes',
+    component: () => import('@/views/RecipesView.vue'),
+    meta: { requiresAuth: true, title: '食谱库' }
+  },
+  {
+    path: '/meal-plans',
+    name: 'MealPlans',
+    component: () => import('@/views/MealPlansView.vue'),
+    meta: { requiresAuth: true, title: '营养餐计划' }
+  },
+  {
     path: '/product-shop',
     name: 'ProductShop',
     component: () => import('@/views/ProductShopView.vue'),
@@ -238,6 +250,18 @@ const routes = [
         name: 'AdminAppVersions',
         component: () => import('@/views/admin/AppVersionManagement.vue'),
         meta: { title: 'APP版本管理' }
+      },
+      {
+        path: 'recipes',
+        name: 'AdminRecipes',
+        component: () => import('@/views/admin/RecipeManagement.vue'),
+        meta: { title: '食谱管理' }
+      },
+      {
+        path: 'meal-plans',
+        name: 'AdminMealPlans',
+        component: () => import('@/views/admin/MealPlanManagement.vue'),
+        meta: { title: '营养餐管理' }
       }
     ]
   },

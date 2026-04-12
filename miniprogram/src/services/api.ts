@@ -109,6 +109,23 @@ export const vipApi = {
   getOrders: (params?: any) => request({ url: '/vip/orders', data: params })
 }
 
+// ============ Recipes ============
+export const recipeApi = {
+  getList: (params?: any) => request({ url: '/recipes', data: params }),
+  getDetail: (id: number | string) => request({ url: `/recipes/${id}` }),
+  toggleFavorite: (id: number | string) => request({ url: `/recipes/${id}/favorite`, method: 'POST' }),
+  rate: (id: number | string, data: { score: number; comment?: string }) => request({ url: `/recipes/${id}/rate`, method: 'POST', data })
+}
+
+// ============ Meal Plans ============
+export const mealPlanApi = {
+  getList: (params?: any) => request({ url: '/meal-plans', data: params }),
+  getDetail: (id: number | string) => request({ url: `/meal-plans/${id}` }),
+  toggleFavorite: (id: number | string) => request({ url: `/meal-plans/${id}/favorite`, method: 'POST' }),
+  getFeatured: () => request({ url: '/meal-plans/featured' }),
+  getMyFavorites: (params?: any) => request({ url: '/meal-plans/my-favorites', data: params }),
+}
+
 // ============ Feedback ============
 export const feedbackApi = {
   submit: (data: any) => request({ url: '/feedback', method: 'POST', data }),

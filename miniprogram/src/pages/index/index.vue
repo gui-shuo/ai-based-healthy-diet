@@ -147,6 +147,8 @@ const features = [
   { icon: '📋', label: 'AI饮食计划', desc: '定制专属饮食方案', path: '/pages/diet-plan/index', badge: 'VIP', bg: 'linear-gradient(135deg, #8B5CF6, #A78BFA)' },
   { icon: '📝', label: '饮食记录', desc: '记录每日饮食摄入', path: '/pages/food-records/index', bg: 'linear-gradient(135deg, #F59E0B, #FBBF24)' },
   { icon: '👨‍⚕️', label: '营养师咨询', desc: '专业营养师在线答疑', path: '/pages/consultation/index', bg: 'linear-gradient(135deg, #EC4899, #F472B6)' },
+  { icon: '🍳', label: '食谱库', desc: '探索数百个营养食谱', path: '/pages/recipes/index', bg: 'linear-gradient(135deg, #F43F5E, #FB7185)' },
+  { icon: '🥗', label: '营养餐计划', desc: '科学配餐方案推荐', path: '/pages/meal-plans/index', bg: 'linear-gradient(135deg, #F97316, #FB923C)' },
   { icon: '🌐', label: '营养圈', desc: '社区交流与分享', path: '/pages/community/index', isTab: true, bg: 'linear-gradient(135deg, #6366F1, #818CF8)' },
   { icon: '🛒', label: '营养商城', desc: '精选营养品推荐', path: '/pages/product-shop/index', bg: 'linear-gradient(135deg, #14B8A6, #5EEAD4)' },
   { icon: '📢', label: '系统公告', desc: '最新通知和活动', path: '/pages/announcements/index', bg: 'linear-gradient(135deg, #EF4444, #F87171)' },

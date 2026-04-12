@@ -31,6 +31,8 @@
                   <el-dropdown-item command="diet-plan"> AI饮食计划 </el-dropdown-item>
                   <el-dropdown-item command="food-records"> 饮食记录 </el-dropdown-item>
                   <el-dropdown-item command="consultation"> 营养师咨询 </el-dropdown-item>
+                  <el-dropdown-item command="recipes"> 食谱库 </el-dropdown-item>
+                  <el-dropdown-item command="meal-plans"> 营养餐计划 </el-dropdown-item>
                   <el-dropdown-item command="community"> 营养圈 </el-dropdown-item>
                   <el-dropdown-item command="product-shop"> 营养产品商城 </el-dropdown-item>
                   <el-dropdown-item command="membership"> 会员中心 </el-dropdown-item>
@@ -125,6 +127,20 @@
               </el-icon></div>
               <h3 class="font-display">营养师咨询</h3>
               <p>专业营养师在线咨询，获取个性化指导</p>
+            </div>
+            <div class="feature-card" @click="goToFeature('recipes')">
+              <div class="feature-icon"><el-icon :size="32" color="white">
+                <food />
+              </el-icon></div>
+              <h3 class="font-display">食谱库</h3>
+              <p>探索数百个营养食谱，轻松烹饪美味</p>
+            </div>
+            <div class="feature-card" @click="goToFeature('meal-plans')">
+              <div class="feature-icon"><el-icon :size="32" color="white">
+                <calendar />
+              </el-icon></div>
+              <h3 class="font-display">营养餐计划</h3>
+              <p>科学搭配每日三餐，定制您的饮食方案</p>
             </div>
             <div class="feature-card" @click="goToFeature('community')">
               <div class="feature-icon"><el-icon :size="32" color="white">
@@ -221,7 +237,8 @@ import {
   Phone,
   Service,
   Goods,
-  ChatLineSquare
+  ChatLineSquare,
+  Food
 } from '@element-plus/icons-vue'
 import { usePublicConfig } from '@/composables/usePublicConfig'
 
@@ -315,6 +332,10 @@ const handleCommand = command => {
     if (route.path !== '/food-records') router.push('/food-records')
   } else if (command === 'consultation') {
     if (route.path !== '/consultation') router.push('/consultation')
+  } else if (command === 'recipes') {
+    if (route.path !== '/recipes') router.push('/recipes')
+  } else if (command === 'meal-plans') {
+    if (route.path !== '/meal-plans') router.push('/meal-plans')
   } else if (command === 'product-shop') {
     if (route.path !== '/product-shop') router.push('/product-shop')
   } else if (command === 'membership') {

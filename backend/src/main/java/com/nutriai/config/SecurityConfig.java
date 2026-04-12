@@ -76,7 +76,14 @@ public class SecurityConfig {
                                 "/auth/social/qq/auth-url",  // QQ授权URL（公开）
                                 "/auth/social/wechat/login",  // 微信登录（公开）
                                 "/auth/social/qq/login",  // QQ登录（公开）
-                                "/auth/social/qq/token-login"  // QQ APP原生登录（公开）
+                                "/auth/social/qq/token-login",  // QQ APP原生登录（公开）
+                                "/recipes",  // 食谱列表（公开）
+                                "/recipes/featured",  // 精选食谱（公开）
+                                "/recipes/tags",  // 食谱标签（公开）
+                                "/recipes/*",  // 食谱详情（公开）
+                                "/meal-plans",  // 健康餐列表（公开）
+                                "/meal-plans/featured",  // 精选健康餐（公开）
+                                "/meal-plans/*"  // 健康餐详情（公开）
                         ).permitAll()
                         
                         // 其他所有请求都需要认证

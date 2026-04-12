@@ -35,6 +35,14 @@
             <el-icon><ChatDotRound /></el-icon>
             <span>社区管理</span>
           </el-menu-item>
+          <el-menu-item index="/admin/recipes">
+            <el-icon><Food /></el-icon>
+            <span>食谱管理</span>
+          </el-menu-item>
+          <el-menu-item index="/admin/meal-plans">
+            <el-icon><Calendar /></el-icon>
+            <span>营养餐管理</span>
+          </el-menu-item>
           <el-menu-item index="/admin/products">
             <el-icon><ShoppingCart /></el-icon>
             <span>产品管理</span>
@@ -92,7 +100,9 @@ import {
   ChatLineSquare,
   UserFilled,
   ShoppingCart,
-  Download
+  Download,
+  Food,
+  Calendar
 } from '@element-plus/icons-vue'
 import AlertNotification from '@/components/admin/AlertNotification.vue'
 import { useAuthStore } from '@/stores/auth'
@@ -118,6 +128,8 @@ const breadcrumbTitle = computed(() => {
     '/admin/nutritionists': '营养师管理',
     '/admin/products': '产品管理',
     '/admin/community': '社区管理',
+    '/admin/recipes': '食谱管理',
+    '/admin/meal-plans': '营养餐管理',
     '/admin/app-versions': 'APP版本管理'
   }
   return titles[route.path] || '管理后台'
