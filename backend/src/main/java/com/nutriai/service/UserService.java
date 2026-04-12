@@ -287,7 +287,7 @@ public class UserService {
                 .orElseThrow(BusinessException.Auth::userNotFound);
 
         // 管理员账号不允许自行注销
-        if ("ADMIN".equals(user.getRole()) || "SUPER_ADMIN".equals(user.getRole())) {
+        if (user.getRole() != null && user.getRole().contains("ADMIN")) {
             throw new BusinessException(403, "管理员账号不允许通过此方式注销");
         }
 

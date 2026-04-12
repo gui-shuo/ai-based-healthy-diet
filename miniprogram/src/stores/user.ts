@@ -17,8 +17,9 @@ export const useUserStore = defineStore('user', () => {
   const userInfo = ref<UserInfo | null>(null)
   const token = ref(getToken())
   const isLoggedIn = computed(() => !!token.value && !!userInfo.value)
-  const isAdmin = computed(() => userInfo.value?.role === 'ADMIN')
-  const isNutritionist = computed(() => userInfo.value?.role === 'NUTRITIONIST')
+  const userRoles = computed(() => (userInfo.value?.role || '').split(',').map(r => r.trim()).filter(Boolean))
+  const isAdmin = computed(() => userRoles.value.includes('ADMIN'))
+  const isNutritionist = computed(() => userRoles.value.includes('NUTRITIONIST'))
 
   function _saveLogin(data: any) {
     setToken(data.accessToken)

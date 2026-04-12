@@ -24,8 +24,9 @@ export const useAuthStore = defineStore('auth', () => {
 
   const isLoggedIn = computed(() => !!token.value && !!user.value && !isTokenExpired.value)
   const userRole = computed(() => user.value?.role || '')
-  const isAdmin = computed(() => ['ADMIN', 'SUPER_ADMIN'].includes(userRole.value))
-  const isNutritionist = computed(() => userRole.value === 'NUTRITIONIST')
+  const userRoles = computed(() => userRole.value.split(',').map(r => r.trim()).filter(Boolean))
+  const isAdmin = computed(() => userRoles.value.includes('ADMIN'))
+  const isNutritionist = computed(() => userRoles.value.includes('NUTRITIONIST'))
   const userName = computed(() => user.value?.nickname || user.value?.username || '')
   const isVip = computed(() => permissions.value?.isVip || false)
   const memberTier = computed(() => permissions.value?.tier || 'FREE')

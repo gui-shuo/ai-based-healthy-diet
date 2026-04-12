@@ -21,7 +21,7 @@ public class UserManagementDTO {
     private String phone;
     private String avatar;
     private String status;              // active/disabled
-    private String role;                // USER/ADMIN/SUPER_ADMIN
+    private String role;                // USER/ADMIN or comma-separated (USER,NUTRITIONIST)
     private String memberLevel;         // FREE/BRONZE/SILVER/GOLD
     private Integer growthValue;
     private LocalDateTime memberExpireTime;

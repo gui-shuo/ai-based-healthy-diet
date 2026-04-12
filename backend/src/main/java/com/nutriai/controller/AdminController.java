@@ -47,7 +47,7 @@ public class AdminController {
      * 获取数据看板统计数据
      */
     @GetMapping("/dashboard/stats")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<DashboardStatsDTO>> getDashboardStats() {
         try {
             DashboardStatsDTO stats = dashboardService.getDashboardStats();
@@ -63,7 +63,7 @@ public class AdminController {
      * 获取数据看板总览（别名，兼容前端）
      */
     @GetMapping("/dashboard/overview")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<DashboardStatsDTO>> getDashboardOverview() {
         return getDashboardStats();
     }
@@ -72,7 +72,7 @@ public class AdminController {
      * 获取会员分布
      */
     @GetMapping("/dashboard/member-distribution")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<DashboardStatsDTO.MemberStats>> getMemberDistribution() {
         try {
             DashboardStatsDTO stats = dashboardService.getDashboardStats();
@@ -88,7 +88,7 @@ public class AdminController {
      * 获取用户增长趋势
      */
     @GetMapping("/dashboard/user-growth")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<List<TrendDataDTO>>> getUserGrowthTrend(
             @RequestParam(defaultValue = "7") int days) {
         try {
@@ -105,7 +105,7 @@ public class AdminController {
      * 获取AI使用趋势
      */
     @GetMapping("/dashboard/ai-usage-trend")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<List<TrendDataDTO>>> getAIUsageTrend(
             @RequestParam(defaultValue = "7") int days) {
         try {
@@ -126,7 +126,7 @@ public class AdminController {
      * 获取用户列表
      */
     @GetMapping("/users")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<Page<UserManagementDTO>>> getUserList(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "20") int size,
@@ -147,7 +147,7 @@ public class AdminController {
      * 获取用户详情
      */
     @GetMapping("/users/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<UserManagementDTO>> getUserDetail(@PathVariable Long id) {
         try {
             UserManagementDTO user = userService.getUserDetail(id);
@@ -163,7 +163,7 @@ public class AdminController {
      * 更新用户状态
      */
     @PutMapping("/users/{id}/status")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<String>> updateUserStatus(
             @PathVariable Long id,
             @RequestBody Map<String, String> request) {
@@ -182,7 +182,7 @@ public class AdminController {
      * 更新用户会员等级
      */
     @PutMapping("/users/{id}/member-level")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<String>> updateUserMemberLevel(
             @PathVariable Long id,
             @RequestBody Map<String, String> request) {
@@ -201,7 +201,7 @@ public class AdminController {
      * 更新用户角色
      */
     @PutMapping("/users/{id}/role")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<String>> updateUserRole(
             @PathVariable Long id,
             @RequestBody Map<String, String> request) {
@@ -222,7 +222,7 @@ public class AdminController {
      * 获取AI日志列表
      */
     @GetMapping("/ai-logs")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<Page<AIChatLogDTO>>> getAILogList(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "20") int size,
@@ -246,7 +246,7 @@ public class AdminController {
      * 获取AI日志详情
      */
     @GetMapping("/ai-logs/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<AIChatLogDTO>> getAILogDetail(@PathVariable Long id) {
         try {
             AIChatLogDTO log = aiLogService.getLogDetail(id);
@@ -264,7 +264,7 @@ public class AdminController {
      * 获取所有可用的配置选项
      */
     @GetMapping("/config/options")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<List<ConfigOptionDTO>>> getConfigOptions(
             @RequestParam(required = false) String category) {
         try {
@@ -283,7 +283,7 @@ public class AdminController {
      * 获取所有配置
      */
     @GetMapping("/config")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<List<SystemConfigDTO>>> getAllConfigs(
             @RequestParam(required = false) String category) {
         try {
@@ -302,7 +302,7 @@ public class AdminController {
      * 更新配置
      */
     @PutMapping("/config/{key}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<String>> updateConfig(
             @PathVariable String key,
             @RequestBody Map<String, String> request) {
@@ -321,7 +321,7 @@ public class AdminController {
      * 创建配置
      */
     @PostMapping("/config")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<SystemConfigDTO>> createConfig(
             @RequestBody SystemConfigDTO dto) {
         try {
@@ -338,7 +338,7 @@ public class AdminController {
      * 删除配置
      */
     @DeleteMapping("/config/{key}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<String>> deleteConfig(@PathVariable String key) {
         try {
             configService.deleteConfig(key);
@@ -357,7 +357,7 @@ public class AdminController {
      * 获取所有公告
      */
     @GetMapping("/announcements")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<List<SystemAnnouncementDTO>>> getAllAnnouncements() {
         try {
             List<SystemAnnouncementDTO> announcements = configService.getAllAnnouncements();
@@ -373,7 +373,7 @@ public class AdminController {
      * 创建公告
      */
     @PostMapping("/announcements")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<SystemAnnouncementDTO>> createAnnouncement(
             @RequestHeader("Authorization") String authHeader,
             @RequestBody SystemAnnouncementDTO dto) {
@@ -394,7 +394,7 @@ public class AdminController {
      * 更新公告
      */
     @PutMapping("/announcements/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<SystemAnnouncementDTO>> updateAnnouncement(
             @PathVariable Long id,
             @RequestBody SystemAnnouncementDTO dto) {
@@ -412,7 +412,7 @@ public class AdminController {
      * 删除公告
      */
     @DeleteMapping("/announcements/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<String>> deleteAnnouncement(@PathVariable Long id) {
         try {
             configService.deleteAnnouncement(id);
@@ -430,7 +430,7 @@ public class AdminController {
      * 获取待审核的营养师列表
      */
     @GetMapping("/nutritionists/pending")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ApiResponse<List<Nutritionist>> getPendingNutritionists() {
         List<Nutritionist> list = nutritionistRepository.findByApprovalStatus("PENDING");
         return ApiResponse.success(list);
@@ -442,7 +442,7 @@ public class AdminController {
      * 审核通过营养师
      */
     @PutMapping("/nutritionists/{id}/approve")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ApiResponse<Nutritionist> approveNutritionist(@PathVariable Long id) {
         Nutritionist n = nutritionistRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("营养师不存在"));
@@ -457,7 +457,7 @@ public class AdminController {
      * 审核拒绝营养师
      */
     @PutMapping("/nutritionists/{id}/reject")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ApiResponse<Nutritionist> rejectNutritionist(@PathVariable Long id,
             @RequestBody(required = false) Map<String, String> body) {
         Nutritionist n = nutritionistRepository.findById(id)
@@ -465,11 +465,16 @@ public class AdminController {
         n.setApprovalStatus("REJECTED");
         n.setIsActive(false);
         nutritionistRepository.save(n);
-        // 将关联用户角色改回USER
+        // 将关联用户的营养师角色移除
         if (n.getUserId() != null) {
             userRepository.findById(n.getUserId()).ifPresent(user -> {
-                user.setRole("USER");
-                userRepository.save(user);
+                String role = user.getRole();
+                if (role != null && role.contains("NUTRITIONIST")) {
+                    String newRole = role.replace(",NUTRITIONIST", "").replace("NUTRITIONIST,", "").replace("NUTRITIONIST", "USER");
+                    if (newRole.isEmpty()) newRole = "USER";
+                    user.setRole(newRole);
+                    userRepository.save(user);
+                }
             });
         }
         log.info("营养师审核拒绝: id={}, name={}", n.getId(), n.getName());

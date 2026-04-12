@@ -98,7 +98,7 @@ const refreshCaptcha = async () => {
 }
 
 onMounted(() => {
-  if (authStore.isLoggedIn && authStore.userRole === 'NUTRITIONIST') {
+  if (authStore.isLoggedIn && authStore.isNutritionist) {
     router.replace('/nutritionist/dashboard')
   }
 })
@@ -119,7 +119,9 @@ const handleLogin = async () => {
 
     if (res.data.code === 200) {
       const data = res.data.data
-      if (data.userInfo?.role !== 'NUTRITIONIST' && data.userInfo?.role !== 'ADMIN' && data.userInfo?.role !== 'SUPER_ADMIN') {
+      const roleStr = data.userInfo?.role || ''
+      const roles = roleStr.split(',').map(r => r.trim())
+      if (!roles.includes('NUTRITIONIST') && !roles.includes('ADMIN')) {
         message.error('该账号不是营养师账号，请使用普通登录')
         return
       }

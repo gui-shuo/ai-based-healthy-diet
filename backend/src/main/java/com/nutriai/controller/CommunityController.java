@@ -158,7 +158,7 @@ public class CommunityController {
     // ========== 管理后台 ==========
 
     @GetMapping("/admin/posts")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<Page<CommunityPost>>> adminGetPosts(
             @RequestParam(required = false) String status,
             @RequestParam(required = false) String category,
@@ -168,14 +168,14 @@ public class CommunityController {
     }
 
     @PutMapping("/admin/posts/{id}/pin")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<Void>> adminTogglePin(@PathVariable Long id) {
         communityService.adminTogglePin(id);
         return ResponseEntity.ok(ApiResponse.success("操作成功", null));
     }
 
     @PutMapping("/admin/posts/{id}/status")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<Void>> adminUpdateStatus(
             @PathVariable Long id,
             @RequestBody Map<String, String> body) {
@@ -184,21 +184,21 @@ public class CommunityController {
     }
 
     @DeleteMapping("/admin/posts/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<Void>> adminDeletePost(@PathVariable Long id) {
         communityService.deletePost(id, null, true);
         return ResponseEntity.ok(ApiResponse.success("删除成功", null));
     }
 
     @DeleteMapping("/admin/comments/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<Void>> adminDeleteComment(@PathVariable Long id) {
         communityService.deleteComment(id, null, true);
         return ResponseEntity.ok(ApiResponse.success("删除成功", null));
     }
 
     @GetMapping("/admin/stats")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<Map<String, Long>>> getStats() {
         return ResponseEntity.ok(ApiResponse.success(communityService.getStats()));
     }

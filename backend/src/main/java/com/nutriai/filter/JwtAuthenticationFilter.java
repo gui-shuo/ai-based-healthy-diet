@@ -16,7 +16,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Collections;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * JWT认证过滤器
@@ -47,11 +49,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     Long userId = jwtUtil.getUserIdFromToken(token);
                     String role = jwtUtil.getRoleFromToken(token);
                     
+                    // Support multi-role: "ADMIN,NUTRITIONIST" → [ROLE_ADMIN, ROLE_NUTRITIONIST]
+                    List<SimpleGrantedAuthority> authorities = Arrays.stream(role.split(","))
+                            .map(String::trim)
+                            .filter(r -> !r.isEmpty())
+                            .map(r -> new SimpleGrantedAuthority("ROLE_" + r))
+                            .collect(Collectors.toList());
+                    
                     UsernamePasswordAuthenticationToken authentication = 
                         new UsernamePasswordAuthenticationToken(
                             userId,
                             null,
-                            Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role))
+                            authorities
                         );
                     
                     authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));

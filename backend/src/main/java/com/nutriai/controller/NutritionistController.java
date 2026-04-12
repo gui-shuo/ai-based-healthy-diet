@@ -21,7 +21,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/nutritionist")
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('NUTRITIONIST')")
+@PreAuthorize("hasAnyRole('NUTRITIONIST', 'ADMIN')")
 public class NutritionistController {
 
     private final ConsultationService consultationService;

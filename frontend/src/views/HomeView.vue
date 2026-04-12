@@ -24,15 +24,15 @@
               </el-button>
               <template #dropdown>
                 <el-dropdown-menu>
-                  <el-dropdown-item command="profile"> 个人中心 </el-dropdown-item>
                   <el-dropdown-item command="ai-chat"> AI营养师 </el-dropdown-item>
-                  <el-dropdown-item command="diet-plan"> AI饮食计划 </el-dropdown-item>
                   <el-dropdown-item command="food-recognition"> AI食物识别 </el-dropdown-item>
+                  <el-dropdown-item command="diet-plan"> AI饮食计划 </el-dropdown-item>
                   <el-dropdown-item command="food-records"> 饮食记录 </el-dropdown-item>
                   <el-dropdown-item command="consultation"> 营养师咨询 </el-dropdown-item>
+                  <el-dropdown-item command="community"> 营养圈 </el-dropdown-item>
                   <el-dropdown-item command="product-shop"> 营养产品商城 </el-dropdown-item>
                   <el-dropdown-item command="membership"> 会员中心 </el-dropdown-item>
-                  <el-dropdown-item command="community"> 营养圈 </el-dropdown-item>
+                  <el-dropdown-item command="profile"> 个人中心 </el-dropdown-item>
                   <el-dropdown-item command="feedback"> 意见反馈 </el-dropdown-item>
                   <el-dropdown-item v-if="isAdmin" command="admin"> 管理后台 </el-dropdown-item>
                   <el-dropdown-item divided command="logout"> 退出登录 </el-dropdown-item>
@@ -89,13 +89,6 @@
         <div class="container">
           <h2 class="section-title font-display"><span class="gradient-text">核心功能</span></h2>
           <div class="features-grid">
-            <div class="feature-card" @click="goToFeature('profile')">
-              <div class="feature-icon"><el-icon :size="32" color="white">
-                <user />
-              </el-icon></div>
-              <h3 class="font-display">个人中心</h3>
-              <p>管理个人资料，记录身体数据</p>
-            </div>
             <div class="feature-card" @click="goToFeature('ai-chat')">
               <div class="feature-icon"><el-icon :size="32" color="white">
                 <chatDotRound />
@@ -103,19 +96,19 @@
               <h3 class="font-display">AI营养师</h3>
               <p>智能对话，获取专业营养建议</p>
             </div>
-            <div class="feature-card" @click="goToFeature('diet-plan')">
-              <div class="feature-icon"><el-icon :size="32" color="white">
-                <calendar />
-              </el-icon></div>
-              <h3 class="font-display">AI饮食计划</h3>
-              <p>智能生成个性化饮食计划</p>
-            </div>
             <div class="feature-card" @click="goToFeature('food-recognition')">
               <div class="feature-icon"><el-icon :size="32" color="white">
                 <camera />
               </el-icon></div>
               <h3 class="font-display">AI食物识别</h3>
               <p>拍照识别食物，智能分析营养</p>
+            </div>
+            <div class="feature-card" @click="goToFeature('diet-plan')">
+              <div class="feature-icon"><el-icon :size="32" color="white">
+                <calendar />
+              </el-icon></div>
+              <h3 class="font-display">AI饮食计划</h3>
+              <p>智能生成个性化饮食计划</p>
             </div>
             <div class="feature-card" @click="goToFeature('food-records')">
               <div class="feature-icon"><el-icon :size="32" color="white">
@@ -131,6 +124,13 @@
               <h3 class="font-display">营养师咨询</h3>
               <p>专业营养师在线咨询，获取个性化指导</p>
             </div>
+            <div class="feature-card" @click="goToFeature('community')">
+              <div class="feature-icon"><el-icon :size="32" color="white">
+                <chatDotRound />
+              </el-icon></div>
+              <h3 class="font-display">营养圈</h3>
+              <p>分享饮食心得，交流营养知识</p>
+            </div>
             <div class="feature-card" @click="goToFeature('product-shop')">
               <div class="feature-icon"><el-icon :size="32" color="white">
                 <goods />
@@ -145,12 +145,12 @@
               <h3 class="font-display">会员服务</h3>
               <p>专属功能，更多权益</p>
             </div>
-            <div class="feature-card" @click="goToFeature('community')">
+            <div class="feature-card" @click="goToFeature('profile')">
               <div class="feature-icon"><el-icon :size="32" color="white">
-                <chatDotRound />
+                <user />
               </el-icon></div>
-              <h3 class="font-display">营养圈</h3>
-              <p>分享饮食心得，交流营养知识</p>
+              <h3 class="font-display">个人中心</h3>
+              <p>管理个人资料，记录身体数据</p>
             </div>
           </div>
         </div>

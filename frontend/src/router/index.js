@@ -324,7 +324,7 @@ router.beforeEach(async (to, from, next) => {
     }
 
     // 检查是否需要营养师权限
-    if (to.meta.requiresNutritionist && !['NUTRITIONIST', 'ADMIN', 'SUPER_ADMIN'].includes(authStore.userRole)) {
+    if (to.meta.requiresNutritionist && !authStore.isNutritionist && !authStore.isAdmin) {
       ElMessage.error('需要营养师权限')
       next({ name: 'Home' })
       return

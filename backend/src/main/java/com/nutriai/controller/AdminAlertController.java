@@ -25,7 +25,7 @@ public class AdminAlertController {
      * 发送测试告警
      */
     @PostMapping("/test")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<String>> sendTestAlert(
             @RequestBody Map<String, String> request) {
         try {
@@ -56,7 +56,7 @@ public class AdminAlertController {
      * 获取在线管理员数量
      */
     @GetMapping("/online-count")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<Integer>> getOnlineAdminCount() {
         try {
             int count = adminAlertService.getOnlineAdminCount();
@@ -72,7 +72,7 @@ public class AdminAlertController {
      * 模拟系统告警
      */
     @PostMapping("/simulate/{type}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<String>> simulateAlert(@PathVariable String type) {
         try {
             switch (type) {

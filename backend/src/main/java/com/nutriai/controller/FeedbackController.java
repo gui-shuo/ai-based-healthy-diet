@@ -55,7 +55,7 @@ public class FeedbackController {
      * 管理员获取所有反馈
      */
     @GetMapping("/admin/list")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<Page<FeedbackDTO>>> getAllFeedbacks(
             @RequestParam(required = false) String status,
             @RequestParam(required = false) String type,
@@ -69,7 +69,7 @@ public class FeedbackController {
      * 管理员回复反馈
      */
     @PostMapping("/admin/{id}/reply")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<FeedbackDTO>> replyFeedback(
             @PathVariable Long id,
             @RequestBody Map<String, String> body) {
@@ -83,7 +83,7 @@ public class FeedbackController {
      * 管理员更新反馈状态
      */
     @PutMapping("/admin/{id}/status")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<FeedbackDTO>> updateStatus(
             @PathVariable Long id,
             @RequestBody Map<String, String> body) {
@@ -96,7 +96,7 @@ public class FeedbackController {
      * 管理员获取反馈统计
      */
     @GetMapping("/admin/stats")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<Map<String, Long>>> getStats() {
         Map<String, Long> stats = feedbackService.getStats();
         return ResponseEntity.ok(ApiResponse.success(stats));

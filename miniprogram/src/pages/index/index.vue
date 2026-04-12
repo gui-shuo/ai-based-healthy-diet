@@ -124,20 +124,20 @@ const greetingText = computed(() => {
 const quickActions = [
   { icon: '🤖', label: 'AI对话', path: '/pages/ai-chat/index', isTab: true, bg: 'rgba(16,185,129,0.1)' },
   { icon: '📸', label: '识别食物', path: '/pages/food-recognition/index', bg: 'rgba(59,130,246,0.1)' },
-  { icon: '📝', label: '饮食记录', path: '/pages/food-records/index', bg: 'rgba(245,158,11,0.1)' },
   { icon: '📋', label: '饮食计划', path: '/pages/diet-plan/index', badge: 'VIP', bg: 'rgba(139,92,246,0.1)' },
+  { icon: '📝', label: '饮食记录', path: '/pages/food-records/index', bg: 'rgba(245,158,11,0.1)' },
 ]
 
 const features = [
   { icon: '🤖', label: 'AI营养师', desc: '智能对话，个性化建议', path: '/pages/ai-chat/index', isTab: true, bg: 'linear-gradient(135deg, #10B981, #34D399)' },
-  { icon: '📋', label: 'AI饮食计划', desc: '定制专属饮食方案', path: '/pages/diet-plan/index', badge: 'VIP', bg: 'linear-gradient(135deg, #8B5CF6, #A78BFA)' },
   { icon: '📸', label: 'AI食物识别', desc: '拍照识别营养成分', path: '/pages/food-recognition/index', bg: 'linear-gradient(135deg, #3B82F6, #60A5FA)' },
+  { icon: '📋', label: 'AI饮食计划', desc: '定制专属饮食方案', path: '/pages/diet-plan/index', badge: 'VIP', bg: 'linear-gradient(135deg, #8B5CF6, #A78BFA)' },
   { icon: '📝', label: '饮食记录', desc: '记录每日饮食摄入', path: '/pages/food-records/index', bg: 'linear-gradient(135deg, #F59E0B, #FBBF24)' },
   { icon: '👨‍⚕️', label: '营养师咨询', desc: '专业营养师在线答疑', path: '/pages/consultation/index', bg: 'linear-gradient(135deg, #EC4899, #F472B6)' },
-  { icon: '🛒', label: '营养商城', desc: '精选营养品推荐', path: '/pages/product-shop/index', bg: 'linear-gradient(135deg, #14B8A6, #5EEAD4)' },
   { icon: '🌐', label: '营养圈', desc: '社区交流与分享', path: '/pages/community/index', isTab: true, bg: 'linear-gradient(135deg, #6366F1, #818CF8)' },
-  { icon: '💬', label: '意见反馈', desc: '帮助我们改进产品', path: '/pages/feedback/index', bg: 'linear-gradient(135deg, #64748B, #94A3B8)' },
-  { icon: '📢', label: '系统公告', desc: '最新通知和活动', path: '/pages/announcements/index', bg: 'linear-gradient(135deg, #EF4444, #F87171)' }
+  { icon: '🛒', label: '营养商城', desc: '精选营养品推荐', path: '/pages/product-shop/index', bg: 'linear-gradient(135deg, #14B8A6, #5EEAD4)' },
+  { icon: '📢', label: '系统公告', desc: '最新通知和活动', path: '/pages/announcements/index', bg: 'linear-gradient(135deg, #EF4444, #F87171)' },
+  { icon: '💬', label: '意见反馈', desc: '帮助我们改进产品', path: '/pages/feedback/index', bg: 'linear-gradient(135deg, #64748B, #94A3B8)' }
 ]
 
 onShow(() => {

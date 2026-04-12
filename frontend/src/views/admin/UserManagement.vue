@@ -58,11 +58,14 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="角色" width="100">
+        <el-table-column label="角色" width="160">
           <template #default="{ row }">
-            <el-tag v-if="row.role === 'ADMIN'" type="warning"> 管理员 </el-tag>
-            <el-tag v-else-if="row.role === 'SUPER_ADMIN'" type="danger"> 超级管理员 </el-tag>
-            <el-tag v-else type="info"> 普通用户 </el-tag>
+            <div style="display: flex; gap: 4px; flex-wrap: wrap;">
+              <el-tag v-for="r in (row.role || 'USER').split(',')" :key="r"
+                :type="r.trim() === 'ADMIN' ? 'warning' : r.trim() === 'NUTRITIONIST' ? 'success' : 'info'" size="small">
+                {{ {ADMIN: '管理员', NUTRITIONIST: '营养师', USER: '普通用户'}[r.trim()] || r.trim() }}
+              </el-tag>
+            </div>
           </template>
         </el-table-column>
         <el-table-column label="会员类型" width="120">
@@ -162,12 +165,14 @@
             <el-option label="禁用" value="DISABLED" />
           </el-select>
         </el-form-item>
-        <el-form-item label="角色">
-          <el-select v-model="editForm.role">
+        <el-form-item label="基础角色">
+          <el-select v-model="editForm.baseRole">
             <el-option label="普通用户" value="USER" />
             <el-option label="管理员" value="ADMIN" />
-            <el-option label="超级管理员" value="SUPER_ADMIN" />
           </el-select>
+        </el-form-item>
+        <el-form-item label="营养师">
+          <el-switch v-model="editForm.isNutritionist" active-text="是" inactive-text="否" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -210,7 +215,8 @@ const pagination = reactive({
 const editForm = reactive({
   status: '',
   memberLevel: '',
-  role: ''
+  baseRole: 'USER',
+  isNutritionist: false
 })
 
 // 加载用户列表
@@ -269,7 +275,9 @@ const handleEdit = row => {
   currentUser.value = row
   editForm.status = row.status
   editForm.memberLevel = row.memberLevel
-  editForm.role = row.role
+  const roles = (row.role || 'USER').split(',').map(r => r.trim())
+  editForm.baseRole = roles.includes('ADMIN') ? 'ADMIN' : 'USER'
+  editForm.isNutritionist = roles.includes('NUTRITIONIST')
   editDialogVisible.value = true
 }
 
@@ -282,8 +290,11 @@ const handleSaveEdit = async () => {
     if (editForm.status !== currentUser.value.status) {
       promises.push(updateUserStatus(userId, editForm.status))
     }
-    if (editForm.role !== currentUser.value.role) {
-      promises.push(updateUserRole(userId, editForm.role))
+
+    // Build multi-role string
+    const newRole = editForm.isNutritionist ? `${editForm.baseRole},NUTRITIONIST` : editForm.baseRole
+    if (newRole !== currentUser.value.role) {
+      promises.push(updateUserRole(userId, newRole))
     }
 
     if (promises.length === 0) {

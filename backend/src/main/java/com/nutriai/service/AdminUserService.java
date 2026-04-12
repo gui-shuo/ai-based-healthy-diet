@@ -98,12 +98,27 @@ public class AdminUserService {
     }
     
     /**
-     * 更新用户角色
+     * 更新用户角色 (支持多角色: USER,NUTRITIONIST 或 ADMIN,NUTRITIONIST)
      */
     @Transactional
     public void updateUserRole(Long userId, String role) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("用户不存在"));
+        
+        // Validate: ADMIN and USER cannot coexist
+        if (role != null && role.contains("ADMIN") && role.contains("USER")) {
+            throw new RuntimeException("管理员和普通用户角色不能同时拥有");
+        }
+        
+        // Validate only known roles
+        if (role != null) {
+            for (String r : role.split(",")) {
+                String trimmed = r.trim();
+                if (!trimmed.equals("USER") && !trimmed.equals("ADMIN") && !trimmed.equals("NUTRITIONIST")) {
+                    throw new RuntimeException("无效的角色: " + trimmed);
+                }
+            }
+        }
         
         user.setRole(role);
         userRepository.save(user);

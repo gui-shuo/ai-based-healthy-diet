@@ -65,9 +65,9 @@
                 <el-icon><UserFilled /></el-icon>
                 角色
               </div>
-              <div class="item-value">
-                <el-tag :type="getRoleType(userProfile?.role)">
-                  {{ getRoleText(userProfile?.role) }}
+              <div class="item-value" style="display: flex; gap: 6px; flex-wrap: wrap;">
+                <el-tag v-for="r in parseRoles(userProfile?.role)" :key="r" :type="getRoleType(r)">
+                  {{ getRoleText(r) }}
                 </el-tag>
               </div>
             </div>
@@ -149,24 +149,27 @@ const fetchProfile = async () => {
   }
 }
 
+// 解析多角色字符串
+const parseRoles = role => (role || 'USER').split(',').map(r => r.trim()).filter(Boolean)
+
 // 获取角色文本
 const getRoleText = role => {
   const roleMap = {
-    SUPER_ADMIN: '超级管理员',
     ADMIN: '管理员',
-    USER: '普通用户'
+    USER: '普通用户',
+    NUTRITIONIST: '营养师'
   }
-  return roleMap[role] || '普通用户'
+  return roleMap[role] || role
 }
 
 // 获取角色标签类型
 const getRoleType = role => {
   const typeMap = {
-    SUPER_ADMIN: 'danger',
     ADMIN: 'warning',
-    USER: 'primary'
+    USER: 'primary',
+    NUTRITIONIST: 'success'
   }
-  return typeMap[role] || 'primary'
+  return typeMap[role] || 'info'
 }
 
 // 获取状态文本

@@ -30,7 +30,7 @@ public class AdminShopController {
     // ==================== 营养师管理 ====================
 
     @GetMapping("/nutritionists")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<Page<Nutritionist>>> getNutritionists(
             @RequestParam(required = false) String keyword,
             @RequestParam(defaultValue = "0") int page,
@@ -45,7 +45,7 @@ public class AdminShopController {
     }
 
     @GetMapping("/nutritionists/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<Nutritionist>> getNutritionist(@PathVariable Long id) {
         Nutritionist n = nutritionistRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("营养师不存在"));
@@ -53,7 +53,7 @@ public class AdminShopController {
     }
 
     @PostMapping("/nutritionists")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<Nutritionist>> createNutritionist(@RequestBody Nutritionist nutritionist) {
         Nutritionist saved = nutritionistRepository.save(nutritionist);
         log.info("创建营养师: {}", saved.getName());
@@ -61,7 +61,7 @@ public class AdminShopController {
     }
 
     @PutMapping("/nutritionists/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<Nutritionist>> updateNutritionist(
             @PathVariable Long id, @RequestBody Nutritionist update) {
         Nutritionist existing = nutritionistRepository.findById(id)
@@ -85,7 +85,7 @@ public class AdminShopController {
     }
 
     @DeleteMapping("/nutritionists/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<String>> deleteNutritionist(@PathVariable Long id) {
         nutritionistRepository.deleteById(id);
         log.info("删除营养师: id={}", id);
@@ -93,7 +93,7 @@ public class AdminShopController {
     }
 
     @PutMapping("/nutritionists/{id}/status")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<Nutritionist>> updateNutritionistStatus(
             @PathVariable Long id, @RequestBody Map<String, Object> body) {
         Nutritionist n = nutritionistRepository.findById(id)
@@ -107,7 +107,7 @@ public class AdminShopController {
     // ==================== 产品管理 ====================
 
     @GetMapping("/products")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<Page<NutritionProduct>>> getProducts(
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) String category,
@@ -125,7 +125,7 @@ public class AdminShopController {
     }
 
     @GetMapping("/products/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<NutritionProduct>> getProduct(@PathVariable Long id) {
         NutritionProduct p = productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("产品不存在"));
@@ -133,7 +133,7 @@ public class AdminShopController {
     }
 
     @PostMapping("/products")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<NutritionProduct>> createProduct(@RequestBody NutritionProduct product) {
         NutritionProduct saved = productRepository.save(product);
         log.info("创建产品: {}", saved.getName());
@@ -141,7 +141,7 @@ public class AdminShopController {
     }
 
     @PutMapping("/products/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<NutritionProduct>> updateProduct(
             @PathVariable Long id, @RequestBody NutritionProduct update) {
         NutritionProduct existing = productRepository.findById(id)
@@ -169,7 +169,7 @@ public class AdminShopController {
     }
 
     @DeleteMapping("/products/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<String>> deleteProduct(@PathVariable Long id) {
         productRepository.deleteById(id);
         log.info("删除产品: id={}", id);
@@ -177,7 +177,7 @@ public class AdminShopController {
     }
 
     @PutMapping("/products/{id}/status")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<NutritionProduct>> updateProductStatus(
             @PathVariable Long id, @RequestBody Map<String, String> body) {
         NutritionProduct p = productRepository.findById(id)

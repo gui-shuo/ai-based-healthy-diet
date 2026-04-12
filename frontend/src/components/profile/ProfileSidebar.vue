@@ -20,7 +20,7 @@
         {{ userInfo?.nickname || userInfo?.username }}
       </h3>
       <p class="role">
-        {{ getRoleText(userInfo?.role) }}
+        {{ parseRoleText(userInfo?.role) }}
       </p>
     </div>
 
@@ -95,11 +95,16 @@ const userInfo = computed(() => authStore.user)
 // 获取角色文本
 const getRoleText = role => {
   const roleMap = {
-    SUPER_ADMIN: '超级管理员',
     ADMIN: '管理员',
-    USER: '普通用户'
+    USER: '普通用户',
+    NUTRITIONIST: '营养师'
   }
-  return roleMap[role] || '普通用户'
+  return roleMap[role] || role
+}
+
+const parseRoleText = role => {
+  if (!role) return '普通用户'
+  return role.split(',').map(r => getRoleText(r.trim())).join(' / ')
 }
 
 // 菜单选择

@@ -171,7 +171,7 @@ public class AuthService {
                 .password(passwordEncoder.encode(request.getPassword()))
                 .email(request.getEmail())
                 .nickname(request.getName())
-                .role("NUTRITIONIST")
+                .role("USER,NUTRITIONIST")
                 .status("ACTIVE")
                 .build();
         userRepository.save(user);

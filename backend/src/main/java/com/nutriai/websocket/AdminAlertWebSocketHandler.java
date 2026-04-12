@@ -139,7 +139,7 @@ public class AdminAlertWebSocketHandler extends TextWebSocketHandler {
             String role = jwtUtil.getRoleFromToken(token);
             log.debug("Token角色: {}", role);
             
-            boolean isAdmin = "ADMIN".equals(role) || "SUPER_ADMIN".equals(role);
+            boolean isAdmin = role != null && role.contains("ADMIN");
             if (!isAdmin) {
                 log.warn("Token验证失败：非管理员角色 ({})", role);
             }
