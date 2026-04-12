@@ -1,326 +1,542 @@
 <template>
   <div class="meal-plans-view">
-    <!-- 顶部导航 -->
-    <nav class="top-nav">
-      <div class="nav-inner">
-        <div class="nav-left">
-          <el-button text @click="router.push('/')">
-            <el-icon><ArrowLeft /></el-icon>
-            返回首页
-          </el-button>
-          <h2 class="page-title">🥗 营养餐计划</h2>
-        </div>
-        <div class="nav-right">
-          <el-button type="primary" round @click="openFavorites">
-            <el-icon><Star /></el-icon>
-            我的收藏
-          </el-button>
-        </div>
+    <!-- Header -->
+    <header class="page-header">
+      <div class="header-inner">
+        <h1 class="page-title">🍽️ 营养餐计划</h1>
+        <p class="page-subtitle">科学搭配，为你定制专属营养方案</p>
       </div>
-    </nav>
+    </header>
 
-    <main class="main-area">
-      <!-- 搜索栏 -->
-      <div class="search-bar">
-        <el-input
-          v-model="keyword"
-          placeholder="搜索餐计划..."
-          size="large"
-          clearable
-          @keydown.enter="handleSearch"
-          class="search-input"
-        >
-          <template #prefix>
-            <el-icon><Search /></el-icon>
-          </template>
-          <template #append>
-            <el-button @click="handleSearch">搜索</el-button>
-          </template>
-        </el-input>
-      </div>
+    <!-- Main Tabs -->
+    <el-tabs v-model="activeTab" class="main-tabs" @tab-change="handleTabChange">
+      <el-tab-pane label="🍽️ 发现" name="discover" />
+      <el-tab-pane label="📋 我的跟随" name="follows" />
+      <el-tab-pane label="⭐ 我的收藏" name="favorites" />
+    </el-tabs>
 
-      <!-- 筛选栏 -->
-      <div class="filter-bar">
-        <!-- 饮食目标 -->
-        <div class="filter-group">
-          <div class="filter-tabs">
-            <div
-              v-for="goal in dietGoalOptions"
-              :key="goal.value"
-              class="filter-tab"
-              :class="{ active: selectedDietGoal === goal.value }"
-              @click="selectDietGoal(goal.value)"
-            >
-              {{ goal.label }}
+    <!-- ==================== DISCOVER TAB ==================== -->
+    <div v-show="activeTab === 'discover'" class="tab-content">
+      <!-- Tag Cloud -->
+      <section v-if="tags.length" class="tag-cloud-section">
+        <h3 class="section-label">🔥 热门标签</h3>
+        <div class="tag-cloud">
+          <span
+            v-for="tag in tags"
+            :key="tag"
+            class="tag-chip"
+            :class="{ active: selectedTag === tag }"
+            @click="toggleTag(tag)"
+          >{{ tag }}</span>
+        </div>
+      </section>
+
+      <!-- Recommended Carousel -->
+      <section v-if="recommendedPlans.length" class="recommended-section">
+        <h3 class="section-label">✨ 为你推荐</h3>
+        <div class="recommended-scroll">
+          <div
+            v-for="plan in recommendedPlans"
+            :key="'rec-' + plan.id"
+            class="rec-card"
+            @click="openDetail(plan.id)"
+          >
+            <img :src="plan.coverImage || defaultCover" :alt="plan.title" class="rec-cover" />
+            <div class="rec-info">
+              <span class="goal-badge" :style="{ background: goalColorMap[plan.dietGoal] || '#999' }">
+                {{ dietGoalMap[plan.dietGoal] || plan.dietGoal }}
+              </span>
+              <h4 class="rec-title">{{ plan.title }}</h4>
+              <div class="rec-meta">
+                <span>{{ plan.targetCalories }}kcal</span>
+                <span>{{ plan.durationDays }}天</span>
+              </div>
             </div>
           </div>
         </div>
+      </section>
 
-        <!-- 计划类型 & 排序 -->
+      <!-- Search & Filters -->
+      <section class="filters-section">
+        <div class="search-row">
+          <el-input
+            v-model="filters.keyword"
+            placeholder="搜索营养餐计划..."
+            clearable
+            :prefix-icon="SearchIcon"
+            class="search-input"
+            @keyup.enter="loadPlans(1)"
+            @clear="loadPlans(1)"
+          />
+          <el-button type="primary" :icon="SearchIcon" @click="loadPlans(1)">搜索</el-button>
+        </div>
+
         <div class="filter-row">
-          <div class="plan-type-toggle">
-            <el-radio-group v-model="selectedPlanType" size="default" @change="handleFilterChange">
+          <div class="filter-group">
+            <span class="filter-label">目标：</span>
+            <el-radio-group v-model="filters.dietGoal" size="small" @change="loadPlans(1)">
               <el-radio-button value="">全部</el-radio-button>
-              <el-radio-button value="DAILY">每日计划</el-radio-button>
-              <el-radio-button value="WEEKLY">每周计划</el-radio-button>
-            </el-radio-group>
-          </div>
-          <div class="sort-toggle">
-            <el-radio-group v-model="selectedSort" size="default" @change="handleFilterChange">
-              <el-radio-button value="latest">最新</el-radio-button>
-              <el-radio-button value="popular">最热</el-radio-button>
-              <el-radio-button value="calories_asc">低卡</el-radio-button>
+              <el-radio-button v-for="(label, key) in dietGoalMap" :key="key" :value="key">
+                {{ label }}
+              </el-radio-button>
             </el-radio-group>
           </div>
         </div>
-      </div>
 
-      <!-- 餐计划网格 -->
-      <el-skeleton :loading="loading" animated :rows="8">
-        <el-empty v-if="!mealPlans.length" description="暂无符合条件的餐计划" />
-        <div v-else class="plan-grid">
+        <div class="filter-row">
+          <div class="filter-group">
+            <span class="filter-label">类型：</span>
+            <el-radio-group v-model="filters.planType" size="small" @change="loadPlans(1)">
+              <el-radio-button value="">全部</el-radio-button>
+              <el-radio-button value="DAILY">单日</el-radio-button>
+              <el-radio-button value="WEEKLY">周计划</el-radio-button>
+              <el-radio-button value="MONTHLY">月计划</el-radio-button>
+            </el-radio-group>
+          </div>
+
+          <div class="filter-group">
+            <span class="filter-label">排序：</span>
+            <el-radio-group v-model="filters.sort" size="small" @change="loadPlans(1)">
+              <el-radio-button value="latest">最新</el-radio-button>
+              <el-radio-button value="popular">最热</el-radio-button>
+              <el-radio-button value="rating">评分</el-radio-button>
+              <el-radio-button value="followers">跟随</el-radio-button>
+              <el-radio-button value="calories_asc">低卡优先</el-radio-button>
+            </el-radio-group>
+          </div>
+        </div>
+      </section>
+
+      <!-- Plan Grid -->
+      <section class="plans-grid-section">
+        <el-skeleton :loading="loadingPlans" animated :count="6">
+          <template #template>
+            <div class="skeleton-card">
+              <el-skeleton-item variant="image" style="height: 180px" />
+              <el-skeleton-item variant="h3" style="margin: 12px 0 8px" />
+              <el-skeleton-item variant="text" />
+              <el-skeleton-item variant="text" style="width: 60%" />
+            </div>
+          </template>
+        </el-skeleton>
+
+        <div v-if="!loadingPlans && plans.length" class="plans-grid">
           <div
-            v-for="plan in mealPlans"
+            v-for="plan in plans"
             :key="plan.id"
             class="plan-card"
             @click="openDetail(plan.id)"
           >
             <div class="card-cover">
-              <img
-                :src="plan.coverImage || defaultCover"
-                :alt="plan.title"
-                loading="lazy"
-              />
-              <div class="cover-overlay" />
-              <span class="badge-goal" :style="{ background: goalColorMap[plan.dietGoal] || '#10B981' }">
+              <img :src="plan.coverImage || defaultCover" :alt="plan.title" />
+              <span class="goal-badge floating" :style="{ background: goalColorMap[plan.dietGoal] || '#999' }">
                 {{ dietGoalMap[plan.dietGoal] || plan.dietGoal }}
               </span>
-              <span class="badge-type">
-                {{ planTypeMap[plan.planType] || plan.planType }}
+              <span
+                class="difficulty-badge floating"
+                :style="{ background: difficultyColors[plan.difficulty] || '#999' }"
+              >
+                {{ difficultyMap[plan.difficulty] || plan.difficulty }}
               </span>
             </div>
             <div class="card-body">
               <h3 class="card-title">{{ plan.title }}</h3>
               <p class="card-desc">{{ plan.description }}</p>
-              <div class="card-info">
-                <span>📅 {{ plan.durationDays }}天</span>
-                <span>🔥 {{ plan.targetCalories }} kcal/日</span>
-                <span v-if="plan.suitableCrowd">👥 {{ plan.suitableCrowd }}</span>
-              </div>
               <div class="card-stats">
-                <span class="stat"><el-icon><Star /></el-icon> {{ plan.favoriteCount || 0 }}</span>
-                <span class="stat"><el-icon><View /></el-icon> {{ plan.viewCount || 0 }}</span>
+                <span class="stat">📅 {{ plan.durationDays }}天</span>
+                <span class="stat">🔥 {{ plan.targetCalories }}kcal</span>
               </div>
-            </div>
-          </div>
-        </div>
-      </el-skeleton>
-
-      <!-- 分页 -->
-      <div v-if="total > pageSize" class="pagination-wrap">
-        <el-pagination
-          v-model:current-page="currentPage"
-          :page-size="pageSize"
-          :total="total"
-          layout="prev, pager, next, jumper"
-          background
-          @current-change="handlePageChange"
-        />
-      </div>
-    </main>
-
-    <!-- 餐计划详情抽屉 -->
-    <el-drawer
-      v-model="detailVisible"
-      direction="rtl"
-      size="680px"
-      :title="detailData?.title || '餐计划详情'"
-      class="detail-drawer"
-      destroy-on-close
-    >
-      <div v-if="detailLoading" class="drawer-loading">
-        <el-skeleton :rows="12" animated />
-      </div>
-      <div v-else-if="detailData" class="detail-content">
-        <!-- 封面 -->
-        <div class="detail-cover">
-          <img :src="detailData.coverImage || defaultCover" :alt="detailData.title" />
-        </div>
-
-        <!-- 标题区 -->
-        <div class="detail-header">
-          <h2 class="detail-title">{{ detailData.title }}</h2>
-          <p class="detail-desc">{{ detailData.description }}</p>
-          <div class="detail-meta">
-            <el-tag :color="goalColorMap[detailData.dietGoal]" effect="dark" style="border: none">
-              {{ dietGoalMap[detailData.dietGoal] }}
-            </el-tag>
-            <el-tag type="info" effect="plain">{{ planTypeMap[detailData.planType] }}</el-tag>
-            <span v-if="detailData.suitableCrowd" class="crowd-label">👥 {{ detailData.suitableCrowd }}</span>
-          </div>
-        </div>
-
-        <!-- 目标营养摘要 -->
-        <div class="nutrition-summary">
-          <div class="nutri-card calories">
-            <div class="nutri-icon">🔥</div>
-            <div class="nutri-value">{{ detailData.targetCalories }}</div>
-            <div class="nutri-label">千卡/日</div>
-          </div>
-          <div class="nutri-card protein">
-            <div class="nutri-icon">🥩</div>
-            <div class="nutri-value">{{ detailData.targetProtein }}g</div>
-            <div class="nutri-label">蛋白质</div>
-          </div>
-          <div class="nutri-card fat">
-            <div class="nutri-icon">🥑</div>
-            <div class="nutri-value">{{ detailData.targetFat }}g</div>
-            <div class="nutri-label">脂肪</div>
-          </div>
-          <div class="nutri-card carbs">
-            <div class="nutri-icon">🍚</div>
-            <div class="nutri-value">{{ detailData.targetCarbs }}g</div>
-            <div class="nutri-label">碳水</div>
-          </div>
-        </div>
-
-        <!-- 每日标签页 -->
-        <el-tabs v-if="detailData.days && detailData.days.length" v-model="activeDay" class="day-tabs">
-          <el-tab-pane
-            v-for="day in detailData.days"
-            :key="day.dayNumber"
-            :label="'Day ' + day.dayNumber"
-            :name="String(day.dayNumber)"
-          >
-            <!-- 日营养摘要 -->
-            <div class="day-nutrition-bar">
-              <span class="day-nutri-item">🔥 {{ day.totalCalories }} kcal</span>
-              <span class="day-nutri-item">🥩 {{ day.totalProtein }}g 蛋白质</span>
-              <span class="day-nutri-item">🥑 {{ day.totalFat }}g 脂肪</span>
-              <span class="day-nutri-item">🍚 {{ day.totalCarbs }}g 碳水</span>
-            </div>
-
-            <!-- 各餐段 -->
-            <div
-              v-for="mealType in ['BREAKFAST', 'LUNCH', 'DINNER', 'SNACK']"
-              :key="mealType"
-              class="meal-section"
-            >
-              <template v-if="getMealItems(day, mealType).length">
-                <h4 class="meal-type-title">
-                  {{ mealTypeIcons[mealType] }} {{ mealTypeMap[mealType] }}
-                </h4>
-                <div class="meal-items">
-                  <div
-                    v-for="(item, idx) in getMealItems(day, mealType)"
-                    :key="idx"
-                    class="meal-item"
-                  >
-                    <div class="item-main">
-                      <span class="item-name">{{ item.foodName }}</span>
-                      <span class="item-portion">{{ item.portion }}</span>
-                    </div>
-                    <div class="item-nutrition">
-                      <span>{{ item.calories }} kcal</span>
-                      <span>蛋白质 {{ item.protein }}g</span>
-                      <span>脂肪 {{ item.fat }}g</span>
-                      <span>碳水 {{ item.carbs }}g</span>
-                    </div>
-                    <a
-                      v-if="item.recipeId"
-                      class="recipe-link"
-                      @click.stop="goToRecipe(item.recipeId)"
-                    >
-                      查看食谱 →
-                    </a>
-                  </div>
+              <div class="card-footer">
+                <div class="rating-info">
+                  <el-rate
+                    :model-value="plan.avgRating || 0"
+                    disabled
+                    show-score
+                    :score-template="(plan.avgRating || 0).toFixed(1)"
+                    size="small"
+                  />
+                  <span class="count">({{ plan.ratingCount || 0 }})</span>
                 </div>
-              </template>
-            </div>
-          </el-tab-pane>
-        </el-tabs>
-        <el-empty v-else description="暂无每日安排数据" :image-size="80" />
-
-        <!-- 收藏按钮 -->
-        <div class="detail-actions">
-          <el-button
-            :type="isFavorited ? 'danger' : 'default'"
-            size="large"
-            round
-            :loading="favoriteLoading"
-            @click="toggleFavorite"
-          >
-            <el-icon><component :is="isFavorited ? StarFilled : Star" /></el-icon>
-            {{ isFavorited ? '已收藏' : '收藏' }}
-          </el-button>
-        </div>
-      </div>
-    </el-drawer>
-
-    <!-- 我的收藏抽屉 -->
-    <el-drawer
-      v-model="favoritesVisible"
-      direction="rtl"
-      size="560px"
-      title="我的收藏"
-      class="favorites-drawer"
-      destroy-on-close
-    >
-      <div v-if="favoritesLoading" class="drawer-loading">
-        <el-skeleton :rows="6" animated />
-      </div>
-      <template v-else>
-        <el-empty v-if="!favoritePlans.length" description="还没有收藏任何餐计划" />
-        <div v-else class="fav-list">
-          <div
-            v-for="plan in favoritePlans"
-            :key="plan.id"
-            class="fav-card"
-            @click="openDetail(plan.id)"
-          >
-            <div class="fav-cover">
-              <img :src="plan.coverImage || defaultCover" :alt="plan.title" />
-            </div>
-            <div class="fav-body">
-              <h4 class="fav-title">{{ plan.title }}</h4>
-              <p class="fav-desc">{{ plan.description }}</p>
-              <div class="fav-meta">
-                <el-tag size="small" :color="goalColorMap[plan.dietGoal]" effect="dark" style="border: none">
-                  {{ dietGoalMap[plan.dietGoal] }}
-                </el-tag>
-                <span>🔥 {{ plan.targetCalories }} kcal/日</span>
+                <div class="follow-info">
+                  <el-icon><UserFilled /></el-icon>
+                  <span>{{ plan.followCount || 0 }}</span>
+                  <el-icon style="margin-left: 8px"><View /></el-icon>
+                  <span>{{ plan.viewCount || 0 }}</span>
+                </div>
+              </div>
+              <div v-if="plan.tags" class="card-tags">
+                <el-tag
+                  v-for="t in parseTags(plan.tags)"
+                  :key="t"
+                  size="small"
+                  type="info"
+                  effect="plain"
+                  round
+                >{{ t }}</el-tag>
               </div>
             </div>
           </div>
         </div>
-        <div v-if="favoritesTotal > favoritesPageSize" class="pagination-wrap">
+
+        <el-empty v-if="!loadingPlans && !plans.length" description="暂无营养餐计划" />
+
+        <div v-if="totalPlans > filters.size" class="pagination-wrap">
           <el-pagination
-            v-model:current-page="favoritesPage"
-            :page-size="favoritesPageSize"
-            :total="favoritesTotal"
+            v-model:current-page="filters.page"
+            :page-size="filters.size"
+            :total="totalPlans"
             layout="prev, pager, next"
-            background
-            small
-            @current-change="loadFavorites"
+            @current-change="loadPlans"
           />
         </div>
+      </section>
+    </div>
+
+    <!-- ==================== MY FOLLOWS TAB ==================== -->
+    <div v-show="activeTab === 'follows'" class="tab-content">
+      <el-skeleton :loading="loadingFollows" animated :count="3">
+        <template #template>
+          <div class="skeleton-card" style="height: 120px">
+            <el-skeleton-item variant="h3" />
+            <el-skeleton-item variant="text" style="width: 80%" />
+          </div>
+        </template>
+      </el-skeleton>
+
+      <div v-if="!loadingFollows && myFollows.length" class="follows-list">
+        <div v-for="follow in myFollows" :key="follow.id" class="follow-card">
+          <div class="follow-header">
+            <div class="follow-title-row">
+              <h3>{{ follow.mealPlan?.title || '营养餐计划' }}</h3>
+              <span
+                v-if="follow.mealPlan?.dietGoal"
+                class="goal-badge small"
+                :style="{ background: goalColorMap[follow.mealPlan.dietGoal] || '#999' }"
+              >
+                {{ dietGoalMap[follow.mealPlan.dietGoal] || follow.mealPlan.dietGoal }}
+              </span>
+            </div>
+            <p class="follow-status-text">
+              第 {{ follow.currentDay || 1 }} / {{ follow.mealPlan?.durationDays || '?' }} 天
+            </p>
+          </div>
+          <div class="follow-progress">
+            <el-progress
+              :percentage="calcFollowProgress(follow)"
+              :stroke-width="12"
+              :color="accentColor"
+              striped
+              striped-flow
+            />
+          </div>
+          <div class="follow-actions">
+            <el-button type="primary" size="small" @click="openDetail(follow.mealPlan?.id)">
+              继续打卡
+            </el-button>
+            <el-button size="small" type="danger" plain @click="handleUnfollow(follow.mealPlan?.id)">
+              放弃跟随
+            </el-button>
+          </div>
+        </div>
+      </div>
+
+      <el-empty v-if="!loadingFollows && !myFollows.length" description="还没有跟随任何计划">
+        <el-button type="primary" @click="activeTab = 'discover'">去发现营养餐</el-button>
+      </el-empty>
+    </div>
+
+    <!-- ==================== MY FAVORITES TAB ==================== -->
+    <div v-show="activeTab === 'favorites'" class="tab-content">
+      <el-skeleton :loading="loadingFavorites" animated :count="4">
+        <template #template>
+          <div class="skeleton-card">
+            <el-skeleton-item variant="image" style="height: 160px" />
+            <el-skeleton-item variant="h3" style="margin-top: 12px" />
+          </div>
+        </template>
+      </el-skeleton>
+
+      <div v-if="!loadingFavorites && myFavorites.length" class="plans-grid">
+        <div
+          v-for="plan in myFavorites"
+          :key="'fav-' + plan.id"
+          class="plan-card"
+          @click="openDetail(plan.id)"
+        >
+          <div class="card-cover">
+            <img :src="plan.coverImage || defaultCover" :alt="plan.title" />
+            <span class="goal-badge floating" :style="{ background: goalColorMap[plan.dietGoal] || '#999' }">
+              {{ dietGoalMap[plan.dietGoal] || plan.dietGoal }}
+            </span>
+          </div>
+          <div class="card-body">
+            <h3 class="card-title">{{ plan.title }}</h3>
+            <p class="card-desc">{{ plan.description }}</p>
+            <div class="card-stats">
+              <span class="stat">📅 {{ plan.durationDays }}天</span>
+              <span class="stat">🔥 {{ plan.targetCalories }}kcal</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <el-empty v-if="!loadingFavorites && !myFavorites.length" description="还没有收藏任何计划">
+        <el-button type="primary" @click="activeTab = 'discover'">去发现营养餐</el-button>
+      </el-empty>
+    </div>
+
+    <!-- ==================== PLAN DETAIL DRAWER ==================== -->
+    <el-drawer
+      v-model="drawerVisible"
+      :size="drawerWidth"
+      direction="rtl"
+      :destroy-on-close="true"
+      class="detail-drawer"
+    >
+      <template #header>
+        <span class="drawer-title">{{ detail?.title || '餐计划详情' }}</span>
       </template>
+
+      <div v-if="loadingDetail" class="drawer-loading">
+        <el-skeleton animated :count="4">
+          <template #template>
+            <el-skeleton-item variant="image" style="height: 200px; margin-bottom: 16px" />
+            <el-skeleton-item variant="h3" />
+            <el-skeleton-item variant="text" />
+            <el-skeleton-item variant="text" style="width: 60%" />
+          </template>
+        </el-skeleton>
+      </div>
+
+      <div v-else-if="detail" class="detail-content">
+        <!-- Cover -->
+        <img :src="detail.coverImage || defaultCover" alt="" class="detail-cover" />
+
+        <!-- Title & Badges -->
+        <h2 class="detail-title">{{ detail.title }}</h2>
+        <div class="detail-badges">
+          <span class="goal-badge" :style="{ background: goalColorMap[detail.dietGoal] || '#999' }">
+            {{ dietGoalMap[detail.dietGoal] || detail.dietGoal }}
+          </span>
+          <span class="type-badge">{{ planTypeMap[detail.planType] || detail.planType }}</span>
+          <span class="difficulty-badge" :style="{ background: difficultyColors[detail.difficulty] || '#999' }">
+            {{ difficultyMap[detail.difficulty] || detail.difficulty }}
+          </span>
+        </div>
+        <p class="detail-desc">{{ detail.description }}</p>
+        <p v-if="detail.suitableCrowd" class="detail-crowd">
+          <el-icon><User /></el-icon> 适宜人群：{{ detail.suitableCrowd }}
+        </p>
+        <div v-if="detail.tags" class="detail-tags">
+          <el-tag
+            v-for="t in parseTags(detail.tags)"
+            :key="t"
+            size="small"
+            round
+            effect="plain"
+          >{{ t }}</el-tag>
+        </div>
+
+        <!-- Nutrition Summary -->
+        <div class="nutrition-cards">
+          <div class="nutri-card calories">
+            <span class="nutri-value">{{ detail.targetCalories }}</span>
+            <span class="nutri-label">千卡</span>
+          </div>
+          <div class="nutri-card protein">
+            <span class="nutri-value">{{ detail.targetProtein }}g</span>
+            <span class="nutri-label">蛋白质</span>
+          </div>
+          <div class="nutri-card fat">
+            <span class="nutri-value">{{ detail.targetFat }}g</span>
+            <span class="nutri-label">脂肪</span>
+          </div>
+          <div class="nutri-card carbs">
+            <span class="nutri-value">{{ detail.targetCarbs }}g</span>
+            <span class="nutri-label">碳水</span>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="detail-actions">
+          <el-button
+            :type="detailIsFollowing ? 'danger' : 'primary'"
+            :loading="actionLoading"
+            @click="toggleFollow"
+          >
+            {{ detailIsFollowing ? '取消跟随' : '开始跟随' }}
+          </el-button>
+          <el-button
+            :icon="detailIsFavorited ? StarFilled : Star"
+            :class="{ favorited: detailIsFavorited }"
+            :loading="actionLoading"
+            @click="toggleFavorite"
+          >
+            {{ detailIsFavorited ? '已收藏' : '收藏' }}
+          </el-button>
+        </div>
+
+        <!-- Follow Progress (if following) -->
+        <div v-if="detailIsFollowing && followProgress" class="follow-progress-section">
+          <h4>📊 跟随进度</h4>
+          <el-progress
+            :percentage="followProgress.progress || 0"
+            :stroke-width="14"
+            :color="accentColor"
+            striped
+            striped-flow
+          />
+          <p class="progress-text">
+            已打卡 {{ followProgress.checkedDays || 0 }} / {{ followProgress.totalDays || 0 }} 天，
+            共 {{ followProgress.totalCheckins || 0 }} 次
+          </p>
+          <div v-if="followProgress.progress >= 100" class="completion-banner">
+            🎉 恭喜你！已完成全部计划！
+          </div>
+        </div>
+
+        <!-- Daily Tabs -->
+        <div v-if="detail.days && detail.days.length" class="days-section">
+          <h4>📅 每日安排</h4>
+          <el-tabs v-model="activeDayTab" type="card" class="day-tabs">
+            <el-tab-pane
+              v-for="day in sortedDays"
+              :key="day.dayNumber"
+              :label="'第' + day.dayNumber + '天'"
+              :name="String(day.dayNumber)"
+            >
+              <!-- Day Nutrition Bar -->
+              <div class="day-nutrition-bar">
+                <span>🔥 {{ day.totalCalories }}kcal</span>
+                <span>蛋白 {{ day.totalProtein }}g</span>
+                <span>脂肪 {{ day.totalFat }}g</span>
+                <span>碳水 {{ day.totalCarbs }}g</span>
+              </div>
+
+              <!-- Meal Sections -->
+              <div v-for="mealType in mealTypes" :key="mealType" class="meal-section">
+                <div class="meal-header">
+                  <span class="meal-icon">{{ mealTypeIcons[mealType] }}</span>
+                  <span class="meal-type-label">{{ mealTypeMap[mealType] }}</span>
+
+                  <!-- Check-in checkbox -->
+                  <label
+                    v-if="detailIsFollowing && detailFollowId"
+                    class="checkin-toggle"
+                    @click.stop
+                  >
+                    <input
+                      type="checkbox"
+                      :checked="isCheckedIn(day.dayNumber, mealType)"
+                      @change="handleCheckin(day.dayNumber, mealType, $event)"
+                    />
+                    <span class="checkin-label">{{ isCheckedIn(day.dayNumber, mealType) ? '已打卡' : '打卡' }}</span>
+                  </label>
+                </div>
+
+                <div
+                  v-for="(item, idx) in getMealItems(day, mealType)"
+                  :key="item.foodName + '-' + idx"
+                  class="meal-item"
+                >
+                  <div class="item-main">
+                    <span class="item-name">{{ item.foodName }}</span>
+                    <span v-if="item.portion" class="item-portion">{{ item.portion }}</span>
+                  </div>
+                  <p v-if="item.description" class="item-desc">{{ item.description }}</p>
+                  <div class="item-macros">
+                    <span>{{ item.calories }}kcal</span>
+                    <span>蛋白{{ item.protein }}g</span>
+                    <span>脂肪{{ item.fat }}g</span>
+                    <span>碳水{{ item.carbs }}g</span>
+                  </div>
+                  <a
+                    v-if="item.recipeId || item.recipeCorpusId"
+                    class="recipe-link"
+                    @click.stop="goToRecipe(item)"
+                  >查看食谱 →</a>
+                </div>
+
+                <p v-if="!getMealItems(day, mealType).length" class="no-items">暂无安排</p>
+              </div>
+            </el-tab-pane>
+          </el-tabs>
+        </div>
+
+        <!-- Rating Section -->
+        <div class="rating-section">
+          <h4>⭐ 评分与评价</h4>
+          <div v-if="authStore.isLoggedIn" class="my-rating">
+            <p class="rating-prompt">你的评分：</p>
+            <el-rate v-model="userRatingValue" :colors="['#F59E0B', '#F59E0B', '#F59E0B']" />
+            <el-input
+              v-model="userReviewText"
+              type="textarea"
+              :rows="2"
+              placeholder="写一句评价（可选）"
+              maxlength="200"
+              show-word-limit
+              style="margin-top: 8px"
+            />
+            <el-button
+              type="primary"
+              size="small"
+              style="margin-top: 8px"
+              :loading="submittingRating"
+              :disabled="!userRatingValue"
+              @click="submitRating"
+            >提交评价</el-button>
+          </div>
+
+          <!-- Ratings List -->
+          <div v-if="ratings.length" class="ratings-list">
+            <div v-for="r in ratings" :key="r.id" class="rating-item">
+              <div class="rating-item-header">
+                <span class="rater-name">{{ r.user?.nickname || r.user?.username || '用户' }}</span>
+                <el-rate :model-value="r.rating" disabled size="small" />
+              </div>
+              <p v-if="r.review" class="rating-review">{{ r.review }}</p>
+              <span class="rating-date">{{ formatDate(r.createdAt) }}</span>
+            </div>
+          </div>
+          <el-empty v-else-if="!loadingRatings" description="暂无评价" :image-size="60" />
+
+          <div v-if="totalRatings > ratingsPage.size" class="pagination-wrap small">
+            <el-pagination
+              v-model:current-page="ratingsPage.page"
+              :page-size="ratingsPage.size"
+              :total="totalRatings"
+              layout="prev, pager, next"
+              small
+              @current-change="loadRatings"
+            />
+          </div>
+        </div>
+      </div>
     </el-drawer>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import { ElMessage as message } from 'element-plus'
-import { ArrowLeft, Search, Star, StarFilled, View } from '@element-plus/icons-vue'
+import message from '@/utils/message'
 import api from '@/services/api'
+import {
+  Search as SearchIcon,
+  Star,
+  StarFilled,
+  UserFilled,
+  View,
+  User,
+} from '@element-plus/icons-vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
 
 const defaultCover = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600&h=340&fit=crop'
+const accentColor = '#10B981'
 
 // ========== Maps ==========
 const dietGoalMap = {
@@ -328,12 +544,11 @@ const dietGoalMap = {
   WEIGHT_LOSS: '减脂塑形',
   MUSCLE_GAIN: '增肌增重',
   WELLNESS: '养生调理',
-  DIABETES_FRIENDLY: '糖尿病适用',
+  DIABETES_FRIENDLY: '控糖饮食',
   PREGNANCY: '孕期营养',
   POSTPARTUM: '产后恢复',
-  ELDERLY: '老年营养'
+  ELDERLY: '老年养护',
 }
-
 const goalColorMap = {
   BALANCED: '#10B981',
   WEIGHT_LOSS: '#F59E0B',
@@ -342,179 +557,428 @@ const goalColorMap = {
   DIABETES_FRIENDLY: '#3B82F6',
   PREGNANCY: '#EC4899',
   POSTPARTUM: '#F97316',
-  ELDERLY: '#6366F1'
+  ELDERLY: '#6366F1',
 }
-
-const planTypeMap = { DAILY: '每日计划', WEEKLY: '每周计划' }
+const difficultyMap = { EASY: '简单', MEDIUM: '适中', HARD: '挑战' }
+const difficultyColors = { EASY: '#10B981', MEDIUM: '#F59E0B', HARD: '#EF4444' }
+const planTypeMap = { DAILY: '单日计划', WEEKLY: '周计划', MONTHLY: '月计划' }
 const mealTypeMap = { BREAKFAST: '早餐', LUNCH: '午餐', DINNER: '晚餐', SNACK: '加餐' }
-const mealTypeIcons = { BREAKFAST: '🌅', LUNCH: '☀️', DINNER: '🌙', SNACK: '🍎' }
+const mealTypeIcons = { BREAKFAST: '🌅', LUNCH: '☀️', DINNER: '🌙', SNACK: '🍪' }
+const mealTypes = ['BREAKFAST', 'LUNCH', 'DINNER', 'SNACK']
 
-const dietGoalOptions = [
-  { value: '', label: '全部' },
-  ...Object.entries(dietGoalMap).map(([value, label]) => ({ value, label }))
-]
+// ========== Discover State ==========
+const activeTab = ref('discover')
+const tags = ref([])
+const selectedTag = ref('')
+const recommendedPlans = ref([])
+const plans = ref([])
+const totalPlans = ref(0)
+const loadingPlans = ref(false)
 
-// ========== List state ==========
-const mealPlans = ref([])
-const loading = ref(false)
-const keyword = ref('')
-const selectedDietGoal = ref('')
-const selectedPlanType = ref('')
-const selectedSort = ref('latest')
-const currentPage = ref(1)
-const pageSize = 12
-const total = ref(0)
+const filters = reactive({
+  page: 1,
+  size: 12,
+  keyword: '',
+  dietGoal: '',
+  planType: '',
+  sort: 'latest',
+})
 
-// ========== Detail state ==========
-const detailVisible = ref(false)
-const detailLoading = ref(false)
-const detailData = ref(null)
-const activeDay = ref('1')
-const isFavorited = ref(false)
-const favoriteLoading = ref(false)
+// ========== Follows State ==========
+const myFollows = ref([])
+const loadingFollows = ref(false)
 
-// ========== Favorites state ==========
-const favoritesVisible = ref(false)
-const favoritesLoading = ref(false)
-const favoritePlans = ref([])
-const favoritesPage = ref(1)
-const favoritesPageSize = 12
-const favoritesTotal = ref(0)
+// ========== Favorites State ==========
+const myFavorites = ref([])
+const loadingFavorites = ref(false)
 
-// ========== Fetch meal plans ==========
-async function fetchMealPlans() {
-  loading.value = true
-  try {
-    const params = {
-      page: currentPage.value,
-      size: pageSize,
-      sort: selectedSort.value
-    }
-    if (selectedDietGoal.value) params.dietGoal = selectedDietGoal.value
-    if (selectedPlanType.value) params.planType = selectedPlanType.value
-    if (keyword.value.trim()) params.keyword = keyword.value.trim()
+// ========== Detail State ==========
+const drawerVisible = ref(false)
+const loadingDetail = ref(false)
+const detail = ref(null)
+const detailIsFavorited = ref(false)
+const detailIsFollowing = ref(false)
+const detailFollowId = ref(null)
+const actionLoading = ref(false)
+const activeDayTab = ref('1')
 
-    const res = await api.get('/meal-plans', { params })
-    const page = res.data?.data
-    mealPlans.value = page?.content || []
-    total.value = page?.totalElements ?? page?.total ?? 0
-  } catch (e) {
-    message.error('加载餐计划失败，请稍后重试')
-    console.error(e)
-  } finally {
-    loading.value = false
-  }
+// Follow progress
+const followProgress = ref(null)
+const checkinSet = ref(new Set())
+
+// Ratings
+const ratings = ref([])
+const totalRatings = ref(0)
+const loadingRatings = ref(false)
+const ratingsPage = reactive({ page: 1, size: 10 })
+const userRatingValue = ref(0)
+const userReviewText = ref('')
+const submittingRating = ref(false)
+
+// Responsive drawer width
+const drawerWidth = computed(() => {
+  if (typeof window !== 'undefined' && window.innerWidth < 768) return '100%'
+  return '780px'
+})
+
+const sortedDays = computed(() => {
+  if (!detail.value?.days) return []
+  return [...detail.value.days].sort((a, b) => a.dayNumber - b.dayNumber)
+})
+
+// ========== Helpers ==========
+function parseTags(tagStr) {
+  if (!tagStr) return []
+  return tagStr.split(',').map(t => t.trim()).filter(Boolean)
 }
 
-// ========== Filter handlers ==========
-function selectDietGoal(val) {
-  selectedDietGoal.value = val
-  currentPage.value = 1
-  fetchMealPlans()
-}
-
-function handleFilterChange() {
-  currentPage.value = 1
-  fetchMealPlans()
-}
-
-function handleSearch() {
-  currentPage.value = 1
-  fetchMealPlans()
-}
-
-function handlePageChange(page) {
-  currentPage.value = page
-  fetchMealPlans()
-  window.scrollTo({ top: 0, behavior: 'smooth' })
-}
-
-// ========== Detail ==========
-async function openDetail(id) {
-  detailVisible.value = true
-  detailLoading.value = true
-  activeDay.value = '1'
-  try {
-    const res = await api.get(`/meal-plans/${id}`)
-    const data = res.data?.data
-    detailData.value = data?.mealPlan || data
-    isFavorited.value = data?.isFavorited ?? false
-  } catch (e) {
-    message.error('加载详情失败')
-    console.error(e)
-  } finally {
-    detailLoading.value = false
-  }
+function formatDate(dateStr) {
+  if (!dateStr) return ''
+  const d = new Date(dateStr)
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0')
 }
 
 function getMealItems(day, mealType) {
   if (!day?.items) return []
-  return day.items.filter(item => item.mealType === mealType)
+  return day.items.filter(i => i.mealType === mealType)
 }
 
-function goToRecipe(recipeId) {
-  router.push({ path: '/recipes', query: { recipeId } })
+function calcFollowProgress(follow) {
+  const total = follow.mealPlan?.durationDays || 1
+  const current = follow.currentDay || 0
+  return Math.min(Math.round((current / total) * 100), 100)
 }
 
-// ========== Favorite ==========
+function goToRecipe(item) {
+  if (item.recipeId) {
+    router.push('/recipes?id=' + item.recipeId)
+  } else if (item.recipeCorpusId) {
+    router.push('/recipes?corpusId=' + item.recipeCorpusId)
+  }
+}
+
+// ========== API: Tags & Recommended ==========
+async function loadTags() {
+  try {
+    const res = await api.get('/meal-plans/tags')
+    if (res.data?.code === 200) {
+      tags.value = res.data.data || []
+    }
+  } catch (e) {
+    console.error('加载标签失败', e)
+  }
+}
+
+async function loadRecommended() {
+  try {
+    const res = await api.get('/meal-plans/recommendations')
+    if (res.data?.code === 200) {
+      recommendedPlans.value = res.data.data || []
+    }
+    if (!recommendedPlans.value.length) {
+      const res2 = await api.get('/meal-plans/featured')
+      if (res2.data?.code === 200) {
+        recommendedPlans.value = res2.data.data || []
+      }
+    }
+  } catch (e) {
+    console.error('加载推荐失败', e)
+  }
+}
+
+// ========== API: Plan List ==========
+async function loadPlans(page) {
+  if (page) filters.page = page
+  loadingPlans.value = true
+  try {
+    const params = {
+      page: filters.page,
+      size: filters.size,
+      sort: filters.sort,
+    }
+    if (filters.keyword) params.keyword = filters.keyword
+    if (filters.dietGoal) params.dietGoal = filters.dietGoal
+    if (filters.planType) params.planType = filters.planType
+
+    let res
+    if (selectedTag.value) {
+      res = await api.get('/meal-plans/by-tag', { params: { tag: selectedTag.value, ...params } })
+    } else {
+      res = await api.get('/meal-plans', { params })
+    }
+
+    if (res.data?.code === 200) {
+      const data = res.data.data
+      if (Array.isArray(data)) {
+        plans.value = data
+        totalPlans.value = data.length
+      } else {
+        plans.value = data?.content || data?.records || []
+        totalPlans.value = data?.totalElements || data?.total || plans.value.length
+      }
+    }
+  } catch (e) {
+    console.error('加载计划列表失败', e)
+    message.error('加载营养餐计划失败')
+  } finally {
+    loadingPlans.value = false
+  }
+}
+
+function toggleTag(tag) {
+  selectedTag.value = selectedTag.value === tag ? '' : tag
+  loadPlans(1)
+}
+
+// ========== API: Follows ==========
+async function loadMyFollows() {
+  if (!authStore.isLoggedIn) return
+  loadingFollows.value = true
+  try {
+    const res = await api.get('/meal-plans/my-follows')
+    if (res.data?.code === 200) {
+      myFollows.value = res.data.data || []
+    }
+  } catch (e) {
+    console.error('加载跟随列表失败', e)
+    message.error('加载跟随列表失败')
+  } finally {
+    loadingFollows.value = false
+  }
+}
+
+// ========== API: Favorites ==========
+async function loadMyFavorites() {
+  if (!authStore.isLoggedIn) return
+  loadingFavorites.value = true
+  try {
+    const res = await api.get('/meal-plans/my-favorites')
+    if (res.data?.code === 200) {
+      myFavorites.value = res.data.data || []
+    }
+  } catch (e) {
+    console.error('加载收藏列表失败', e)
+    message.error('加载收藏列表失败')
+  } finally {
+    loadingFavorites.value = false
+  }
+}
+
+// ========== API: Detail ==========
+async function openDetail(planId) {
+  if (!planId) return
+  drawerVisible.value = true
+  loadingDetail.value = true
+  detail.value = null
+  followProgress.value = null
+  checkinSet.value = new Set()
+  userRatingValue.value = 0
+  userReviewText.value = ''
+  ratings.value = []
+  totalRatings.value = 0
+  ratingsPage.page = 1
+  activeDayTab.value = '1'
+
+  try {
+    const res = await api.get('/meal-plans/' + planId)
+    if (res.data?.code === 200) {
+      const d = res.data.data
+      detail.value = d.mealPlan || d
+      detailIsFavorited.value = !!d.isFavorited
+      detailIsFollowing.value = !!d.isFollowing
+      detailFollowId.value = d.followStatus?.id || null
+      if (d.userRating) {
+        userRatingValue.value = d.userRating.rating || 0
+        userReviewText.value = d.userRating.review || ''
+      }
+    }
+    await loadRatings()
+    if (detailIsFollowing.value) {
+      await loadFollowProgress(planId)
+    }
+  } catch (e) {
+    console.error('加载计划详情失败', e)
+    message.error('加载详情失败')
+  } finally {
+    loadingDetail.value = false
+  }
+}
+
+async function loadFollowProgress(planId) {
+  try {
+    const res = await api.get('/meal-plans/' + planId + '/progress')
+    if (res.data?.code === 200) {
+      followProgress.value = res.data.data
+      const newSet = new Set()
+      const checkins = res.data.data?.checkins || []
+      checkins.forEach(c => {
+        newSet.add(c.dayNumber + '-' + c.mealType)
+      })
+      checkinSet.value = newSet
+    }
+  } catch (e) {
+    console.error('加载进度失败', e)
+  }
+}
+
+function isCheckedIn(dayNumber, mealType) {
+  return checkinSet.value.has(dayNumber + '-' + mealType)
+}
+
+async function handleCheckin(dayNumber, mealType, event) {
+  const checked = event.target.checked
+  try {
+    if (checked) {
+      await api.post('/meal-plans/checkin', {
+        followId: detailFollowId.value,
+        dayNumber,
+        mealType,
+      })
+      checkinSet.value.add(dayNumber + '-' + mealType)
+      message.success('打卡成功 ✅')
+    } else {
+      await api.delete('/meal-plans/checkin', {
+        params: {
+          followId: detailFollowId.value,
+          dayNumber,
+          mealType,
+        },
+      })
+      checkinSet.value.delete(dayNumber + '-' + mealType)
+      message.info('已取消打卡')
+    }
+    if (detail.value?.id) {
+      await loadFollowProgress(detail.value.id)
+    }
+  } catch (e) {
+    console.error('打卡操作失败', e)
+    message.error('打卡操作失败')
+    event.target.checked = !checked
+  }
+}
+
+// ========== API: Follow/Unfollow ==========
+async function toggleFollow() {
+  if (!authStore.isLoggedIn) {
+    message.warning('请先登录')
+    return
+  }
+  if (!detail.value?.id) return
+  actionLoading.value = true
+  try {
+    if (detailIsFollowing.value) {
+      await api.delete('/meal-plans/' + detail.value.id + '/follow')
+      detailIsFollowing.value = false
+      detailFollowId.value = null
+      followProgress.value = null
+      checkinSet.value = new Set()
+      message.success('已取消跟随')
+    } else {
+      const res = await api.post('/meal-plans/' + detail.value.id + '/follow')
+      detailIsFollowing.value = true
+      if (res.data?.code === 200 && res.data.data) {
+        detailFollowId.value = res.data.data.id || res.data.data
+      }
+      message.success('开始跟随计划！加油💪')
+      await loadFollowProgress(detail.value.id)
+    }
+    loadMyFollows()
+  } catch (e) {
+    console.error('跟随操作失败', e)
+    message.error(e.response?.data?.message || '操作失败')
+  } finally {
+    actionLoading.value = false
+  }
+}
+
+async function handleUnfollow(planId) {
+  if (!planId) return
+  try {
+    await api.delete('/meal-plans/' + planId + '/follow')
+    message.success('已取消跟随')
+    loadMyFollows()
+  } catch (e) {
+    console.error('取消跟随失败', e)
+    message.error('取消跟随失败')
+  }
+}
+
+// ========== API: Favorite ==========
 async function toggleFavorite() {
   if (!authStore.isLoggedIn) {
     message.warning('请先登录')
     return
   }
-  if (!detailData.value) return
-
-  favoriteLoading.value = true
+  if (!detail.value?.id) return
+  actionLoading.value = true
   try {
-    const res = await api.post(`/meal-plans/${detailData.value.id}/favorite`)
-    const data = res.data?.data
-    isFavorited.value = data?.favorited ?? !isFavorited.value
-    message.success(isFavorited.value ? '已收藏' : '已取消收藏')
+    await api.post('/meal-plans/' + detail.value.id + '/favorite')
+    detailIsFavorited.value = !detailIsFavorited.value
+    message.success(detailIsFavorited.value ? '已收藏 ⭐' : '已取消收藏')
+    loadMyFavorites()
+  } catch (e) {
+    console.error('收藏操作失败', e)
+    message.error('收藏操作失败')
+  } finally {
+    actionLoading.value = false
+  }
+}
 
-    // Update count in list
-    const plan = mealPlans.value.find(p => p.id === detailData.value.id)
-    if (plan) {
-      plan.favoriteCount = (plan.favoriteCount || 0) + (isFavorited.value ? 1 : -1)
+// ========== API: Ratings ==========
+async function loadRatings(page) {
+  if (page) ratingsPage.page = page
+  if (!detail.value?.id) return
+  loadingRatings.value = true
+  try {
+    const res = await api.get('/meal-plans/' + detail.value.id + '/ratings', {
+      params: { page: ratingsPage.page, size: ratingsPage.size },
+    })
+    if (res.data?.code === 200) {
+      const data = res.data.data
+      if (Array.isArray(data)) {
+        ratings.value = data
+        totalRatings.value = data.length
+      } else {
+        ratings.value = data?.content || data?.records || []
+        totalRatings.value = data?.totalElements || data?.total || ratings.value.length
+      }
     }
   } catch (e) {
-    message.error('操作失败，请重试')
-    console.error(e)
+    console.error('加载评价失败', e)
   } finally {
-    favoriteLoading.value = false
+    loadingRatings.value = false
   }
 }
 
-// ========== Favorites drawer ==========
-function openFavorites() {
-  if (!authStore.isLoggedIn) {
-    message.warning('请先登录')
-    return
-  }
-  favoritesVisible.value = true
-  favoritesPage.value = 1
-  loadFavorites()
-}
-
-async function loadFavorites() {
-  favoritesLoading.value = true
+async function submitRating() {
+  if (!detail.value?.id || !userRatingValue.value) return
+  submittingRating.value = true
   try {
-    const res = await api.get('/meal-plans/my-favorites', {
-      params: { page: favoritesPage.value, size: favoritesPageSize }
+    await api.post('/meal-plans/' + detail.value.id + '/rate', {
+      rating: userRatingValue.value,
+      review: userReviewText.value || '',
     })
-    const page = res.data?.data
-    favoritePlans.value = page?.content || []
-    favoritesTotal.value = page?.totalElements ?? page?.total ?? 0
+    message.success('评价已提交')
+    await loadRatings(1)
   } catch (e) {
-    message.error('加载收藏失败')
-    console.error(e)
+    console.error('提交评价失败', e)
+    message.error(e.response?.data?.message || '提交失败')
   } finally {
-    favoritesLoading.value = false
+    submittingRating.value = false
   }
+}
+
+// ========== Tab Change ==========
+function handleTabChange(tab) {
+  if (tab === 'follows') loadMyFollows()
+  else if (tab === 'favorites') loadMyFavorites()
 }
 
 // ========== Init ==========
 onMounted(() => {
-  fetchMealPlans()
+  loadTags()
+  loadRecommended()
+  loadPlans(1)
 })
 </script>
 
@@ -522,674 +986,708 @@ onMounted(() => {
 @use '@/styles/variables.scss' as *;
 
 .meal-plans-view {
-  min-height: 100vh;
-  background: $background;
-  font-family: $font-body;
-  color: $foreground;
-}
-
-// ========== Top nav ==========
-.top-nav {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid $border;
-  box-shadow: $shadow-sm;
-}
-
-.nav-inner {
   max-width: 1200px;
   margin: 0 auto;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px 24px;
+  padding: $spacing-md;
+  font-family: $font-body;
 }
 
-.nav-left {
-  display: flex;
-  align-items: center;
-  gap: 12px;
+// ===== Header =====
+.page-header {
+  text-align: center;
+  padding: $spacing-xl 0 $spacing-md;
 }
-
-.nav-right {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
 .page-title {
   font-family: $font-display;
-  font-size: 22px;
+  font-size: 2rem;
+  color: $foreground;
   margin: 0;
-  background: $gradient-accent;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+}
+.page-subtitle {
+  color: $text-secondary;
+  margin-top: $spacing-xs;
+  font-size: 0.95rem;
 }
 
-// ========== Main area ==========
-.main-area {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 24px;
-}
-
-// ========== Search bar ==========
-.search-bar {
-  margin-bottom: 20px;
-}
-
-.search-input {
-  :deep(.el-input__wrapper) {
-    border-radius: $radius-lg;
-    box-shadow: $shadow-sm;
-    border: 1px solid $border;
-    padding: 4px 12px;
-
-    &:hover,
-    &:focus-within {
-      border-color: $accent;
-      box-shadow: $shadow-accent;
-    }
+// ===== Main Tabs =====
+.main-tabs {
+  margin-bottom: $spacing-lg;
+  :deep(.el-tabs__item) {
+    font-size: 1rem;
+    font-weight: 600;
   }
-
-  :deep(.el-input-group__append) {
-    border-radius: 0 $radius-lg $radius-lg 0;
+  :deep(.el-tabs__active-bar) {
     background: $gradient-accent;
-    color: #fff;
-    border: none;
-
-    .el-button {
-      color: #fff;
-    }
   }
 }
 
-// ========== Filter bar ==========
-.filter-bar {
-  margin-bottom: 24px;
+.tab-content {
+  min-height: 400px;
 }
 
-.filter-group {
-  margin-bottom: 12px;
+// ===== Tag Cloud =====
+.section-label {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: $foreground;
+  margin-bottom: $spacing-sm;
 }
 
-.filter-tabs {
+.tag-cloud-section {
+  margin-bottom: $spacing-lg;
+}
+.tag-cloud {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: $spacing-sm;
 }
-
-.filter-tab {
-  padding: 6px 16px;
+.tag-chip {
+  display: inline-block;
+  padding: 4px 14px;
   border-radius: $radius-full;
-  font-size: 13px;
-  cursor: pointer;
-  transition: all 0.25s ease;
-  background: $card;
   border: 1px solid $border;
+  background: $card;
   color: $text-secondary;
-  white-space: nowrap;
-
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: all 0.2s;
   &:hover {
     border-color: $accent;
     color: $accent;
   }
-
   &.active {
-    background: $gradient-accent;
-    color: #fff;
-    border-color: transparent;
-    box-shadow: $shadow-accent;
-  }
-}
-
-.filter-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 12px;
-
-  :deep(.el-radio-button__inner) {
-    border-radius: $radius-md !important;
-    border: 1px solid $border !important;
-    box-shadow: none !important;
-    font-size: 13px;
-  }
-
-  :deep(.el-radio-button__original-radio:checked + .el-radio-button__inner) {
     background: $accent;
-    border-color: $accent !important;
     color: #fff;
-    box-shadow: $shadow-accent !important;
-  }
-
-  :deep(.el-radio-group) {
-    display: flex;
-    gap: 6px;
-  }
-
-  :deep(.el-radio-button:first-child .el-radio-button__inner),
-  :deep(.el-radio-button:last-child .el-radio-button__inner) {
-    border-radius: $radius-md !important;
+    border-color: $accent;
   }
 }
 
-// ========== Plan grid ==========
-.plan-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
+// ===== Recommended =====
+.recommended-section {
+  margin-bottom: $spacing-xl;
 }
-
-.plan-card {
-  background: $card;
-  border-radius: $radius-xl;
+.recommended-scroll {
+  display: flex;
+  gap: $spacing-md;
+  overflow-x: auto;
+  padding-bottom: $spacing-sm;
+  scrollbar-width: thin;
+  &::-webkit-scrollbar {
+    height: 4px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: $border;
+    border-radius: 2px;
+  }
+}
+.rec-card {
+  flex: 0 0 220px;
+  border-radius: $radius-lg;
   overflow: hidden;
-  border: 1px solid $border;
+  background: $card;
   box-shadow: $shadow-sm;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-
+  transition: transform 0.2s, box-shadow 0.2s;
   &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
-    border-color: $accent-secondary;
-
-    .card-cover img {
-      transform: scale(1.05);
-    }
+    transform: translateY(-3px);
+    box-shadow: $shadow-md;
   }
 }
+.rec-cover {
+  width: 100%;
+  height: 130px;
+  object-fit: cover;
+}
+.rec-info {
+  padding: $spacing-sm $spacing-md;
+}
+.rec-title {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: $foreground;
+  margin: 4px 0 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.rec-meta {
+  display: flex;
+  gap: $spacing-sm;
+  color: $text-secondary;
+  font-size: 0.78rem;
+}
 
+// ===== Badges =====
+.goal-badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: $radius-full;
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  &.floating {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+  }
+  &.small {
+    font-size: 0.68rem;
+    padding: 1px 8px;
+  }
+}
+.difficulty-badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: $radius-full;
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 600;
+  &.floating {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+  }
+}
+.type-badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: $radius-full;
+  background: $muted;
+  color: $text-secondary;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+// ===== Filters =====
+.filters-section {
+  margin-bottom: $spacing-lg;
+}
+.search-row {
+  display: flex;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-md;
+}
+.search-input {
+  flex: 1;
+  max-width: 400px;
+}
+.filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-md;
+  align-items: center;
+  margin-bottom: $spacing-sm;
+}
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  flex-wrap: wrap;
+}
+.filter-label {
+  font-size: 0.85rem;
+  color: $text-secondary;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+// ===== Plan Grid =====
+.plans-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: $spacing-lg;
+}
+.skeleton-card {
+  border-radius: $radius-lg;
+  overflow: hidden;
+  background: $card;
+  padding: $spacing-md;
+}
+.plan-card {
+  border-radius: $radius-lg;
+  overflow: hidden;
+  background: $card;
+  box-shadow: $shadow-sm;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: $shadow-md;
+  }
+}
 .card-cover {
   position: relative;
-  aspect-ratio: 16 / 9;
+  height: 180px;
   overflow: hidden;
-
   img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.4s ease;
   }
 }
-
-.cover-overlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.45) 0%, transparent 50%);
-  pointer-events: none;
-}
-
-.badge-goal {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  padding: 4px 10px;
-  border-radius: $radius-full;
-  font-size: 11px;
-  font-weight: 600;
-  color: #fff;
-  backdrop-filter: blur(4px);
-}
-
-.badge-type {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  padding: 4px 10px;
-  border-radius: $radius-full;
-  font-size: 11px;
-  font-weight: 600;
-  color: $foreground;
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(4px);
-}
-
 .card-body {
-  padding: 16px;
+  padding: $spacing-md;
 }
-
 .card-title {
-  margin: 0 0 6px;
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 700;
   color: $foreground;
+  margin: 0 0 6px;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
-
 .card-desc {
-  margin: 0 0 10px;
-  font-size: 13px;
+  font-size: 0.82rem;
   color: $text-secondary;
-  line-height: 1.5;
+  margin: 0 0 $spacing-sm;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  line-height: 1.5;
 }
-
-.card-info {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  font-size: 12px;
-  color: $text-secondary;
-  margin-bottom: 10px;
-
-  span {
-    white-space: nowrap;
-  }
-}
-
 .card-stats {
   display: flex;
-  gap: 16px;
-  font-size: 12px;
-  color: $text-disabled;
-
+  gap: $spacing-md;
+  font-size: 0.8rem;
+  color: $text-secondary;
+  margin-bottom: $spacing-sm;
   .stat {
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 2px;
+  }
+}
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-xs;
+}
+.rating-info {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  .count {
+    font-size: 0.72rem;
+    color: $text-secondary;
+  }
+  :deep(.el-rate) {
+    --el-rate-icon-size: 14px;
+  }
+  :deep(.el-rate__text) {
+    font-size: 0.75rem;
+  }
+}
+.follow-info {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.78rem;
+  color: $text-secondary;
+}
+.card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: $spacing-xs;
+  .el-tag {
+    font-size: 0.68rem;
   }
 }
 
-// ========== Pagination ==========
 .pagination-wrap {
   display: flex;
   justify-content: center;
-  margin-top: 32px;
-
-  :deep(.el-pagination.is-background .el-pager li.is-active) {
-    background: $accent;
+  padding: $spacing-lg 0;
+  &.small {
+    padding: $spacing-md 0;
   }
 }
 
-// ========== Detail drawer ==========
+// ===== Follows =====
+.follows-list {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+.follow-card {
+  background: $card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow-sm;
+}
+.follow-header {
+  margin-bottom: $spacing-sm;
+}
+.follow-title-row {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  h3 {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: $foreground;
+  }
+}
+.follow-status-text {
+  font-size: 0.85rem;
+  color: $text-secondary;
+  margin: 4px 0 0;
+}
+.follow-progress {
+  margin: $spacing-sm 0;
+}
+.follow-actions {
+  display: flex;
+  gap: $spacing-sm;
+}
+
+// ===== Detail Drawer =====
 .detail-drawer {
   :deep(.el-drawer__header) {
     margin-bottom: 0;
-    padding: 16px 24px;
+    padding-bottom: $spacing-sm;
     border-bottom: 1px solid $border;
   }
-
-  :deep(.el-drawer__body) {
-    padding: 0;
-  }
 }
-
+.drawer-title {
+  font-family: $font-display;
+  font-size: 1.15rem;
+  color: $foreground;
+}
 .drawer-loading {
-  padding: 24px;
+  padding: $spacing-md;
 }
-
 .detail-content {
-  padding-bottom: 32px;
+  padding: 0 $spacing-xs $spacing-xl;
 }
-
 .detail-cover {
   width: 100%;
-  aspect-ratio: 16 / 9;
-  overflow: hidden;
-
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
+  height: 220px;
+  object-fit: cover;
+  border-radius: $radius-lg;
+  margin-bottom: $spacing-md;
 }
-
-.detail-header {
-  padding: 20px 24px 0;
-}
-
 .detail-title {
   font-family: $font-display;
-  font-size: 24px;
-  margin: 0 0 8px;
+  font-size: 1.4rem;
   color: $foreground;
+  margin: 0 0 $spacing-sm;
 }
-
+.detail-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-sm;
+}
 .detail-desc {
-  font-size: 14px;
+  font-size: 0.9rem;
   color: $text-secondary;
   line-height: 1.6;
-  margin: 0 0 12px;
+  margin-bottom: $spacing-sm;
 }
-
-.detail-meta {
+.detail-crowd {
+  font-size: 0.85rem;
+  color: $text-secondary;
+  margin-bottom: $spacing-sm;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 4px;
+}
+.detail-tags {
+  display: flex;
   flex-wrap: wrap;
-
-  .crowd-label {
-    font-size: 13px;
-    color: $text-secondary;
-  }
+  gap: 6px;
+  margin-bottom: $spacing-md;
 }
 
-// ========== Nutrition summary ==========
-.nutrition-summary {
+// Nutrition cards
+.nutrition-cards {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
-  padding: 20px 24px;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-md;
 }
-
 .nutri-card {
   text-align: center;
-  padding: 14px 8px;
-  border-radius: $radius-lg;
-  transition: transform 0.2s ease;
-
-  &:hover {
-    transform: translateY(-2px);
-  }
-
-  &.calories {
-    background: rgba(239, 68, 68, 0.08);
-  }
-  &.protein {
-    background: rgba(59, 130, 246, 0.08);
-  }
-  &.fat {
-    background: rgba(245, 158, 11, 0.08);
-  }
-  &.carbs {
-    background: rgba(16, 185, 129, 0.08);
-  }
+  padding: $spacing-sm $spacing-xs;
+  border-radius: $radius-md;
+  background: $muted;
+  &.calories { border-left: 3px solid #F59E0B; }
+  &.protein { border-left: 3px solid #EF4444; }
+  &.fat { border-left: 3px solid #8B5CF6; }
+  &.carbs { border-left: 3px solid #3B82F6; }
 }
-
-.nutri-icon {
-  font-size: 22px;
-  margin-bottom: 4px;
-}
-
 .nutri-value {
-  font-size: 20px;
+  display: block;
+  font-size: 1.15rem;
   font-weight: 700;
   color: $foreground;
+  font-family: $font-mono;
 }
-
 .nutri-label {
-  font-size: 12px;
+  font-size: 0.72rem;
   color: $text-secondary;
-  margin-top: 2px;
 }
 
-// ========== Day tabs ==========
+// Actions
+.detail-actions {
+  display: flex;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-lg;
+  .favorited {
+    color: #F59E0B;
+    border-color: #F59E0B;
+  }
+}
+
+// Follow progress in detail
+.follow-progress-section {
+  background: $muted;
+  border-radius: $radius-lg;
+  padding: $spacing-md;
+  margin-bottom: $spacing-lg;
+  h4 {
+    margin: 0 0 $spacing-sm;
+    font-size: 0.95rem;
+    color: $foreground;
+  }
+}
+.progress-text {
+  font-size: 0.82rem;
+  color: $text-secondary;
+  margin-top: $spacing-sm;
+}
+.completion-banner {
+  background: $gradient-accent;
+  color: #fff;
+  padding: $spacing-sm $spacing-md;
+  border-radius: $radius-md;
+  text-align: center;
+  font-weight: 700;
+  margin-top: $spacing-sm;
+}
+
+// Days section
+.days-section {
+  margin-bottom: $spacing-lg;
+  h4 {
+    margin: 0 0 $spacing-sm;
+    font-size: 0.95rem;
+    color: $foreground;
+  }
+}
 .day-tabs {
-  padding: 0 24px;
-
   :deep(.el-tabs__item) {
-    font-weight: 600;
-    font-size: 14px;
-
-    &.is-active {
-      color: $accent;
-    }
-  }
-
-  :deep(.el-tabs__active-bar) {
-    background: $accent;
+    font-size: 0.85rem;
   }
 }
-
 .day-nutrition-bar {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
-  padding: 12px 16px;
+  gap: $spacing-md;
+  padding: $spacing-sm $spacing-md;
   background: $muted;
   border-radius: $radius-md;
-  margin-bottom: 16px;
-}
-
-.day-nutri-item {
-  font-size: 13px;
+  margin-bottom: $spacing-md;
+  font-size: 0.82rem;
   color: $text-secondary;
-  font-weight: 500;
+  font-family: $font-mono;
 }
 
-// ========== Meal sections ==========
+// Meal sections
 .meal-section {
-  margin-bottom: 20px;
+  margin-bottom: $spacing-md;
+  &:last-child {
+    margin-bottom: 0;
+  }
 }
-
-.meal-type-title {
-  font-size: 15px;
-  font-weight: 700;
-  color: $foreground;
-  margin: 0 0 10px;
-  padding-bottom: 6px;
-  border-bottom: 2px solid $border;
-}
-
-.meal-items {
+.meal-header {
   display: flex;
-  flex-direction: column;
-  gap: 8px;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: $spacing-xs 0;
+  border-bottom: 1px solid $border;
+  margin-bottom: $spacing-sm;
+}
+.meal-icon {
+  font-size: 1.1rem;
+}
+.meal-type-label {
+  font-weight: 700;
+  font-size: 0.92rem;
+  color: $foreground;
+}
+.checkin-toggle {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  input[type="checkbox"] {
+    accent-color: $accent;
+    width: 16px;
+    height: 16px;
+  }
+}
+.checkin-label {
+  font-size: 0.78rem;
+  color: $accent;
+  font-weight: 600;
 }
 
 .meal-item {
-  background: $card;
-  border: 1px solid $border;
+  padding: $spacing-sm;
   border-radius: $radius-md;
-  padding: 12px 14px;
-  transition: border-color 0.2s ease;
-
-  &:hover {
-    border-color: $accent-secondary;
-  }
+  background: $card;
+  border: 1px solid $border-light;
+  margin-bottom: $spacing-xs;
 }
-
 .item-main {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 6px;
 }
-
 .item-name {
   font-weight: 600;
-  font-size: 14px;
+  font-size: 0.88rem;
   color: $foreground;
 }
-
 .item-portion {
-  font-size: 12px;
+  font-size: 0.78rem;
   color: $text-secondary;
   background: $muted;
-  padding: 2px 8px;
+  padding: 1px 8px;
   border-radius: $radius-full;
 }
-
-.item-nutrition {
-  display: flex;
-  gap: 12px;
-  font-size: 12px;
+.item-desc {
+  font-size: 0.78rem;
   color: $text-secondary;
+  margin: 4px 0;
 }
-
+.item-macros {
+  display: flex;
+  gap: $spacing-sm;
+  font-size: 0.72rem;
+  color: $text-secondary;
+  font-family: $font-mono;
+}
 .recipe-link {
   display: inline-block;
-  margin-top: 6px;
-  font-size: 12px;
+  margin-top: 4px;
+  font-size: 0.78rem;
   color: $accent;
   cursor: pointer;
   font-weight: 600;
-  transition: color 0.2s ease;
-
   &:hover {
-    color: darken(#10B981, 10%);
     text-decoration: underline;
   }
 }
-
-// ========== Detail actions ==========
-.detail-actions {
-  padding: 24px;
-  display: flex;
-  justify-content: center;
-
-  .el-button {
-    min-width: 160px;
-    font-weight: 600;
-    font-size: 15px;
-  }
+.no-items {
+  font-size: 0.82rem;
+  color: $text-disabled;
+  text-align: center;
+  padding: $spacing-sm;
 }
 
-// ========== Favorites drawer ==========
-.favorites-drawer {
-  :deep(.el-drawer__header) {
-    margin-bottom: 0;
-    padding: 16px 24px;
-    border-bottom: 1px solid $border;
-  }
-
-  :deep(.el-drawer__body) {
-    padding: 16px;
+// Rating section
+.rating-section {
+  margin-bottom: $spacing-lg;
+  h4 {
+    margin: 0 0 $spacing-md;
+    font-size: 0.95rem;
+    color: $foreground;
   }
 }
-
-.fav-list {
+.my-rating {
+  background: $muted;
+  padding: $spacing-md;
+  border-radius: $radius-md;
+  margin-bottom: $spacing-md;
+}
+.rating-prompt {
+  font-size: 0.85rem;
+  color: $text-secondary;
+  margin: 0 0 $spacing-xs;
+}
+.ratings-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: $spacing-sm;
 }
-
-.fav-card {
-  display: flex;
-  gap: 12px;
+.rating-item {
+  padding: $spacing-sm $spacing-md;
+  border-radius: $radius-md;
   background: $card;
-  border: 1px solid $border;
-  border-radius: $radius-lg;
-  overflow: hidden;
-  cursor: pointer;
-  transition: all 0.25s ease;
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
-    border-color: $accent-secondary;
-  }
+  border: 1px solid $border-light;
 }
-
-.fav-cover {
-  width: 120px;
-  min-height: 90px;
-  flex-shrink: 0;
-
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-}
-
-.fav-body {
-  flex: 1;
-  padding: 10px 12px 10px 0;
-  min-width: 0;
-}
-
-.fav-title {
-  margin: 0 0 4px;
-  font-size: 14px;
-  font-weight: 700;
-  color: $foreground;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.fav-desc {
-  margin: 0 0 6px;
-  font-size: 12px;
-  color: $text-secondary;
-  line-height: 1.4;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.fav-meta {
+.rating-item-header {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 8px;
-  font-size: 12px;
+}
+.rater-name {
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: $foreground;
+}
+.rating-review {
+  font-size: 0.82rem;
   color: $text-secondary;
+  margin: 4px 0;
+  line-height: 1.5;
+}
+.rating-date {
+  font-size: 0.72rem;
+  color: $text-disabled;
 }
 
-// ========== Responsive ==========
-@media (max-width: $breakpoint-tablet) {
-  .plan-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
-  }
-
-  .nutrition-summary {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .detail-drawer {
-    :deep(.el-drawer) {
-      width: 90% !important;
-    }
-  }
-
-  .nav-inner {
-    padding: 10px 16px;
-  }
-
-  .main-area {
-    padding: 16px;
-  }
-}
-
+// ===== Responsive =====
 @media (max-width: $breakpoint-mobile) {
-  .plan-grid {
-    grid-template-columns: 1fr;
-    gap: 14px;
+  .meal-plans-view {
+    padding: $spacing-sm;
   }
-
   .page-title {
-    font-size: 18px;
+    font-size: 1.5rem;
   }
-
+  .plans-grid {
+    grid-template-columns: 1fr;
+  }
+  .nutrition-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
   .filter-row {
     flex-direction: column;
     align-items: flex-start;
   }
-
-  .nutrition-summary {
-    grid-template-columns: repeat(2, 1fr);
-    padding: 16px;
-  }
-
-  .item-nutrition {
-    flex-wrap: wrap;
-    gap: 6px;
-  }
-
-  .day-nutrition-bar {
-    gap: 8px;
-  }
-
-  .detail-drawer,
-  .favorites-drawer {
-    :deep(.el-drawer) {
-      width: 100% !important;
+  .search-row {
+    flex-direction: column;
+    .search-input {
+      max-width: 100%;
     }
+  }
+  .recommended-scroll {
+    gap: $spacing-sm;
+  }
+  .rec-card {
+    flex: 0 0 180px;
+  }
+  .detail-cover {
+    height: 160px;
+  }
+  .day-nutrition-bar {
+    gap: $spacing-sm;
+  }
+}
+
+@media (max-width: $breakpoint-tablet) and (min-width: $breakpoint-mobile) {
+  .plans-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 </style>
