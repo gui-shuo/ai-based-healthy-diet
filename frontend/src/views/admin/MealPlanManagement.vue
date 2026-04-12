@@ -52,6 +52,26 @@
         </el-table-column>
         <el-table-column prop="durationDays" label="天数" width="70" align="center" />
         <el-table-column prop="suitableCrowd" label="适用人群" min-width="110" show-overflow-tooltip />
+        <el-table-column label="难度" width="80" align="center">
+          <template #default="{ row }">
+            <el-tag size="small" :type="difficultyTagType(row.difficulty)">{{ DifficultyMap[row.difficulty] || row.difficulty || '-' }}</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column label="标签" min-width="120" show-overflow-tooltip>
+          <template #default="{ row }">
+            <span v-if="row.tags">{{ row.tags }}</span>
+            <span v-else style="color:#94a3b8">-</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="评分" width="80" align="center">
+          <template #default="{ row }">
+            <span v-if="row.ratingCount">⭐ {{ Number(row.avgRating).toFixed(1) }} ({{ row.ratingCount }})</span>
+            <span v-else style="color:#94a3b8">-</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="跟随" width="70" align="center">
+          <template #default="{ row }">{{ row.followCount || 0 }}</template>
+        </el-table-column>
         <el-table-column label="精选" width="70" align="center">
           <template #default="{ row }">
             <el-switch v-model="row.isFeatured" size="small" @change="toggleFeatured(row)" />
@@ -127,9 +147,23 @@
               <el-input v-model="form.suitableCrowd" placeholder="如：上班族、学生、老年人" />
             </el-form-item>
           </el-col>
-          <el-col :span="12">
+          <el-col :span="6">
+            <el-form-item label="难度">
+              <el-select v-model="form.difficulty" style="width:100%">
+                <el-option v-for="(label, code) in DifficultyMap" :key="code" :label="label" :value="code" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="6">
             <el-form-item label="精选">
               <el-switch v-model="form.isFeatured" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="16">
+          <el-col :span="24">
+            <el-form-item label="标签">
+              <el-input v-model="form.tags" placeholder="逗号分隔，如：素食,低卡,养生" />
             </el-form-item>
           </el-col>
         </el-row>
@@ -287,6 +321,18 @@ const MealTypeMap = {
   SNACK: '加餐'
 }
 
+const DifficultyMap = {
+  EASY: '简单',
+  MEDIUM: '中等',
+  HARD: '困难'
+}
+
+const difficultyTagType = (d) => {
+  if (d === 'EASY') return 'success'
+  if (d === 'HARD') return 'danger'
+  return 'warning'
+}
+
 // 列表状态
 const loading = ref(false)
 const list = ref([])
@@ -337,6 +383,8 @@ const defaultForm = () => ({
   targetCarbs: 250,
   durationDays: 1,
   suitableCrowd: '',
+  tags: '',
+  difficulty: 'MEDIUM',
   isFeatured: false,
   days: []
 })
@@ -409,6 +457,8 @@ const openForm = async (row) => {
           targetCarbs: data.targetCarbs ?? 250,
           durationDays: data.durationDays ?? 1,
           suitableCrowd: data.suitableCrowd || '',
+          tags: data.tags || '',
+          difficulty: data.difficulty || 'MEDIUM',
           isFeatured: data.isFeatured || false,
           days: (data.days || []).map(d => ({
             dayNumber: d.dayNumber || 1,

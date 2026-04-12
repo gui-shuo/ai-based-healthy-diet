@@ -1,207 +1,159 @@
 <template>
   <view class="page-container">
-    <!-- Search bar -->
-    <view class="search-bar">
-      <view class="search-input-wrap">
-        <text class="search-icon">🔍</text>
-        <input
-          class="search-input"
-          type="text"
-          placeholder="搜索餐计划..."
-          :value="keyword"
-          @input="onSearchInput"
-          confirm-type="search"
-          @confirm="onSearchConfirm"
-        />
-        <text v-if="keyword" class="search-clear" @tap="clearSearch">✕</text>
+    <!-- Tab bar -->
+    <view class="tab-bar">
+      <view class="tab-item" :class="{ active: activeTab === 'discover' }" @tap="activeTab = 'discover'">
+        <text class="tab-text">发现</text>
+      </view>
+      <view class="tab-item" :class="{ active: activeTab === 'following' }" @tap="switchToFollowing">
+        <text class="tab-text">我的跟随</text>
+        <view v-if="followCount > 0" class="tab-badge">{{ followCount }}</view>
       </view>
     </view>
 
-    <!-- Diet goal tabs -->
-    <scroll-view scroll-x class="goal-bar" :show-scrollbar="false">
-      <view class="goal-tabs">
-        <view
-          v-for="goal in goalTabs"
-          :key="goal.value"
-          class="goal-tab"
-          :class="{ active: activeGoal === goal.value }"
-          @tap="switchGoal(goal.value)"
-        >
-          <text class="goal-label">{{ goal.label }}</text>
+    <!-- ===== Discover Tab ===== -->
+    <template v-if="activeTab === 'discover'">
+      <!-- Search -->
+      <view class="search-bar">
+        <view class="search-input-wrap">
+          <text class="search-icon">🔍</text>
+          <input class="search-input" type="text" placeholder="搜索营养餐..." :value="keyword"
+            @input="e => keyword = e.detail.value" confirm-type="search" @confirm="refreshData" />
+          <text v-if="keyword" class="search-clear" @tap="keyword = ''; refreshData()">✕</text>
         </view>
       </view>
-    </scroll-view>
 
-    <!-- Filter row -->
-    <view class="filter-row">
-      <picker :range="planTypes" range-key="label" @change="onPlanTypeChange">
-        <view class="filter-btn">
-          <text class="filter-text">{{ currentPlanTypeLabel }}</text>
-          <text class="filter-arrow">▾</text>
+      <!-- Tags -->
+      <scroll-view scroll-x class="tag-bar" :show-scrollbar="false" v-if="tags.length > 0">
+        <view class="tag-list">
+          <view v-for="tag in tags" :key="tag" class="tag-chip" :class="{ active: activeTag === tag }"
+            @tap="toggleTag(tag)">
+            <text class="tag-text">{{ tag }}</text>
+          </view>
         </view>
-      </picker>
-      <picker :range="sortOptions" range-key="label" @change="onSortChange">
-        <view class="filter-btn">
-          <text class="filter-text">{{ currentSortLabel }}</text>
-          <text class="filter-arrow">▾</text>
-        </view>
-      </picker>
-    </view>
+      </scroll-view>
 
-    <!-- Plan list -->
-    <view class="plan-list" v-if="plans.length > 0">
-      <view
-        v-for="item in plans"
-        :key="item.id"
-        class="plan-card"
-        @tap="goDetail(item.id)"
-      >
-        <view class="card-cover-wrap">
-          <image
-            class="card-cover"
-            :src="item.coverImage"
-            mode="aspectFill"
-            lazy-load
-          />
-          <view class="cover-gradient" />
-          <view
-            class="badge-goal"
-            :style="{ background: getGoalColor(item.dietGoal) }"
-          >
-            {{ getGoalLabel(item.dietGoal) }}
-          </view>
-          <view class="badge-type">{{ getPlanTypeLabel(item.planType) }}</view>
+      <!-- Sort -->
+      <view class="sort-bar">
+        <view v-for="s in sortOptions" :key="s.value" class="sort-item"
+          :class="{ active: selectedSort === s.value }" @tap="selectedSort = s.value; refreshData()">
+          <text class="sort-text">{{ s.label }}</text>
         </view>
-        <view class="card-body">
-          <text class="card-title">{{ item.title }}</text>
-          <text class="card-desc">{{ item.description }}</text>
-          <view class="card-info">
-            <text class="info-item">📅 {{ item.durationDays }}天</text>
-            <text class="info-sep">|</text>
-            <text class="info-item">🔥 {{ item.targetCalories }}kcal/日</text>
-            <text class="info-sep">|</text>
-            <text class="info-item">👥 {{ item.suitableCrowd }}</text>
+      </view>
+
+      <!-- Plan list -->
+      <view class="plan-list" v-if="plans.length > 0">
+        <view v-for="item in plans" :key="item.id" class="plan-card" @tap="goDetail(item.id)">
+          <view class="card-cover-wrap">
+            <image class="card-cover" :src="item.coverImage || '/static/default-food.jpg'" mode="aspectFill" lazy-load />
+            <view class="cover-gradient" />
+            <view class="badge-difficulty" :class="'diff-' + (item.difficulty || 'MEDIUM').toLowerCase()">
+              {{ difficultyMap[item.difficulty] || '中等' }}
+            </view>
           </view>
-          <view class="card-footer">
-            <text class="footer-item">❤️ {{ item.favoriteCount || 0 }}</text>
-            <text class="footer-item">👁 {{ item.viewCount || 0 }}</text>
+          <view class="card-body">
+            <text class="card-title">{{ item.title }}</text>
+            <text class="card-desc">{{ item.description }}</text>
+            <view class="card-tags" v-if="item.tags">
+              <text v-for="t in item.tags.split(',').slice(0, 3)" :key="t" class="mini-tag">{{ t.trim() }}</text>
+            </view>
+            <view class="card-info">
+              <text class="info-item">📅 {{ item.durationDays }}天</text>
+              <text class="info-sep">·</text>
+              <text class="info-item">🔥 {{ item.targetCalories }}kcal</text>
+            </view>
+            <view class="card-footer">
+              <view class="footer-left">
+                <text v-if="item.avgRating > 0" class="footer-item">⭐ {{ Number(item.avgRating).toFixed(1) }}</text>
+                <text class="footer-item">👥 {{ item.followCount || 0 }}人跟随</text>
+              </view>
+              <text class="footer-item">👁 {{ item.viewCount || 0 }}</text>
+            </view>
           </view>
         </view>
       </view>
-    </view>
 
-    <!-- Empty state -->
-    <view class="empty-state" v-else-if="!loading">
-      <text class="empty-icon">📋</text>
-      <text class="empty-text">暂无餐计划</text>
-    </view>
+      <!-- Empty -->
+      <view class="empty-state" v-else-if="!loading">
+        <text class="empty-icon">📋</text>
+        <text class="empty-text">暂无营养餐</text>
+      </view>
 
-    <!-- Loading / no more -->
-    <view class="list-status">
-      <text v-if="loading" class="status-text">加载中...</text>
-      <text v-else-if="noMore && plans.length > 0" class="status-text">没有更多了</text>
-    </view>
+      <!-- Loading -->
+      <view class="list-status">
+        <text v-if="loading" class="status-text">加载中...</text>
+        <text v-else-if="noMore && plans.length > 0" class="status-text">— 没有更多了 —</text>
+      </view>
+    </template>
+
+    <!-- ===== Following Tab ===== -->
+    <template v-if="activeTab === 'following'">
+      <view class="follow-list" v-if="follows.length > 0">
+        <view v-for="f in follows" :key="f.id" class="follow-card" @tap="goDetail(f.mealPlanId)">
+          <view class="follow-header">
+            <text class="follow-title">{{ f.mealPlan?.title || '营养餐' }}</text>
+            <view class="follow-status" :class="'st-' + (f.status || '').toLowerCase()">
+              <text class="st-text">{{ statusMap[f.status] || f.status }}</text>
+            </view>
+          </view>
+          <view class="follow-progress">
+            <view class="progress-bar">
+              <view class="progress-fill" :style="{ width: getProgress(f) + '%' }" />
+            </view>
+            <text class="progress-text">Day {{ f.currentDay || 1 }} / {{ f.mealPlan?.durationDays || '?' }}</text>
+          </view>
+          <view class="follow-meta">
+            <text class="meta-item">开始于 {{ formatDate(f.startDate) }}</text>
+          </view>
+        </view>
+      </view>
+
+      <view class="empty-state" v-else-if="!followLoading">
+        <text class="empty-icon">📝</text>
+        <text class="empty-text">还没有跟随任何营养餐计划</text>
+        <view class="empty-btn" @tap="activeTab = 'discover'">
+          <text class="empty-btn-text">去发现 →</text>
+        </view>
+      </view>
+
+      <view class="list-status" v-if="followLoading">
+        <text class="status-text">加载中...</text>
+      </view>
+    </template>
   </view>
 </template>
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { onShow, onReachBottom } from '@dcloudio/uni-app'
-import { request } from '@/utils/request'
+import { mealPlanApi } from '@/services/api'
 
-const DIET_GOAL_MAP: Record<string, { label: string; color: string }> = {
-  BALANCED: { label: '均衡饮食', color: '#10B981' },
-  WEIGHT_LOSS: { label: '减脂塑形', color: '#F59E0B' },
-  MUSCLE_GAIN: { label: '增肌增重', color: '#3B82F6' },
-  WELLNESS: { label: '养生调理', color: '#8B5CF6' },
-  DIABETES_FRIENDLY: { label: '糖尿病适用', color: '#EF4444' },
-  PREGNANCY: { label: '孕期营养', color: '#EC4899' },
-  POSTPARTUM: { label: '产后恢复', color: '#F97316' },
-  ELDERLY: { label: '老年营养', color: '#6366F1' }
-}
+const activeTab = ref('discover')
 
-const goalTabs = [
-  { value: '', label: '全部' },
-  { value: 'BALANCED', label: '均衡饮食' },
-  { value: 'WEIGHT_LOSS', label: '减脂塑形' },
-  { value: 'MUSCLE_GAIN', label: '增肌增重' },
-  { value: 'WELLNESS', label: '养生调理' },
-  { value: 'DIABETES_FRIENDLY', label: '糖尿病适用' },
-  { value: 'PREGNANCY', label: '孕期营养' },
-  { value: 'POSTPARTUM', label: '产后恢复' },
-  { value: 'ELDERLY', label: '老年营养' }
-]
-
-const planTypes = [
-  { value: '', label: '全部' },
-  { value: 'DAILY', label: '每日' },
-  { value: 'WEEKLY', label: '每周' }
-]
-
-const sortOptions = [
-  { value: 'newest', label: '最新' },
-  { value: 'popular', label: '最热' },
-  { value: 'lowcal', label: '低卡' }
-]
-
+// ===== Discover =====
 const keyword = ref('')
-const activeGoal = ref('')
-const activePlanType = ref(0)
-const activeSort = ref(0)
+const activeTag = ref('')
+const selectedSort = ref('latest')
 const plans = ref<any[]>([])
 const page = ref(1)
 const pageSize = 10
 const loading = ref(false)
 const noMore = ref(false)
+const tags = ref<string[]>([])
 
-let searchTimer: ReturnType<typeof setTimeout> | null = null
+const sortOptions = [
+  { label: '最新', value: 'latest' },
+  { label: '最热', value: 'popular' },
+  { label: '评分', value: 'rating' },
+  { label: '跟随', value: 'followers' },
+  { label: '低卡', value: 'calories_asc' }
+]
 
-const currentPlanTypeLabel = computed(() => planTypes[activePlanType.value].label)
-const currentSortLabel = computed(() => sortOptions[activeSort.value].label)
+const difficultyMap: Record<string, string> = { EASY: '简单', MEDIUM: '中等', HARD: '困难' }
+const statusMap: Record<string, string> = { ACTIVE: '进行中', COMPLETED: '已完成', ABANDONED: '已放弃' }
 
-function getGoalLabel(goal: string) {
-  return DIET_GOAL_MAP[goal]?.label || goal
-}
-
-function getGoalColor(goal: string) {
-  return DIET_GOAL_MAP[goal]?.color || '#10B981'
-}
-
-function getPlanTypeLabel(type: string) {
-  const map: Record<string, string> = { DAILY: '每日', WEEKLY: '每周' }
-  return map[type] || type
-}
-
-function onSearchInput(e: any) {
-  keyword.value = e.detail.value
-  if (searchTimer) clearTimeout(searchTimer)
-  searchTimer = setTimeout(() => {
-    refreshData()
-  }, 500)
-}
-
-function onSearchConfirm() {
-  if (searchTimer) clearTimeout(searchTimer)
-  refreshData()
-}
-
-function clearSearch() {
-  keyword.value = ''
-  refreshData()
-}
-
-function switchGoal(val: string) {
-  activeGoal.value = val
-  refreshData()
-}
-
-function onPlanTypeChange(e: any) {
-  activePlanType.value = Number(e.detail.value)
-  refreshData()
-}
-
-function onSortChange(e: any) {
-  activeSort.value = Number(e.detail.value)
+function toggleTag(tag: string) {
+  activeTag.value = activeTag.value === tag ? '' : tag
   refreshData()
 }
 
@@ -216,20 +168,17 @@ async function loadPlans() {
   if (loading.value || noMore.value) return
   loading.value = true
   try {
-    const params: Record<string, any> = {
-      page: page.value,
-      size: pageSize
+    let res: any
+    if (activeTag.value) {
+      res = await mealPlanApi.searchByTag(activeTag.value, { page: page.value, size: pageSize })
+    } else {
+      const params: Record<string, any> = { page: page.value, size: pageSize, sort: selectedSort.value }
+      if (keyword.value) params.keyword = keyword.value
+      res = await mealPlanApi.getList(params)
     }
-    if (keyword.value) params.keyword = keyword.value
-    if (activeGoal.value) params.dietGoal = activeGoal.value
-    const typeVal = planTypes[activePlanType.value].value
-    if (typeVal) params.planType = typeVal
-    params.sort = sortOptions[activeSort.value].value
-
-    const res = await request({ url: '/meal-plans', data: params })
-    const list = res.data?.content || res.data?.records || res.data?.list || res.data || []
+    const data = res.data?.data || res.data
+    const list = data?.content || data?.records || data?.list || data || []
     const arr = Array.isArray(list) ? list : []
-
     if (page.value === 1) {
       plans.value = arr
     } else {
@@ -243,17 +192,61 @@ async function loadPlans() {
   }
 }
 
+async function loadTags() {
+  try {
+    const res = await mealPlanApi.getTags()
+    const data = res.data?.data || res.data
+    tags.value = Array.isArray(data) ? data : []
+  } catch {}
+}
+
+// ===== Following =====
+const follows = ref<any[]>([])
+const followLoading = ref(false)
+const followCount = computed(() => follows.value.filter(f => f.status === 'ACTIVE').length)
+
+async function loadFollows() {
+  followLoading.value = true
+  try {
+    const res = await mealPlanApi.getMyFollows()
+    const data = res.data?.data || res.data
+    follows.value = Array.isArray(data) ? data : []
+  } catch {
+    uni.showToast({ title: '加载失败', icon: 'none' })
+  } finally {
+    followLoading.value = false
+  }
+}
+
+function switchToFollowing() {
+  activeTab.value = 'following'
+  loadFollows()
+}
+
+function getProgress(f: any) {
+  const total = f.mealPlan?.durationDays || 1
+  const current = f.currentDay || 1
+  return Math.min(Math.round((current / total) * 100), 100)
+}
+
+function formatDate(d: string) {
+  if (!d) return ''
+  return d.substring(0, 10)
+}
+
 function goDetail(id: number | string) {
-  uni.navigateTo({ url: `/pages/meal-plans/detail?id=${id}` })
+  uni.navigateTo({ url: '/pages/meal-plans/detail?id=' + id })
 }
 
 onShow(() => {
   if (plans.value.length === 0) {
     loadPlans()
+    loadTags()
   }
 })
 
 onReachBottom(() => {
+  if (activeTab.value !== 'discover') return
   if (noMore.value || loading.value) return
   page.value++
   loadPlans()
@@ -267,7 +260,49 @@ onReachBottom(() => {
   padding-bottom: 40rpx;
 }
 
-/* ===== Search Bar ===== */
+.tab-bar {
+  display: flex;
+  background: $card;
+  border-bottom: 1rpx solid $border;
+}
+
+.tab-item {
+  flex: 1;
+  text-align: center;
+  padding: 24rpx 0;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+}
+
+.tab-item.active {
+  border-bottom: 4rpx solid $accent;
+}
+
+.tab-text {
+  font-size: 30rpx;
+  color: $muted-foreground;
+}
+
+.tab-item.active .tab-text {
+  color: $accent;
+  font-weight: 600;
+}
+
+.tab-badge {
+  background: $uni-error;
+  color: #fff;
+  font-size: 20rpx;
+  min-width: 32rpx;
+  height: 32rpx;
+  line-height: 32rpx;
+  border-radius: $radius-full;
+  text-align: center;
+  padding: 0 8rpx;
+}
+
 .search-bar {
   padding: 20rpx 24rpx;
   background: $card;
@@ -282,10 +317,7 @@ onReachBottom(() => {
   height: 72rpx;
 }
 
-.search-icon {
-  font-size: 28rpx;
-  margin-right: 12rpx;
-}
+.search-icon { font-size: 28rpx; margin-right: 12rpx; }
 
 .search-input {
   flex: 1;
@@ -299,71 +331,60 @@ onReachBottom(() => {
   padding: 8rpx;
 }
 
-/* ===== Goal Tabs ===== */
-.goal-bar {
+.tag-bar {
   background: $card;
   border-bottom: 1rpx solid $border;
   white-space: nowrap;
 }
 
-.goal-tabs {
+.tag-list {
   display: inline-flex;
   padding: 16rpx 24rpx;
-  gap: 16rpx;
+  gap: 12rpx;
 }
 
-.goal-tab {
-  padding: 12rpx 28rpx;
+.tag-chip {
+  padding: 8rpx 24rpx;
   border-radius: $radius-full;
   background: $muted;
   flex-shrink: 0;
-  transition: all 0.2s;
 }
 
-.goal-tab.active {
+.tag-chip.active {
   background: $accent;
 }
 
-.goal-tab.active .goal-label {
+.tag-chip.active .tag-text {
   color: #fff;
 }
 
-.goal-label {
-  font-size: 26rpx;
+.tag-text {
+  font-size: 24rpx;
   color: $foreground;
   white-space: nowrap;
 }
 
-/* ===== Filter Row ===== */
-.filter-row {
+.sort-bar {
   display: flex;
-  gap: 16rpx;
-  padding: 16rpx 24rpx;
   background: $card;
   border-bottom: 1rpx solid $border;
+  padding: 0 24rpx;
 }
 
-.filter-btn {
-  display: flex;
-  align-items: center;
-  gap: 6rpx;
-  padding: 10rpx 20rpx;
-  border-radius: $radius-sm;
-  border: 1rpx solid $border;
-  background: $card;
+.sort-item {
+  padding: 16rpx 20rpx;
 }
 
-.filter-text {
-  font-size: 24rpx;
-  color: $foreground;
+.sort-item.active .sort-text {
+  color: $accent;
+  font-weight: 600;
 }
 
-.filter-arrow {
-  font-size: 20rpx;
+.sort-text {
+  font-size: 26rpx;
   color: $muted-foreground;
 }
 
-/* ===== Plan List ===== */
 .plan-list {
   padding: 20rpx 24rpx;
   display: flex;
@@ -376,11 +397,6 @@ onReachBottom(() => {
   border-radius: $radius-xl;
   overflow: hidden;
   box-shadow: $shadow-sm;
-  transition: box-shadow 0.2s;
-}
-
-.plan-card:active {
-  box-shadow: $shadow-md;
 }
 
 .card-cover-wrap {
@@ -396,34 +412,24 @@ onReachBottom(() => {
 
 .cover-gradient {
   position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  bottom: 0; left: 0; right: 0;
   height: 120rpx;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.45), transparent);
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.4), transparent);
 }
 
-.badge-goal {
-  position: absolute;
-  top: 16rpx;
-  left: 16rpx;
-  padding: 6rpx 18rpx;
-  border-radius: $radius-sm;
-  color: #fff;
-  font-size: 22rpx;
-  font-weight: 500;
-}
-
-.badge-type {
+.badge-difficulty {
   position: absolute;
   top: 16rpx;
   right: 16rpx;
   padding: 6rpx 18rpx;
   border-radius: $radius-sm;
-  background: rgba(0, 0, 0, 0.5);
   color: #fff;
   font-size: 22rpx;
 }
+
+.diff-easy { background: #22C55E; }
+.diff-medium { background: #F59E0B; }
+.diff-hard { background: #EF4444; }
 
 .card-body {
   padding: 20rpx 24rpx 24rpx;
@@ -446,70 +452,140 @@ onReachBottom(() => {
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  text-overflow: ellipsis;
-  margin-top: 10rpx;
+  margin-top: 8rpx;
   line-height: 1.5;
+}
+
+.card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8rpx;
+  margin-top: 12rpx;
+}
+
+.mini-tag {
+  font-size: 20rpx;
+  padding: 4rpx 14rpx;
+  border-radius: $radius-full;
+  background: rgba(16, 185, 129, 0.1);
+  color: $accent;
 }
 
 .card-info {
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
   gap: 8rpx;
-  margin-top: 16rpx;
+  margin-top: 12rpx;
 }
 
-.info-item {
-  font-size: 22rpx;
-  color: $muted-foreground;
-}
-
-.info-sep {
-  font-size: 20rpx;
-  color: $border;
-}
+.info-item { font-size: 22rpx; color: $muted-foreground; }
+.info-sep { font-size: 20rpx; color: $border; }
 
 .card-footer {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: 16rpx;
-  padding-top: 16rpx;
+  margin-top: 12rpx;
+  padding-top: 12rpx;
   border-top: 1rpx solid $border;
 }
 
-.footer-item {
-  font-size: 22rpx;
-  color: $muted-foreground;
+.footer-left { display: flex; gap: 16rpx; }
+.footer-item { font-size: 22rpx; color: $muted-foreground; }
+
+.follow-list {
+  padding: 20rpx 24rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
 }
 
-/* ===== Empty State ===== */
+.follow-card {
+  background: $card;
+  border-radius: $radius-lg;
+  padding: 24rpx;
+  box-shadow: $shadow-sm;
+}
+
+.follow-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.follow-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: $foreground;
+}
+
+.follow-status {
+  padding: 6rpx 16rpx;
+  border-radius: $radius-full;
+}
+
+.st-active { background: rgba(16, 185, 129, 0.1); }
+.st-active .st-text { color: $accent; }
+.st-completed { background: rgba(59, 130, 246, 0.1); }
+.st-completed .st-text { color: #3B82F6; }
+.st-abandoned { background: rgba(239, 68, 68, 0.1); }
+.st-abandoned .st-text { color: #EF4444; }
+
+.st-text { font-size: 22rpx; }
+
+.follow-progress {
+  margin-top: 16rpx;
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.progress-bar {
+  flex: 1;
+  height: 12rpx;
+  background: $muted;
+  border-radius: $radius-full;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: $gradient-accent;
+  border-radius: $radius-full;
+}
+
+.progress-text {
+  font-size: 24rpx;
+  color: $muted-foreground;
+  white-space: nowrap;
+}
+
+.follow-meta { margin-top: 12rpx; }
+.meta-item { font-size: 22rpx; color: $muted-foreground; }
+
 .empty-state {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   padding: 200rpx 0;
 }
 
-.empty-icon {
-  font-size: 80rpx;
-  margin-bottom: 20rpx;
+.empty-icon { font-size: 80rpx; margin-bottom: 20rpx; }
+.empty-text { font-size: 28rpx; color: $muted-foreground; }
+
+.empty-btn {
+  margin-top: 24rpx;
+  padding: 16rpx 40rpx;
+  background: $gradient-accent;
+  border-radius: $radius-full;
 }
 
-.empty-text {
-  font-size: 28rpx;
-  color: $muted-foreground;
-}
+.empty-btn-text { color: #fff; font-size: 28rpx; }
 
-/* ===== List Status ===== */
 .list-status {
   text-align: center;
   padding: 30rpx 0;
 }
 
-.status-text {
-  font-size: 24rpx;
-  color: $muted-foreground;
-}
+.status-text { font-size: 24rpx; color: $muted-foreground; }
 </style>

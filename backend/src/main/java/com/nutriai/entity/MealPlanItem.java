@@ -28,6 +28,9 @@ public class MealPlanItem {
     @Column(name = "recipe_id")
     private Long recipeId;
 
+    @Column(name = "recipe_corpus_id")
+    private Long recipeCorpusId;
+
     @Column(name = "food_name", nullable = false, length = 200)
     private String foodName;
 

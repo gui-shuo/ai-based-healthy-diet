@@ -124,6 +124,23 @@ export const mealPlanApi = {
   toggleFavorite: (id: number | string) => request({ url: `/meal-plans/${id}/favorite`, method: 'POST' }),
   getFeatured: () => request({ url: '/meal-plans/featured' }),
   getMyFavorites: (params?: any) => request({ url: '/meal-plans/my-favorites', data: params }),
+  getTags: () => request({ url: '/meal-plans/tags' }),
+  searchByTag: (tag: string, params?: any) => request({ url: '/meal-plans/by-tag', data: { tag, ...params } }),
+  getRecommendations: () => request({ url: '/meal-plans/recommendations' }),
+  // Follow & Track
+  follow: (id: number | string) => request({ url: `/meal-plans/${id}/follow`, method: 'POST' }),
+  unfollow: (id: number | string) => request({ url: `/meal-plans/${id}/follow`, method: 'DELETE' }),
+  getMyFollows: () => request({ url: '/meal-plans/my-follows' }),
+  getProgress: (id: number | string) => request({ url: `/meal-plans/${id}/progress` }),
+  // Check-in
+  checkin: (data: { followId: number; dayNumber: number; mealType: string }) =>
+    request({ url: '/meal-plans/checkin', method: 'POST', data }),
+  uncheckin: (followId: number, dayNumber: number, mealType: string) =>
+    request({ url: `/meal-plans/checkin?followId=${followId}&dayNumber=${dayNumber}&mealType=${mealType}`, method: 'DELETE' }),
+  // Ratings
+  rate: (id: number | string, data: { rating: number; review?: string }) =>
+    request({ url: `/meal-plans/${id}/rate`, method: 'POST', data }),
+  getRatings: (id: number | string, params?: any) => request({ url: `/meal-plans/${id}/ratings`, data: params }),
 }
 
 // ============ Feedback ============

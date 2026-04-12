@@ -16,6 +16,8 @@ public interface MealPlanRepository extends JpaRepository<MealPlan, Long> {
 
     Page<MealPlan> findByIsActiveTrue(Pageable pageable);
 
+    List<MealPlan> findByIsActiveTrue();
+
     Page<MealPlan> findByIsActiveTrueAndDietGoal(String dietGoal, Pageable pageable);
 
     Page<MealPlan> findByIsActiveTrueAndPlanType(String planType, Pageable pageable);
@@ -38,10 +40,23 @@ public interface MealPlanRepository extends JpaRepository<MealPlan, Long> {
     @Query("UPDATE MealPlan m SET m.favoriteCount = m.favoriteCount + :delta WHERE m.id = :id")
     void updateFavoriteCount(@Param("id") Long id, @Param("delta") int delta);
 
+    @Modifying
+    @Query("UPDATE MealPlan m SET m.followCount = m.followCount + :delta WHERE m.id = :id")
+    void updateFollowCount(@Param("id") Long id, @Param("delta") int delta);
+
+    @Modifying
+    @Query("UPDATE MealPlan m SET m.avgRating = :avg, m.ratingCount = :count WHERE m.id = :id")
+    void updateRating(@Param("id") Long id, @Param("avg") java.math.BigDecimal avg, @Param("count") int count);
+
     Page<MealPlan> findAllByOrderByCreatedAtDesc(Pageable pageable);
 
     @Query("SELECT m FROM MealPlan m WHERE m.isActive = true AND " +
            "(LOWER(m.title) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-           "LOWER(m.description) LIKE LOWER(CONCAT('%', :keyword, '%')))")
+           "LOWER(m.description) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+           "LOWER(m.tags) LIKE LOWER(CONCAT('%', :keyword, '%')))")
     Page<MealPlan> searchByKeyword(@Param("keyword") String keyword, Pageable pageable);
+
+    @Query("SELECT m FROM MealPlan m WHERE m.isActive = true AND " +
+           "LOWER(m.tags) LIKE LOWER(CONCAT('%', :tag, '%'))")
+    Page<MealPlan> searchByTag(@Param("tag") String tag, Pageable pageable);
 }

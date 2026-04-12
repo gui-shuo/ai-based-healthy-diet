@@ -83,9 +83,13 @@ public class SecurityConfig {
                                 "/recipes/*",  // 食谱详情（公开）
                                 "/recipes/corpus",  // 食谱语料库搜索（公开）
                                 "/recipes/corpus/**",  // 食谱语料库详情/分类（公开）
-                                "/meal-plans",  // 健康餐列表（公开）
-                                "/meal-plans/featured",  // 精选健康餐（公开）
-                                "/meal-plans/*"  // 健康餐详情（公开）
+                                "/meal-plans",  // 营养餐列表（公开）
+                                "/meal-plans/featured",  // 精选营养餐（公开）
+                                "/meal-plans/tags",  // 标签列表（公开）
+                                "/meal-plans/by-tag",  // 按标签搜索（公开）
+                                "/meal-plans/recommendations",  // 推荐（公开）
+                                "/meal-plans/*/ratings",  // 评价列表（公开）
+                                "/meal-plans/*"  // 营养餐详情（公开）
                         ).permitAll()
                         
                         // 其他所有请求都需要认证

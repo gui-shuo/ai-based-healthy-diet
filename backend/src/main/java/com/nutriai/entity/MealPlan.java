@@ -56,6 +56,21 @@ public class MealPlan {
     @Column(name = "suitable_crowd", length = 200)
     private String suitableCrowd;
 
+    @Column(length = 500)
+    private String tags;
+
+    @Column(length = 20)
+    private String difficulty;
+
+    @Column(name = "avg_rating", precision = 3, scale = 2)
+    private java.math.BigDecimal avgRating;
+
+    @Column(name = "rating_count")
+    private Integer ratingCount;
+
+    @Column(name = "follow_count")
+    private Integer followCount;
+
     @Column(name = "is_featured")
     private Boolean isFeatured;
 
@@ -89,6 +104,10 @@ public class MealPlan {
         if (isFeatured == null) isFeatured = false;
         if (viewCount == null) viewCount = 0;
         if (favoriteCount == null) favoriteCount = 0;
+        if (followCount == null) followCount = 0;
+        if (ratingCount == null) ratingCount = 0;
+        if (avgRating == null) avgRating = java.math.BigDecimal.ZERO;
+        if (difficulty == null) difficulty = "MEDIUM";
     }
 
     @PreUpdate
