@@ -1,5 +1,17 @@
 <template>
   <view class="page-container">
+    <!-- Tab switcher -->
+    <view class="tab-switcher">
+      <view class="tab-item" :class="{ active: mainTab === 'curated' }" @tap="mainTab = 'curated'">
+        <text>⭐ 精选食谱</text>
+      </view>
+      <view class="tab-item" :class="{ active: mainTab === 'corpus' }" @tap="switchToCorpus">
+        <text>📚 食谱大全</text>
+      </view>
+    </view>
+
+    <!-- ══════ CURATED TAB ══════ -->
+    <template v-if="mainTab === 'curated'">
     <!-- Search bar -->
     <view class="search-bar">
       <view class="search-input-wrap">
@@ -98,6 +110,70 @@
       <text v-if="loading" class="status-text">加载中...</text>
       <text v-else-if="noMore && recipes.length > 0" class="status-text">没有更多了</text>
     </view>
+    </template>
+
+    <!-- ══════ CORPUS TAB (食谱大全) ══════ -->
+    <template v-if="mainTab === 'corpus'">
+      <view class="search-bar">
+        <view class="search-input-wrap">
+          <text class="search-icon">🔍</text>
+          <input
+            class="search-input"
+            type="text"
+            placeholder="搜索155万+食谱..."
+            :value="corpusKeyword"
+            @input="onCorpusInput"
+            confirm-type="search"
+            @confirm="doCorpusSearch"
+          />
+          <text v-if="corpusKeyword" class="search-clear" @tap="clearCorpusSearch">✕</text>
+        </view>
+      </view>
+
+      <scroll-view scroll-x class="category-bar" :show-scrollbar="false">
+        <view class="category-tabs">
+          <view
+            v-for="cat in corpusCategories"
+            :key="cat.value"
+            class="category-tab"
+            :class="{ active: corpusCat === cat.value }"
+            @tap="switchCorpusCat(cat.value)"
+          >
+            <text class="category-label">{{ cat.label }}</text>
+          </view>
+        </view>
+      </scroll-view>
+
+      <view class="recipe-grid" v-if="corpusList.length > 0">
+        <view
+          v-for="item in corpusList"
+          :key="item.id"
+          class="recipe-card"
+          @tap="openCorpusDetail(item)"
+        >
+          <view class="card-cover-wrap">
+            <view class="corpus-cover">
+              <text class="corpus-cover-emoji">{{ getCorpusEmoji(item.category) }}</text>
+            </view>
+            <view class="card-badge">{{ corpusCatMap[item.category] || '其他' }}</view>
+          </view>
+          <view class="card-body">
+            <text class="card-title">{{ item.name }}</text>
+            <text class="card-desc" v-if="item.description">{{ item.description?.substring(0, 40) }}</text>
+          </view>
+        </view>
+      </view>
+
+      <view class="empty-state" v-else-if="!corpusLoading">
+        <text class="empty-icon">📚</text>
+        <text class="empty-text">未找到食谱</text>
+      </view>
+
+      <view class="list-status">
+        <text v-if="corpusLoading" class="status-text">加载中...</text>
+        <text v-else-if="corpusNoMore && corpusList.length > 0" class="status-text">没有更多了</text>
+      </view>
+    </template>
   </view>
 </template>
 
@@ -105,6 +181,8 @@
 import { ref, computed } from 'vue'
 import { onShow, onReachBottom } from '@dcloudio/uni-app'
 import { request } from '@/utils/request'
+
+const mainTab = ref('curated')
 
 const categories = [
   { value: '', label: '全部' },
@@ -246,10 +324,111 @@ onShow(() => {
 })
 
 onReachBottom(() => {
+  if (mainTab.value === 'corpus') {
+    if (corpusNoMore.value || corpusLoading.value) return
+    corpusPage.value++
+    loadCorpus()
+    return
+  }
   if (noMore.value || loading.value) return
   page.value++
   loadRecipes()
 })
+
+// ─── Corpus State & Methods ──────────────────────────
+const corpusCatMap: Record<string, string> = {
+  BREAKFAST: '早餐', LUNCH: '午餐', DINNER: '晚餐',
+  SOUP: '汤品', DESSERT: '甜品', SNACK: '小食',
+  STAPLE: '主食', OTHER: '其他'
+}
+const corpusCategories = [
+  { value: '', label: '全部' },
+  ...Object.entries(corpusCatMap).map(([value, label]) => ({ label, value }))
+]
+
+const corpusKeyword = ref('')
+const corpusCat = ref('')
+const corpusList = ref<any[]>([])
+const corpusPage = ref(1)
+const corpusLoading = ref(false)
+const corpusNoMore = ref(false)
+
+function getCorpusEmoji(cat: string) {
+  const map: Record<string, string> = {
+    BREAKFAST: '🌅', LUNCH: '☀️', DINNER: '🌙',
+    SOUP: '🍲', DESSERT: '🍰', SNACK: '🍡',
+    STAPLE: '🍚', OTHER: '🍽️'
+  }
+  return map[cat] || '🍽️'
+}
+
+function switchToCorpus() {
+  mainTab.value = 'corpus'
+  if (corpusList.value.length === 0) loadCorpus()
+}
+
+function onCorpusInput(e: any) {
+  corpusKeyword.value = e.detail.value
+}
+
+function doCorpusSearch() {
+  corpusPage.value = 1
+  corpusNoMore.value = false
+  corpusList.value = []
+  loadCorpus()
+}
+
+function clearCorpusSearch() {
+  corpusKeyword.value = ''
+  doCorpusSearch()
+}
+
+function switchCorpusCat(val: string) {
+  corpusCat.value = val
+  doCorpusSearch()
+}
+
+async function loadCorpus() {
+  if (corpusLoading.value || corpusNoMore.value) return
+  corpusLoading.value = true
+  try {
+    const params: Record<string, any> = { page: corpusPage.value, size: 20 }
+    if (corpusKeyword.value) params.keyword = corpusKeyword.value
+    if (corpusCat.value) params.category = corpusCat.value
+    const res = await request({ url: '/recipes/corpus', data: params })
+    const content = res.data?.content || []
+    if (corpusPage.value === 1) {
+      corpusList.value = content
+    } else {
+      corpusList.value = [...corpusList.value, ...content]
+    }
+    corpusNoMore.value = content.length < 20
+  } catch {
+    uni.showToast({ title: '加载失败', icon: 'none' })
+  } finally {
+    corpusLoading.value = false
+  }
+}
+
+function openCorpusDetail(item: any) {
+  // Store in global data and navigate to a detail page
+  // For now, use a modal-like approach with uni.showModal
+  const ingredients = parseJson(item.ingredientsJson)
+  const steps = parseJson(item.stepsJson)
+  const msg = `食材：${ingredients.join('、')}\n\n步骤：\n${steps.map((s: string, i: number) => `${i + 1}. ${s}`).join('\n')}`
+  
+  uni.showModal({
+    title: item.name,
+    content: msg.substring(0, 800),
+    showCancel: false,
+    confirmText: '关闭'
+  })
+}
+
+function parseJson(str: string): string[] {
+  if (!str) return []
+  try { return JSON.parse(str) } catch { return [str] }
+}
 </script>
 
 <style lang="scss" scoped>
@@ -507,5 +686,43 @@ onReachBottom(() => {
 .status-text {
   font-size: 24rpx;
   color: $muted-foreground;
+}
+
+/* ===== Tab Switcher ===== */
+.tab-switcher {
+  display: flex;
+  background: $card;
+  border-bottom: 2rpx solid $border;
+}
+
+.tab-item {
+  flex: 1;
+  text-align: center;
+  padding: 24rpx 0;
+  font-size: 28rpx;
+  font-weight: 600;
+  color: $muted-foreground;
+  border-bottom: 4rpx solid transparent;
+  transition: all 0.2s;
+
+  &.active {
+    color: $accent;
+    border-bottom-color: $accent;
+  }
+}
+
+/* ===== Corpus Cover ===== */
+.corpus-cover {
+  width: 100%;
+  height: 260rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(16, 185, 129, 0.03));
+  border-radius: 16rpx 16rpx 0 0;
+}
+
+.corpus-cover-emoji {
+  font-size: 80rpx;
 }
 </style>

@@ -34,6 +34,7 @@ public class AIService {
     private final ConversationContextManager contextManager;
     private final AIToolkit toolkit;
     private final com.nutriai.ai.NutritionKnowledgeBase knowledgeBase;
+    private final KnowledgeBaseService knowledgeBaseService;
     
     /**
      * 初始化用户的AI对话上下文
@@ -119,8 +120,16 @@ public class AIService {
                 log.info("用户 {} 首次对话，自动注入知识库系统提示词", userId);
             }
             
+            // 使用知识库增强用户消息上下文
+            String kbContext = knowledgeBaseService.getEnhancedContext(userMessage);
+            String enhancedMessage = userMessage;
+            if (!kbContext.isEmpty()) {
+                enhancedMessage = userMessage + "\n\n[知识库参考数据]" + kbContext;
+                log.debug("已注入知识库上下文，额外长度: {} 字符", kbContext.length());
+            }
+            
             // 添加用户消息到上下文
-            contextManager.addUserMessage(userId, userMessage);
+            contextManager.addUserMessage(userId, enhancedMessage);
             
             // 获取消息历史（根据keepContext决定）
             List<ChatMessage> messageHistory;

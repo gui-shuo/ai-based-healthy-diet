@@ -32,6 +32,7 @@ public class AIStreamingService {
     private final AIToolkit toolkit;
     private final com.nutriai.ai.NutritionKnowledgeBase knowledgeBase;
     private final AIChatLogRepository chatLogRepository;
+    private final KnowledgeBaseService knowledgeBaseService;
     
     public void chatStreaming(Long userId, String userMessage,
                             String model, Double temperature, Integer maxTokens, Boolean keepContext,
@@ -63,7 +64,15 @@ public class AIStreamingService {
                 log.info("用户 {} 首次流式对话，自动注入知识库系统提示词", userId);
             }
             
-            contextManager.addUserMessage(userId, userMessage);
+            // 使用知识库增强用户消息上下文
+            String kbContext = knowledgeBaseService.getEnhancedContext(userMessage);
+            String enhancedMessage = userMessage;
+            if (!kbContext.isEmpty()) {
+                enhancedMessage = userMessage + "\n\n[知识库参考数据]" + kbContext;
+                log.debug("流式对话已注入知识库上下文，额外长度: {} 字符", kbContext.length());
+            }
+            
+            contextManager.addUserMessage(userId, enhancedMessage);
             
             List<ChatMessage> messageHistory;
             if (actualKeepContext) {

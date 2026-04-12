@@ -11,7 +11,7 @@
 *.ipr
 *.iws
 out/
-
+recipe_corpus_full.json
 # VS Code
 .vscode/
 !.vscode/extensions.json

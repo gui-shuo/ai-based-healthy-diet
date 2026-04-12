@@ -81,6 +81,8 @@ public class SecurityConfig {
                                 "/recipes/featured",  // 精选食谱（公开）
                                 "/recipes/tags",  // 食谱标签（公开）
                                 "/recipes/*",  // 食谱详情（公开）
+                                "/recipes/corpus",  // 食谱语料库搜索（公开）
+                                "/recipes/corpus/**",  // 食谱语料库详情/分类（公开）
                                 "/meal-plans",  // 健康餐列表（公开）
                                 "/meal-plans/featured",  // 精选健康餐（公开）
                                 "/meal-plans/*"  // 健康餐详情（公开）

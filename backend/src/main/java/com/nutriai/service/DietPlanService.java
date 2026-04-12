@@ -31,6 +31,7 @@ public class DietPlanService {
     
     private final AIConfig aiConfig;
     private final FoodNutritionRepository foodNutritionRepository;
+    private final KnowledgeBaseService knowledgeBaseService;
     
     @Value("${ai.api-key:}")
     private String apiKey;
@@ -452,6 +453,18 @@ public class DietPlanService {
             p.append("+烹饪提示");
         }
         p.append("。食材每天要有变化，充分利用上述食材。\n\n");
+        
+        // 从知识库补充营养参考数据
+        try {
+            String goal = request.getGoal() != null ? request.getGoal() : "";
+            String kbKeyword = goal.contains("lose") ? "低脂低卡" : goal.contains("muscle") ? "高蛋白" : "均衡营养";
+            String nutritionCtx = knowledgeBaseService.getNutritionContext(kbKeyword, 5);
+            if (!nutritionCtx.isEmpty()) {
+                p.append(nutritionCtx).append("\n");
+            }
+        } catch (Exception e) {
+            log.debug("知识库增强跳过: {}", e.getMessage());
+        }
         
         // 格式模板
         for (int d = dayStart; d <= dayEnd; d++) {

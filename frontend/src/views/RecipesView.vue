@@ -17,6 +17,28 @@
       </div>
     </header>
 
+    <!-- Main Tabs: 精选食谱 / 食谱大全 -->
+    <div class="main-tabs">
+      <span
+        class="main-tab"
+        :class="{ active: activeMainTab === 'curated' }"
+        @click="switchMainTab('curated')"
+      >
+        ⭐ 精选食谱
+      </span>
+      <span
+        class="main-tab"
+        :class="{ active: activeMainTab === 'corpus' }"
+        @click="switchMainTab('corpus')"
+      >
+        📚 食谱大全
+        <span v-if="corpusTotal > 0" class="corpus-count">{{ formatCount(corpusTotal) }}</span>
+      </span>
+    </div>
+
+    <!-- ══════════ CURATED TAB ══════════ -->
+    <template v-if="activeMainTab === 'curated'">
+
     <!-- Search Bar -->
     <div class="search-bar">
       <el-input
@@ -223,6 +245,147 @@
         @current-change="loadRecipes"
       />
     </div>
+
+    </template>
+
+    <!-- ══════════ CORPUS TAB (食谱大全) ══════════ -->
+    <template v-if="activeMainTab === 'corpus'">
+      <!-- Corpus Search -->
+      <div class="search-bar">
+        <el-input
+          v-model="corpusKeyword"
+          placeholder="搜索155万+食谱（输入菜名、食材...）"
+          size="large"
+          clearable
+          @keyup.enter="doCorpusSearch"
+          @clear="doCorpusSearch"
+        >
+          <template #prefix>
+            <el-icon><Search /></el-icon>
+          </template>
+          <template #append>
+            <el-button @click="doCorpusSearch">搜索</el-button>
+          </template>
+        </el-input>
+      </div>
+
+      <!-- Corpus Categories -->
+      <div class="filter-bar">
+        <div class="category-tabs">
+          <span
+            v-for="cat in corpusCategoryOptions"
+            :key="cat.value"
+            class="category-tab"
+            :class="{ active: corpusCategory === cat.value }"
+            @click="setCorpusCategory(cat.value)"
+          >
+            {{ cat.label }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Corpus Grid -->
+      <section class="recipes-section">
+        <div v-if="corpusLoading" class="loading-container">
+          <el-skeleton :rows="3" animated />
+          <el-skeleton :rows="3" animated />
+        </div>
+        <div v-else-if="corpusRecipes.length === 0" class="empty-container">
+          <el-empty description="没有找到相关食谱，试试其他关键词" />
+        </div>
+        <div v-else class="recipe-grid">
+          <div
+            v-for="recipe in corpusRecipes"
+            :key="'corpus-' + recipe.id"
+            class="recipe-card corpus-card"
+            @click="openCorpusDetail(recipe)"
+          >
+            <div class="card-image">
+              <div class="image-placeholder corpus-placeholder">
+                <span class="corpus-emoji">{{ getCategoryEmoji(recipe.category) }}</span>
+              </div>
+              <span class="badge-category">{{ corpusCategoryMap[recipe.category] || '其他' }}</span>
+            </div>
+            <div class="card-body">
+              <h3 class="card-title">{{ recipe.name }}</h3>
+              <p class="card-desc">{{ truncate(recipe.description, 60) }}</p>
+              <div class="card-meta">
+                <span v-if="recipe.author" class="meta-item">👨‍🍳 {{ recipe.author }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Corpus Pagination -->
+      <div v-if="corpusTotal > 0" class="pagination-wrap">
+        <el-pagination
+          v-model:current-page="corpusPage"
+          :page-size="corpusPageSize"
+          :total="Math.min(corpusTotal, 10000)"
+          layout="prev, pager, next, jumper"
+          background
+          @current-change="loadCorpus"
+        />
+        <p class="corpus-total-info">共 {{ formatCount(corpusTotal) }} 道食谱</p>
+      </div>
+    </template>
+
+    <!-- Corpus Detail Dialog -->
+    <el-dialog
+      v-model="corpusDetailVisible"
+      :title="corpusDetailData?.name || '食谱详情'"
+      width="600px"
+      top="5vh"
+      class="corpus-detail-dialog"
+    >
+      <div v-if="corpusDetailData" class="corpus-detail-content">
+        <div v-if="corpusDetailData.description" class="corpus-desc">
+          <p>{{ corpusDetailData.description }}</p>
+        </div>
+
+        <div class="corpus-section">
+          <h4>🥗 食材</h4>
+          <div class="ingredient-tags">
+            <el-tag
+              v-for="(ing, idx) in parseCorpusJson(corpusDetailData.ingredientsJson)"
+              :key="idx"
+              size="default"
+              type="success"
+              class="ingredient-tag"
+            >
+              {{ ing }}
+            </el-tag>
+          </div>
+        </div>
+
+        <div class="corpus-section">
+          <h4>📝 步骤</h4>
+          <ol class="corpus-steps">
+            <li
+              v-for="(step, idx) in parseCorpusJson(corpusDetailData.stepsJson)"
+              :key="idx"
+            >
+              {{ step }}
+            </li>
+          </ol>
+        </div>
+
+        <div v-if="corpusDetailData.keywordsJson" class="corpus-section">
+          <h4>🏷️ 标签</h4>
+          <div class="keyword-tags">
+            <el-tag
+              v-for="(kw, idx) in parseCorpusJson(corpusDetailData.keywordsJson)"
+              :key="idx"
+              size="small"
+              type="info"
+            >
+              {{ kw }}
+            </el-tag>
+          </div>
+        </div>
+      </div>
+    </el-dialog>
 
     <!-- Recipe Detail Drawer -->
     <el-drawer
@@ -571,6 +734,34 @@ const favPage = ref(1)
 const favPageSize = 12
 const favTotal = ref(0)
 
+// ─── Main Tab ────────────────────────────────────────────────
+const activeMainTab = ref('curated')
+
+// ─── Corpus State ────────────────────────────────────────────
+const corpusCategoryMap = {
+  BREAKFAST: '早餐',
+  LUNCH: '午餐',
+  DINNER: '晚餐',
+  SOUP: '汤品',
+  DESSERT: '甜品',
+  SNACK: '小食',
+  STAPLE: '主食',
+  OTHER: '其他'
+}
+const corpusCategoryOptions = [
+  { label: '全部', value: '' },
+  ...Object.entries(corpusCategoryMap).map(([value, label]) => ({ label, value }))
+]
+const corpusKeyword = ref('')
+const corpusCategory = ref('')
+const corpusRecipes = ref([])
+const corpusLoading = ref(false)
+const corpusPage = ref(1)
+const corpusPageSize = 20
+const corpusTotal = ref(0)
+const corpusDetailVisible = ref(false)
+const corpusDetailData = ref(null)
+
 // ─── Computed ────────────────────────────────────────────────
 const hasActiveFilters = computed(() => {
   return !!(
@@ -799,6 +990,85 @@ async function loadFavorites() {
   } finally {
     favLoading.value = false
   }
+}
+
+// ─── Corpus Methods ──────────────────────────────────────────
+function switchMainTab(tab) {
+  activeMainTab.value = tab
+  if (tab === 'corpus' && corpusRecipes.value.length === 0) {
+    loadCorpus()
+    loadCorpusCategories()
+  }
+}
+
+function formatCount(n) {
+  if (n >= 10000) return (n / 10000).toFixed(1) + '万'
+  if (n >= 1000) return (n / 1000).toFixed(1) + 'k'
+  return String(n)
+}
+
+function getCategoryEmoji(cat) {
+  const map = {
+    BREAKFAST: '🌅', LUNCH: '☀️', DINNER: '🌙',
+    SOUP: '🍲', DESSERT: '🍰', SNACK: '🍡',
+    STAPLE: '🍚', OTHER: '🍽️'
+  }
+  return map[cat] || '🍽️'
+}
+
+function truncate(str, len) {
+  if (!str) return ''
+  return str.length > len ? str.substring(0, len) + '...' : str
+}
+
+function parseCorpusJson(jsonStr) {
+  if (!jsonStr) return []
+  try { return JSON.parse(jsonStr) } catch { return [jsonStr] }
+}
+
+function doCorpusSearch() {
+  corpusPage.value = 1
+  loadCorpus()
+}
+
+function setCorpusCategory(val) {
+  corpusCategory.value = val
+  corpusPage.value = 1
+  loadCorpus()
+}
+
+async function loadCorpus() {
+  corpusLoading.value = true
+  try {
+    const params = { page: corpusPage.value, size: corpusPageSize }
+    if (corpusKeyword.value) params.keyword = corpusKeyword.value
+    if (corpusCategory.value) params.category = corpusCategory.value
+    const res = await api.get('/recipes/corpus', { params })
+    if (res.data.code === 200) {
+      const page = res.data.data
+      corpusRecipes.value = page.content || []
+      corpusTotal.value = page.totalElements || 0
+    }
+  } catch (e) {
+    console.error('加载食谱大全失败', e)
+    message.error('加载食谱大全失败')
+  } finally {
+    corpusLoading.value = false
+  }
+}
+
+async function loadCorpusCategories() {
+  try {
+    const res = await api.get('/recipes/corpus/categories')
+    if (res.data.code === 200) {
+      corpusTotal.value = res.data.data.total || corpusTotal.value
+    }
+  } catch { /* silent */ }
+}
+
+function openCorpusDetail(recipe) {
+  corpusDetailData.value = recipe
+  corpusDetailVisible.value = true
 }
 
 // ─── Lifecycle ───────────────────────────────────────────────
@@ -1542,5 +1812,109 @@ onMounted(() => {
 
 :deep(.el-rate) {
   --el-rate-fill-color: #F59E0B;
+}
+
+/* ─── Main Tabs ─────────────────────────────────── */
+.main-tabs {
+  display: flex;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-lg;
+  border-bottom: 2px solid $border;
+  padding-bottom: 0;
+}
+
+.main-tab {
+  padding: $spacing-sm $spacing-lg;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  color: rgba($foreground, 0.6);
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  &:hover { color: $foreground; }
+  &.active {
+    color: $accent;
+    border-bottom-color: $accent;
+  }
+
+  .corpus-count {
+    background: rgba($accent, 0.1);
+    color: $accent;
+    font-size: 11px;
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-weight: 500;
+  }
+}
+
+/* ─── Corpus Styles ─────────────────────────────── */
+.corpus-card {
+  .corpus-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, rgba($accent, 0.08), rgba($accent, 0.03));
+  }
+  .corpus-emoji {
+    font-size: 42px;
+  }
+}
+
+.corpus-total-info {
+  text-align: center;
+  color: rgba($foreground, 0.5);
+  font-size: 13px;
+  margin-top: $spacing-sm;
+}
+
+.corpus-detail-content {
+  .corpus-desc {
+    color: rgba($foreground, 0.7);
+    line-height: 1.8;
+    margin-bottom: $spacing-lg;
+    font-size: 14px;
+  }
+
+  .corpus-section {
+    margin-bottom: $spacing-lg;
+
+    h4 {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: $spacing-sm;
+      color: $foreground;
+    }
+  }
+
+  .ingredient-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .ingredient-tag {
+    font-size: 13px;
+  }
+
+  .corpus-steps {
+    padding-left: 20px;
+    li {
+      line-height: 1.8;
+      margin-bottom: 8px;
+      color: rgba($foreground, 0.8);
+      font-size: 14px;
+    }
+  }
+
+  .keyword-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
 }
 </style>
