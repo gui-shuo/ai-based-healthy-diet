@@ -806,6 +806,12 @@ onMounted(() => {
   loadRecipes()
   loadFeatured()
   loadTags()
+
+  // 支持从营养餐跳转直接打开食谱详情
+  const recipeId = route.query.recipeId
+  if (recipeId) {
+    openDetail(Number(recipeId))
+  }
 })
 </script>
 

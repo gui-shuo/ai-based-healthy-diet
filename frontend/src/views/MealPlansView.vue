@@ -453,7 +453,7 @@ function getMealItems(day, mealType) {
 }
 
 function goToRecipe(recipeId) {
-  router.push(`/recipes/${recipeId}`)
+  router.push({ path: '/recipes', query: { recipeId } })
 }
 
 // ========== Favorite ==========
