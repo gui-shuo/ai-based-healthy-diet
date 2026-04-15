@@ -1,0 +1,72 @@
+-- 营养餐菜品表
+CREATE TABLE IF NOT EXISTS meal_items (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(200) NOT NULL COMMENT '餐品名称',
+    image_url VARCHAR(500) COMMENT '主图',
+    image_urls JSON COMMENT '图片列表',
+    category VARCHAR(50) NOT NULL DEFAULT 'ANTI_INFLAMMATORY' COMMENT '分类: ANTI_INFLAMMATORY/LOW_FAT/HIGH_PROTEIN/VEGETARIAN',
+    meal_type VARCHAR(20) DEFAULT 'LUNCH' COMMENT '餐类: BREAKFAST/LUNCH/DINNER/SNACK',
+    brief VARCHAR(500) COMMENT '简短描述',
+    description TEXT COMMENT '详细描述',
+    ingredients TEXT COMMENT '食材成分',
+    nutrition_info JSON COMMENT '营养信息{calories,protein,fat,carbs,fiber}',
+    original_price DECIMAL(10,2) NOT NULL COMMENT '原价',
+    sale_price DECIMAL(10,2) NOT NULL COMMENT '售价',
+    stock INT NOT NULL DEFAULT 999 COMMENT '每日库存',
+    daily_limit INT DEFAULT 0 COMMENT '每人每日限购(0=不限)',
+    sales_count INT DEFAULT 0 COMMENT '累计销量',
+    rating DECIMAL(3,1) DEFAULT 5.0 COMMENT '评分',
+    tags JSON COMMENT '标签["抗炎","低GI"]',
+    is_recommended TINYINT(1) DEFAULT 0 COMMENT '是否推荐',
+    is_available TINYINT(1) DEFAULT 1 COMMENT '是否上架',
+    available_days VARCHAR(100) DEFAULT '1,2,3,4,5' COMMENT '供应日(1=周一)',
+    available_start_time VARCHAR(10) DEFAULT '07:00' COMMENT '开始供应时间',
+    available_end_time VARCHAR(10) DEFAULT '20:00' COMMENT '结束供应时间',
+    sort_order INT DEFAULT 0 COMMENT '排序',
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_meal_category (category),
+    INDEX idx_meal_type (meal_type),
+    INDEX idx_meal_available (is_available)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='营养餐菜品表';
+
+-- 营养餐订单表
+CREATE TABLE IF NOT EXISTS meal_orders (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    order_no VARCHAR(32) NOT NULL UNIQUE COMMENT '订单号',
+    user_id BIGINT NOT NULL COMMENT '用户ID',
+    items JSON NOT NULL COMMENT '订单商品[{mealItemId,name,price,quantity,imageUrl}]',
+    total_quantity INT NOT NULL COMMENT '总数量',
+    total_amount DECIMAL(10,2) NOT NULL COMMENT '总金额',
+    payment_method VARCHAR(20) NOT NULL DEFAULT 'WECHAT_PAY' COMMENT '支付方式',
+    payment_status VARCHAR(20) NOT NULL DEFAULT 'PENDING' COMMENT 'PENDING/PAID/REFUNDED',
+    order_status VARCHAR(20) NOT NULL DEFAULT 'PENDING_PAYMENT' COMMENT 'PENDING_PAYMENT/PAID/PREPARING/READY/PICKED_UP/DELIVERED/COMPLETED/CANCELLED',
+    fulfillment_type VARCHAR(20) NOT NULL DEFAULT 'PICKUP' COMMENT 'PICKUP/DELIVERY',
+    pickup_time VARCHAR(50) COMMENT '取餐时间',
+    pickup_location VARCHAR(200) DEFAULT '营养工作室' COMMENT '取餐地点',
+    receiver_name VARCHAR(50) COMMENT '收货人',
+    receiver_phone VARCHAR(20) COMMENT '联系电话',
+    receiver_address VARCHAR(500) COMMENT '配送地址(配送时)',
+    remark VARCHAR(500) COMMENT '备注',
+    wx_transaction_id VARCHAR(64) COMMENT '微信支付交易号',
+    paid_at DATETIME COMMENT '支付时间',
+    ready_at DATETIME COMMENT '备餐完成时间',
+    completed_at DATETIME COMMENT '完成时间',
+    cancelled_at DATETIME COMMENT '取消时间',
+    cancel_reason VARCHAR(200) COMMENT '取消原因',
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_meal_order_user (user_id),
+    INDEX idx_meal_order_no (order_no),
+    INDEX idx_meal_order_status (order_status),
+    INDEX idx_meal_order_date (created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='营养餐订单表';
+
+-- 插入示例营养餐数据
+INSERT INTO meal_items (name, category, meal_type, brief, description, ingredients, nutrition_info, original_price, sale_price, tags, is_recommended, sort_order) VALUES
+('地中海风味沙拉套餐', 'ANTI_INFLAMMATORY', 'LUNCH', '富含omega-3和抗氧化物的经典地中海饮食', '新鲜混合生菜、樱桃番茄、黄瓜、橄榄、牛油果，配以特级初榨橄榄油和柠檬汁调味，搭配全麦面包和鹰嘴豆泥', '混合生菜、樱桃番茄、黄瓜、橄榄、牛油果、鹰嘴豆、全麦面包、特级初榨橄榄油', '{"calories":450,"protein":15,"fat":22,"carbs":48,"fiber":12}', 38.00, 32.00, '["抗炎","地中海饮食","低GI"]', 1, 1),
+('三文鱼藜麦能量碗', 'ANTI_INFLAMMATORY', 'LUNCH', '优质蛋白+omega-3，抗炎明星组合', '烤三文鱼配藜麦、西兰花、紫甘蓝、牛油果，淋上姜黄酱汁', '三文鱼、藜麦、西兰花、紫甘蓝、牛油果、姜黄、柠檬', '{"calories":520,"protein":35,"fat":24,"carbs":42,"fiber":8}', 48.00, 42.00, '["抗炎","高蛋白","omega-3"]', 1, 2),
+('姜黄鸡胸肉糙米饭', 'ANTI_INFLAMMATORY', 'LUNCH', '姜黄素+优质蛋白，经济实惠的抗炎选择', '姜黄腌制鸡胸肉配糙米饭、蒸南瓜、清炒时蔬', '鸡胸肉、姜黄粉、糙米、南瓜、时蔬、橄榄油', '{"calories":480,"protein":38,"fat":12,"carbs":55,"fiber":6}', 32.00, 26.00, '["抗炎","高蛋白","低脂"]', 1, 3),
+('莓果酸奶燕麦杯', 'ANTI_INFLAMMATORY', 'BREAKFAST', '花青素满满的抗炎早餐', '隔夜燕麦配蓝莓、草莓、希腊酸奶、奇亚籽、蜂蜜', '燕麦、蓝莓、草莓、希腊酸奶、奇亚籽、蜂蜜、杏仁', '{"calories":320,"protein":18,"fat":10,"carbs":42,"fiber":8}', 28.00, 22.00, '["抗炎","早餐","花青素"]', 1, 4),
+('牛油果吐司配水波蛋', 'LOW_FAT', 'BREAKFAST', '健康脂肪+蛋白质的完美早餐', '全麦吐司配捣碎牛油果、水波蛋、樱桃番茄、微辣调味', '全麦吐司、牛油果、鸡蛋、樱桃番茄、辣椒片', '{"calories":380,"protein":16,"fat":20,"carbs":35,"fiber":7}', 30.00, 25.00, '["健康脂肪","早餐"]', 0, 5),
+('清蒸鲈鱼蔬菜套餐', 'ANTI_INFLAMMATORY', 'DINNER', '清淡高蛋白的抗炎晚餐', '清蒸鲈鱼配姜丝葱花，搭配清炒芦笋、蒸紫薯', '鲈鱼、姜、葱、芦笋、紫薯、橄榄油', '{"calories":420,"protein":32,"fat":14,"carbs":38,"fiber":5}', 42.00, 36.00, '["抗炎","清淡","高蛋白"]', 1, 6);

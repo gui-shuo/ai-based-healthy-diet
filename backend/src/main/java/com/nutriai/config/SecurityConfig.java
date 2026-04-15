@@ -68,6 +68,12 @@ public class SecurityConfig {
                                 "/products/recommended",  // 推荐产品（公开）
                                 "/products/categories",  // 产品分类（公开）
                                 "/products/*",  // 产品详情（公开）
+                                "/meals",  // 营养餐列表（公开）
+                                "/meals/search",  // 营养餐搜索（公开）
+                                "/meals/recommended",  // 推荐营养餐（公开）
+                                "/meals/categories",  // 营养餐分类（公开）
+                                "/meals/*",  // 营养餐详情（公开）
+                                "/wxpay/notify",  // 微信支付回调（服务端无Token）
                                 "/community/feed",  // 社区动态列表（公开浏览）
                                 "/app-versions/latest",  // APP最新版本（公开）
                                 "/app-versions/list",  // APP版本列表（公开）

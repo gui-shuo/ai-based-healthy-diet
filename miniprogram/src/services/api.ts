@@ -158,25 +158,27 @@ export const mealApi = {
 
 // ============ Admin APIs ============
 export const adminApi = {
-  // Meal management
-  getMeals: (params?: any) => request({ url: '/admin/shop/meals', data: params }),
-  createMeal: (data: any) => request({ url: '/admin/shop/meals', method: 'POST', data }),
-  updateMeal: (id: number, data: any) => request({ url: `/admin/shop/meals/${id}`, method: 'PUT', data }),
-  deleteMeal: (id: number) => request({ url: `/admin/shop/meals/${id}`, method: 'DELETE' }),
-  toggleMealStatus: (id: number) => request({ url: `/admin/shop/meals/${id}/toggle-status`, method: 'PUT' }),
-  // Product management
-  getProducts: (params?: any) => request({ url: '/admin/shop/products', data: params }),
-  createProduct: (data: any) => request({ url: '/admin/shop/products', method: 'POST', data }),
-  updateProduct: (id: number, data: any) => request({ url: `/admin/shop/products/${id}`, method: 'PUT', data }),
-  deleteProduct: (id: number) => request({ url: `/admin/shop/products/${id}`, method: 'DELETE' }),
-  toggleProductStatus: (id: number) => request({ url: `/admin/shop/products/${id}/toggle-status`, method: 'PUT' }),
-  // Order management
-  getOrders: (params?: any) => request({ url: '/admin/shop/orders', data: params }),
-  updateOrderStatus: (orderNo: string, data: any) => request({ url: `/admin/shop/orders/${orderNo}/status`, method: 'PUT', data }),
   // Dashboard
-  getDashboard: () => request({ url: '/admin/shop/dashboard' }),
+  getDashboard: () => request({ url: '/admin/meal-orders/stats' }),
+  // Meal management
+  getMeals: (params?: any) => request({ url: '/admin/meals', data: params }),
+  createMeal: (data: any) => request({ url: '/admin/meals', method: 'POST', data }),
+  updateMeal: (id: number, data: any) => request({ url: `/admin/meals/${id}`, method: 'PUT', data }),
+  deleteMeal: (id: number) => request({ url: `/admin/meals/${id}`, method: 'DELETE' }),
+  toggleMealStatus: (id: number) => request({ url: `/admin/meals/${id}/status`, method: 'PUT' }),
+  // Product management
+  getProducts: (params?: any) => request({ url: '/admin/products', data: params }),
+  createProduct: (data: any) => request({ url: '/admin/products', method: 'POST', data }),
+  updateProduct: (id: number, data: any) => request({ url: `/admin/products/${id}`, method: 'PUT', data }),
+  deleteProduct: (id: number) => request({ url: `/admin/products/${id}`, method: 'DELETE' }),
+  toggleProductStatus: (id: number) => request({ url: `/admin/products/${id}/status`, method: 'PUT' }),
+  // Order management
+  getMealOrders: (params?: any) => request({ url: '/admin/meal-orders', data: params }),
+  updateMealOrderStatus: (orderNo: string, data: any) => request({ url: `/admin/meal-orders/${orderNo}/status`, method: 'PUT', data }),
+  getMealOrderStats: () => request({ url: '/admin/meal-orders/stats' }),
+  getProductOrders: (params?: any) => request({ url: '/products/orders', data: params }),
   // Upload
-  uploadImage: (filePath: string) => uploadFile({ url: '/admin/shop/upload', filePath, name: 'file' })
+  uploadImage: (filePath: string) => uploadFile({ url: '/community/upload', filePath, name: 'file' })
 }
 
 // ============ Feedback ============

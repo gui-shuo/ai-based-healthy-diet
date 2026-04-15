@@ -1,10 +1,15 @@
 package com.nutriai.controller;
 
 import com.nutriai.common.ApiResponse;
+import com.nutriai.entity.MealItem;
+import com.nutriai.entity.MealOrder;
 import com.nutriai.entity.Nutritionist;
 import com.nutriai.entity.NutritionProduct;
+import com.nutriai.repository.MealItemRepository;
+import com.nutriai.repository.MealOrderRepository;
 import com.nutriai.repository.NutritionistRepository;
 import com.nutriai.repository.NutritionProductRepository;
+import com.nutriai.service.MealService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -26,6 +31,9 @@ public class AdminShopController {
 
     private final NutritionistRepository nutritionistRepository;
     private final NutritionProductRepository productRepository;
+    private final MealItemRepository mealItemRepository;
+    private final MealOrderRepository mealOrderRepository;
+    private final MealService mealService;
 
     // ==================== 营养师管理 ====================
 
@@ -185,5 +193,118 @@ public class AdminShopController {
         p.setStatus(body.get("status"));
         NutritionProduct saved = productRepository.save(p);
         return ResponseEntity.ok(ApiResponse.success("状态更新成功", saved));
+    }
+
+    // ==================== 营养餐管理 ====================
+
+    @GetMapping("/meals")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<Page<MealItem>>> getMeals(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        Page<MealItem> result;
+        if (keyword != null && !keyword.isBlank()) {
+            result = mealItemRepository.adminSearchByKeyword(keyword, PageRequest.of(page, size));
+        } else {
+            result = mealItemRepository.findAllByOrderBySortOrderAsc(PageRequest.of(page, size));
+        }
+        return ResponseEntity.ok(ApiResponse.success(result));
+    }
+
+    @GetMapping("/meals/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<MealItem>> getMeal(@PathVariable Long id) {
+        MealItem m = mealItemRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("餐品不存在"));
+        return ResponseEntity.ok(ApiResponse.success(m));
+    }
+
+    @PostMapping("/meals")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<MealItem>> createMeal(@RequestBody MealItem mealItem) {
+        MealItem saved = mealItemRepository.save(mealItem);
+        log.info("创建餐品: {}", saved.getName());
+        return ResponseEntity.ok(ApiResponse.success("创建成功", saved));
+    }
+
+    @PutMapping("/meals/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<MealItem>> updateMeal(
+            @PathVariable Long id, @RequestBody MealItem update) {
+        MealItem existing = mealItemRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("餐品不存在"));
+
+        if (update.getName() != null) existing.setName(update.getName());
+        if (update.getImageUrl() != null) existing.setImageUrl(update.getImageUrl());
+        if (update.getImageUrls() != null) existing.setImageUrls(update.getImageUrls());
+        if (update.getCategory() != null) existing.setCategory(update.getCategory());
+        if (update.getMealType() != null) existing.setMealType(update.getMealType());
+        if (update.getBrief() != null) existing.setBrief(update.getBrief());
+        if (update.getDescription() != null) existing.setDescription(update.getDescription());
+        if (update.getIngredients() != null) existing.setIngredients(update.getIngredients());
+        if (update.getNutritionInfo() != null) existing.setNutritionInfo(update.getNutritionInfo());
+        if (update.getOriginalPrice() != null) existing.setOriginalPrice(update.getOriginalPrice());
+        if (update.getSalePrice() != null) existing.setSalePrice(update.getSalePrice());
+        if (update.getStock() != null) existing.setStock(update.getStock());
+        if (update.getDailyLimit() != null) existing.setDailyLimit(update.getDailyLimit());
+        if (update.getTags() != null) existing.setTags(update.getTags());
+        if (update.getIsRecommended() != null) existing.setIsRecommended(update.getIsRecommended());
+        if (update.getIsAvailable() != null) existing.setIsAvailable(update.getIsAvailable());
+        if (update.getAvailableDays() != null) existing.setAvailableDays(update.getAvailableDays());
+        if (update.getAvailableStartTime() != null) existing.setAvailableStartTime(update.getAvailableStartTime());
+        if (update.getAvailableEndTime() != null) existing.setAvailableEndTime(update.getAvailableEndTime());
+        if (update.getSortOrder() != null) existing.setSortOrder(update.getSortOrder());
+
+        MealItem saved = mealItemRepository.save(existing);
+        log.info("更新餐品: {} (id={})", saved.getName(), id);
+        return ResponseEntity.ok(ApiResponse.success("更新成功", saved));
+    }
+
+    @DeleteMapping("/meals/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<String>> deleteMeal(@PathVariable Long id) {
+        mealItemRepository.deleteById(id);
+        log.info("删除餐品: id={}", id);
+        return ResponseEntity.ok(ApiResponse.success("删除成功", null));
+    }
+
+    @PutMapping("/meals/{id}/status")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<MealItem>> updateMealStatus(
+            @PathVariable Long id, @RequestBody Map<String, Object> body) {
+        MealItem m = mealItemRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("餐品不存在"));
+        if (body.containsKey("isAvailable")) m.setIsAvailable((Boolean) body.get("isAvailable"));
+        MealItem saved = mealItemRepository.save(m);
+        return ResponseEntity.ok(ApiResponse.success("状态更新成功", saved));
+    }
+
+    // ==================== 营养餐订单管理 ====================
+
+    @GetMapping("/meal-orders")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<Page<MealOrder>>> getMealOrders(
+            @RequestParam(required = false) String status,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(ApiResponse.success(mealService.getAllOrders(status, page, size)));
+    }
+
+    @PutMapping("/meal-orders/{orderNo}/status")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<MealOrder>> updateMealOrderStatus(
+            @PathVariable String orderNo, @RequestBody Map<String, String> body) {
+        String newStatus = body.get("status");
+        if (newStatus == null || newStatus.isBlank()) {
+            return ResponseEntity.badRequest().body(ApiResponse.error(400, "缺少status参数"));
+        }
+        return ResponseEntity.ok(ApiResponse.success("状态更新成功", mealService.updateOrderStatus(orderNo, newStatus)));
+    }
+
+    @GetMapping("/meal-orders/stats")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> getMealOrderStats() {
+        return ResponseEntity.ok(ApiResponse.success(mealService.getOrderStats()));
     }
 }

@@ -124,9 +124,14 @@ const features = [
 
 async function fetchFeaturedMeals() {
   try {
-    const res = await mealApi.getList({ page: 1, size: 3, recommended: true })
-    if (res.code === 200 && res.data?.records?.length) {
-      featuredMeals.value = res.data.records
+    const res = await mealApi.getRecommended()
+    if (res.code === 200 && res.data?.length) {
+      featuredMeals.value = res.data.map((m: any) => ({
+        ...m,
+        price: m.salePrice || m.price || m.sale_price,
+        calories: m.nutritionInfo?.calories || m.nutrition_info?.calories || 0,
+        tags: m.tags || []
+      }))
     }
   } catch {
     // keep mock data

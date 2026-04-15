@@ -22,7 +22,7 @@ services:
       - nutriai-network
 
   backend:
-    image: heyitshuo/nutriai-backend:v202604151454
+    image: heyitshuo/nutriai-backend:v202604151633
     container_name: nutriai-backend
     restart: always
     depends_on:
@@ -98,27 +98,15 @@ services:
       - nutriai-network
 
   frontend:
-    image: heyitshuo/nutriai-frontend:v202604151446
+    image: heyitshuo/nutriai-frontend:v202604151633
     container_name: nutriai-frontend
     restart: always
     depends_on:
       - backend
-      - h5
     mem_limit: 48m
     memswap_limit: 48m
     ports:
       - "3000:80"
-    networks:
-      - nutriai-network
-
-  h5:
-    image: heyitshuo/nutriai-h5:v202604151513
-    container_name: nutriai-h5
-    restart: always
-    depends_on:
-      - backend
-    mem_limit: 48m
-    memswap_limit: 48m
     networks:
       - nutriai-network
 

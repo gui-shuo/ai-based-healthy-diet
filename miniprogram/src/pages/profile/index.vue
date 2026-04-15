@@ -130,21 +130,6 @@
       </view>
     </view>
 
-    <!-- Admin Entry -->
-    <view v-if="userStore.isAdmin" class="section-label">管理</view>
-    <view v-if="userStore.isAdmin" class="card menu-card">
-      <view class="menu-item" @tap="navigateTo('/pages/admin/index')">
-        <view class="menu-icon-wrap" style="background: rgba(16,185,129,0.15)">
-          <text class="menu-icon">⚙️</text>
-        </view>
-        <text class="menu-text">管理后台</text>
-        <view class="menu-badge-row">
-          <text class="menu-badge" style="background: rgba(16,185,129,0.1); color: #10B981;">管理员</text>
-          <text class="menu-arrow">›</text>
-        </view>
-      </view>
-    </view>
-
     <!-- Menu List - Settings -->
     <view class="section-label">设置</view>
     <view class="card menu-card">

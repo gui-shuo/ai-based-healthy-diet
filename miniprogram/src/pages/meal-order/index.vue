@@ -206,9 +206,16 @@ function goToCheckout() {
 async function fetchMeals() {
   loading.value = true
   try {
-    const res = await mealApi.getList({ page: 1, size: 20 })
-    if (res.code === 200 && res.data?.records?.length) {
-      meals.value = res.data.records
+    const res = await mealApi.getList({ page: 0, size: 20 })
+    const list = res.data?.content || res.data?.records || (Array.isArray(res.data) ? res.data : [])
+    if (res.code === 200 && list.length) {
+      meals.value = list.map((m: any) => ({
+        ...m,
+        price: m.salePrice || m.sale_price || m.price,
+        calories: m.nutritionInfo?.calories || m.nutrition_info?.calories || 0,
+        description: m.brief || m.description,
+        tags: m.tags || []
+      }))
     } else {
       meals.value = mockMeals
     }

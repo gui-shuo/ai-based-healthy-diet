@@ -136,7 +136,7 @@ async function loadProducts() {
     const res = await adminApi.getProducts()
     if (res.code === 200) {
       const data = res.data as any
-      products.value = data?.records || data?.list || (Array.isArray(data) ? data : [])
+      products.value = data?.content || data?.records || data?.list || (Array.isArray(data) ? data : [])
     }
   } catch {} finally {
     loading.value = false

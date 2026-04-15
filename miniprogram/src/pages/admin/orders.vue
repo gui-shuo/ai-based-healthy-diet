@@ -104,19 +104,7 @@ import { useUserStore } from '@/stores/user'
 
 const userStore = useUserStore()
 
-// Fallback admin API
-const adminApiLocal = {
-  getOrders: async (_p?: any) => ({ code: 200, data: { records: [] as any[], total: 0 } }),
-  updateOrderStatus: async (_id: number, _s: string) => ({ code: 200, data: null })
-}
-
-let adminApi: typeof adminApiLocal
-try {
-  const mod = require('@/services/api')
-  adminApi = mod.adminApi || adminApiLocal
-} catch {
-  adminApi = adminApiLocal
-}
+import { adminApi } from '@/services/api'
 
 const tabs = [
   { label: '全部', value: '' },
@@ -205,10 +193,10 @@ async function loadOrders() {
   try {
     const params: any = {}
     if (currentTab.value) params.status = currentTab.value
-    const res = await adminApi.getOrders(params)
+    const res = await adminApi.getMealOrders(params)
     if (res.code === 200) {
       const data = res.data as any
-      orders.value = data?.records || data?.list || (Array.isArray(data) ? data : [])
+      orders.value = data?.content || data?.records || data?.list || (Array.isArray(data) ? data : [])
     }
   } catch {} finally {
     loading.value = false
@@ -222,7 +210,7 @@ async function updateStatus(order: any, newStatus: string) {
     success: async ({ confirm }) => {
       if (!confirm) return
       try {
-        const res = await adminApi.updateOrderStatus(order.id, newStatus)
+        const res = await adminApi.updateMealOrderStatus(order.orderNo, { status: newStatus })
         if (res.code === 200) {
           uni.showToast({ title: '操作成功', icon: 'success' })
           loadOrders()

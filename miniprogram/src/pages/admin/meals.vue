@@ -155,7 +155,7 @@ async function loadMeals() {
     const res = await adminApi.getMeals()
     if (res.code === 200) {
       const data = res.data as any
-      meals.value = data?.records || data?.list || (Array.isArray(data) ? data : [])
+      meals.value = data?.content || data?.records || data?.list || (Array.isArray(data) ? data : [])
     }
   } catch {} finally {
     loading.value = false
