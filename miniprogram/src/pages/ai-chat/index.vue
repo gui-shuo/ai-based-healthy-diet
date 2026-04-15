@@ -1312,6 +1312,7 @@ onUnmounted(() => {
   max-height: 320px;
   overflow: hidden;
   box-sizing: border-box;
+  margin-bottom: -1rpx;
 }
 .qa-sections {
   padding: 12rpx 24rpx;
@@ -1363,7 +1364,6 @@ onUnmounted(() => {
   padding-bottom: calc(12rpx + env(safe-area-inset-bottom));
   border-top: 1rpx solid $border;
   z-index: 100;
-  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.04);
 }
 .input-top-row {
   display: flex;

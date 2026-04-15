@@ -93,8 +93,17 @@
             <input class="form-input" v-model="form.tags" placeholder="低脂,高蛋白" />
           </view>
           <view class="form-group">
-            <text class="form-label">图片URL</text>
-            <input class="form-input" v-model="form.imageUrl" placeholder="https://..." />
+            <text class="form-label">图片</text>
+            <view class="image-upload-area" @tap="chooseImage">
+              <image v-if="form.imageUrl" class="upload-preview" :src="form.imageUrl" mode="aspectFill" />
+              <view v-else class="upload-placeholder">
+                <text class="upload-icon">📷</text>
+                <text class="upload-text">拍照/相册上传</text>
+              </view>
+            </view>
+            <view v-if="uploading" class="upload-progress">
+              <text class="upload-progress-text">上传中...</text>
+            </view>
           </view>
           <view class="form-group">
             <text class="form-label">过敏原信息</text>
@@ -128,6 +137,7 @@ import { adminApi } from '@/services/api'
 
 const loading = ref(false)
 const saving = ref(false)
+const uploading = ref(false)
 const showForm = ref(false)
 const editingId = ref<number | null>(null)
 const meals = ref<any[]>([])
@@ -185,6 +195,31 @@ function openForm(meal?: any) {
     Object.assign(form, defaultForm)
   }
   showForm.value = true
+}
+
+async function chooseImage() {
+  uni.chooseImage({
+    count: 1,
+    sizeType: ['compressed'],
+    sourceType: ['album', 'camera'],
+    success: async (res) => {
+      const tempFilePath = res.tempFilePaths[0]
+      uploading.value = true
+      try {
+        const uploadRes = await adminApi.uploadImage(tempFilePath)
+        if (uploadRes.code === 200 && uploadRes.data) {
+          form.imageUrl = (uploadRes.data as any).url || (uploadRes.data as any)
+          uni.showToast({ title: '上传成功', icon: 'success' })
+        } else {
+          uni.showToast({ title: '上传失败', icon: 'none' })
+        }
+      } catch {
+        uni.showToast({ title: '上传失败', icon: 'none' })
+      } finally {
+        uploading.value = false
+      }
+    }
+  })
 }
 
 async function saveMeal() {
@@ -547,5 +582,41 @@ onShow(() => {
 .safe-bottom {
   height: env(safe-area-inset-bottom);
   padding-bottom: 40rpx;
+}
+
+.image-upload-area {
+  width: 200rpx;
+  height: 200rpx;
+  border-radius: $radius-lg;
+  border: 2rpx dashed $border;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: $muted;
+}
+
+.upload-preview {
+  width: 100%;
+  height: 100%;
+}
+
+.upload-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.upload-icon { font-size: 48rpx; }
+.upload-text { font-size: 22rpx; color: $muted-foreground; }
+
+.upload-progress {
+  margin-top: 8rpx;
+}
+
+.upload-progress-text {
+  font-size: 22rpx;
+  color: $accent;
 }
 </style>

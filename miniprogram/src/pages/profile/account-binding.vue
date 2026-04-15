@@ -458,6 +458,34 @@ async function handleBind(provider: 'wechat' | 'qq') {
     // #endif
   }
 
+  // #ifdef MP-WEIXIN
+  if (provider === 'wechat') {
+    try {
+      const loginRes: any = await new Promise((resolve, reject) => {
+        uni.login({ provider: 'weixin', success: resolve, fail: reject })
+      })
+      if (!loginRes.code) {
+        uni.showToast({ title: '微信授权失败', icon: 'none' })
+        loading.value = false
+        return
+      }
+      const res = await socialAuthApi.bindWechat(loginRes.code) as any
+      if (res.code === 200) {
+        uni.showToast({ title: '微信绑定成功', icon: 'success' })
+        bindInfo.wechatBound = true
+      } else {
+        uni.showToast({ title: res.message || '绑定失败', icon: 'none' })
+      }
+    } catch (e: any) {
+      uni.showToast({ title: e?.message || '微信绑定失败', icon: 'none' })
+    } finally {
+      loading.value = false
+    }
+    return
+  }
+  // #endif
+
+  // #ifndef MP-WEIXIN
   try {
     let state = `h5_bind_${provider}`
     const res = provider === 'wechat'
@@ -476,6 +504,7 @@ async function handleBind(provider: 'wechat' | 'qq') {
   } finally {
     loading.value = false
   }
+  // #endif
 }
 
 async function handleUnbind(provider: 'wechat' | 'qq') {

@@ -307,4 +307,14 @@ public class AdminShopController {
     public ResponseEntity<ApiResponse<Map<String, Object>>> getMealOrderStats() {
         return ResponseEntity.ok(ApiResponse.success(mealService.getOrderStats()));
     }
+
+    @PostMapping("/meal-orders/verify-pickup")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<MealOrder>> verifyPickupCode(@RequestBody Map<String, String> body) {
+        String pickupCode = body.get("pickupCode");
+        if (pickupCode == null || pickupCode.isBlank()) {
+            return ResponseEntity.badRequest().body(ApiResponse.error(400, "缺少取餐码"));
+        }
+        return ResponseEntity.ok(ApiResponse.success("核验成功", mealService.verifyPickupCode(pickupCode.trim())));
+    }
 }

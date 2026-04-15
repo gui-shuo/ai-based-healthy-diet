@@ -926,12 +926,13 @@ onUnmounted(() => {
   background: $card;
   border-radius: $radius-2xl $radius-2xl 0 0;
   width: 100%;
-  max-width: 750px;
+  max-width: 750rpx;
   max-height: 85vh;
   display: flex;
   flex-direction: column;
   animation: sheetUp 0.3s ease;
   overflow: hidden;
+  box-sizing: border-box;
 }
 
 .sheet-sm {
@@ -971,6 +972,8 @@ onUnmounted(() => {
   overflow-y: auto;
   overflow-x: hidden;
   flex: 1;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 /* ============ Form controls ============ */

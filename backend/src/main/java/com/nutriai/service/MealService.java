@@ -176,9 +176,14 @@ public class MealService {
         order.setOrderStatus("PREPARING");
         order.setPaymentMethod("SIMULATE");
         order.setPaidAt(LocalDateTime.now());
+
+        // Generate 6-digit pickup code
+        String pickupCode = generatePickupCode();
+        order.setPickupCode(pickupCode);
+
         mealOrderRepository.save(order);
 
-        log.info("营养餐订单支付成功(模拟), userId={}, orderNo={}", userId, orderNo);
+        log.info("营养餐订单支付成功(模拟), userId={}, orderNo={}, pickupCode={}", userId, orderNo, pickupCode);
         return order;
     }
 
@@ -292,6 +297,45 @@ public class MealService {
         stats.put("completed", mealOrderRepository.countByOrderStatus("COMPLETED"));
         stats.put("cancelled", mealOrderRepository.countByOrderStatus("CANCELLED"));
         return stats;
+    }
+
+    /**
+     * 管理员：通过取餐码核验订单
+     */
+    @Transactional
+    public MealOrder verifyPickupCode(String pickupCode) {
+        MealOrder order = mealOrderRepository.findByPickupCode(pickupCode)
+                .orElseThrow(() -> new BusinessException("取餐码无效"));
+
+        if (!"READY".equals(order.getOrderStatus()) && !"PREPARING".equals(order.getOrderStatus())) {
+            if ("PICKED_UP".equals(order.getOrderStatus()) || "COMPLETED".equals(order.getOrderStatus())) {
+                throw new BusinessException("此订单已完成取餐");
+            }
+            throw new BusinessException("订单状态不允许核验: " + order.getOrderStatus());
+        }
+
+        order.setOrderStatus("PICKED_UP");
+        order.setPickupCodeVerifiedAt(LocalDateTime.now());
+        order.setCompletedAt(LocalDateTime.now());
+        order.setOrderStatus("COMPLETED");
+        mealOrderRepository.save(order);
+
+        log.info("取餐码核验成功, orderNo={}, pickupCode={}", order.getOrderNo(), pickupCode);
+        return order;
+    }
+
+    private String generatePickupCode() {
+        Random random = new Random();
+        int code = 100000 + random.nextInt(900000);
+        // Ensure uniqueness among active orders
+        String codeStr = String.valueOf(code);
+        while (mealOrderRepository.findByPickupCode(codeStr).filter(
+                o -> !"COMPLETED".equals(o.getOrderStatus()) && !"CANCELLED".equals(o.getOrderStatus())
+        ).isPresent()) {
+            code = 100000 + random.nextInt(900000);
+            codeStr = String.valueOf(code);
+        }
+        return codeStr;
     }
 
     private String generateOrderNo(String prefix) {

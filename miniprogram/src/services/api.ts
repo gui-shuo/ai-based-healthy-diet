@@ -177,6 +177,7 @@ export const adminApi = {
   updateMealOrderStatus: (orderNo: string, data: any) => request({ url: `/admin/meal-orders/${orderNo}/status`, method: 'PUT', data }),
   getMealOrderStats: () => request({ url: '/admin/meal-orders/stats' }),
   getProductOrders: (params?: any) => request({ url: '/products/orders', data: params }),
+  verifyPickupCode: (pickupCode: string) => request({ url: '/admin/meal-orders/verify-pickup', method: 'POST', data: { pickupCode } }),
   // Upload
   uploadImage: (filePath: string) => uploadFile({ url: '/community/upload', filePath, name: 'file' })
 }

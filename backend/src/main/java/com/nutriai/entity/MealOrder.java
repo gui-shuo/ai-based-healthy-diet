@@ -123,6 +123,14 @@ public class MealOrder {
     @Column(name = "cancel_reason", length = 200)
     private String cancelReason;
 
+    /** 取餐码（6位数字） */
+    @Column(name = "pickup_code", length = 6)
+    private String pickupCode;
+
+    /** 取餐码核验时间 */
+    @Column(name = "pickup_code_verified_at")
+    private LocalDateTime pickupCodeVerifiedAt;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 

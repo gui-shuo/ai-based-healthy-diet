@@ -1,27 +1,20 @@
 <template>
   <view class="page">
-    <!-- Order Tabs -->
+    <!-- Top-level type switch: 营养餐 / 商品 -->
+    <view class="type-bar">
+      <view class="type-item" :class="{ active: orderType === 'meals' }" @tap="switchType('meals')">🍱 营养餐订单</view>
+      <view class="type-item" :class="{ active: orderType === 'products' }" @tap="switchType('products')">📦 商品订单</view>
+    </view>
+
+    <!-- Status filter tabs -->
     <view class="tab-bar">
       <view
+        v-for="tab in currentTabs"
+        :key="tab.value"
         class="tab-item"
-        :class="{ active: activeTab === 'all' }"
-        @tap="switchTab('all')"
-      >全部</view>
-      <view
-        class="tab-item"
-        :class="{ active: activeTab === 'pending' }"
-        @tap="switchTab('pending')"
-      >待支付</view>
-      <view
-        class="tab-item"
-        :class="{ active: activeTab === 'paid' }"
-        @tap="switchTab('paid')"
-      >待收货</view>
-      <view
-        class="tab-item"
-        :class="{ active: activeTab === 'completed' }"
-        @tap="switchTab('completed')"
-      >已完成</view>
+        :class="{ active: activeTab === tab.value }"
+        @tap="switchTab(tab.value)"
+      >{{ tab.label }}</view>
     </view>
 
     <view v-if="loading && !orders.length" class="loading-state">
@@ -29,7 +22,7 @@
     </view>
 
     <view v-else-if="!orders.length" class="empty-state">
-      <text class="empty-icon">📦</text>
+      <text class="empty-icon">{{ orderType === 'meals' ? '🍱' : '📦' }}</text>
       <text class="empty-text">暂无订单</text>
       <button class="btn-primary btn-shop" @tap="goShop">去逛逛</button>
     </view>
@@ -38,11 +31,11 @@
       <view v-for="order in filteredOrders" :key="order.id || order.orderNo" class="order-card">
         <view class="order-header flex-between">
           <text class="order-no text-sm text-secondary">订单号：{{ order.orderNo }}</text>
-          <text class="order-status" :class="getStatusClass(order.status)">{{ getStatusText(order.status) }}</text>
+          <text class="order-status" :class="getStatusClass(order)">{{ getStatusText(order) }}</text>
         </view>
 
         <view class="order-items">
-          <view class="order-item flex" v-for="(item, idx) in (order.items || [order])" :key="idx">
+          <view class="order-item flex" v-for="(item, idx) in getOrderItems(order)" :key="idx">
             <image v-if="item.productImage || item.imageUrl" class="item-img" :src="item.productImage || item.imageUrl" mode="aspectFill" />
             <view class="item-info flex-1">
               <text class="item-name">{{ item.productName || item.name || '商品' }}</text>
@@ -55,6 +48,23 @@
           </view>
         </view>
 
+        <!-- Meal order: pickup info & pickup code -->
+        <view v-if="orderType === 'meals' && order.fulfillmentType" class="meal-info">
+          <view class="meal-info-row">
+            <text class="meal-label">{{ order.fulfillmentType === 'PICKUP' ? '📍 取餐' : '🚗 配送' }}</text>
+            <text class="meal-value">{{ order.pickupLocation || order.receiverAddress || '-' }}</text>
+          </view>
+          <view v-if="order.pickupTime" class="meal-info-row">
+            <text class="meal-label">⏰ 时间</text>
+            <text class="meal-value">{{ order.pickupTime }}</text>
+          </view>
+          <view v-if="order.pickupCode && isPaidMealOrder(order)" class="pickup-code-area">
+            <text class="pickup-code-label">取餐码</text>
+            <text class="pickup-code">{{ order.pickupCode }}</text>
+            <text class="pickup-code-hint">请向工作人员出示取餐码</text>
+          </view>
+        </view>
+
         <view class="order-footer flex-between">
           <text class="order-time text-sm text-secondary">{{ formatTime(order.createdAt) }}</text>
           <view class="order-total">
@@ -63,11 +73,15 @@
           </view>
         </view>
 
-        <view class="order-actions flex" v-if="order.status === 'PENDING'">
-          <button class="btn-small btn-pay" @tap="payOrder(order.orderNo)">立即支付</button>
+        <!-- Actions for product orders -->
+        <view v-if="orderType === 'products'" class="order-actions flex">
+          <button v-if="order.status === 'PENDING'" class="btn-small btn-pay" @tap="payProductOrder(order.orderNo)">立即支付</button>
+          <button v-if="order.status === 'PAID' || order.status === 'SHIPPED'" class="btn-small btn-confirm" @tap="confirmReceive(order.orderNo)">确认收货</button>
         </view>
-        <view class="order-actions flex" v-else-if="order.status === 'PAID' || order.status === 'SHIPPED'">
-          <button class="btn-small btn-confirm" @tap="confirmReceive(order.orderNo)">确认收货</button>
+        <!-- Actions for meal orders -->
+        <view v-if="orderType === 'meals'" class="order-actions flex">
+          <button v-if="order.orderStatus === 'PENDING_PAYMENT'" class="btn-small btn-pay" @tap="payMealOrder(order.orderNo)">立即支付</button>
+          <button v-if="order.orderStatus === 'PENDING_PAYMENT'" class="btn-small btn-cancel" @tap="cancelMealOrder(order.orderNo)">取消订单</button>
         </view>
       </view>
     </view>
@@ -80,40 +94,93 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { onShow, onReachBottom } from '@dcloudio/uni-app'
-import { productApi } from '@/services/api'
+import { onShow, onLoad, onReachBottom } from '@dcloudio/uni-app'
+import { productApi, mealApi } from '@/services/api'
 import { checkLogin, formatTime } from '@/utils/common'
 
+const orderType = ref<'meals' | 'products'>('products')
 const activeTab = ref('all')
 const orders = ref<any[]>([])
 const loading = ref(false)
 const page = ref(1)
 const noMore = ref(false)
 
+const mealTabs = [
+  { label: '全部', value: 'all' },
+  { label: '待支付', value: 'pending' },
+  { label: '备餐中', value: 'preparing' },
+  { label: '待取餐', value: 'ready' },
+  { label: '已完成', value: 'completed' }
+]
+
+const productTabs = [
+  { label: '全部', value: 'all' },
+  { label: '待支付', value: 'pending' },
+  { label: '待收货', value: 'paid' },
+  { label: '已完成', value: 'completed' }
+]
+
+const currentTabs = computed(() => orderType.value === 'meals' ? mealTabs : productTabs)
+
 const filteredOrders = computed(() => {
   if (activeTab.value === 'all') return orders.value
-  const statusMap: Record<string, string[]> = {
-    pending: ['PENDING'],
-    paid: ['PAID', 'SHIPPED'],
-    completed: ['COMPLETED', 'RECEIVED']
+  if (orderType.value === 'meals') {
+    const mealStatusMap: Record<string, string[]> = {
+      pending: ['PENDING_PAYMENT'],
+      preparing: ['PREPARING', 'PAID'],
+      ready: ['READY'],
+      completed: ['PICKED_UP', 'DELIVERED', 'COMPLETED']
+    }
+    const statuses = mealStatusMap[activeTab.value] || []
+    return orders.value.filter(o => statuses.includes(o.orderStatus))
+  } else {
+    const productStatusMap: Record<string, string[]> = {
+      pending: ['PENDING'],
+      paid: ['PAID', 'SHIPPED'],
+      completed: ['COMPLETED', 'RECEIVED']
+    }
+    const statuses = productStatusMap[activeTab.value] || []
+    return orders.value.filter(o => statuses.includes(o.status))
   }
-  const statuses = statusMap[activeTab.value] || []
-  return orders.value.filter(o => statuses.includes(o.status))
 })
 
-function getStatusText(status: string) {
+function getOrderItems(order: any) {
+  return order.items || [order]
+}
+
+function isPaidMealOrder(order: any) {
+  return ['PREPARING', 'READY', 'PICKED_UP', 'DELIVERED', 'COMPLETED'].includes(order.orderStatus)
+}
+
+function getStatusText(order: any) {
+  if (orderType.value === 'meals') {
+    const map: Record<string, string> = {
+      PENDING_PAYMENT: '待支付', PAID: '已支付', PREPARING: '备餐中',
+      READY: '待取餐', PICKED_UP: '已取餐', DELIVERED: '已配送',
+      COMPLETED: '已完成', CANCELLED: '已取消'
+    }
+    return map[order.orderStatus] || order.orderStatus
+  }
   const map: Record<string, string> = {
     PENDING: '待支付', PAID: '已支付', SHIPPED: '已发货',
     RECEIVED: '已收货', COMPLETED: '已完成', CANCELLED: '已取消', REFUNDED: '已退款'
   }
-  return map[status] || status
+  return map[order.status] || order.status
 }
 
-function getStatusClass(status: string) {
-  if (['PENDING'].includes(status)) return 'status-pending'
-  if (['PAID', 'SHIPPED'].includes(status)) return 'status-active'
-  if (['COMPLETED', 'RECEIVED'].includes(status)) return 'status-done'
+function getStatusClass(order: any) {
+  const status = orderType.value === 'meals' ? order.orderStatus : order.status
+  if (['PENDING', 'PENDING_PAYMENT'].includes(status)) return 'status-pending'
+  if (['PAID', 'SHIPPED', 'PREPARING'].includes(status)) return 'status-active'
+  if (['COMPLETED', 'RECEIVED', 'PICKED_UP', 'DELIVERED', 'READY'].includes(status)) return 'status-done'
   return 'status-cancelled'
+}
+
+function switchType(type: 'meals' | 'products') {
+  if (orderType.value === type) return
+  orderType.value = type
+  activeTab.value = 'all'
+  loadOrders(true)
 }
 
 function switchTab(tab: string) {
@@ -122,22 +189,32 @@ function switchTab(tab: string) {
 
 async function loadOrders(reset = false) {
   if (loading.value) return
-  if (reset) { page.value = 1; noMore.value = false }
+  if (reset) { page.value = 1; noMore.value = false; orders.value = [] }
   loading.value = true
   try {
-    const res = await productApi.getOrders({ page: page.value, size: 20 })
-    if (res.code === 200) {
-      const list = res.data?.content || res.data?.records || res.data?.list || res.data || []
-      orders.value = reset ? list : [...orders.value, ...list]
-      if (list.length < 20) noMore.value = true
-      else page.value++
+    if (orderType.value === 'meals') {
+      const res = await mealApi.getOrders({ page: page.value - 1, size: 20 })
+      if (res.code === 200) {
+        const list = res.data?.content || res.data?.records || res.data?.list || res.data || []
+        orders.value = reset ? list : [...orders.value, ...list]
+        if (list.length < 20) noMore.value = true
+        else page.value++
+      }
+    } else {
+      const res = await productApi.getOrders({ page: page.value, size: 20 })
+      if (res.code === 200) {
+        const list = res.data?.content || res.data?.records || res.data?.list || res.data || []
+        orders.value = reset ? list : [...orders.value, ...list]
+        if (list.length < 20) noMore.value = true
+        else page.value++
+      }
     }
   } catch {} finally {
     loading.value = false
   }
 }
 
-async function payOrder(orderNo: string) {
+async function payProductOrder(orderNo: string) {
   try {
     uni.showLoading({ title: '支付中...' })
     const res = await productApi.simulatePay(orderNo)
@@ -149,6 +226,34 @@ async function payOrder(orderNo: string) {
       uni.showToast({ title: res.message || '支付失败', icon: 'none' })
     }
   } catch { uni.hideLoading(); uni.showToast({ title: '支付失败', icon: 'none' }) }
+}
+
+async function payMealOrder(orderNo: string) {
+  try {
+    uni.showLoading({ title: '支付中...' })
+    const res = await mealApi.simulatePay(orderNo)
+    uni.hideLoading()
+    if (res.code === 200) {
+      uni.showToast({ title: '支付成功', icon: 'success' })
+      loadOrders(true)
+    } else {
+      uni.showToast({ title: res.message || '支付失败', icon: 'none' })
+    }
+  } catch { uni.hideLoading(); uni.showToast({ title: '支付失败', icon: 'none' }) }
+}
+
+async function cancelMealOrder(orderNo: string) {
+  uni.showModal({
+    title: '提示', content: '确定取消此订单？',
+    success: async (r) => {
+      if (!r.confirm) return
+      try {
+        await mealApi.cancelOrder(orderNo)
+        uni.showToast({ title: '已取消', icon: 'success' })
+        loadOrders(true)
+      } catch { uni.showToast({ title: '操作失败', icon: 'none' }) }
+    }
+  })
 }
 
 async function confirmReceive(orderNo: string) {
@@ -166,8 +271,18 @@ async function confirmReceive(orderNo: string) {
 }
 
 function goShop() {
-  uni.navigateTo({ url: '/pages/product-shop/index' })
+  if (orderType.value === 'meals') {
+    uni.switchTab({ url: '/pages/meals/index' })
+  } else {
+    uni.navigateTo({ url: '/pages/product-shop/index' })
+  }
 }
+
+onLoad((options: any) => {
+  if (options?.tab === 'meals') {
+    orderType.value = 'meals'
+  }
+})
 
 onShow(() => {
   if (checkLogin()) loadOrders(true)
@@ -183,6 +298,32 @@ onReachBottom(() => {
   min-height: 100vh;
   background: $background;
   font-family: 'Inter', sans-serif;
+}
+
+.type-bar {
+  display: flex;
+  background: $card;
+  padding: 16rpx 24rpx;
+  gap: 16rpx;
+  border-bottom: 1rpx solid $border;
+}
+
+.type-item {
+  flex: 1;
+  text-align: center;
+  padding: 16rpx 0;
+  font-size: 28rpx;
+  color: $muted-foreground;
+  border-radius: $radius-lg;
+  background: $muted;
+  transition: all 0.2s;
+}
+
+.type-item.active {
+  background: rgba(16, 185, 129, 0.1);
+  color: $accent;
+  font-weight: 600;
+  border: 1rpx solid $accent;
 }
 
 .tab-bar {
@@ -297,6 +438,65 @@ onReachBottom(() => {
 .item-price { font-size: 28rpx; color: $accent; font-weight: 600; font-family: 'JetBrains Mono', monospace; }
 .item-qty { font-size: 24rpx; color: $muted-foreground; }
 
+.meal-info {
+  margin-top: 16rpx;
+  padding: 16rpx;
+  background: rgba(16, 185, 129, 0.04);
+  border-radius: $radius-lg;
+  border: 1rpx solid rgba(16, 185, 129, 0.1);
+}
+
+.meal-info-row {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  margin-bottom: 8rpx;
+}
+
+.meal-info-row:last-child { margin-bottom: 0; }
+
+.meal-label {
+  font-size: 24rpx;
+  color: $muted-foreground;
+  flex-shrink: 0;
+}
+
+.meal-value {
+  font-size: 24rpx;
+  color: $foreground;
+}
+
+.pickup-code-area {
+  margin-top: 16rpx;
+  padding: 20rpx;
+  background: rgba(16, 185, 129, 0.08);
+  border-radius: $radius-lg;
+  text-align: center;
+}
+
+.pickup-code-label {
+  font-size: 24rpx;
+  color: $muted-foreground;
+  display: block;
+  margin-bottom: 8rpx;
+}
+
+.pickup-code {
+  font-size: 56rpx;
+  font-weight: 700;
+  color: $accent;
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 12rpx;
+  display: block;
+}
+
+.pickup-code-hint {
+  font-size: 22rpx;
+  color: $muted-foreground;
+  display: block;
+  margin-top: 8rpx;
+}
+
 .order-footer {
   margin-top: 16rpx;
   padding-top: 16rpx;
@@ -331,6 +531,12 @@ onReachBottom(() => {
 .btn-confirm {
   background: $muted;
   color: $accent;
+  border: 1rpx solid $border;
+}
+
+.btn-cancel {
+  background: $muted;
+  color: $muted-foreground;
   border: 1rpx solid $border;
 }
 

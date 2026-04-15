@@ -18,6 +18,27 @@
       </view>
     </view>
 
+    <!-- Pickup Code Verification -->
+    <view class="verify-section">
+      <view class="verify-card">
+        <text class="verify-title">🎫 取餐码核验</text>
+        <view class="verify-row">
+          <input
+            class="verify-input"
+            v-model="pickupCodeInput"
+            type="number"
+            placeholder="输入6位取餐码"
+            maxlength="6"
+            @confirm="verifyPickupCode"
+          />
+          <button class="verify-btn" :loading="verifying" @tap="verifyPickupCode">核验</button>
+        </view>
+        <view v-if="verifyResult" class="verify-result" :class="verifyResult.success ? 'result-success' : 'result-error'">
+          <text>{{ verifyResult.message }}</text>
+        </view>
+      </view>
+    </view>
+
     <!-- Loading -->
     <view v-if="loading" class="loading-wrap">
       <text class="loading-text">加载中...</text>
@@ -63,6 +84,14 @@
           <view v-if="order.remark" class="detail-row">
             <text class="detail-label">备注</text>
             <text class="detail-value">{{ order.remark }}</text>
+          </view>
+          <view v-if="order.pickupCode" class="detail-row">
+            <text class="detail-label">取餐码</text>
+            <text class="detail-value pickup-code-display">{{ order.pickupCode }}</text>
+          </view>
+          <view v-if="order.fulfillmentType" class="detail-row">
+            <text class="detail-label">方式</text>
+            <text class="detail-value">{{ order.fulfillmentType === 'PICKUP' ? '自取' : '配送' }}</text>
           </view>
 
           <!-- Actions -->
@@ -118,6 +147,9 @@ const currentTab = ref('')
 const loading = ref(false)
 const orders = ref<any[]>([])
 const expandedId = ref<number | null>(null)
+const pickupCodeInput = ref('')
+const verifying = ref(false)
+const verifyResult = ref<{ success: boolean; message: string } | null>(null)
 
 const statusMap: Record<string, string> = {
   PENDING: '待确认',
@@ -224,6 +256,33 @@ async function updateStatus(order: any, newStatus: string) {
   })
 }
 
+async function verifyPickupCode() {
+  if (!pickupCodeInput.value || pickupCodeInput.value.length !== 6) {
+    uni.showToast({ title: '请输入6位取餐码', icon: 'none' })
+    return
+  }
+  verifying.value = true
+  verifyResult.value = null
+  try {
+    const res = await adminApi.verifyPickupCode(pickupCodeInput.value)
+    if (res.code === 200) {
+      const order = res.data as any
+      verifyResult.value = {
+        success: true,
+        message: `✅ 核验成功！订单 ${order.orderNo}，${getItemsSummary(order)}，¥${order.totalAmount}`
+      }
+      pickupCodeInput.value = ''
+      loadOrders()
+    } else {
+      verifyResult.value = { success: false, message: `❌ ${(res as any).message || '核验失败'}` }
+    }
+  } catch (e: any) {
+    verifyResult.value = { success: false, message: `❌ ${e?.message || '核验失败'}` }
+  } finally {
+    verifying.value = false
+  }
+}
+
 onShow(() => {
   if (checkPermission()) loadOrders()
 })
@@ -287,6 +346,84 @@ onShow(() => {
 .tab-text {
   font-size: 26rpx;
   color: $muted-foreground;
+}
+
+.verify-section {
+  padding: 20rpx 24rpx 0;
+}
+
+.verify-card {
+  background: $card;
+  border-radius: $radius-xl;
+  padding: 24rpx;
+  border: 1rpx solid rgba(16, 185, 129, 0.2);
+  box-shadow: $shadow-sm;
+}
+
+.verify-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: $foreground;
+  display: block;
+  margin-bottom: 16rpx;
+}
+
+.verify-row {
+  display: flex;
+  gap: 16rpx;
+  align-items: center;
+}
+
+.verify-input {
+  flex: 1;
+  height: 80rpx;
+  background: $muted;
+  border: 1rpx solid $border;
+  border-radius: $radius-lg;
+  padding: 0 24rpx;
+  font-size: 32rpx;
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 8rpx;
+  text-align: center;
+  color: $foreground;
+}
+
+.verify-btn {
+  width: 160rpx;
+  height: 80rpx;
+  line-height: 80rpx;
+  background: $accent;
+  color: #fff;
+  font-size: 28rpx;
+  border-radius: $radius-lg;
+  text-align: center;
+  border: none;
+  font-weight: 600;
+}
+
+.verify-result {
+  margin-top: 16rpx;
+  padding: 16rpx;
+  border-radius: $radius-lg;
+  font-size: 26rpx;
+}
+
+.result-success {
+  background: rgba(16, 185, 129, 0.08);
+  color: $accent;
+}
+
+.result-error {
+  background: rgba(239, 68, 68, 0.08);
+  color: $uni-error;
+}
+
+.pickup-code-display {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 32rpx;
+  font-weight: 700;
+  color: $accent;
+  letter-spacing: 8rpx;
 }
 
 .loading-wrap, .empty-wrap {

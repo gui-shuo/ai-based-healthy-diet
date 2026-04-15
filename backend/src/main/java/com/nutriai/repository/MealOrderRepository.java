@@ -28,4 +28,6 @@ public interface MealOrderRepository extends JpaRepository<MealOrder, Long> {
 
     @Query("SELECT COUNT(o) FROM MealOrder o WHERE o.orderStatus = :status")
     long countByOrderStatus(@Param("status") String status);
+
+    Optional<MealOrder> findByPickupCode(String pickupCode);
 }
