@@ -82,6 +82,33 @@
         </view>
       </view>
 
+      <!-- Admin Panel (管理员可见) -->
+      <view class="menu-section card" v-if="userStore.isAdmin">
+        <text class="section-title">🔧 管理后台</text>
+        <view class="menu-list">
+          <view class="menu-item" @tap="goPage('/pages/admin/index')">
+            <text class="menu-icon">📊</text>
+            <text class="menu-label">管理面板</text>
+            <text class="menu-arrow">›</text>
+          </view>
+          <view class="menu-item" @tap="goPage('/pages/admin/meals')">
+            <text class="menu-icon">🍱</text>
+            <text class="menu-label">营养餐管理</text>
+            <text class="menu-arrow">›</text>
+          </view>
+          <view class="menu-item" @tap="goPage('/pages/admin/products')">
+            <text class="menu-icon">🏪</text>
+            <text class="menu-label">产品管理</text>
+            <text class="menu-arrow">›</text>
+          </view>
+          <view class="menu-item" @tap="goPage('/pages/admin/orders')">
+            <text class="menu-icon">📋</text>
+            <text class="menu-label">订单管理</text>
+            <text class="menu-arrow">›</text>
+          </view>
+        </view>
+      </view>
+
       <!-- Settings -->
       <view class="menu-section card">
         <text class="section-title">账号设置</text>

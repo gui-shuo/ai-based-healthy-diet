@@ -28,6 +28,13 @@ export function formatDate(dateStr: string, format = 'YYYY-MM-DD'): string {
 }
 
 // Relative time
+
+// 格式化时间为 MM-DD HH:mm
+export function formatTime(dateStr: string): string {
+  return formatDate(dateStr, 'MM-DD HH:mm')
+}
+
+//
 export function timeAgo(dateStr: string): string {
   const now = Date.now()
   const date = new Date(dateStr).getTime()

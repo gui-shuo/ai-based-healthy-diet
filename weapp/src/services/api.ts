@@ -278,3 +278,160 @@ export const PRODUCT_CATEGORIES = [
   { key: '有机食品', label: '有机食品' },
   { key: '营养食品', label: '营养食品' }
 ]
+
+// ==================== Admin ====================
+
+// 管理后台 - 仪表盘
+export const adminDashboardApi = {
+  getStats() {
+    return request({ url: '/admin/dashboard/stats' })
+  },
+  getUserGrowth(days = 7) {
+    return request({ url: `/admin/dashboard/user-growth?days=${days}` })
+  },
+  getOverview() {
+    return request({ url: '/admin/dashboard/overview' })
+  }
+}
+
+// 管理后台 - 营养餐管理
+export const adminMealApi = {
+  getList(params: { page?: number; size?: number; keyword?: string; type?: string }) {
+    const query = new URLSearchParams()
+    if (params.page) query.append('page', String(params.page - 1))
+    if (params.size) query.append('size', String(params.size))
+    if (params.keyword) query.append('keyword', params.keyword)
+    if (params.type) query.append('type', params.type)
+    return request({ url: `/admin/meal-plans?${query}` })
+  },
+  getDetail(id: number) {
+    return request({ url: `/admin/meal-plans/${id}` })
+  },
+  create(data: any) {
+    return request({ url: '/admin/meal-plans', method: 'POST', data })
+  },
+  update(id: number, data: any) {
+    return request({ url: `/admin/meal-plans/${id}`, method: 'PUT', data })
+  },
+  remove(id: number) {
+    return request({ url: `/admin/meal-plans/${id}`, method: 'DELETE' })
+  },
+  toggleActive(id: number) {
+    return request({ url: `/admin/meal-plans/${id}/toggle-active`, method: 'PUT' })
+  },
+  toggleFeatured(id: number) {
+    return request({ url: `/admin/meal-plans/${id}/toggle-featured`, method: 'PUT' })
+  }
+}
+
+// 管理后台 - 产品管理
+export const adminProductApi = {
+  getList(params: { page?: number; size?: number; keyword?: string; category?: string }) {
+    const query = new URLSearchParams()
+    if (params.page) query.append('page', String(params.page - 1))
+    if (params.size) query.append('size', String(params.size))
+    if (params.keyword) query.append('keyword', params.keyword)
+    if (params.category) query.append('category', params.category)
+    return request({ url: `/admin/products?${query}` })
+  },
+  getDetail(id: number) {
+    return request({ url: `/admin/products/${id}` })
+  },
+  create(data: any) {
+    return request({ url: '/admin/products', method: 'POST', data })
+  },
+  update(id: number, data: any) {
+    return request({ url: `/admin/products/${id}`, method: 'PUT', data })
+  },
+  remove(id: number) {
+    return request({ url: `/admin/products/${id}`, method: 'DELETE' })
+  },
+  updateStatus(id: number, status: string) {
+    return request({ url: `/admin/products/${id}/status?status=${status}`, method: 'PUT' })
+  }
+}
+
+// 管理后台 - 订单管理
+export const adminOrderApi = {
+  getList(params: { page?: number; size?: number; status?: string; orderNo?: string }) {
+    const query = new URLSearchParams()
+    if (params.page) query.append('page', String(params.page - 1))
+    if (params.size) query.append('size', String(params.size))
+    if (params.status) query.append('status', params.status)
+    if (params.orderNo) query.append('orderNo', params.orderNo)
+    return request({ url: `/admin/products/orders?${query}` })
+  },
+  getDetail(orderNo: string) {
+    return request({ url: `/admin/products/orders/${orderNo}` })
+  },
+  updateStatus(orderNo: string, status: string) {
+    return request({ url: `/admin/products/orders/${orderNo}/status?status=${status}`, method: 'PUT' })
+  },
+  ship(orderNo: string, data: { trackingNo?: string; carrier?: string }) {
+    return request({ url: `/admin/products/orders/${orderNo}/ship`, method: 'PUT', data })
+  }
+}
+
+// 管理后台 - 社区管理
+export const adminCommunityApi = {
+  getPosts(params: { page?: number; size?: number; status?: string; category?: string }) {
+    const query = new URLSearchParams()
+    if (params.page) query.append('page', String(params.page - 1))
+    if (params.size) query.append('size', String(params.size))
+    if (params.status) query.append('status', params.status)
+    if (params.category) query.append('category', params.category)
+    return request({ url: `/community/admin/posts?${query}` })
+  },
+  getStats() {
+    return request({ url: '/community/admin/stats' })
+  },
+  togglePin(id: number) {
+    return request({ url: `/community/admin/posts/${id}/pin`, method: 'PUT' })
+  },
+  updateStatus(id: number, status: string) {
+    return request({ url: `/community/admin/posts/${id}/status?status=${status}`, method: 'PUT' })
+  },
+  deletePost(id: number) {
+    return request({ url: `/community/admin/posts/${id}`, method: 'DELETE' })
+  },
+  deleteComment(id: number) {
+    return request({ url: `/community/admin/comments/${id}`, method: 'DELETE' })
+  }
+}
+
+// 管理后台 - 公告管理
+export const adminAnnouncementApi = {
+  getList() {
+    return request({ url: '/admin/announcements' })
+  },
+  create(data: any) {
+    return request({ url: '/admin/announcements', method: 'POST', data })
+  },
+  update(id: number, data: any) {
+    return request({ url: `/admin/announcements/${id}`, method: 'PUT', data })
+  },
+  remove(id: number) {
+    return request({ url: `/admin/announcements/${id}`, method: 'DELETE' })
+  }
+}
+
+// 管理后台 - 反馈管理
+export const adminFeedbackApi = {
+  getList(params: { page?: number; size?: number; status?: string; type?: string }) {
+    const query = new URLSearchParams()
+    if (params.page) query.append('page', String(params.page - 1))
+    if (params.size) query.append('size', String(params.size))
+    if (params.status) query.append('status', params.status)
+    if (params.type) query.append('type', params.type)
+    return request({ url: `/feedback/admin/list?${query}` })
+  },
+  getStats() {
+    return request({ url: '/feedback/admin/stats' })
+  },
+  reply(id: number, content: string) {
+    return request({ url: `/feedback/admin/${id}/reply`, method: 'POST', data: { content } })
+  },
+  updateStatus(id: number, status: string) {
+    return request({ url: `/feedback/admin/${id}/status?status=${status}`, method: 'PUT' })
+  }
+}

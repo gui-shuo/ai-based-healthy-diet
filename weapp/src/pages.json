@@ -17,7 +17,16 @@
     { "path": "pages/order/confirm", "style": { "navigationBarTitleText": "确认订单" } },
     { "path": "pages/order/result", "style": { "navigationBarTitleText": "订单结果" } },
     { "path": "pages/auth/login", "style": { "navigationBarTitleText": "登录" } },
-    { "path": "pages/auth/register", "style": { "navigationBarTitleText": "注册" } }
+    { "path": "pages/auth/register", "style": { "navigationBarTitleText": "注册" } },
+    { "path": "pages/admin/index", "style": { "navigationStyle": "custom" } },
+    { "path": "pages/admin/meals", "style": { "navigationBarTitleText": "营养餐管理" } },
+    { "path": "pages/admin/meal-edit", "style": { "navigationBarTitleText": "编辑营养餐" } },
+    { "path": "pages/admin/products", "style": { "navigationBarTitleText": "产品管理" } },
+    { "path": "pages/admin/product-edit", "style": { "navigationBarTitleText": "编辑产品" } },
+    { "path": "pages/admin/orders", "style": { "navigationBarTitleText": "订单管理" } },
+    { "path": "pages/admin/community", "style": { "navigationBarTitleText": "社区管理" } },
+    { "path": "pages/admin/announcements", "style": { "navigationBarTitleText": "公告管理" } },
+    { "path": "pages/admin/feedback", "style": { "navigationBarTitleText": "反馈管理" } }
   ],
   "globalStyle": {
     "navigationBarTextStyle": "white",
