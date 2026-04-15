@@ -81,6 +81,13 @@
         <text class="menu-text">我的咨询</text>
         <text class="menu-arrow">›</text>
       </view>
+      <view class="menu-item" @tap="navigateTo('/pages/profile/my-orders?tab=meals')">
+        <view class="menu-icon-wrap" style="background: rgba(16,185,129,0.1)">
+          <text class="menu-icon">🍱</text>
+        </view>
+        <text class="menu-text">我的营养餐</text>
+        <text class="menu-arrow">›</text>
+      </view>
       <view class="menu-item" @tap="navigateTo('/pages/profile/my-orders')">
         <view class="menu-icon-wrap" style="background: rgba(20,184,166,0.1)">
           <text class="menu-icon">📦</text>
@@ -94,6 +101,47 @@
         </view>
         <text class="menu-text">收货地址</text>
         <text class="menu-arrow">›</text>
+      </view>
+    </view>
+
+    <!-- Admin Entry - only show for admin users -->
+    <view v-if="userStore.isAdmin" class="section-label">管理功能</view>
+    <view v-if="userStore.isAdmin" class="card menu-card">
+      <view class="menu-item" @tap="navigateTo('/pages/admin/index')">
+        <view class="menu-icon-wrap" style="background: rgba(16,185,129,0.1)">
+          <text class="menu-icon">⚙️</text>
+        </view>
+        <text class="menu-text">管理后台</text>
+        <text class="menu-arrow">›</text>
+      </view>
+      <view class="menu-item" @tap="navigateTo('/pages/admin/meals')">
+        <view class="menu-icon-wrap" style="background: rgba(16,185,129,0.1)">
+          <text class="menu-icon">🍱</text>
+        </view>
+        <text class="menu-text">营养餐管理</text>
+        <text class="menu-arrow">›</text>
+      </view>
+      <view class="menu-item" @tap="navigateTo('/pages/admin/orders')">
+        <view class="menu-icon-wrap" style="background: rgba(245,158,11,0.1)">
+          <text class="menu-icon">📦</text>
+        </view>
+        <text class="menu-text">订单管理</text>
+        <text class="menu-arrow">›</text>
+      </view>
+    </view>
+
+    <!-- Admin Entry -->
+    <view v-if="userStore.isAdmin" class="section-label">管理</view>
+    <view v-if="userStore.isAdmin" class="card menu-card">
+      <view class="menu-item" @tap="navigateTo('/pages/admin/index')">
+        <view class="menu-icon-wrap" style="background: rgba(16,185,129,0.15)">
+          <text class="menu-icon">⚙️</text>
+        </view>
+        <text class="menu-text">管理后台</text>
+        <view class="menu-badge-row">
+          <text class="menu-badge" style="background: rgba(16,185,129,0.1); color: #10B981;">管理员</text>
+          <text class="menu-arrow">›</text>
+        </view>
       </view>
     </view>
 
