@@ -65,8 +65,8 @@ public class SystemConfigInitializer implements ApplicationRunner {
         // ─── AI 配置 ───
         add(list, "ai.api_key",          env("AI_API_KEY", ""),                           "string", "AI API密钥",               "AI",     false);
         add(list, "ai.base_url",         env("AI_BASE_URL", "https://dashscope.aliyuncs.com/compatible-mode/v1"), "string", "AI API基础URL",           "AI",     false);
-        add(list, "ai.model",            env("AI_MODEL_NAME", "kimi-k2.5"),               "string", "默认AI模型（火山方舟Coding套餐）",  "AI",     true);
-        add(list, "ai.diet_plan_model",  env("AI_DIET_PLAN_MODEL", "doubao-seed-2.0-lite"), "string", "饮食计划专用AI模型",       "AI",     true);
+        add(list, "ai.model",            env("AI_MODEL_NAME", "qwen3.5-122b-a10b"),       "string", "默认AI模型（通义千问）",    "AI",     true);
+        add(list, "ai.diet_plan_model",  env("AI_DIET_PLAN_MODEL", "qwen3.5-flash"),      "string", "饮食计划专用AI模型",       "AI",     true);
         add(list, "ai.max_tokens",       env("ai.max-tokens", "2000"),                    "number", "最大Token数",              "AI",     true);
         add(list, "ai.temperature",      env("ai.temperature", "0.7"),                    "number", "温度参数(0-1)",            "AI",     true);
         add(list, "ai.top_p",            env("ai.top-p", "0.9"),                          "number", "Top-P参数(0-1)",           "AI",     true);
