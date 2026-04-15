@@ -91,7 +91,7 @@ const routes = [
     path: '/meal-plans',
     name: 'MealPlans',
     component: () => import('@/views/MealPlansView.vue'),
-    meta: { requiresAuth: true, title: '营养餐计划' }
+    meta: { requiresAuth: true, title: '抗炎营养餐' }
   },
   {
     path: '/product-shop',

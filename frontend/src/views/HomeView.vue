@@ -32,7 +32,7 @@
                   <el-dropdown-item command="food-records"> 饮食记录 </el-dropdown-item>
                   <el-dropdown-item command="consultation"> 营养师咨询 </el-dropdown-item>
                   <el-dropdown-item command="recipes"> 食谱库 </el-dropdown-item>
-                  <el-dropdown-item command="meal-plans"> 营养餐计划 </el-dropdown-item>
+                  <el-dropdown-item command="meal-plans"> 抗炎营养餐 </el-dropdown-item>
                   <el-dropdown-item command="community"> 营养圈 </el-dropdown-item>
                   <el-dropdown-item command="product-shop"> 营养产品商城 </el-dropdown-item>
                   <el-dropdown-item command="membership"> 会员中心 </el-dropdown-item>
@@ -60,13 +60,6 @@
         <div class="hero-buttons animate-fade-in-up" style="animation-delay: 0.2s">
           <el-button type="primary" size="large" @click="getStarted"> 立即开始 </el-button>
           <el-button size="large" @click="learnMore"> 了解更多 </el-button>
-        </div>
-        <div class="hero-mobile-hint animate-fade-in-up" style="animation-delay: 0.3s">
-          📱 手机用户？访问
-          <a href="/h5/" target="_blank" class="h5-link">H5移动版</a>
-          或前往
-          <router-link to="/download" class="h5-link">下载中心</router-link>
-          获取APP
         </div>
       </div>
 
@@ -139,8 +132,8 @@
               <div class="feature-icon"><el-icon :size="32" color="white">
                 <calendar />
               </el-icon></div>
-              <h3 class="font-display">营养餐计划</h3>
-              <p>科学搭配每日三餐，定制您的饮食方案</p>
+              <h3 class="font-display">抗炎营养餐</h3>
+              <p>科学搭配每日三餐，定制您的抗炎饮食方案</p>
             </div>
             <div class="feature-card" @click="goToFeature('community')">
               <div class="feature-icon"><el-icon :size="32" color="white">
@@ -207,10 +200,6 @@
             <router-link to="/legal/privacy">隐私政策</router-link>
             <span class="sep">|</span>
             <router-link to="/legal/disclaimer">免责声明</router-link>
-            <span class="sep">|</span>
-            <a href="/h5/" target="_blank">H5移动版</a>
-            <span class="sep">|</span>
-            <router-link to="/download">APP下载</router-link>
           </div>
         </div>
       </div>
@@ -511,26 +500,6 @@ const goToFeature = feature => {
   color: #10B981;
   transform: translateY(-2px);
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
-}
-
-.hero-mobile-hint {
-  margin-top: 24px;
-  font-size: 14px;
-  color: #64748B;
-  position: relative;
-  z-index: 1;
-}
-
-.h5-link {
-  color: #10B981;
-  font-weight: 600;
-  text-decoration: none;
-  transition: color 0.2s;
-}
-
-.h5-link:hover {
-  color: #34D399;
-  text-decoration: underline;
 }
 
 /* 营养师工作台入口 */

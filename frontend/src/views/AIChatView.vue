@@ -26,7 +26,6 @@
         <el-button :icon="Star" circle title="收藏" @click.stop="handleShowFavorites" />
         <el-button :icon="Delete" circle title="清空对话" @click.stop="handleClearHistory" />
         <el-button :icon="Download" circle title="导出对话" @click.stop="handleExport" />
-        <el-button :icon="Setting" circle title="设置" @click.stop="handleShowSettings" />
       </div>
     </div>
 
@@ -65,47 +64,6 @@
         @file-select="handleFileSelect"
       />
     </div>
-
-    <!-- 设置对话框 -->
-    <el-dialog
-      v-model="showSettings"
-      title="聊天设置"
-      width="500px"
-      :append-to-body="true"
-      :close-on-click-modal="false"
-      :destroy-on-close="false"
-    >
-      <el-form label-width="120px">
-        <el-form-item label="AI模型">
-          <el-select v-model="settings.model" style="width: 100%">
-            <el-option label="Kimi K2.5（推荐）" value="kimi-k2.5" />
-            <el-option label="DeepSeek V3.2" value="deepseek-v3.2" />
-            <el-option label="GLM 4.7" value="glm-4.7" />
-            <el-option label="MiniMax M2.5" value="minimax-m2.5" />
-            <el-option label="豆包 Seed 2.0 Pro" value="doubao-seed-2.0-pro" />
-            <el-option label="豆包 Seed 2.0 Lite" value="doubao-seed-2.0-lite" />
-            <el-option label="豆包 Seed Code" value="doubao-seed-code" />
-            <el-option label="豆包 Seed 2.0 Code" value="doubao-seed-2.0-code" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="温度参数">
-          <el-slider v-model="settings.temperature" :min="0" :max="1" :step="0.1" show-input />
-          <span class="setting-tip">控制回答的随机性，值越大回答越发散</span>
-        </el-form-item>
-        <el-form-item label="最大字数">
-          <el-input-number v-model="settings.maxTokens" :min="500" :max="4000" :step="100" />
-          <span class="setting-tip">单次回复的最大字数</span>
-        </el-form-item>
-        <el-form-item label="上下文记忆">
-          <el-switch v-model="settings.keepContext" />
-          <span class="setting-tip">是否保持对话上下文</span>
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <el-button @click="showSettings = false"> 取消 </el-button>
-        <el-button type="primary" @click="handleSaveSettings"> 保存 </el-button>
-      </template>
-    </el-dialog>
 
     <!-- 历史记录对话框 -->
     <el-dialog
@@ -180,7 +138,6 @@ import {
   Delete,
   Download,
   FolderOpened,
-  Setting,
   Star,
   DocumentCopy,
   ArrowLeft
@@ -219,16 +176,12 @@ const streamingMessageId = ref(null)
 const streamingContent = ref('')
 const showHistory = ref(false)
 const showFavorites = ref(false)
-const showSettings = ref(false)
 
 // 保存定时器
 const saveTimer = ref(null)
 
-// 设置
+// 上下文记忆设置（仅保留此项，模型参数由管理后台统一管理）
 const settings = reactive({
-  model: 'kimi-k2.5',
-  temperature: 0.7,
-  maxTokens: 2000,
   keepContext: true,
   autoSave: true
 })
@@ -350,9 +303,6 @@ const sendViaHttp = async (messageText, aiMessageId) => {
       '/ai/chat',
       {
         message: messageText,
-        model: settings.model,
-        temperature: settings.temperature,
-        maxTokens: settings.maxTokens,
         keepContext: settings.keepContext
       },
       { timeout: 180000 }
@@ -624,28 +574,12 @@ const handleShowFavorites = async () => {
   showFavorites.value = true
 }
 
-// 显示设置
-const handleShowSettings = () => {
-  showSettings.value = true
-}
-
-// 保存设置
-const handleSaveSettings = () => {
-  localStorage.setItem('aiChatSettings', JSON.stringify(settings))
-  showSettings.value = false
-  ElMessage.success('设置已保存')
-}
-
-// 加载设置
+// 加载设置（仅加载上下文和自动保存偏好）
 const loadSettings = () => {
   try {
     const saved = localStorage.getItem('aiChatSettings')
     if (saved) {
       const parsed = JSON.parse(saved)
-      // 仅赋值合法字段，防止注入
-      if (parsed.model) settings.model = parsed.model
-      if (typeof parsed.temperature === 'number') settings.temperature = parsed.temperature
-      if (typeof parsed.maxTokens === 'number') settings.maxTokens = parsed.maxTokens
       if (typeof parsed.keepContext === 'boolean') settings.keepContext = parsed.keepContext
       if (typeof parsed.autoSave === 'boolean') settings.autoSave = parsed.autoSave
     }

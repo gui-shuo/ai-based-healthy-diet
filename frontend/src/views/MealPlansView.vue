@@ -3,8 +3,8 @@
     <!-- Header -->
     <header class="page-header">
       <div class="header-inner">
-        <h1 class="page-title">🍽️ 营养餐计划</h1>
-        <p class="page-subtitle">科学搭配，为你定制专属营养方案</p>
+        <h1 class="page-title">🍽️ 抗炎营养餐</h1>
+        <p class="page-subtitle">科学搭配，为你定制专属抗炎营养方案</p>
       </div>
     </header>
 
@@ -61,7 +61,7 @@
         <div class="search-row">
           <el-input
             v-model="filters.keyword"
-            placeholder="搜索营养餐计划..."
+            placeholder="搜索抗炎营养餐..."
             clearable
             :prefix-icon="SearchIcon"
             class="search-input"
@@ -178,7 +178,7 @@
           </div>
         </div>
 
-        <el-empty v-if="!loadingPlans && !plans.length" description="暂无营养餐计划" />
+        <el-empty v-if="!loadingPlans && !plans.length" description="暂无抗炎营养餐" />
 
         <div v-if="totalPlans > filters.size" class="pagination-wrap">
           <el-pagination
@@ -207,7 +207,7 @@
         <div v-for="follow in myFollows" :key="follow.id" class="follow-card">
           <div class="follow-header">
             <div class="follow-title-row">
-              <h3>{{ follow.mealPlan?.title || '营养餐计划' }}</h3>
+              <h3>{{ follow.mealPlan?.title || '抗炎营养餐' }}</h3>
               <span
                 v-if="follow.mealPlan?.dietGoal"
                 class="goal-badge small"
@@ -719,7 +719,7 @@ async function loadPlans(page) {
     }
   } catch (e) {
     console.error('加载计划列表失败', e)
-    message.error('加载营养餐计划失败')
+    message.error('加载抗炎营养餐失败')
   } finally {
     loadingPlans.value = false
   }

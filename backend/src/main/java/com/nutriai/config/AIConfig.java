@@ -43,11 +43,11 @@ public class AIConfig {
     @Getter
     private String apiUrl;
 
-    @Value("${ai.model-name:qwen-turbo}")
+    @Value("${ai.model-name:qwen3.5-122b-a10b}")
     @Getter
     private String modelName;
 
-    @Value("${ai.diet-plan-model:doubao-seed-2.0-lite}")
+    @Value("${ai.diet-plan-model:qwen3.5-flash}")
     @Getter
     private String dietPlanModel;
 

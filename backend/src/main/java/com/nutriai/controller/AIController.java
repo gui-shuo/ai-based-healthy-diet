@@ -89,12 +89,9 @@ public class AIController {
                 return ApiResponse.error("消息不能为空");
             }
             
-            log.info("📨 用户 {} 发送消息: {}, 模型: {}, 温度: {}, 最大字数: {}, 保持上下文: {}", 
+            log.info("📨 用户 {} 发送消息: {}, 保持上下文: {}", 
                 userId, 
                 message.substring(0, Math.min(message.length(), 50)),
-                chatRequest.getModel(),
-                chatRequest.getTemperature(),
-                chatRequest.getMaxTokens(),
                 chatRequest.getKeepContext());
             
             // 检查AI配额
@@ -103,13 +100,13 @@ public class AIController {
                 return ApiResponse.error("今日AI咨询次数已达上限（" + quota + "次/天），升级会员可享受更多次数");
             }
 
-            // 调用AI服务（传递用户设置的参数）
+            // 调用AI服务（使用管理后台配置的参数，用户仅可控制上下文记忆）
             String response = aiService.chat(
                 userId, 
                 message, 
-                chatRequest.getModel(), 
-                chatRequest.getTemperature(), 
-                chatRequest.getMaxTokens(), 
+                null, 
+                null, 
+                null, 
                 chatRequest.getKeepContext()
             );
             
@@ -121,9 +118,9 @@ public class AIController {
                 "message", response,
                 "timestamp", System.currentTimeMillis(),
                 "settings", Map.of(
-                    "model", chatRequest.getModel() != null ? chatRequest.getModel() : aiConfig.getEffectiveModelName(),
-                    "temperature", chatRequest.getTemperature() != null ? chatRequest.getTemperature() : 0.7,
-                    "maxTokens", chatRequest.getMaxTokens() != null ? chatRequest.getMaxTokens() : 2000
+                    "model", aiConfig.getEffectiveModelName(),
+                    "temperature", aiConfig.getEffectiveTemperature(),
+                    "maxTokens", aiConfig.getEffectiveMaxTokens()
                 )
             );
             

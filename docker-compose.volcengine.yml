@@ -22,7 +22,7 @@ services:
       - nutriai-network
 
   backend:
-    image: heyitshuo/nutriai-backend:v202604122250
+    image: heyitshuo/nutriai-backend:v202604151446
     container_name: nutriai-backend
     restart: always
     depends_on:
@@ -42,8 +42,8 @@ services:
       JWT_SECRET: ${JWT_SECRET}
       AI_API_KEY: ${AI_API_KEY}
       AI_BASE_URL: ${AI_BASE_URL:-https://dashscope.aliyuncs.com/compatible-mode/v1}
-      AI_MODEL_NAME: ${AI_MODEL_NAME:-qwen-turbo}
-      AI_DIET_PLAN_MODEL: ${AI_DIET_PLAN_MODEL:-doubao-seed-2.0-lite}
+      AI_MODEL_NAME: ${AI_MODEL_NAME:-qwen3.5-122b-a10b}
+      AI_DIET_PLAN_MODEL: ${AI_DIET_PLAN_MODEL:-qwen3.5-flash}
       COS_SECRET_ID: ${COS_SECRET_ID}
       COS_SECRET_KEY: ${COS_SECRET_KEY}
       COS_REGION: ${COS_REGION}
@@ -98,7 +98,7 @@ services:
       - nutriai-network
 
   frontend:
-    image: heyitshuo/nutriai-frontend:v202604122250
+    image: heyitshuo/nutriai-frontend:v202604151446
     container_name: nutriai-frontend
     restart: always
     depends_on:
