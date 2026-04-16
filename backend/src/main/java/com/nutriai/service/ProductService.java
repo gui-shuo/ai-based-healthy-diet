@@ -35,9 +35,9 @@ public class ProductService {
      */
     public Page<NutritionProduct> getProducts(String category, int page, int size) {
         if (category != null && !category.isBlank() && !"ALL".equals(category)) {
-            return productRepository.findByStatusAndCategoryOrderBySortOrderAsc("ACTIVE", category, PageRequest.of(page, size));
+            return productRepository.findOnSaleByCategory(category, PageRequest.of(page, size));
         }
-        return productRepository.findByStatusOrderBySortOrderAsc("ACTIVE", PageRequest.of(page, size));
+        return productRepository.findOnSale(PageRequest.of(page, size));
     }
 
     /**
@@ -51,7 +51,7 @@ public class ProductService {
      * 获取推荐产品
      */
     public List<NutritionProduct> getRecommendedProducts() {
-        return productRepository.findByStatusAndIsRecommendedTrueOrderBySortOrderAsc("ACTIVE");
+        return productRepository.findOnSaleAndRecommended();
     }
 
     /**

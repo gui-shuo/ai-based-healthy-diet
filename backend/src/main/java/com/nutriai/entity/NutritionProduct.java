@@ -98,10 +98,10 @@ public class NutritionProduct {
     @Column(name = "specifications", columnDefinition = "json")
     private Map<String, Object> specifications;
 
-    /** 产品状态: ACTIVE/INACTIVE/SOLD_OUT */
+    /** 产品状态: ON_SALE/OFF_SALE/SOLD_OUT */
     @Column(name = "status", nullable = false, length = 20)
     @Builder.Default
-    private String status = "ACTIVE";
+    private String status = "ON_SALE";
 
     /** 是否推荐 */
     @Column(name = "is_recommended")

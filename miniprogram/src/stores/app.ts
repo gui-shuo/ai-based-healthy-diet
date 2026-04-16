@@ -21,7 +21,12 @@ export const useAppStore = defineStore('app', () => {
     icp: ''
   })
 
-  async function fetchConfig() {
+  let _fetched = false
+  let _fetching = false
+
+  async function fetchConfig(force = false) {
+    if ((_fetched || _fetching) && !force) return
+    _fetching = true
     try {
       const res = await request<any>({ url: '/public/config', showError: false })
       if (res.code === 200 && res.data) {
@@ -34,8 +39,11 @@ export const useAppStore = defineStore('app', () => {
           copyright: d.copyright || '',
           icp: d.icp || ''
         }
+        _fetched = true
       }
-    } catch {}
+    } catch {} finally {
+      _fetching = false
+    }
   }
 
   return { config, fetchConfig }

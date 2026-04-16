@@ -198,10 +198,10 @@ onShow(() => {
   navBarTotalHeight.value = statusBarHeight.value + 44
 
   userStore.restore()
-  appStore.fetchConfig()
-  fetchUnreadCount()
+  // fetchConfig is already called in App.vue onLaunch; skip here to reduce startup requests
   fetchFeaturedMeals()
   fetchFeaturedProducts()
+  fetchUnreadCount()
 })
 </script>
 
