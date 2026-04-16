@@ -57,7 +57,7 @@
     <view class="section">
       <text class="section-title">🛍 订单商品</text>
       <view class="order-item" v-for="item in orderItems" :key="item.productId || item.id">
-        <image class="item-image" :src="item.imageUrl || '/static/placeholder.png'" mode="aspectFill" />
+        <image class="item-image" :src="item.imageUrl || '/static/images/product-placeholder.png'" mode="aspectFill" />
         <view class="item-info">
           <text class="item-name">{{ item.name }}</text>
           <view class="item-row">

@@ -7,8 +7,8 @@ import { setToken, setRefreshToken } from "@/utils/request";
 onLaunch((options: any) => {
   const userStore = useUserStore();
   const appStore = useAppStore();
-  userStore.restore();
-  appStore.fetchConfig();
+  userStore.restore()
+  setTimeout(() => appStore.fetchConfig(), 0)
 
   // #ifdef APP-PLUS
   plus.globalEvent.addEventListener('newintent', () => {

@@ -32,7 +32,7 @@
         <!-- Image -->
         <image
           class="item-image"
-          :src="item.imageUrl || '/static/placeholder.png'"
+          :src="item.imageUrl || '/static/images/product-placeholder.png'"
           mode="aspectFill"
           @tap="goDetail(item)"
         />

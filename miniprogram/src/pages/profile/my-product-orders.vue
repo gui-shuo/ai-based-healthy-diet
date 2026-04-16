@@ -31,7 +31,7 @@
         </view>
 
         <view class="card-product">
-          <image class="product-img" :src="order.imageUrl || '/static/placeholder.png'" mode="aspectFill" />
+          <image class="product-img" :src="order.imageUrl || '/static/images/product-placeholder.png'" mode="aspectFill" />
           <view class="product-info">
             <text class="product-name">{{ order.productName || '营养产品' }}</text>
             <text class="product-qty">× {{ order.quantity }}</text>

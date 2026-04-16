@@ -1,15 +1,9 @@
 <template>
   <view class="page">
-    <!-- Top-level type switch: 营养餐 / 商品 -->
-    <view class="type-bar">
-      <view class="type-item" :class="{ active: orderType === 'meals' }" @tap="switchType('meals')">🍱 营养餐订单</view>
-      <view class="type-item" :class="{ active: orderType === 'products' }" @tap="switchType('products')">📦 商品订单</view>
-    </view>
-
     <!-- Status filter tabs -->
     <view class="tab-bar">
       <view
-        v-for="tab in currentTabs"
+        v-for="tab in mealTabs"
         :key="tab.value"
         class="tab-item"
         :class="{ active: activeTab === tab.value }"
@@ -22,9 +16,9 @@
     </view>
 
     <view v-else-if="!orders.length" class="empty-state">
-      <text class="empty-icon">{{ orderType === 'meals' ? '🍱' : '📦' }}</text>
-      <text class="empty-text">暂无订单</text>
-      <button class="btn-primary btn-shop" @tap="goShop">去逛逛</button>
+      <text class="empty-icon">🍱</text>
+      <text class="empty-text">暂无营养餐订单</text>
+      <button class="btn-primary btn-shop" @tap="goShop">去点餐</button>
     </view>
 
     <view v-else class="order-list">
@@ -38,7 +32,7 @@
           <view class="order-item flex" v-for="(item, idx) in getOrderItems(order)" :key="idx">
             <image v-if="item.productImage || item.imageUrl" class="item-img" :src="item.productImage || item.imageUrl" mode="aspectFill" />
             <view class="item-info flex-1">
-              <text class="item-name">{{ item.productName || item.name || '商品' }}</text>
+              <text class="item-name">{{ item.productName || item.name || '营养餐' }}</text>
               <text class="item-spec text-sm text-secondary" v-if="item.specification">{{ item.specification }}</text>
               <view class="flex-between">
                 <text class="item-price">¥{{ item.price || item.unitPrice }}</text>
@@ -48,8 +42,8 @@
           </view>
         </view>
 
-        <!-- Meal order: pickup info & pickup code -->
-        <view v-if="orderType === 'meals' && order.fulfillmentType" class="meal-info">
+        <!-- Meal pickup info & pickup code -->
+        <view v-if="order.fulfillmentType" class="meal-info">
           <view class="meal-info-row">
             <text class="meal-label">{{ order.fulfillmentType === 'PICKUP' ? '📍 取餐' : '🚗 配送' }}</text>
             <text class="meal-value">{{ order.pickupLocation || order.receiverAddress || '-' }}</text>
@@ -73,15 +67,12 @@
           </view>
         </view>
 
-        <!-- Actions for product orders -->
-        <view v-if="orderType === 'products'" class="order-actions flex">
-          <button v-if="order.status === 'PENDING'" class="btn-small btn-pay" @tap="payProductOrder(order.orderNo)">立即支付</button>
-          <button v-if="order.status === 'PAID' || order.status === 'SHIPPED'" class="btn-small btn-confirm" @tap="confirmReceive(order.orderNo)">确认收货</button>
-        </view>
-        <!-- Actions for meal orders -->
-        <view v-if="orderType === 'meals'" class="order-actions flex">
+        <!-- Meal order actions -->
+        <view class="order-actions flex">
           <button v-if="order.orderStatus === 'PENDING_PAYMENT'" class="btn-small btn-pay" @tap="payMealOrder(order.orderNo)">立即支付</button>
           <button v-if="order.orderStatus === 'PENDING_PAYMENT'" class="btn-small btn-cancel" @tap="cancelMealOrder(order.orderNo)">取消订单</button>
+          <button v-if="['PAID','PREPARING','READY'].includes(order.orderStatus)" class="btn-small btn-cancel" @tap="applyRefund(order.orderNo)">申请退款</button>
+          <button v-if="['PICKED_UP','DELIVERED','COMPLETED'].includes(order.orderStatus)" class="btn-small btn-confirm" @tap="buyAgain(order)">再次购买</button>
         </view>
       </view>
     </view>
@@ -95,10 +86,9 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { onShow, onLoad, onReachBottom } from '@dcloudio/uni-app'
-import { productApi, mealApi } from '@/services/api'
+import { mealApi } from '@/services/api'
 import { checkLogin, formatTime } from '@/utils/common'
 
-const orderType = ref<'meals' | 'products'>('products')
 const activeTab = ref('all')
 const orders = ref<any[]>([])
 const loading = ref(false)
@@ -113,35 +103,16 @@ const mealTabs = [
   { label: '已完成', value: 'completed' }
 ]
 
-const productTabs = [
-  { label: '全部', value: 'all' },
-  { label: '待支付', value: 'pending' },
-  { label: '待收货', value: 'paid' },
-  { label: '已完成', value: 'completed' }
-]
-
-const currentTabs = computed(() => orderType.value === 'meals' ? mealTabs : productTabs)
-
 const filteredOrders = computed(() => {
   if (activeTab.value === 'all') return orders.value
-  if (orderType.value === 'meals') {
-    const mealStatusMap: Record<string, string[]> = {
-      pending: ['PENDING_PAYMENT'],
-      preparing: ['PREPARING', 'PAID'],
-      ready: ['READY'],
-      completed: ['PICKED_UP', 'DELIVERED', 'COMPLETED']
-    }
-    const statuses = mealStatusMap[activeTab.value] || []
-    return orders.value.filter(o => statuses.includes(o.orderStatus))
-  } else {
-    const productStatusMap: Record<string, string[]> = {
-      pending: ['PENDING'],
-      paid: ['PAID', 'SHIPPED'],
-      completed: ['COMPLETED', 'RECEIVED']
-    }
-    const statuses = productStatusMap[activeTab.value] || []
-    return orders.value.filter(o => statuses.includes(o.status))
+  const mealStatusMap: Record<string, string[]> = {
+    pending: ['PENDING_PAYMENT'],
+    preparing: ['PREPARING', 'PAID'],
+    ready: ['READY'],
+    completed: ['PICKED_UP', 'DELIVERED', 'COMPLETED']
   }
+  const statuses = mealStatusMap[activeTab.value] || []
+  return orders.value.filter(o => statuses.includes(o.orderStatus))
 })
 
 function getOrderItems(order: any) {
@@ -153,34 +124,20 @@ function isPaidMealOrder(order: any) {
 }
 
 function getStatusText(order: any) {
-  if (orderType.value === 'meals') {
-    const map: Record<string, string> = {
-      PENDING_PAYMENT: '待支付', PAID: '已支付', PREPARING: '备餐中',
-      READY: '待取餐', PICKED_UP: '已取餐', DELIVERED: '已配送',
-      COMPLETED: '已完成', CANCELLED: '已取消'
-    }
-    return map[order.orderStatus] || order.orderStatus
-  }
   const map: Record<string, string> = {
-    PENDING: '待支付', PAID: '已支付', SHIPPED: '已发货',
-    RECEIVED: '已收货', COMPLETED: '已完成', CANCELLED: '已取消', REFUNDED: '已退款'
+    PENDING_PAYMENT: '待支付', PAID: '已支付', PREPARING: '备餐中',
+    READY: '待取餐', PICKED_UP: '已取餐', DELIVERED: '已配送',
+    COMPLETED: '已完成', CANCELLED: '已取消', REFUNDED: '已退款'
   }
-  return map[order.status] || order.status
+  return map[order.orderStatus] || order.orderStatus
 }
 
 function getStatusClass(order: any) {
-  const status = orderType.value === 'meals' ? order.orderStatus : order.status
-  if (['PENDING', 'PENDING_PAYMENT'].includes(status)) return 'status-pending'
-  if (['PAID', 'SHIPPED', 'PREPARING'].includes(status)) return 'status-active'
-  if (['COMPLETED', 'RECEIVED', 'PICKED_UP', 'DELIVERED', 'READY'].includes(status)) return 'status-done'
+  const status = order.orderStatus
+  if (status === 'PENDING_PAYMENT') return 'status-pending'
+  if (['PAID', 'PREPARING'].includes(status)) return 'status-active'
+  if (['PICKED_UP', 'DELIVERED', 'COMPLETED', 'READY'].includes(status)) return 'status-done'
   return 'status-cancelled'
-}
-
-function switchType(type: 'meals' | 'products') {
-  if (orderType.value === type) return
-  orderType.value = type
-  activeTab.value = 'all'
-  loadOrders(true)
 }
 
 function switchTab(tab: string) {
@@ -192,40 +149,16 @@ async function loadOrders(reset = false) {
   if (reset) { page.value = 1; noMore.value = false; orders.value = [] }
   loading.value = true
   try {
-    if (orderType.value === 'meals') {
-      const res = await mealApi.getOrders({ page: page.value - 1, size: 20 })
-      if (res.code === 200) {
-        const list = res.data?.content || res.data?.records || res.data?.list || res.data || []
-        orders.value = reset ? list : [...orders.value, ...list]
-        if (list.length < 20) noMore.value = true
-        else page.value++
-      }
-    } else {
-      const res = await productApi.getOrders({ page: page.value, size: 20 })
-      if (res.code === 200) {
-        const list = res.data?.content || res.data?.records || res.data?.list || res.data || []
-        orders.value = reset ? list : [...orders.value, ...list]
-        if (list.length < 20) noMore.value = true
-        else page.value++
-      }
+    const res = await mealApi.getOrders({ page: page.value - 1, size: 20 })
+    if (res.code === 200) {
+      const list = res.data?.content || res.data?.records || res.data?.list || res.data || []
+      orders.value = reset ? list : [...orders.value, ...list]
+      if (list.length < 20) noMore.value = true
+      else page.value++
     }
   } catch {} finally {
     loading.value = false
   }
-}
-
-async function payProductOrder(orderNo: string) {
-  try {
-    uni.showLoading({ title: '支付中...' })
-    const res = await productApi.simulatePay(orderNo)
-    uni.hideLoading()
-    if (res.code === 200) {
-      uni.showToast({ title: '支付成功', icon: 'success' })
-      loadOrders(true)
-    } else {
-      uni.showToast({ title: res.message || '支付失败', icon: 'none' })
-    }
-  } catch { uni.hideLoading(); uni.showToast({ title: '支付失败', icon: 'none' }) }
 }
 
 async function payMealOrder(orderNo: string) {
@@ -256,33 +189,34 @@ async function cancelMealOrder(orderNo: string) {
   })
 }
 
-async function confirmReceive(orderNo: string) {
+async function applyRefund(orderNo: string) {
   uni.showModal({
-    title: '提示', content: '确认已收到商品？',
+    title: '申请退款', content: '确定申请退款？退款将在1-3个工作日内处理',
     success: async (r) => {
       if (!r.confirm) return
       try {
-        await productApi.confirmReceive(orderNo)
-        uni.showToast({ title: '已确认收货', icon: 'success' })
+        await mealApi.cancelOrder(orderNo)
+        uni.showToast({ title: '退款申请已提交', icon: 'success' })
         loadOrders(true)
-      } catch { uni.showToast({ title: '操作失败', icon: 'none' }) }
+      } catch { uni.showToast({ title: '申请失败', icon: 'none' }) }
     }
   })
 }
 
-function goShop() {
-  if (orderType.value === 'meals') {
-    uni.switchTab({ url: '/pages/meal-order/index' })
+function buyAgain(order: any) {
+  const items = order.items || [order]
+  if (items.length && items[0].mealId) {
+    uni.navigateTo({ url: `/pages/meal-order/detail?id=${items[0].mealId}` })
   } else {
-    uni.switchTab({ url: '/pages/product-shop/index' })
+    uni.switchTab({ url: '/pages/meal-order/index' })
   }
 }
 
-onLoad((options: any) => {
-  if (options?.tab === 'meals') {
-    orderType.value = 'meals'
-  }
-})
+function goShop() {
+  uni.switchTab({ url: '/pages/meal-order/index' })
+}
+
+onLoad(() => {})
 
 onShow(() => {
   if (checkLogin()) loadOrders(true)
@@ -301,29 +235,15 @@ onReachBottom(() => {
 }
 
 .type-bar {
-  display: flex;
-  background: $card;
-  padding: 16rpx 24rpx;
-  gap: 16rpx;
-  border-bottom: 1rpx solid $border;
+  display: none;
 }
 
 .type-item {
-  flex: 1;
-  text-align: center;
-  padding: 16rpx 0;
-  font-size: 28rpx;
-  color: $muted-foreground;
-  border-radius: $radius-lg;
-  background: $muted;
-  transition: all 0.2s;
+  display: none;
 }
 
 .type-item.active {
-  background: rgba(16, 185, 129, 0.1);
-  color: $accent;
-  font-weight: 600;
-  border: 1rpx solid $accent;
+  display: none;
 }
 
 .tab-bar {

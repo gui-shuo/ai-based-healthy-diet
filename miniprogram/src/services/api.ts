@@ -179,6 +179,7 @@ export const adminApi = {
   getMealOrders: (params?: any) => request({ url: '/admin/meal-orders', data: params }),
   updateMealOrderStatus: (orderNo: string, data: any) => request({ url: `/admin/meal-orders/${orderNo}/status`, method: 'PUT', data }),
   getMealOrderStats: () => request({ url: '/admin/meal-orders/stats' }),
+  verifyPickupCode: (pickupCode: string) => request({ url: '/admin/meal-orders/verify-pickup', method: 'POST', data: { pickupCode } }),
   getProductOrders: (params?: any) => request({ url: '/admin/product-orders', data: params }),
   getAdminProductOrder: (orderNo: string) => request({ url: `/admin/product-orders/${orderNo}` }),
   shipProductOrder: (orderNo: string, data: any) => request({ url: `/admin/product-orders/${orderNo}/ship`, method: 'PUT', data }),

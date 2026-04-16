@@ -112,6 +112,7 @@ const mockProducts = [
 
 const featuredMeals = ref<any[]>(mockMeals)
 const featuredProducts = ref<any[]>(mockProducts)
+const hasLoaded = ref(false)
 
 const features = [
   { icon: '🤖', label: 'AI营养师', path: '/pages/ai-chat/index', isTab: true, bg: 'rgba(16,185,129,0.1)' },
@@ -198,12 +199,18 @@ onShow(() => {
   navBarTotalHeight.value = statusBarHeight.value + 44
 
   userStore.restore()
-  // Defer data fetches to avoid blocking WeChat miniprogram launch (timeout prevention)
-  setTimeout(() => {
-    fetchFeaturedMeals()
-    fetchFeaturedProducts()
+  if (!hasLoaded.value) {
+    hasLoaded.value = true
+    // Defer heavy API calls to avoid blocking WeChat miniprogram JS thread on launch
+    setTimeout(() => {
+      fetchFeaturedMeals()
+      fetchFeaturedProducts()
+      fetchUnreadCount()
+    }, 500)
+  } else {
+    // On subsequent visits only refresh lightweight data
     fetchUnreadCount()
-  }, 200)
+  }
 })
 </script>
 
