@@ -45,7 +45,7 @@
       </div>
 
       <div v-else-if="meals.length === 0" class="empty-state">
-        <img src="/icons/empty-meal.svg" alt="暂无餐品" class="empty-img" onerror="this.style.display='none'" />
+        <div class="empty-icon">🥗</div>
         <p class="empty-text">暂无可订购的餐品，请稍后再来</p>
       </div>
 
@@ -420,7 +420,7 @@ onMounted(() => loadMeals(1))
   padding: 80px 0;
   color: #94a3b8;
 }
-.empty-img { width: 120px; margin-bottom: 16px; }
+.empty-icon { font-size: 64px; margin-bottom: 16px; }
 .empty-text { font-size: 15px; }
 
 /* Meals Grid */
