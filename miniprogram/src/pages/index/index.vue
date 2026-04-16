@@ -198,10 +198,12 @@ onShow(() => {
   navBarTotalHeight.value = statusBarHeight.value + 44
 
   userStore.restore()
-  // fetchConfig is already called in App.vue onLaunch; skip here to reduce startup requests
-  fetchFeaturedMeals()
-  fetchFeaturedProducts()
-  fetchUnreadCount()
+  // Defer data fetches to avoid blocking WeChat miniprogram launch (timeout prevention)
+  setTimeout(() => {
+    fetchFeaturedMeals()
+    fetchFeaturedProducts()
+    fetchUnreadCount()
+  }, 200)
 })
 </script>
 

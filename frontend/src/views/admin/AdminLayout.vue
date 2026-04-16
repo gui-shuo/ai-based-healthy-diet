@@ -39,7 +39,7 @@
             <el-icon><Food /></el-icon>
             <span>食谱管理</span>
           </el-menu-item>
-          <el-menu-item index="/admin/meal-plans">
+          <el-menu-item index="/admin/meal-items">
             <el-icon><Calendar /></el-icon>
             <span>营养餐管理</span>
           </el-menu-item>
@@ -149,7 +149,8 @@ const breadcrumbTitle = computed(() => {
     '/admin/products': '产品管理',
     '/admin/community': '社区管理',
     '/admin/recipes': '食谱管理',
-    '/admin/meal-plans': '营养餐管理',
+    '/admin/meal-items': '营养餐管理',
+    '/admin/meal-plans': '膳食计划',
     '/admin/app-versions': 'APP版本管理'
   }
   return titles[route.path] || '管理后台'

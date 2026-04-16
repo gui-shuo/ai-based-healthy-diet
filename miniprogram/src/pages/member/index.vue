@@ -274,8 +274,8 @@
     </view>
 
     <!-- ==================== Simulate Pay Modal ==================== -->
-    <view v-if="payModalVisible" class="modal-overlay" @tap.self="payModalVisible = false">
-      <view class="modal-content">
+    <view v-if="payModalVisible" class="modal-overlay" @tap="payModalVisible = false">
+      <view class="modal-content" @tap.stop>
         <view class="modal-header">
           <text class="modal-title">模拟支付</text>
           <text class="modal-close" @tap="payModalVisible = false">✕</text>
@@ -321,8 +321,8 @@
     </view>
 
     <!-- ==================== Benefits Detail Modal ==================== -->
-    <view v-if="benefitsModalVisible" class="modal-overlay" @tap.self="benefitsModalVisible = false">
-      <view class="modal-content">
+    <view v-if="benefitsModalVisible" class="modal-overlay" @tap="benefitsModalVisible = false">
+      <view class="modal-content" @tap.stop>
         <view class="modal-header">
           <text class="modal-title">{{ benefitsModalPlan?.planName }} · 全部权益</text>
           <text class="modal-close" @tap="benefitsModalVisible = false">✕</text>

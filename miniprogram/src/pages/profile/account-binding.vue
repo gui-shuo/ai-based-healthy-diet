@@ -148,8 +148,8 @@
     </view>
 
     <!-- Email Bind Dialog -->
-    <view v-if="showEmailBindDialog" class="dialog-mask" @tap.self="showEmailBindDialog = false">
-      <view class="dialog-box">
+    <view v-if="showEmailBindDialog" class="dialog-mask" @tap="showEmailBindDialog = false">
+      <view class="dialog-box" @tap.stop>
         <text class="dialog-title">绑定邮箱</text>
         <input class="dialog-input" v-model="emailForm.email" placeholder="请输入邮箱地址" type="text" />
         <view class="code-row">
@@ -166,8 +166,8 @@
     </view>
 
     <!-- Merge Confirm Dialog -->
-    <view v-if="showMergeDialog" class="dialog-mask" @tap.self="showMergeDialog = false">
-      <view class="dialog-box">
+    <view v-if="showMergeDialog" class="dialog-mask" @tap="showMergeDialog = false">
+      <view class="dialog-box" @tap.stop>
         <text class="dialog-title">⚠️ 账号合并确认</text>
         <text class="dialog-desc">该邮箱已注册账号。确认将当前QQ账号的资源合并到邮箱账号吗？合并后当前账号将被删除，QQ将绑定到邮箱账号。</text>
         <view class="code-row">

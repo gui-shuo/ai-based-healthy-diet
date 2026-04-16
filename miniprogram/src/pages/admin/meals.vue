@@ -43,8 +43,8 @@
     </view>
 
     <!-- Form Sheet -->
-    <view v-if="showForm" class="sheet-mask" @tap.self="showForm = false">
-      <view class="sheet">
+    <view v-if="showForm" class="sheet-mask" @tap="showForm = false">
+      <view class="sheet" @tap.stop>
         <view class="sheet-header">
           <text class="sheet-title">{{ editingId ? '编辑营养餐' : '添加营养餐' }}</text>
           <text class="sheet-close" @tap="showForm = false">✕</text>

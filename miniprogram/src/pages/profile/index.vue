@@ -95,13 +95,6 @@
         <text class="menu-text">产品订单</text>
         <text class="menu-arrow">›</text>
       </view>
-      <view class="menu-item" @tap="navigateTo('/pages/profile/my-orders')">
-        <view class="menu-icon-wrap" style="background: rgba(20,184,166,0.1)">
-          <text class="menu-icon">📦</text>
-        </view>
-        <text class="menu-text">我的订单</text>
-        <text class="menu-arrow">›</text>
-      </view>
       <view class="menu-item" @tap="navigateTo('/pages/profile/coupons')">
         <view class="menu-icon-wrap" style="background: rgba(239,68,68,0.1)">
           <text class="menu-icon">🏷</text>
@@ -126,20 +119,6 @@
           <text class="menu-icon">⚙️</text>
         </view>
         <text class="menu-text">管理后台</text>
-        <text class="menu-arrow">›</text>
-      </view>
-      <view class="menu-item" @tap="navigateTo('/pages/admin/meals')">
-        <view class="menu-icon-wrap" style="background: rgba(16,185,129,0.1)">
-          <text class="menu-icon">🍱</text>
-        </view>
-        <text class="menu-text">营养餐管理</text>
-        <text class="menu-arrow">›</text>
-      </view>
-      <view class="menu-item" @tap="navigateTo('/pages/admin/orders')">
-        <view class="menu-icon-wrap" style="background: rgba(245,158,11,0.1)">
-          <text class="menu-icon">📦</text>
-        </view>
-        <text class="menu-text">订单管理</text>
         <text class="menu-arrow">›</text>
       </view>
     </view>
@@ -193,8 +172,8 @@
     </view>
 
     <!-- ========== Bottom Sheet: Edit Profile ========== -->
-    <view v-if="showEditSheet" class="sheet-mask" @tap.self="showEditSheet = false">
-      <view class="sheet">
+    <view v-if="showEditSheet" class="sheet-mask" @tap="showEditSheet = false">
+      <view class="sheet" @tap.stop>
         <view class="sheet-header">
           <text class="sheet-title">编辑资料</text>
           <text class="sheet-close" @tap="showEditSheet = false">✕</text>
@@ -243,8 +222,8 @@
     </view>
 
     <!-- ========== Bottom Sheet: Change Password ========== -->
-    <view v-if="showPasswordSheet" class="sheet-mask" @tap.self="showPasswordSheet = false">
-      <view class="sheet">
+    <view v-if="showPasswordSheet" class="sheet-mask" @tap="showPasswordSheet = false">
+      <view class="sheet" @tap.stop>
         <view class="sheet-header">
           <text class="sheet-title">修改密码</text>
           <text class="sheet-close" @tap="showPasswordSheet = false">✕</text>
@@ -275,8 +254,8 @@
     </view>
 
     <!-- ========== Bottom Sheet: About ========== -->
-    <view v-if="showAboutSheet" class="sheet-mask" @tap.self="showAboutSheet = false">
-      <view class="sheet sheet-sm">
+    <view v-if="showAboutSheet" class="sheet-mask" @tap="showAboutSheet = false">
+      <view class="sheet sheet-sm" @tap.stop>
         <view class="sheet-header">
           <text class="sheet-title">关于我们</text>
           <text class="sheet-close" @tap="showAboutSheet = false">✕</text>
@@ -295,8 +274,8 @@
     </view>
 
     <!-- ========== Bottom Sheet: Delete Account ========== -->
-    <view v-if="showDeleteSheet" class="sheet-mask" @tap.self="showDeleteSheet = false">
-      <view class="sheet">
+    <view v-if="showDeleteSheet" class="sheet-mask" @tap="showDeleteSheet = false">
+      <view class="sheet" @tap.stop>
         <view class="sheet-header">
           <text class="sheet-title danger-color">⚠️ 注销账号</text>
           <text class="sheet-close" @tap="showDeleteSheet = false">✕</text>

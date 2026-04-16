@@ -264,10 +264,16 @@ const routes = [
         meta: { title: '食谱管理' }
       },
       {
+        path: 'meal-items',
+        name: 'AdminMealItems',
+        component: () => import('@/views/admin/MealItemManagement.vue'),
+        meta: { title: '营养餐管理' }
+      },
+      {
         path: 'meal-plans',
         name: 'AdminMealPlans',
         component: () => import('@/views/admin/MealPlanManagement.vue'),
-        meta: { title: '营养餐管理' }
+        meta: { title: '膳食计划' }
       },
       {
         path: 'meal-orders',
