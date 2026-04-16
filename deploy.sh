@@ -122,11 +122,11 @@ do_build() {
     log_info "镜像标签: ${IMAGE_TAG}"
 
     log_info "构建后端镜像..."
-    docker build -t "${BACKEND_IMAGE}:${IMAGE_TAG}" ./backend
+    docker build --provenance=false --sbom=false -t "${BACKEND_IMAGE}:${IMAGE_TAG}" ./backend
     log_ok "后端镜像构建完成"
 
     log_info "构建前端镜像..."
-    docker build -t "${FRONTEND_IMAGE}:${IMAGE_TAG}" ./frontend
+    docker build --provenance=false --sbom=false -t "${FRONTEND_IMAGE}:${IMAGE_TAG}" ./frontend
     log_ok "前端镜像构建完成"
 
     # 更新 docker-compose 文件
