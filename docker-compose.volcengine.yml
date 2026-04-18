@@ -1,5 +1,5 @@
 # 火山引擎部署 - 针对 2核2GB 优化
-# 使用 Docker Hub 镜像 + 腾讯云 MySQL（不运行本地数据库）
+# 使用腾讯云 TCR 镜像 + 腾讯云 MySQL（不运行本地数据库）
 name: nutriai
 
 services:
@@ -22,7 +22,7 @@ services:
       - nutriai-network
 
   backend:
-    image: heyitshuo/nutriai-backend:v202604162109
+    image: ccr.ccs.tencentyun.com/heyitshuo/nutriai-backend:v202604181402
     container_name: nutriai-backend
     restart: always
     depends_on:
@@ -98,7 +98,7 @@ services:
       - nutriai-network
 
   frontend:
-    image: heyitshuo/nutriai-frontend:v202604162109
+    image: ccr.ccs.tencentyun.com/heyitshuo/nutriai-frontend:v202604181402
     container_name: nutriai-frontend
     restart: always
     depends_on:
