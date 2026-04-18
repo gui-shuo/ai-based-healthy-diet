@@ -1,0 +1,159 @@
+{
+	"pages": [
+		{
+			"path": "pages/index/index",
+			"style": {
+				"navigationStyle": "custom",
+				"navigationBarTitleText": "NutriAI"
+			}
+		},
+		{
+			"path": "pages/meal/index",
+			"style": {
+				"navigationStyle": "custom",
+				"navigationBarTitleText": "营养餐"
+			}
+		},
+		{
+			"path": "pages/meal/detail",
+			"style": {
+				"navigationStyle": "custom",
+				"navigationBarTitleText": "餐品详情"
+			}
+		},
+		{
+			"path": "pages/meal/search",
+			"style": {
+				"navigationBarTitleText": "搜索营养餐"
+			}
+		},
+		{
+			"path": "pages/meal/checkout",
+			"style": {
+				"navigationBarTitleText": "确认订单"
+			}
+		},
+		{
+			"path": "pages/shop/index",
+			"style": {
+				"navigationStyle": "custom",
+				"navigationBarTitleText": "商城"
+			}
+		},
+		{
+			"path": "pages/shop/detail",
+			"style": {
+				"navigationStyle": "custom",
+				"navigationBarTitleText": "商品详情"
+			}
+		},
+		{
+			"path": "pages/shop/search",
+			"style": {
+				"navigationBarTitleText": "搜索商品"
+			}
+		},
+		{
+			"path": "pages/shop/cart",
+			"style": {
+				"navigationBarTitleText": "购物车"
+			}
+		},
+		{
+			"path": "pages/profile/index",
+			"style": {
+				"navigationStyle": "custom",
+				"navigationBarTitleText": "我的"
+			}
+		},
+		{
+			"path": "pages/profile/edit",
+			"style": {
+				"navigationBarTitleText": "编辑资料"
+			}
+		},
+		{
+			"path": "pages/profile/orders",
+			"style": {
+				"navigationBarTitleText": "我的订单"
+			}
+		},
+		{
+			"path": "pages/profile/coupons",
+			"style": {
+				"navigationBarTitleText": "优惠券"
+			}
+		},
+		{
+			"path": "pages/profile/notifications",
+			"style": {
+				"navigationBarTitleText": "通知中心"
+			}
+		},
+		{
+			"path": "pages/profile/address",
+			"style": {
+				"navigationBarTitleText": "收货地址"
+			}
+		},
+		{
+			"path": "pages/profile/settings",
+			"style": {
+				"navigationBarTitleText": "设置"
+			}
+		},
+		{
+			"path": "pages/profile/feedback",
+			"style": {
+				"navigationBarTitleText": "意见反馈"
+			}
+		},
+		{
+			"path": "pages/auth/login",
+			"style": {
+				"navigationBarTitleText": "登录"
+			}
+		}
+	],
+	"globalStyle": {
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "NutriAI",
+		"navigationBarBackgroundColor": "#ffffff",
+		"backgroundColor": "#ffffff",
+		"backgroundColorTop": "#ffffff",
+		"backgroundColorBottom": "#ffffff"
+	},
+	"tabBar": {
+		"color": "#707a6c",
+		"selectedColor": "#0d631b",
+		"backgroundColor": "#ffffff",
+		"borderStyle": "white",
+		"list": [
+			{
+				"pagePath": "pages/index/index",
+				"text": "首页",
+				"iconPath": "static/icons/home.png",
+				"selectedIconPath": "static/icons/home-active.png"
+			},
+			{
+				"pagePath": "pages/meal/index",
+				"text": "营养餐",
+				"iconPath": "static/icons/meal.png",
+				"selectedIconPath": "static/icons/meal-active.png"
+			},
+			{
+				"pagePath": "pages/shop/index",
+				"text": "商城",
+				"iconPath": "static/icons/shop.png",
+				"selectedIconPath": "static/icons/shop-active.png"
+			},
+			{
+				"pagePath": "pages/profile/index",
+				"text": "我的",
+				"iconPath": "static/icons/profile.png",
+				"selectedIconPath": "static/icons/profile-active.png"
+			}
+		]
+	},
+	"uniIdRouter": {}
+}

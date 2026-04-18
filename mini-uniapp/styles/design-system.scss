@@ -1,0 +1,94 @@
+// NutriAI 设计系统变量 - Digital Greenhouse
+// 颜色体系
+$primary: #0d631b;
+$primary-container: #2e7d32;
+$primary-fixed: #a3f69c;
+$primary-fixed-dim: #88d982;
+$on-primary: #ffffff;
+$on-primary-container: #cbffc2;
+
+$secondary: #476644;
+$secondary-container: #c6e9be;
+$on-secondary: #ffffff;
+
+$tertiary: #923357;
+$tertiary-container: #b14b6f;
+$on-tertiary: #ffffff;
+
+$error: #ba1a1a;
+$error-container: #ffdad6;
+$on-error: #ffffff;
+
+$surface: #ffffff;
+$surface-bright: #ffffff;
+$surface-dim: #f2f2f2;
+$surface-container-lowest: #ffffff;
+$surface-container-low: #f5f5f5;
+$surface-container: #f0f0f0;
+$surface-container-high: #ebebeb;
+$surface-container-highest: #e5e5e5;
+$surface-variant: #e8e8e8;
+
+$on-surface: #181c1b;
+$on-surface-variant: #40493d;
+$on-background: #181c1b;
+$background: #ffffff;
+
+$outline: #707a6c;
+$outline-variant: #bfcaba;
+
+$inverse-surface: #2d3130;
+$inverse-on-surface: #eef1ef;
+$inverse-primary: #88d982;
+
+// 圆角
+$radius-sm: 4px;
+$radius-md: 8px;
+$radius-lg: 12px;
+$radius-xl: 16px;
+$radius-2xl: 24px;
+$radius-full: 9999px;
+
+// 间距 (基于8px)
+$space-1: 4px;
+$space-2: 8px;
+$space-3: 12px;
+$space-4: 16px;
+$space-5: 20px;
+$space-6: 24px;
+$space-8: 32px;
+$space-10: 40px;
+$space-12: 48px;
+
+// 字体大小
+$font-xs: 20rpx;
+$font-sm: 24rpx;
+$font-base: 28rpx;
+$font-md: 30rpx;
+$font-lg: 32rpx;
+$font-xl: 36rpx;
+$font-2xl: 40rpx;
+$font-3xl: 48rpx;
+$font-4xl: 56rpx;
+
+// 行高
+$leading-tight: 1.25;
+$leading-normal: 1.5;
+$leading-relaxed: 1.6;
+$leading-loose: 1.75;
+
+// 阴影 (环境阴影)
+$shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.06);
+$shadow-md: 0 2px 8px rgba(0, 0, 0, 0.08);
+$shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.08);
+$shadow-xl: 0 8px 24px rgba(0, 0, 0, 0.10);
+
+// 过渡
+$transition-fast: 150ms ease-out;
+$transition-normal: 300ms ease-out;
+$transition-slow: 500ms ease-out;
+
+// 安全区域
+$safe-bottom: env(safe-area-inset-bottom);
+$tabbar-height: 120rpx;
+$navbar-height: 88rpx;
