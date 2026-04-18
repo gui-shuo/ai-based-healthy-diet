@@ -2,7 +2,8 @@
   <view class="community-page">
     <!-- Disclaimer -->
     <view class="disclaimer-tip" v-if="showDisclaimer">
-      <text>💬 社区内容为用户个人观点，不代表平台立场，请自行甄别信息的准确性。</text>
+      <NutriIcon name="message" :size="24" color="#F59E0B" />
+      <text> 社区内容为用户个人观点，不代表平台立场，请自行甄别信息的准确性。</text>
       <text class="dismiss" @tap="showDisclaimer = false">✕</text>
     </view>
 
@@ -31,7 +32,8 @@
       >
         <!-- Pinned indicator -->
         <view class="pinned-badge" v-if="post.pinned">
-          <text>📌 置顶</text>
+          <NutriIcon name="pin" :size="22" color="#EF4444" />
+          <text> 置顶</text>
         </view>
 
         <!-- Author Info -->
@@ -84,11 +86,11 @@
             :class="{ liked: post.liked }"
             @tap.stop="handleLike(post)"
           >
-            <text class="icon">{{ post.liked ? '❤️' : '🤍' }}</text>
+            <NutriIcon :name="post.liked ? 'heart-fill' : 'heart'" :size="24" :color="post.liked ? '#EF4444' : '#9CA3AF'" />
             <text class="count">{{ post.likesCount || 0 }}</text>
           </view>
           <view class="footer-item">
-            <text class="icon">💬</text>
+            <NutriIcon name="message" :size="24" color="#9CA3AF" />
             <text class="count">{{ post.commentsCount || 0 }}</text>
           </view>
           <view
@@ -96,7 +98,7 @@
             v-if="post.userId === currentUserId"
             @tap.stop="handleDeletePost(post)"
           >
-            <text class="icon">🗑️</text>
+            <NutriIcon name="trash" :size="24" color="#EF4444" />
           </view>
         </view>
       </view>
@@ -104,7 +106,7 @@
 
     <!-- Empty State -->
     <view class="empty-state" v-else-if="!loading">
-      <text class="empty-icon">🌱</text>
+      <NutriIcon name="leaf" :size="64" color="#D1D5DB" />
       <text class="empty-text">暂无动态，快来发布第一条吧</text>
     </view>
 
@@ -129,6 +131,7 @@ import { onPullDownRefresh, onReachBottom, onShow } from '@dcloudio/uni-app'
 import { communityApi, PostCategories } from '@/services/api'
 import { checkLogin, formatTime, defaultAvatar } from '@/utils/common'
 import { useUserStore } from '@/stores/user'
+import NutriIcon from '@/components/NutriIcon.vue'
 
 const userStore = useUserStore()
 const currentUserId = computed(() => userStore.userInfo?.id)

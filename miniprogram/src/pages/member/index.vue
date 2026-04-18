@@ -3,7 +3,7 @@
     <!-- ==================== VIP Status Card ==================== -->
     <view v-if="loading" class="vip-banner vip-loading">
       <view class="vip-top-row">
-        <text class="vip-icon-big">⏳</text>
+        <NutriIcon name="clock" :size="36" color="#9CA3AF" />
         <view class="vip-info">
           <text class="vip-plan-name skeleton-pulse">加载中...</text>
         </view>
@@ -11,7 +11,7 @@
     </view>
     <view v-else-if="isVip" class="vip-banner vip-active">
       <view class="vip-top-row">
-        <text class="vip-icon-big">💎</text>
+        <NutriIcon name="diamond" :size="36" color="#F59E0B" />
         <view class="vip-info">
           <view class="vip-name-row">
             <text class="vip-plan-name">{{ vipStatus.planName || vipLevelText }}</text>
@@ -49,7 +49,7 @@
     </view>
     <view v-else class="vip-banner vip-inactive" @tap="scrollToPlan">
       <view class="vip-top-row">
-        <text class="vip-icon-big">🌱</text>
+        <NutriIcon name="leaf" :size="36" color="#10B981" />
         <view class="vip-info">
           <text class="vip-plan-name">免费用户</text>
           <text class="vip-username">开通营养卡，解锁全部AI营养功能</text>
@@ -68,7 +68,9 @@
       <!-- Sign-In Calendar Card -->
       <view class="card sign-card">
         <view class="card-header-row">
-          <text class="card-title-text">📅 每日签到</text>
+          <text class="card-title-text">
+            <NutriIcon name="calendar" :size="24" color="#10B981" /> 每日签到
+          </text>
           <text class="card-header-sub">{{ currentYear }}年{{ currentMonth }}月</text>
         </view>
 
@@ -119,14 +121,18 @@
           {{ todaySigned ? '今日已签到 ✓' : '立即签到 +10成长值' }}
         </button>
         <view class="sign-tip">
-          <text>ℹ️ 每日签到可获得 10 成长值，积累升级会员等级</text>
+          <text>
+            <NutriIcon name="info" :size="20" color="#6366F1" /> 每日签到可获得 10 成长值，积累升级会员等级
+          </text>
         </view>
       </view>
 
       <!-- Invitation Card -->
       <view class="card invite-card">
         <view class="card-header-row">
-          <text class="card-title-text">🎁 邀请好友</text>
+          <text class="card-title-text">
+            <NutriIcon name="gift" :size="24" color="#EF4444" /> 邀请好友
+          </text>
           <view class="invite-reward-tag">每人+50成长值</view>
         </view>
 
@@ -152,14 +158,18 @@
         <!-- Invitation Stats -->
         <view class="invite-stats">
           <view class="invite-stat-box">
-            <view class="invite-stat-icon bg-accent">👥</view>
+            <view class="invite-stat-icon bg-accent">
+              <NutriIcon name="users" :size="24" color="#FFFFFF" />
+            </view>
             <view class="invite-stat-info">
               <text class="invite-stat-val">{{ memberInfo.invitationCount || 0 }}</text>
               <text class="invite-stat-lbl">已邀请</text>
             </view>
           </view>
           <view class="invite-stat-box">
-            <view class="invite-stat-icon bg-gold">🎁</view>
+            <view class="invite-stat-icon bg-gold">
+              <NutriIcon name="gift" :size="24" color="#FFFFFF" />
+            </view>
             <view class="invite-stat-info">
               <text class="invite-stat-val">{{ (memberInfo.invitationCount || 0) * 50 }}</text>
               <text class="invite-stat-lbl">奖励成长值</text>
@@ -269,7 +279,9 @@
         >
           💳 立即开通
         </button>
-        <view class="pay-tip">🔒 安全加密 · 支持多种支付方式</view>
+        <view class="pay-tip">
+          <NutriIcon name="lock" :size="20" color="#9CA3AF" /> 安全加密 · 支持多种支付方式
+        </view>
       </view>
     </view>
 
@@ -304,7 +316,9 @@
           </view>
           <view v-else class="pay-expired">订单已超时，请重新下单</view>
           <view class="pay-simulate-hint">
-            <text>ℹ️ 当前为模拟支付模式，点击下方按钮即可模拟支付成功</text>
+            <text>
+              <NutriIcon name="info" :size="20" color="#6366F1" /> 当前为模拟支付模式，点击下方按钮即可模拟支付成功
+            </text>
           </view>
           <view class="modal-btns">
             <button
@@ -335,10 +349,18 @@
             </view>
           </view>
           <view v-if="benefitsModalPlan?.benefits" class="benefits-quota-box">
-            <text v-if="benefitsModalPlan.benefits.ai_daily_quota === -1">✨ AI咨询：无限次/天</text>
-            <text v-else>🤖 AI咨询：{{ benefitsModalPlan.benefits.ai_daily_quota }}次/天</text>
-            <text v-if="benefitsModalPlan.benefits.food_recognition === -1">📸 食物识别：不限次数</text>
-            <text v-else>📸 食物识别：{{ benefitsModalPlan.benefits.food_recognition }}次/天</text>
+            <text v-if="benefitsModalPlan.benefits.ai_daily_quota === -1">
+              <NutriIcon name="sparkles" :size="20" color="#F59E0B" /> AI咨询：无限次/天
+            </text>
+            <text v-else>
+              <NutriIcon name="bot" :size="20" color="#6366F1" /> AI咨询：{{ benefitsModalPlan.benefits.ai_daily_quota }}次/天
+            </text>
+            <text v-if="benefitsModalPlan.benefits.food_recognition === -1">
+              <NutriIcon name="camera" :size="20" color="#10B981" /> 食物识别：不限次数
+            </text>
+            <text v-else>
+              <NutriIcon name="camera" :size="20" color="#10B981" /> 食物识别：{{ benefitsModalPlan.benefits.food_recognition }}次/天
+            </text>
           </view>
           <button class="btn-confirm mt20" @tap="selectFromBenefits">选择此套餐</button>
         </view>
@@ -348,7 +370,9 @@
     <!-- ==================== Growth Records ==================== -->
     <view class="card">
       <view class="card-header-row">
-        <text class="card-title-text">📊 成长记录</text>
+        <text class="card-title-text">
+          <NutriIcon name="bar-chart" :size="24" color="#6366F1" /> 成长记录
+        </text>
         <text class="card-header-sub">总成长值：{{ memberInfo.totalGrowth || 0 }}</text>
       </view>
 
@@ -375,7 +399,7 @@
         </view>
       </view>
       <view v-else class="empty-state">
-        <text class="empty-icon">📊</text>
+        <NutriIcon name="bar-chart" :size="64" color="#D1D5DB" />
         <text class="empty-text">暂无成长记录</text>
       </view>
 
@@ -388,7 +412,9 @@
     <!-- ==================== Order History ==================== -->
     <view v-if="isVip" class="card">
       <view class="card-header-row" @tap="toggleOrderHistory">
-        <text class="card-title-text">📋 我的订单</text>
+        <text class="card-title-text">
+          <NutriIcon name="clipboard" :size="24" color="#10B981" /> 我的订单
+        </text>
         <text class="toggle-text">{{ showOrders ? '收起 ▲' : '查看 ▼' }}</text>
       </view>
       <view v-if="showOrders">
@@ -430,6 +456,7 @@ import { onShow } from '@dcloudio/uni-app'
 import { useUserStore } from '@/stores/user'
 import { memberApi, vipApi } from '@/services/api'
 import { checkLogin, formatTime, formatDate } from '@/utils/common'
+import NutriIcon from '@/components/NutriIcon.vue'
 
 const userStore = useUserStore()
 
@@ -525,12 +552,7 @@ const remainingDays = computed(() => vipStatus.value.remainDays || 0)
 
 const invitationLink = computed(() => {
   if (!invitationCode.value) return ''
-  // #ifdef H5
-  return `${window.location.origin}/register?code=${invitationCode.value}`
-  // #endif
-  // #ifndef H5
   return `https://nutriai.itshuo.me/register?code=${invitationCode.value}`
-  // #endif
 })
 
 // ========== Data Loading ==========

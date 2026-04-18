@@ -4,24 +4,24 @@
     <view class="nav-bar" :style="{ paddingTop: statusBarHeight + 'px' }">
       <view class="nav-bar-inner">
         <view class="nav-left">
-          <view class="nav-back" @tap="goBack">
-            <text class="icon-back">‹</text>
+          <view class="nav-back pressable" @tap="goBack">
+            <NutriIcon name="arrow-left" :size="36" color="#1A1A2E" />
           </view>
           <text class="nav-title">AI 营养师</text>
           <view class="conn-dot" :class="connStatusClass" />
         </view>
         <view class="nav-right">
-          <view class="nav-icon-btn" @tap="showHistoryPopup = true">
-            <text>📂</text>
+          <view class="nav-icon-btn pressable" @tap="showHistoryPopup = true">
+            <NutriIcon name="history" :size="32" color="#1A1A2E" />
           </view>
-          <view class="nav-icon-btn" @tap="showFavoritesPopup = true">
-            <text>⭐</text>
+          <view class="nav-icon-btn pressable" @tap="showFavoritesPopup = true">
+            <NutriIcon name="star" :size="32" color="#1A1A2E" />
           </view>
-          <view class="nav-icon-btn" @tap="handleClearConversation">
-            <text>🗑️</text>
+          <view class="nav-icon-btn pressable" @tap="handleClearConversation">
+            <NutriIcon name="trash" :size="32" color="#1A1A2E" />
           </view>
-          <view class="nav-icon-btn" @tap="showSettingsPopup = true">
-            <text>⚙️</text>
+          <view class="nav-icon-btn pressable" @tap="showSettingsPopup = true">
+            <NutriIcon name="settings" :size="32" color="#1A1A2E" />
           </view>
         </view>
       </view>
@@ -29,20 +29,26 @@
 
     <!-- Disclaimer -->
     <view class="disclaimer-bar" v-if="showDisclaimer" :style="{ top: navHeight + 'px' }">
-      <text>⚕️ AI建议仅供参考，不构成医疗建议。如有身体不适请咨询专业医生。</text>
-      <text class="dismiss" @tap="showDisclaimer = false">✕</text>
+      <NutriIcon name="shield" :size="24" color="#10B981" />
+      <text>AI建议仅供参考，不构成医疗建议。如有身体不适请咨询专业医生。</text>
+      <view class="dismiss pressable" @tap="showDisclaimer = false">
+        <NutriIcon name="x" :size="24" color="#8896AB" />
+      </view>
     </view>
 
     <!-- Connection Status -->
     <view class="conn-bar" v-if="!connected && !isConnecting" :style="{ top: connBarTop + 'px' }">
-      <text class="conn-text">⚠️ 连接已断开</text>
+      <NutriIcon name="alert-triangle" :size="24" color="#EF4444" />
+      <text class="conn-text">连接已断开</text>
       <text class="conn-retry" @tap="retryConnect">点击重连</text>
     </view>
     <view class="conn-bar connecting" v-else-if="isConnecting" :style="{ top: connBarTop + 'px' }">
-      <text class="conn-text">🔄 正在连接...</text>
+      <NutriIcon name="refresh" :size="24" color="#F59E0B" />
+      <text class="conn-text">正在连接...</text>
     </view>
     <view class="conn-bar conn-ok" v-else-if="showConnected" :style="{ top: connBarTop + 'px' }">
-      <text class="conn-text">✅ 已连接</text>
+      <NutriIcon name="check-circle" :size="24" color="#10B981" />
+      <text class="conn-text">已连接</text>
     </view>
 
     <!-- Message List -->
@@ -54,7 +60,9 @@
     >
       <!-- Welcome message when empty -->
       <view v-if="messages.length === 0" class="welcome-block">
-        <text class="welcome-icon">🤖</text>
+        <view class="welcome-icon">
+          <NutriIcon name="bot" :size="64" color="#10B981" />
+        </view>
         <text class="welcome-title">你好！我是AI营养师</text>
         <text class="welcome-desc">我可以帮你分析食物营养、制定饮食计划、提供健康建议</text>
       </view>
@@ -62,7 +70,9 @@
       <view class="message-wrapper" v-for="(msg, idx) in messages" :key="msg.id || idx" :id="'msg-' + idx">
         <!-- AI Message -->
         <view v-if="msg.role === 'assistant'" class="message-row assistant">
-          <view class="avatar avatar-ai">🤖</view>
+          <view class="avatar avatar-ai">
+            <NutriIcon name="bot" :size="36" color="#10B981" />
+          </view>
           <view class="bubble-wrap">
             <view class="bubble bubble-ai">
               <!-- Streaming: show with cursor -->
@@ -79,12 +89,16 @@
             <view v-if="!msg.streaming && msg.content" class="msg-actions">
               <text class="msg-time">{{ formatMsgTime(msg.timestamp) }}</text>
               <view class="msg-action-btns">
-                <text class="action-btn" @tap="copyMessage(msg.content)">📋</text>
-                <text
-                  class="action-btn"
+                <view class="action-btn pressable" @tap="copyMessage(msg.content)">
+                  <NutriIcon name="copy" :size="24" color="#8896AB" />
+                </view>
+                <view
+                  class="action-btn pressable"
                   :class="{ 'favorited': msg.favorite }"
                   @tap="toggleFavorite(msg, idx)"
-                >{{ msg.favorite ? '💛' : '🤍' }}</text>
+                >
+                  <NutriIcon :name="msg.favorite ? 'heart-fill' : 'heart'" :size="24" :color="msg.favorite ? '#F59E0B' : '#8896AB'" />
+                </view>
               </view>
             </view>
           </view>
@@ -100,7 +114,9 @@
 
       <!-- Typing Indicator -->
       <view v-if="isTyping && !streamingIdx" class="message-row assistant" id="typing-indicator">
-        <view class="avatar avatar-ai">🤖</view>
+        <view class="avatar avatar-ai">
+          <NutriIcon name="bot" :size="36" color="#10B981" />
+        </view>
         <view class="bubble bubble-ai typing-bubble">
           <view class="typing-dots">
             <view class="dot" />
@@ -139,13 +155,7 @@
     </view>
 
     <!-- Settings Popup -->
-    <view class="popup-mask" v-if="showSettingsPopup" @tap="showSettingsPopup = false">
-      <view class="popup-panel" @tap.stop>
-        <view class="popup-header">
-          <text class="popup-title">⚙️ 聊天设置</text>
-          <text class="popup-close" @tap="showSettingsPopup = false">✕</text>
-        </view>
-        <view class="popup-body">
+    <BottomSheet v-model="showSettingsPopup" title="聊天设置">
           <view class="setting-item">
             <text class="setting-label">温度参数</text>
             <text class="setting-value">{{ settings.temperature.toFixed(1) }}</text>
@@ -187,26 +197,19 @@
             />
           </view>
           <text class="setting-tip">开启后AI会记住之前的对话内容</text>
+      <template #footer>
+        <view class="popup-btn popup-btn-primary pressable" @tap="saveSettings">
+          <text>保存设置</text>
         </view>
-        <view class="popup-footer">
-          <view class="popup-btn popup-btn-primary" @tap="saveSettings">
-            <text>保存设置</text>
-          </view>
-        </view>
-      </view>
-    </view>
+      </template>
+    </BottomSheet>
 
     <!-- History Popup -->
-    <view class="popup-mask" v-if="showHistoryPopup" @tap="showHistoryPopup = false">
-      <view class="popup-panel popup-panel-tall" @tap.stop>
-        <view class="popup-header">
-          <text class="popup-title">📂 历史记录</text>
-          <text class="popup-close" @tap="showHistoryPopup = false">✕</text>
-        </view>
-        <view class="popup-body">
+    <BottomSheet v-model="showHistoryPopup" title="历史记录" max-height="80vh">
           <view class="popup-action-row">
-            <view class="popup-btn popup-btn-sm popup-btn-primary" @tap="saveCurrentConversation">
-              <text>💾 保存当前对话</text>
+            <view class="popup-btn popup-btn-sm popup-btn-primary pressable" @tap="saveCurrentConversation">
+              <NutriIcon name="download" :size="24" color="#fff" />
+              <text>保存当前对话</text>
             </view>
           </view>
           <view v-if="historyList.length === 0" class="empty-hint">
@@ -229,18 +232,10 @@
               </view>
             </view>
           </scroll-view>
-        </view>
-      </view>
-    </view>
+    </BottomSheet>
 
     <!-- Favorites Popup -->
-    <view class="popup-mask" v-if="showFavoritesPopup" @tap="showFavoritesPopup = false">
-      <view class="popup-panel popup-panel-tall" @tap.stop>
-        <view class="popup-header">
-          <text class="popup-title">⭐ 我的收藏</text>
-          <text class="popup-close" @tap="showFavoritesPopup = false">✕</text>
-        </view>
-        <view class="popup-body">
+    <BottomSheet v-model="showFavoritesPopup" title="我的收藏" max-height="80vh">
           <view v-if="favoritesList.length === 0" class="empty-hint">
             <text>暂无收藏</text>
           </view>
@@ -252,15 +247,17 @@
               <view class="fav-footer">
                 <text class="fav-time">{{ formatMsgTime(fav.timestamp) }}</text>
                 <view class="fav-actions">
-                  <text class="action-btn" @tap="copyMessage(fav.content)">📋</text>
-                  <text class="action-btn" @tap="removeFavorite(fav.id)">🗑️</text>
+                  <view class="action-btn pressable" @tap="copyMessage(fav.content)">
+                    <NutriIcon name="copy" :size="24" color="#8896AB" />
+                  </view>
+                  <view class="action-btn pressable" @tap="removeFavorite(fav.id)">
+                    <NutriIcon name="trash" :size="24" color="#EF4444" />
+                  </view>
                 </view>
               </view>
             </view>
           </scroll-view>
-        </view>
-      </view>
-    </view>
+    </BottomSheet>
   </view>
 </template>
 
@@ -270,6 +267,8 @@ import { onLoad, onShow, onHide } from '@dcloudio/uni-app'
 import { checkLogin, defaultAvatar } from '@/utils/common'
 import { getToken, request } from '@/utils/request'
 import { useUserStore } from '@/stores/user'
+import NutriIcon from '@/components/NutriIcon.vue'
+import BottomSheet from '@/components/BottomSheet.vue'
 
 // ─── Types ───
 interface ChatMessage {
@@ -295,14 +294,8 @@ interface FavoriteRecord {
   timestamp: number
 }
 
-// ─── WebSocket URL (conditional compilation) ───
-// #ifdef H5
-const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
-const WS_URL = `${protocol}//${window.location.host}/api/ws/ai/chat`
-// #endif
-// #ifndef H5
+// ─── WebSocket URL ───
 const WS_URL = 'wss://nutriai.itshuo.me/api/ws/ai/chat'
-// #endif
 
 // ─── Stores & computed ───
 const userStore = useUserStore()
@@ -376,10 +369,10 @@ const bottomAreaHeight = computed(() => {
 })
 
 const waitingHintText = computed(() => {
-  if (waitingSeconds.value >= 60) return '🔄 AI仍在处理中，请继续等待...'
-  if (waitingSeconds.value >= 30) return '⏳ AI正在生成回复，请耐心等待...'
-  if (waitingSeconds.value >= 15) return '🧠 AI正在深度思考，请耐心等待...'
-  return '⏳ 网络响应中，请稍候...'
+  if (waitingSeconds.value >= 60) return 'AI仍在处理中，请继续等待...'
+  if (waitingSeconds.value >= 30) return 'AI正在生成回复，请耐心等待...'
+  if (waitingSeconds.value >= 15) return 'AI正在深度思考，请耐心等待...'
+  return '网络响应中，请稍候...'
 })
 
 // ─── ID generation ───
@@ -874,15 +867,7 @@ function goBack() {
 onLoad(() => {
   if (!checkLogin()) return
   const windowInfo = uni.getWindowInfo()
-  // #ifdef APP-PLUS
-  statusBarHeight.value = windowInfo.statusBarHeight || 44
-  // #endif
-  // #ifdef H5
-  statusBarHeight.value = 0
-  // #endif
-  // #ifdef MP
   statusBarHeight.value = windowInfo.statusBarHeight || 20
-  // #endif
   navHeight.value = statusBarHeight.value + 44
   const tabBarHeight = windowInfo.windowBottom || 50
   const safeBottom = windowInfo.safeArea ? (windowInfo.screenHeight - windowInfo.safeArea.bottom) : 0
@@ -961,6 +946,9 @@ onUnmounted(() => {
   font-size: 48rpx;
   color: $foreground;
   font-weight: bold;
+}
+.nav-back {
+  .nutri-icon { display: flex; }
 }
 .nav-title {
   font-size: 32rpx;
@@ -1058,7 +1046,16 @@ onUnmounted(() => {
   box-shadow: $shadow-sm;
   animation: fadeInUp 0.4s ease-out;
 }
-.welcome-icon { font-size: 80rpx; margin-bottom: 20rpx; }
+.welcome-icon {
+  width: 120rpx;
+  height: 120rpx;
+  background: rgba(16, 185, 129, 0.1);
+  border-radius: $radius-full;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20rpx;
+}
 .welcome-title {
   font-size: 36rpx;
   font-weight: 700;

@@ -16,7 +16,7 @@
       <!-- Search -->
       <view class="search-bar">
         <view class="search-input-wrap">
-          <text class="search-icon">🔍</text>
+          <NutriIcon name="search" :size="28" color="#9CA3AF" />
           <input class="search-input" type="text" placeholder="搜索营养餐..." :value="keyword"
             @input="e => keyword = e.detail.value" confirm-type="search" @confirm="refreshData" />
           <text v-if="keyword" class="search-clear" @tap="keyword = ''; refreshData()">✕</text>
@@ -58,14 +58,26 @@
               <text v-for="t in item.tags.split(',').slice(0, 3)" :key="t" class="mini-tag">{{ t.trim() }}</text>
             </view>
             <view class="card-info">
-              <text class="info-item">📅 {{ item.durationDays }}天</text>
+              <text class="info-item">
+                <NutriIcon name="calendar" :size="22" color="#6366F1" />
+                {{ item.durationDays }}天
+              </text>
               <text class="info-sep">·</text>
-              <text class="info-item">🔥 {{ item.targetCalories }}kcal</text>
+              <text class="info-item">
+                <NutriIcon name="flame" :size="22" color="#EF4444" />
+                {{ item.targetCalories }}kcal
+              </text>
             </view>
             <view class="card-footer">
               <view class="footer-left">
-                <text v-if="item.avgRating > 0" class="footer-item">⭐ {{ Number(item.avgRating).toFixed(1) }}</text>
-                <text class="footer-item">👥 {{ item.followCount || 0 }}人跟随</text>
+                <text v-if="item.avgRating > 0" class="footer-item">
+                  <NutriIcon name="star" :size="22" color="#F59E0B" />
+                  {{ Number(item.avgRating).toFixed(1) }}
+                </text>
+                <text class="footer-item">
+                  <NutriIcon name="users" :size="22" color="#6366F1" />
+                  {{ item.followCount || 0 }}人跟随
+                </text>
               </view>
               <text class="footer-item">👁 {{ item.viewCount || 0 }}</text>
             </view>
@@ -75,7 +87,7 @@
 
       <!-- Empty -->
       <view class="empty-state" v-else-if="!loading">
-        <text class="empty-icon">📋</text>
+        <NutriIcon name="clipboard" :size="64" color="#D1D5DB" />
         <text class="empty-text">暂无营养餐</text>
       </view>
 
@@ -109,7 +121,7 @@
       </view>
 
       <view class="empty-state" v-else-if="!followLoading">
-        <text class="empty-icon">📝</text>
+        <NutriIcon name="edit" :size="64" color="#D1D5DB" />
         <text class="empty-text">还没有跟随任何营养餐计划</text>
         <view class="empty-btn" @tap="activeTab = 'discover'">
           <text class="empty-btn-text">去发现 →</text>
@@ -127,6 +139,7 @@
 import { ref, computed } from 'vue'
 import { onShow, onReachBottom } from '@dcloudio/uni-app'
 import { mealPlanApi } from '@/services/api'
+import NutriIcon from '@/components/NutriIcon.vue'
 
 const activeTab = ref('discover')
 

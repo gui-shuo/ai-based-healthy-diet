@@ -23,7 +23,9 @@
     <!-- Post Content -->
     <view class="post-body">
       <view class="post-meta-row" v-if="post.category || post.pinned">
-        <view class="pinned-tag" v-if="post.pinned">📌 置顶</view>
+        <view class="pinned-tag" v-if="post.pinned">
+          <NutriIcon name="pin" :size="22" color="#EF4444" /> 置顶
+        </view>
         <view class="category-tag" v-if="post.category">{{ post.category }}</view>
       </view>
       <text class="content-text">{{ post.content }}</text>
@@ -59,11 +61,11 @@
     <!-- Stats Bar -->
     <view class="stats-bar">
       <view class="stat-item" :class="{ liked: isLiked }" @tap="handleLike">
-        <text class="stat-icon">{{ isLiked ? '❤️' : '🤍' }}</text>
+        <NutriIcon :name="isLiked ? 'heart-fill' : 'heart'" :size="24" :color="isLiked ? '#EF4444' : '#9CA3AF'" />
         <text class="stat-count">{{ post.likesCount || 0 }} 赞</text>
       </view>
       <view class="stat-item">
-        <text class="stat-icon">💬</text>
+        <NutriIcon name="message" :size="24" color="#9CA3AF" />
         <text class="stat-count">{{ post.commentsCount || 0 }} 条评论</text>
       </view>
     </view>
@@ -104,7 +106,7 @@
       </view>
 
       <view class="empty-comments" v-else-if="!commentLoading">
-        <text>还没有评论，快来抢沙发 🛋️</text>
+        <text>还没有评论，快来抢沙发</text>
       </view>
 
       <view class="loading-more" v-if="commentLoading">
@@ -156,6 +158,7 @@ import { onLoad } from '@dcloudio/uni-app'
 import { communityApi } from '@/services/api'
 import { checkLogin, formatTime, defaultAvatar } from '@/utils/common'
 import { useUserStore } from '@/stores/user'
+import NutriIcon from '@/components/NutriIcon.vue'
 
 const userStore = useUserStore()
 

@@ -9,7 +9,7 @@
         <view class="date-display flex-center">
           <text class="date-text">{{ displayDate }}</text>
           <text v-if="isToday" class="today-badge">今天</text>
-          <text class="date-picker-hint">📅</text>
+          <NutriIcon name="calendar" :size="28" color="#10B981" />
         </view>
         <view class="date-arrow flex-center" @tap.stop="changeDate(1)">
           <text class="arrow-icon">›</text>
@@ -20,7 +20,10 @@
     <!-- Daily Summary with macro rings -->
     <view class="card summary-card">
       <view class="summary-header flex-between">
-        <text class="summary-title">📊 今日营养摄入</text>
+        <text class="summary-title">
+          <NutriIcon name="bar-chart" :size="28" color="#10B981" />
+          今日营养摄入
+        </text>
         <text class="summary-cal">{{ stats.totalCalories || 0 }} / {{ dailyGoal.calories }} kcal</text>
       </view>
 
@@ -36,7 +39,9 @@
             />
             <text class="ring-percent">{{ macro.percent }}%</text>
           </view>
-          <text class="ring-label">{{ macro.icon }} {{ macro.label }}</text>
+          <text class="ring-label">
+            <NutriIcon :name="macro.icon" :size="20" :color="macro.color" /> {{ macro.label }}
+          </text>
           <text class="ring-value">{{ macro.current }}/{{ macro.goal }}{{ macro.unit }}</text>
         </view>
       </view>
@@ -45,7 +50,10 @@
       <view class="progress-section">
         <view class="progress-item">
           <view class="flex-between">
-            <text class="p-label">🔥 热量</text>
+            <text class="p-label">
+              <NutriIcon name="flame" :size="24" color="#EF4444" />
+              热量
+            </text>
             <text class="p-value">{{ stats.totalCalories || 0 }} / {{ dailyGoal.calories }} kcal</text>
           </view>
           <view class="progress-bar">
@@ -54,7 +62,10 @@
         </view>
         <view class="progress-item">
           <view class="flex-between">
-            <text class="p-label">🥩 蛋白质</text>
+            <text class="p-label">
+              <NutriIcon name="apple" :size="24" color="#8B5CF6" />
+              蛋白质
+            </text>
             <text class="p-value">{{ stats.totalProtein || 0 }} / {{ dailyGoal.protein }}g</text>
           </view>
           <view class="progress-bar">
@@ -63,7 +74,10 @@
         </view>
         <view class="progress-item">
           <view class="flex-between">
-            <text class="p-label">🧈 脂肪</text>
+            <text class="p-label">
+              <NutriIcon name="droplet" :size="24" color="#F59E0B" />
+              脂肪
+            </text>
             <text class="p-value">{{ stats.totalFat || 0 }} / {{ dailyGoal.fat }}g</text>
           </view>
           <view class="progress-bar">
@@ -72,7 +86,10 @@
         </view>
         <view class="progress-item">
           <view class="flex-between">
-            <text class="p-label">🍚 碳水</text>
+            <text class="p-label">
+              <NutriIcon name="wheat" :size="24" color="#10B981" />
+              碳水
+            </text>
             <text class="p-value">{{ stats.totalCarbs || 0 }} / {{ dailyGoal.carbs }}g</text>
           </view>
           <view class="progress-bar">
@@ -90,7 +107,8 @@
           :class="{ active: activeMealFilter === 'ALL' }"
           @tap="setMealFilter('ALL')"
         >
-          <text>🍽️ 全部</text>
+          <NutriIcon name="utensils" :size="24" color="#9CA3AF" />
+          <text> 全部</text>
           <text class="tab-count">{{ records.length }}</text>
         </view>
         <view
@@ -100,7 +118,8 @@
           :class="{ active: activeMealFilter === m.value }"
           @tap="setMealFilter(m.value)"
         >
-          <text>{{ m.icon }} {{ m.label }}</text>
+          <NutriIcon :name="m.icon" :size="24" :color="m.color" />
+          <text> {{ m.label }}</text>
           <text class="tab-count">{{ getMealRecords(m.value).length }}</text>
         </view>
       </view>
@@ -114,7 +133,7 @@
     >
       <view class="meal-header flex-between">
         <view class="flex" style="align-items: center; gap: 12rpx;">
-          <text class="meal-icon">{{ meal.icon }}</text>
+          <NutriIcon :name="meal.icon" :size="28" :color="meal.color" />
           <text class="meal-name">{{ meal.label }}</text>
           <text class="meal-count-badge">{{ getMealRecords(meal.value).length }}项</text>
           <text class="meal-cal text-secondary">{{ getMealCalories(meal.value) }} kcal</text>
@@ -164,7 +183,7 @@
 
     <!-- Empty state when filtering -->
     <view v-if="filteredMealTypes.length === 0 || (filteredMealTypes.length === 1 && getMealRecords(filteredMealTypes[0].value).length === 0)" class="empty-state card">
-      <text class="empty-icon">🍽️</text>
+      <NutriIcon name="utensils" :size="64" color="#D1D5DB" />
       <text class="empty-text">暂无{{ activeMealFilter === 'ALL' ? '' : filterLabel }}记录</text>
       <view class="btn-primary empty-btn" @tap="openAddDialog(activeMealFilter === 'ALL' ? 'BREAKFAST' : activeMealFilter)">
         <text style="color: #fff;">+ 添加记录</text>
@@ -175,7 +194,10 @@
     <view class="dialog-mask" v-if="showDetail" @tap="showDetail = false">
       <view class="dialog-content detail-dialog" @tap.stop>
         <view class="dialog-header flex-between">
-          <text class="dialog-title">🔍 食物详情</text>
+          <text class="dialog-title">
+            <NutriIcon name="search" :size="28" color="#10B981" />
+            食物详情
+          </text>
           <text class="dialog-close" @tap="showDetail = false">✕</text>
         </view>
 
@@ -215,27 +237,27 @@
             <text class="detail-section-title">营养成分</text>
             <view class="detail-grid">
               <view class="detail-item">
-                <text class="detail-item-label">🥩 蛋白质</text>
+                <text class="detail-item-label">蛋白质</text>
                 <text class="detail-item-value">{{ detailRecord.protein || 0 }}g</text>
               </view>
               <view class="detail-item">
-                <text class="detail-item-label">🧈 脂肪</text>
+                <text class="detail-item-label">脂肪</text>
                 <text class="detail-item-value">{{ detailRecord.fat || 0 }}g</text>
               </view>
               <view class="detail-item">
-                <text class="detail-item-label">🍚 碳水化合物</text>
+                <text class="detail-item-label">碳水化合物</text>
                 <text class="detail-item-value">{{ detailRecord.carbohydrates || detailRecord.carbs || 0 }}g</text>
               </view>
               <view class="detail-item">
-                <text class="detail-item-label">🌾 膳食纤维</text>
+                <text class="detail-item-label">膳食纤维</text>
                 <text class="detail-item-value">{{ detailRecord.fiber || detailRecord.dietaryFiber || '-' }}g</text>
               </view>
               <view class="detail-item">
-                <text class="detail-item-label">🧂 钠</text>
+                <text class="detail-item-label">钠</text>
                 <text class="detail-item-value">{{ detailRecord.sodium || '-' }}mg</text>
               </view>
               <view class="detail-item">
-                <text class="detail-item-label">🍬 糖</text>
+                <text class="detail-item-label">糖</text>
                 <text class="detail-item-value">{{ detailRecord.sugar || '-' }}g</text>
               </view>
             </view>
@@ -265,7 +287,9 @@
         </view>
 
         <view class="dialog-footer detail-footer flex" style="gap: 16rpx;">
-          <button class="btn-outline flex-1" @tap="editFromDetail">✏️ 编辑</button>
+          <button class="btn-outline flex-1" @tap="editFromDetail">
+            <NutriIcon name="edit" :size="22" color="#10B981" /> 编辑
+          </button>
           <button class="btn-primary flex-1" @tap="showDetail = false">关闭</button>
         </view>
       </view>
@@ -290,23 +314,30 @@
                   :key="m.value"
                   :class="{ selected: addForm.mealType === m.value }"
                   @tap="addForm.mealType = m.value"
-                >{{ m.icon }} {{ m.label }}</view>
+                >
+                  <NutriIcon :name="m.icon" :size="24" :color="addForm.mealType === m.value ? '#FFFFFF' : m.color" />
+                  {{ m.label }}
+                </view>
               </view>
             </view>
 
             <!-- Image Upload for Food Recognition -->
             <view class="input-group">
-              <text class="label">📷 拍照识别</text>
+              <text class="label">
+                <NutriIcon name="camera" :size="22" color="#10B981" /> 拍照识别
+              </text>
               <view class="photo-recognize-area">
                 <view v-if="!recognizeImage" class="photo-upload-btn flex-center" @tap="chooseRecognizeImage">
-                  <text class="photo-upload-icon">📷</text>
+                  <NutriIcon name="camera" :size="36" color="#9CA3AF" />
                   <text class="photo-upload-text">拍照/选择图片识别食物</text>
                 </view>
                 <view v-else class="photo-preview-row">
                   <image :src="recognizeImage" mode="aspectFill" class="photo-preview-img" />
                   <view class="photo-actions">
                     <button v-if="!recognizeLoading" class="btn-sm btn-accent" @tap="chooseRecognizeImage">重新选择</button>
-                    <text v-if="recognizeLoading" class="recognize-loading">🔍 识别中...</text>
+                    <text v-if="recognizeLoading" class="recognize-loading">
+                      <NutriIcon name="search" :size="20" color="#10B981" /> 识别中...
+                    </text>
                     <button v-if="recognizeImage && !recognizeLoading" class="btn-sm btn-outline" @tap="clearRecognizeImage">清除</button>
                   </view>
                 </view>
@@ -361,6 +392,8 @@ import { ref, computed, reactive, watch, nextTick } from 'vue'
 import { onLoad, onPullDownRefresh } from '@dcloudio/uni-app'
 import { foodApi, MealTypes } from '@/services/api'
 import { checkLogin, formatDate } from '@/utils/common'
+import NutriIcon from '@/components/NutriIcon.vue'
+import BottomSheet from '@/components/BottomSheet.vue'
 
 interface FoodRecord {
   id: number
@@ -449,10 +482,10 @@ const filteredMealTypes = computed(() => {
 // Macro ring data for the summary card
 const macroRings = computed(() => {
   const items = [
-    { key: 'protein', label: '蛋白质', icon: '🥩', current: stats.value.totalProtein || 0, goal: dailyGoal.protein, unit: 'g', color: '#3B82F6' },
-    { key: 'fat', label: '脂肪', icon: '🧈', current: stats.value.totalFat || 0, goal: dailyGoal.fat, unit: 'g', color: '#F59E0B' },
-    { key: 'carbs', label: '碳水', icon: '🍚', current: stats.value.totalCarbs || 0, goal: dailyGoal.carbs, unit: 'g', color: '#10B981' },
-    { key: 'calories', label: '热量', icon: '🔥', current: stats.value.totalCalories || 0, goal: dailyGoal.calories, unit: 'kcal', color: '#EF4444' }
+    { key: 'protein', label: '蛋白质', icon: 'apple', current: stats.value.totalProtein || 0, goal: dailyGoal.protein, unit: 'g', color: '#3B82F6' },
+    { key: 'fat', label: '脂肪', icon: 'droplet', current: stats.value.totalFat || 0, goal: dailyGoal.fat, unit: 'g', color: '#F59E0B' },
+    { key: 'carbs', label: '碳水', icon: 'wheat', current: stats.value.totalCarbs || 0, goal: dailyGoal.carbs, unit: 'g', color: '#10B981' },
+    { key: 'calories', label: '热量', icon: 'flame', current: stats.value.totalCalories || 0, goal: dailyGoal.calories, unit: 'kcal', color: '#EF4444' }
   ]
   return items.map(i => ({ ...i, percent: calcPercent(i.current, i.goal) }))
 })

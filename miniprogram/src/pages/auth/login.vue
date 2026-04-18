@@ -88,23 +88,6 @@
         <text>和</text>
         <text class="legal-link" @tap="goTo('/pages/legal/index?type=privacy')">《隐私政策》</text>
       </view>
-
-      <!-- #ifndef MP-WEIXIN -->
-      <!-- Social Login Divider -->
-      <view class="divider-row">
-        <view class="divider-line" />
-        <text class="divider-text">其他登录方式</text>
-        <view class="divider-line" />
-      </view>
-
-      <!-- Social Login Buttons -->
-      <view class="social-row">
-        <view class="social-btn qq-btn" @tap="handleSocialLogin('qq')">
-          <text class="social-icon">🐧</text>
-          <text class="social-label">QQ登录</text>
-        </view>
-      </view>
-      <!-- #endif -->
     </view>
   </view>
 </template>
@@ -113,7 +96,7 @@
 import { ref, reactive } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import { useUserStore } from '@/stores/user'
-import { authApi, socialAuthApi } from '@/services/api'
+import { authApi } from '@/services/api'
 
 const userStore = useUserStore()
 
@@ -207,67 +190,6 @@ async function handleWxLogin() {
   } finally {
     loginLoading.value = false
   }
-}
-// #endif
-
-// #ifndef MP-WEIXIN
-async function handleSocialLogin(provider: 'qq') {
-  // #ifdef APP-PLUS
-  try {
-    uni.showLoading({ title: '正在登录...', mask: true })
-    const services = await new Promise<any[]>((resolve, reject) => {
-      plus.oauth.getServices((s: any[]) => resolve(s), (e: any) => reject(e))
-    })
-    const qqService = services.find((s: any) => s.id === 'qq')
-    if (!qqService) {
-      uni.hideLoading()
-      uni.showToast({ title: '当前设备不支持QQ登录', icon: 'none' })
-      return
-    }
-
-    await new Promise<void>((resolve, reject) => {
-      qqService.login((result: any) => resolve(), (e: any) => reject(e))
-    })
-
-    const authResult = qqService.authResult
-    if (!authResult || !authResult.access_token) {
-      uni.hideLoading()
-      uni.showToast({ title: 'QQ授权失败', icon: 'none' })
-      return
-    }
-
-    const res = await socialAuthApi.qqTokenLogin(authResult.access_token) as any
-    uni.hideLoading()
-    if (res.code === 200 && res.data) {
-      userStore._saveLogin(res.data)
-      uni.showToast({ title: '登录成功', icon: 'success' })
-      setTimeout(() => uni.reLaunch({ url: '/pages/index/index' }), 500)
-    } else {
-      uni.showToast({ title: res.message || 'QQ登录失败', icon: 'none' })
-    }
-  } catch (e: any) {
-    uni.hideLoading()
-    console.error('QQ APP login error:', e)
-    uni.showToast({ title: 'QQ登录失败，请稍后重试', icon: 'none' })
-  }
-  return
-  // #endif
-
-  // #ifdef H5
-  try {
-    uni.showLoading({ title: '正在跳转...', mask: true })
-    const res = await socialAuthApi.getQqAuthUrl('h5_login') as any
-    uni.hideLoading()
-    if (res.code === 200 && res.data) {
-      window.location.href = res.data
-    } else {
-      uni.showToast({ title: res.message || '获取授权地址失败', icon: 'none' })
-    }
-  } catch (e: any) {
-    uni.hideLoading()
-    uni.showToast({ title: e?.message || '登录失败，请稍后重试', icon: 'none' })
-  }
-  // #endif
 }
 // #endif
 

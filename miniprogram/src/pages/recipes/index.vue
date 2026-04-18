@@ -3,10 +3,12 @@
     <!-- Tab switcher -->
     <view class="tab-switcher">
       <view class="tab-item" :class="{ active: mainTab === 'curated' }" @tap="mainTab = 'curated'">
-        <text>⭐ 精选食谱</text>
+        <NutriIcon name="star" :size="28" color="#F59E0B" />
+        <text>精选食谱</text>
       </view>
       <view class="tab-item" :class="{ active: mainTab === 'corpus' }" @tap="switchToCorpus">
-        <text>📚 食谱大全</text>
+        <NutriIcon name="book" :size="28" color="#6366F1" />
+        <text>食谱大全</text>
       </view>
     </view>
 
@@ -83,16 +85,25 @@
         <view class="card-body">
           <text class="card-title">{{ item.title }}</text>
           <view class="card-meta">
-            <text class="meta-item">⏱ {{ item.totalTime }}min</text>
+            <text class="meta-item">
+              <NutriIcon name="clock" :size="22" color="#9CA3AF" />
+              {{ item.totalTime }}min
+            </text>
             <text class="meta-sep">|</text>
-            <text class="meta-item">🔥 {{ item.calories }}kcal</text>
+            <text class="meta-item">
+              <NutriIcon name="flame" :size="22" color="#EF4444" />
+              {{ item.calories }}kcal
+            </text>
           </view>
           <view class="card-rating">
             <text class="stars">{{ renderStars(item.ratingAvg) }}</text>
             <text class="rating-count">({{ item.ratingCount || 0 }})</text>
           </view>
           <view class="card-footer">
-            <text class="footer-item">❤️ {{ item.favoriteCount || 0 }}</text>
+            <text class="footer-item">
+              <NutriIcon name="heart-fill" :size="22" color="#EF4444" />
+              {{ item.favoriteCount || 0 }}
+            </text>
             <text class="footer-item">👁 {{ item.viewCount || 0 }}</text>
           </view>
         </view>
@@ -101,7 +112,7 @@
 
     <!-- Empty state -->
     <view class="empty-state" v-else-if="!loading">
-      <text class="empty-icon">🍽️</text>
+      <NutriIcon name="utensils" :size="64" color="#D1D5DB" />
       <text class="empty-text">暂无食谱</text>
     </view>
 
@@ -116,7 +127,7 @@
     <template v-if="mainTab === 'corpus'">
       <view class="search-bar">
         <view class="search-input-wrap">
-          <text class="search-icon">🔍</text>
+          <NutriIcon name="search" :size="28" color="#9CA3AF" />
           <input
             class="search-input"
             type="text"
@@ -153,7 +164,7 @@
         >
           <view class="card-cover-wrap">
             <view class="corpus-cover">
-              <text class="corpus-cover-emoji">{{ getCorpusEmoji(item.category) }}</text>
+              <NutriIcon :name="getCorpusEmoji(item.category)" :size="48" color="#10B981" />
             </view>
             <view class="card-badge">{{ corpusCatMap[item.category] || '其他' }}</view>
           </view>
@@ -165,7 +176,7 @@
       </view>
 
       <view class="empty-state" v-else-if="!corpusLoading">
-        <text class="empty-icon">📚</text>
+        <NutriIcon name="book" :size="64" color="#D1D5DB" />
         <text class="empty-text">未找到食谱</text>
       </view>
 
@@ -181,6 +192,7 @@
 import { ref, computed } from 'vue'
 import { onShow, onReachBottom } from '@dcloudio/uni-app'
 import { request } from '@/utils/request'
+import NutriIcon from '@/components/NutriIcon.vue'
 
 const mainTab = ref('curated')
 
@@ -355,11 +367,11 @@ const corpusNoMore = ref(false)
 
 function getCorpusEmoji(cat: string) {
   const map: Record<string, string> = {
-    BREAKFAST: '🌅', LUNCH: '☀️', DINNER: '🌙',
-    SOUP: '🍲', DESSERT: '🍰', SNACK: '🍡',
-    STAPLE: '🍚', OTHER: '🍽️'
+    BREAKFAST: 'sunrise', LUNCH: 'sun', DINNER: 'moon',
+    SOUP: 'utensils', DESSERT: 'cookie', SNACK: 'cookie',
+    STAPLE: 'wheat', OTHER: 'utensils'
   }
-  return map[cat] || '🍽️'
+  return map[cat] || 'utensils'
 }
 
 function switchToCorpus() {

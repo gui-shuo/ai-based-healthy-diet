@@ -6,17 +6,22 @@
       <view class="header-inner">
         <view class="avatar-wrap" @tap="changeAvatar">
           <image class="avatar" :src="defaultAvatar(userStore.userInfo?.avatar)" mode="aspectFill" />
-          <view class="avatar-edit">📷</view>
+          <view class="avatar-edit">
+            <NutriIcon name="camera" :size="20" color="#666" />
+          </view>
         </view>
         <view class="user-meta">
           <view class="nickname-row">
             <text class="nickname">{{ userStore.userInfo?.nickname || '未设置昵称' }}</text>
-            <view v-if="isVip" class="vip-badge-tag">VIP</view>
+            <view v-if="isVip" class="vip-badge-tag">
+              <NutriIcon name="crown" :size="20" color="#92400E" />
+              <text>VIP</text>
+            </view>
           </view>
           <text class="username">@{{ userStore.userInfo?.username }}</text>
           <text class="user-bio" v-if="(userStore.userInfo as any)?.bio">{{ (userStore.userInfo as any).bio }}</text>
         </view>
-        <view class="edit-btn" @tap="openEditSheet">编辑资料</view>
+        <view class="edit-btn pressable" @tap="openEditSheet">编辑资料</view>
       </view>
 
       <!-- Quick Stats Row -->
@@ -43,272 +48,322 @@
       </view>
     </view>
 
-    <!-- Menu List - Services -->
-    <view class="section-label">我的服务</view>
-    <view class="card menu-card">
-      <view class="menu-item" @tap="navigateTo('/pages/food-records/index')">
-        <view class="menu-icon-wrap" style="background: rgba(245,158,11,0.1)">
-          <text class="menu-icon">🍽️</text>
+    <!-- AI Features Section -->
+    <view class="section-label">
+      <NutriIcon name="sparkles" :size="28" color="#10B981" />
+      <text>AI 功能</text>
+    </view>
+    <view class="ai-grid">
+      <view class="ai-card pressable" @tap="navigateTo('/pages/ai-chat/index')">
+        <view class="ai-icon-wrap" style="background: rgba(16,185,129,0.1)">
+          <NutriIcon name="bot" :size="44" color="#10B981" />
         </view>
-        <text class="menu-text">我的饮食记录</text>
-        <text class="menu-arrow">›</text>
+        <text class="ai-card-title">AI营养师</text>
+        <text class="ai-card-desc">智能对话咨询</text>
       </view>
-      <view class="menu-item" @tap="navigateTo('/pages/diet-plan/index')">
-        <view class="menu-icon-wrap" style="background: rgba(139,92,246,0.1)">
-          <text class="menu-icon">📋</text>
+      <view class="ai-card pressable" @tap="navigateTo('/pages/food-recognition/index')">
+        <view class="ai-icon-wrap" style="background: rgba(59,130,246,0.1)">
+          <NutriIcon name="scan" :size="44" color="#3B82F6" />
         </view>
-        <text class="menu-text">我的饮食计划</text>
-        <text class="menu-arrow">›</text>
+        <text class="ai-card-title">食物识别</text>
+        <text class="ai-card-desc">拍照识别营养</text>
       </view>
-      <view class="menu-item" @tap="navigateTo('/pages/profile/health-record')">
-        <view class="menu-icon-wrap" style="background: rgba(16,185,129,0.1)">
-          <text class="menu-icon">💪</text>
+      <view class="ai-card pressable" @tap="navigateTo('/pages/diet-plan/index')">
+        <view class="ai-icon-wrap" style="background: rgba(139,92,246,0.1)">
+          <NutriIcon name="clipboard" :size="44" color="#8B5CF6" />
         </view>
-        <text class="menu-text">体质档案</text>
-        <text class="menu-arrow">›</text>
-      </view>
-      <view class="menu-item" @tap="navigateTo('/pages/profile/my-posts')">
-        <view class="menu-icon-wrap" style="background: rgba(99,102,241,0.1)">
-          <text class="menu-icon">📝</text>
-        </view>
-        <text class="menu-text">我的帖子</text>
-        <text class="menu-arrow">›</text>
-      </view>
-      <view class="menu-item" @tap="navigateTo('/pages/consultation/index?tab=orders')">
-        <view class="menu-icon-wrap" style="background: rgba(236,72,153,0.1)">
-          <text class="menu-icon">👩‍⚕️</text>
-        </view>
-        <text class="menu-text">我的咨询</text>
-        <text class="menu-arrow">›</text>
-      </view>
-      <view class="menu-item" @tap="navigateTo('/pages/profile/my-orders?tab=meals')">
-        <view class="menu-icon-wrap" style="background: rgba(16,185,129,0.1)">
-          <text class="menu-icon">🍱</text>
-        </view>
-        <text class="menu-text">我的营养餐</text>
-        <text class="menu-arrow">›</text>
-      </view>
-      <view class="menu-item" @tap="navigateTo('/pages/profile/my-product-orders')">
-        <view class="menu-icon-wrap" style="background: rgba(59,130,246,0.1)">
-          <text class="menu-icon">🛍</text>
-        </view>
-        <text class="menu-text">产品订单</text>
-        <text class="menu-arrow">›</text>
-      </view>
-      <view class="menu-item" @tap="navigateTo('/pages/profile/coupons')">
-        <view class="menu-icon-wrap" style="background: rgba(239,68,68,0.1)">
-          <text class="menu-icon">🏷</text>
-        </view>
-        <text class="menu-text">我的优惠券</text>
-        <text class="menu-arrow">›</text>
-      </view>
-      <view class="menu-item" @tap="navigateTo('/pages/address/index')">
-        <view class="menu-icon-wrap" style="background: rgba(59,130,246,0.1)">
-          <text class="menu-icon">📍</text>
-        </view>
-        <text class="menu-text">收货地址</text>
-        <text class="menu-arrow">›</text>
+        <text class="ai-card-title">饮食计划</text>
+        <text class="ai-card-desc">AI定制方案</text>
       </view>
     </view>
 
-    <!-- Admin Entry - only show for admin users -->
-    <view v-if="userStore.isAdmin" class="section-label">管理功能</view>
+    <!-- Merchant Management (Admin only) -->
+    <view v-if="userStore.isAdmin" class="section-label">
+      <NutriIcon name="store" :size="28" color="#F59E0B" />
+      <text>商家管理</text>
+    </view>
     <view v-if="userStore.isAdmin" class="card menu-card">
-      <view class="menu-item" @tap="navigateTo('/pages/admin/index')">
-        <view class="menu-icon-wrap" style="background: rgba(16,185,129,0.1)">
-          <text class="menu-icon">⚙️</text>
+      <view class="menu-item pressable" @tap="navigateTo('/pages/merchant/index')">
+        <view class="menu-icon-wrap" style="background: rgba(245,158,11,0.1)">
+          <NutriIcon name="bar-chart" :size="36" color="#F59E0B" />
         </view>
-        <text class="menu-text">管理后台</text>
-        <text class="menu-arrow">›</text>
+        <text class="menu-text">经营概况</text>
+        <NutriIcon name="chevron-right" :size="28" color="#8896AB" />
+      </view>
+      <view class="menu-item pressable" @tap="navigateTo('/pages/merchant/meals')">
+        <view class="menu-icon-wrap" style="background: rgba(16,185,129,0.1)">
+          <NutriIcon name="utensils" :size="36" color="#10B981" />
+        </view>
+        <text class="menu-text">营养餐管理</text>
+        <NutriIcon name="chevron-right" :size="28" color="#8896AB" />
+      </view>
+      <view class="menu-item pressable" @tap="navigateTo('/pages/merchant/products')">
+        <view class="menu-icon-wrap" style="background: rgba(59,130,246,0.1)">
+          <NutriIcon name="shopping-bag" :size="36" color="#3B82F6" />
+        </view>
+        <text class="menu-text">产品管理</text>
+        <NutriIcon name="chevron-right" :size="28" color="#8896AB" />
+      </view>
+      <view class="menu-item pressable" @tap="navigateTo('/pages/merchant/orders')">
+        <view class="menu-icon-wrap" style="background: rgba(139,92,246,0.1)">
+          <NutriIcon name="receipt" :size="36" color="#8B5CF6" />
+        </view>
+        <text class="menu-text">订单管理</text>
+        <NutriIcon name="chevron-right" :size="28" color="#8896AB" />
+      </view>
+    </view>
+
+    <!-- Menu List - Services -->
+    <view class="section-label">
+      <NutriIcon name="user" :size="28" color="#10B981" />
+      <text>我的服务</text>
+    </view>
+    <view class="card menu-card">
+      <view class="menu-item pressable" @tap="navigateTo('/pages/food-records/index')">
+        <view class="menu-icon-wrap" style="background: rgba(245,158,11,0.1)">
+          <NutriIcon name="utensils" :size="36" color="#F59E0B" />
+        </view>
+        <text class="menu-text">我的饮食记录</text>
+        <NutriIcon name="chevron-right" :size="28" color="#8896AB" />
+      </view>
+      <view class="menu-item pressable" @tap="navigateTo('/pages/profile/health-record')">
+        <view class="menu-icon-wrap" style="background: rgba(16,185,129,0.1)">
+          <NutriIcon name="activity" :size="36" color="#10B981" />
+        </view>
+        <text class="menu-text">体质档案</text>
+        <NutriIcon name="chevron-right" :size="28" color="#8896AB" />
+      </view>
+      <view class="menu-item pressable" @tap="navigateTo('/pages/profile/my-posts')">
+        <view class="menu-icon-wrap" style="background: rgba(99,102,241,0.1)">
+          <NutriIcon name="file-text" :size="36" color="#6366F1" />
+        </view>
+        <text class="menu-text">我的帖子</text>
+        <NutriIcon name="chevron-right" :size="28" color="#8896AB" />
+      </view>
+      <view class="menu-item pressable" @tap="navigateTo('/pages/consultation/index?tab=orders')">
+        <view class="menu-icon-wrap" style="background: rgba(236,72,153,0.1)">
+          <NutriIcon name="stethoscope" :size="36" color="#EC4899" />
+        </view>
+        <text class="menu-text">我的咨询</text>
+        <NutriIcon name="chevron-right" :size="28" color="#8896AB" />
+      </view>
+      <view class="menu-item pressable" @tap="navigateTo('/pages/profile/my-orders?tab=meals')">
+        <view class="menu-icon-wrap" style="background: rgba(16,185,129,0.1)">
+          <NutriIcon name="receipt" :size="36" color="#10B981" />
+        </view>
+        <text class="menu-text">我的营养餐</text>
+        <NutriIcon name="chevron-right" :size="28" color="#8896AB" />
+      </view>
+      <view class="menu-item pressable" @tap="navigateTo('/pages/profile/my-product-orders')">
+        <view class="menu-icon-wrap" style="background: rgba(59,130,246,0.1)">
+          <NutriIcon name="shopping-bag" :size="36" color="#3B82F6" />
+        </view>
+        <text class="menu-text">产品订单</text>
+        <NutriIcon name="chevron-right" :size="28" color="#8896AB" />
+      </view>
+      <view class="menu-item pressable" @tap="navigateTo('/pages/profile/coupons')">
+        <view class="menu-icon-wrap" style="background: rgba(239,68,68,0.1)">
+          <NutriIcon name="tag" :size="36" color="#EF4444" />
+        </view>
+        <text class="menu-text">我的优惠券</text>
+        <NutriIcon name="chevron-right" :size="28" color="#8896AB" />
+      </view>
+      <view class="menu-item pressable" @tap="navigateTo('/pages/address/index')">
+        <view class="menu-icon-wrap" style="background: rgba(59,130,246,0.1)">
+          <NutriIcon name="map-pin" :size="36" color="#3B82F6" />
+        </view>
+        <text class="menu-text">收货地址</text>
+        <NutriIcon name="chevron-right" :size="28" color="#8896AB" />
       </view>
     </view>
 
     <!-- Menu List - Settings -->
-    <view class="section-label">设置</view>
+    <view class="section-label">
+      <NutriIcon name="settings" :size="28" color="#10B981" />
+      <text>设置</text>
+    </view>
     <view class="card menu-card">
-      <view class="menu-item" @tap="navigateTo('/pages/profile/account-binding')">
+      <view class="menu-item pressable" @tap="navigateTo('/pages/member/index')">
+        <view class="menu-icon-wrap" style="background: rgba(245,158,11,0.1)">
+          <NutriIcon name="crown" :size="36" color="#F59E0B" />
+        </view>
+        <text class="menu-text">会员中心</text>
+        <NutriIcon name="chevron-right" :size="28" color="#8896AB" />
+      </view>
+      <view class="menu-item pressable" @tap="navigateTo('/pages/profile/account-binding')">
         <view class="menu-icon-wrap" style="background: rgba(16,185,129,0.1)">
-          <text class="menu-icon">🔗</text>
+          <NutriIcon name="link" :size="36" color="#10B981" />
         </view>
         <text class="menu-text">账号绑定</text>
         <view class="menu-badge-row">
           <text class="menu-badge" v-if="bindSummary">{{ bindSummary }}</text>
-          <text class="menu-arrow">›</text>
+          <NutriIcon name="chevron-right" :size="28" color="#8896AB" />
         </view>
       </view>
-      <view class="menu-item" @tap="showPasswordSheet = true">
+      <view class="menu-item pressable" @tap="showPasswordSheet = true">
         <view class="menu-icon-wrap" style="background: rgba(239,68,68,0.1)">
-          <text class="menu-icon">🔒</text>
+          <NutriIcon name="lock" :size="36" color="#EF4444" />
         </view>
         <text class="menu-text">修改密码</text>
-        <text class="menu-arrow">›</text>
+        <NutriIcon name="chevron-right" :size="28" color="#8896AB" />
       </view>
-      <view class="menu-item" @tap="navigateTo('/pages/feedback/index')">
+      <view class="menu-item pressable" @tap="navigateTo('/pages/feedback/index')">
         <view class="menu-icon-wrap" style="background: rgba(100,116,139,0.1)">
-          <text class="menu-icon">💬</text>
+          <NutriIcon name="message-circle" :size="36" color="#64748B" />
         </view>
         <text class="menu-text">意见反馈</text>
-        <text class="menu-arrow">›</text>
+        <NutriIcon name="chevron-right" :size="28" color="#8896AB" />
       </view>
-      <view class="menu-item" @tap="showAboutSheet = true">
+      <view class="menu-item pressable" @tap="showAboutSheet = true">
         <view class="menu-icon-wrap" style="background: rgba(16,185,129,0.1)">
-          <text class="menu-icon">ℹ️</text>
+          <NutriIcon name="info" :size="36" color="#10B981" />
         </view>
         <text class="menu-text">关于我们</text>
-        <text class="menu-arrow">›</text>
+        <NutriIcon name="chevron-right" :size="28" color="#8896AB" />
       </view>
-      <view class="menu-item" @tap="showDeleteSheet = true">
+      <view class="menu-item pressable" @tap="showDeleteSheet = true">
         <view class="menu-icon-wrap" style="background: rgba(239,68,68,0.08)">
-          <text class="menu-icon">⚠️</text>
+          <NutriIcon name="alert-triangle" :size="36" color="#EF4444" />
         </view>
         <text class="menu-text danger-text">注销账号</text>
-        <text class="menu-arrow">›</text>
+        <NutriIcon name="chevron-right" :size="28" color="#8896AB" />
       </view>
     </view>
 
     <!-- Logout -->
     <view class="logout-wrap">
-      <button class="btn-logout" @tap="handleLogout">退出登录</button>
+      <button class="btn-logout pressable" @tap="handleLogout">
+        <NutriIcon name="logout" :size="32" color="#EF4444" />
+        <text>退出登录</text>
+      </button>
     </view>
 
-    <!-- ========== Bottom Sheet: Edit Profile ========== -->
-    <view v-if="showEditSheet" class="sheet-mask" @tap="showEditSheet = false">
-      <view class="sheet" @tap.stop>
-        <view class="sheet-header">
-          <text class="sheet-title">编辑资料</text>
-          <text class="sheet-close" @tap="showEditSheet = false">✕</text>
-        </view>
-        <scroll-view scroll-y class="sheet-body" :scroll-into-view="''" :enable-flex="true">
-          <view class="form-group">
-            <text class="form-label">昵称</text>
-            <input class="form-input" v-model="profileForm.nickname" placeholder="请输入昵称" maxlength="20" :adjust-position="true" />
-          </view>
-          <view class="form-group">
-            <text class="form-label">个人简介</text>
-            <textarea class="form-textarea" v-model="profileForm.bio" placeholder="介绍一下自己" maxlength="200" :adjust-position="true" auto-height />
-          </view>
-          <view class="form-group">
-            <text class="form-label">性别</text>
-            <view class="gender-row">
-              <view
-                v-for="(opt, idx) in genderOptions"
-                :key="idx"
-                class="gender-chip"
-                :class="{ active: profileForm.gender === genderValueMap[idx] }"
-                @tap="profileForm.gender = genderValueMap[idx]"
-              >{{ opt }}</view>
-            </view>
-          </view>
-          <view class="form-group">
-            <text class="form-label">邮箱</text>
-            <input class="form-input" v-model="profileForm.email" type="text" placeholder="请输入邮箱" :adjust-position="true" />
-          </view>
-          <view class="form-group">
-            <text class="form-label">手机号</text>
-            <view class="phone-row">
-              <input class="form-input flex-1" v-model="profileForm.phone" type="number" placeholder="请输入手机号" maxlength="11" :adjust-position="true" />
-              <view v-if="(userStore.userInfo as any)?.email" class="send-code-btn" @tap="handleSendEmailCode">
-                {{ smsCooldown > 0 ? `${smsCooldown}s` : '发送验证码' }}
-              </view>
-            </view>
-          </view>
-          <view v-if="showPhoneCode" class="form-group">
-            <text class="form-label">邮箱验证码</text>
-            <input class="form-input" v-model="profileForm.emailCode" type="number" placeholder="请输入邮箱验证码" maxlength="6" :adjust-position="true" />
-          </view>
-          <button class="btn-primary sheet-save-btn" :loading="saving" @tap="saveProfile">保存修改</button>
-        </scroll-view>
+    <!-- ========== BottomSheet: Edit Profile ========== -->
+    <BottomSheet v-model="showEditSheet" title="编辑资料" max-height="85vh">
+      <view class="form-group">
+        <text class="form-label">昵称</text>
+        <input class="form-input" v-model="profileForm.nickname" placeholder="请输入昵称" maxlength="20" :adjust-position="true" />
       </view>
-    </view>
+      <view class="form-group">
+        <text class="form-label">个人简介</text>
+        <textarea class="form-textarea" v-model="profileForm.bio" placeholder="介绍一下自己" maxlength="200" :adjust-position="true" auto-height />
+      </view>
+      <view class="form-group">
+        <text class="form-label">性别</text>
+        <view class="gender-row">
+          <view
+            v-for="(opt, idx) in genderOptions"
+            :key="idx"
+            class="gender-chip pressable"
+            :class="{ active: profileForm.gender === genderValueMap[idx] }"
+            @tap="profileForm.gender = genderValueMap[idx]"
+          >{{ opt }}</view>
+        </view>
+      </view>
+      <view class="form-group">
+        <text class="form-label">邮箱</text>
+        <input class="form-input" v-model="profileForm.email" type="text" placeholder="请输入邮箱" :adjust-position="true" />
+      </view>
+      <view class="form-group">
+        <text class="form-label">手机号</text>
+        <view class="phone-row">
+          <input class="form-input flex-1" v-model="profileForm.phone" type="number" placeholder="请输入手机号" maxlength="11" :adjust-position="true" />
+          <view v-if="(userStore.userInfo as any)?.email" class="send-code-btn pressable" @tap="handleSendEmailCode">
+            {{ smsCooldown > 0 ? `${smsCooldown}s` : '发送验证码' }}
+          </view>
+        </view>
+      </view>
+      <view v-if="showPhoneCode" class="form-group">
+        <text class="form-label">邮箱验证码</text>
+        <input class="form-input" v-model="profileForm.emailCode" type="number" placeholder="请输入邮箱验证码" maxlength="6" :adjust-position="true" />
+      </view>
+      <template #footer>
+        <button class="btn-primary sheet-save-btn" :loading="saving" @tap="saveProfile">保存修改</button>
+      </template>
+    </BottomSheet>
 
-    <!-- ========== Bottom Sheet: Change Password ========== -->
-    <view v-if="showPasswordSheet" class="sheet-mask" @tap="showPasswordSheet = false">
-      <view class="sheet" @tap.stop>
-        <view class="sheet-header">
-          <text class="sheet-title">修改密码</text>
-          <text class="sheet-close" @tap="showPasswordSheet = false">✕</text>
-        </view>
-        <scroll-view scroll-y class="sheet-body">
-          <view class="form-group">
-            <text class="form-label">原密码</text>
-            <input class="form-input" v-model="passwordForm.oldPassword" type="password" placeholder="请输入原密码" />
-          </view>
-          <view class="form-group">
-            <text class="form-label">新密码</text>
-            <input class="form-input" v-model="passwordForm.newPassword" type="password" placeholder="8-20位，含大小写字母和数字" />
-            <view v-if="passwordForm.newPassword" class="pwd-strength">
-              <view class="pwd-bar">
-                <view class="pwd-bar-fill" :class="pwdStrengthClass" :style="{ width: pwdStrengthPercent + '%' }" />
-              </view>
-              <text class="pwd-strength-text" :class="pwdStrengthClass">{{ pwdStrengthLabel }}</text>
-            </view>
-            <text class="form-hint">密码需包含大小写字母、数字，长度8-20位</text>
-          </view>
-          <view class="form-group">
-            <text class="form-label">确认新密码</text>
-            <input class="form-input" v-model="passwordForm.confirmPassword" type="password" placeholder="请再次输入新密码" />
-          </view>
-          <button class="btn-primary sheet-save-btn" :loading="changingPwd" @tap="changePassword">确认修改</button>
-        </scroll-view>
+    <!-- ========== BottomSheet: Change Password ========== -->
+    <BottomSheet v-model="showPasswordSheet" title="修改密码">
+      <view class="form-group">
+        <text class="form-label">原密码</text>
+        <input class="form-input" v-model="passwordForm.oldPassword" type="password" placeholder="请输入原密码" />
       </view>
-    </view>
+      <view class="form-group">
+        <text class="form-label">新密码</text>
+        <input class="form-input" v-model="passwordForm.newPassword" type="password" placeholder="8-20位，含大小写字母和数字" />
+        <view v-if="passwordForm.newPassword" class="pwd-strength">
+          <view class="pwd-bar">
+            <view class="pwd-bar-fill" :class="pwdStrengthClass" :style="{ width: pwdStrengthPercent + '%' }" />
+          </view>
+          <text class="pwd-strength-text" :class="pwdStrengthClass">{{ pwdStrengthLabel }}</text>
+        </view>
+        <text class="form-hint">密码需包含大小写字母、数字，长度8-20位</text>
+      </view>
+      <view class="form-group">
+        <text class="form-label">确认新密码</text>
+        <input class="form-input" v-model="passwordForm.confirmPassword" type="password" placeholder="请再次输入新密码" />
+      </view>
+      <template #footer>
+        <button class="btn-primary sheet-save-btn" :loading="changingPwd" @tap="changePassword">确认修改</button>
+      </template>
+    </BottomSheet>
 
-    <!-- ========== Bottom Sheet: About ========== -->
-    <view v-if="showAboutSheet" class="sheet-mask" @tap="showAboutSheet = false">
-      <view class="sheet sheet-sm" @tap.stop>
-        <view class="sheet-header">
-          <text class="sheet-title">关于我们</text>
-          <text class="sheet-close" @tap="showAboutSheet = false">✕</text>
+    <!-- ========== BottomSheet: About ========== -->
+    <BottomSheet v-model="showAboutSheet" title="关于我们" max-height="60vh">
+      <view class="about-body">
+        <view class="about-logo">
+          <NutriIcon name="salad" :size="64" color="#10B981" />
         </view>
-        <view class="sheet-body about-body">
-          <view class="about-logo">🥗</view>
-          <text class="about-name">NutriAI 饮食规划助手</text>
-          <text class="about-version">Version 1.0.0</text>
-          <text class="about-desc">
-            NutriAI 是一款基于人工智能的饮食管理应用，为您提供个性化的饮食计划、
-            智能食物识别、营养师咨询等专业服务，助您实现健康生活目标。
-          </text>
-          <button class="btn-primary sheet-save-btn" @tap="showAboutSheet = false">知道了</button>
-        </view>
+        <text class="about-name">NutriAI 饮食规划助手</text>
+        <text class="about-version">Version 1.0.0</text>
+        <text class="about-desc">
+          NutriAI 是一款基于人工智能的饮食管理应用，为您提供个性化的饮食计划、
+          智能食物识别、营养师咨询等专业服务，助您实现健康生活目标。
+        </text>
       </view>
-    </view>
+      <template #footer>
+        <button class="btn-primary sheet-save-btn" @tap="showAboutSheet = false">知道了</button>
+      </template>
+    </BottomSheet>
 
-    <!-- ========== Bottom Sheet: Delete Account ========== -->
-    <view v-if="showDeleteSheet" class="sheet-mask" @tap="showDeleteSheet = false">
-      <view class="sheet" @tap.stop>
-        <view class="sheet-header">
-          <text class="sheet-title danger-color">⚠️ 注销账号</text>
-          <text class="sheet-close" @tap="showDeleteSheet = false">✕</text>
+    <!-- ========== BottomSheet: Delete Account ========== -->
+    <BottomSheet v-model="showDeleteSheet" title="注销账号">
+      <template #header>
+        <view class="sheet-danger-header">
+          <NutriIcon name="alert-triangle" :size="36" color="#EF4444" />
+          <text class="danger-title">注销账号</text>
         </view>
-        <scroll-view scroll-y class="sheet-body">
-          <view class="delete-warning">
-            <text class="warning-text">注销后以下数据将被永久删除且无法恢复：</text>
-            <text class="warning-item">• 个人资料、头像、饮食档案</text>
-            <text class="warning-item">• AI对话记录、收藏内容</text>
-            <text class="warning-item">• 饮食计划、饮食记录</text>
-            <text class="warning-item">• 食物识别历史</text>
-            <text class="warning-item">• 社区帖子、评论、点赞</text>
-            <text class="warning-item">• 订单记录、会员信息</text>
-            <text class="warning-item">• QQ/微信绑定关系</text>
-            <text class="warning-item">• 所有其他关联数据</text>
-          </view>
-          <view v-if="needPassword" class="form-group">
-            <text class="form-label">输入登录密码确认</text>
-            <input class="form-input" v-model="deletePassword" type="password" placeholder="请输入当前登录密码" />
-          </view>
-          <view class="delete-checkbox" @tap="deleteConfirmed = !deleteConfirmed">
-            <text :class="['checkbox-icon', { checked: deleteConfirmed }]">{{ deleteConfirmed ? '☑' : '☐' }}</text>
-            <text class="checkbox-text">我已了解注销后所有数据将被永久删除且无法恢复</text>
-          </view>
-          <button
-            class="btn-danger sheet-save-btn"
-            :disabled="!deleteConfirmed || (needPassword && !deletePassword)"
-            :loading="deleting"
-            @tap="confirmDeleteAccount"
-          >确认注销账号</button>
-        </scroll-view>
+      </template>
+      <view class="delete-warning">
+        <text class="warning-text">注销后以下数据将被永久删除且无法恢复：</text>
+        <text class="warning-item">• 个人资料、头像、饮食档案</text>
+        <text class="warning-item">• AI对话记录、收藏内容</text>
+        <text class="warning-item">• 饮食计划、饮食记录</text>
+        <text class="warning-item">• 食物识别历史</text>
+        <text class="warning-item">• 社区帖子、评论、点赞</text>
+        <text class="warning-item">• 订单记录、会员信息</text>
+        <text class="warning-item">• QQ/微信绑定关系</text>
+        <text class="warning-item">• 所有其他关联数据</text>
       </view>
-    </view>
+      <view v-if="needPassword" class="form-group">
+        <text class="form-label">输入登录密码确认</text>
+        <input class="form-input" v-model="deletePassword" type="password" placeholder="请输入当前登录密码" />
+      </view>
+      <view class="delete-checkbox" @tap="deleteConfirmed = !deleteConfirmed">
+        <view class="checkbox-icon" :class="{ checked: deleteConfirmed }">
+          <NutriIcon v-if="deleteConfirmed" name="check" :size="24" color="#EF4444" />
+        </view>
+        <text class="checkbox-text">我已了解注销后所有数据将被永久删除且无法恢复</text>
+      </view>
+      <template #footer>
+        <button
+          class="btn-danger sheet-save-btn"
+          :disabled="!deleteConfirmed || (needPassword && !deletePassword)"
+          :loading="deleting"
+          @tap="confirmDeleteAccount"
+        >确认注销账号</button>
+      </template>
+    </BottomSheet>
 
     <view class="safe-bottom" />
   </view>
@@ -320,6 +375,8 @@ import { onShow } from '@dcloudio/uni-app'
 import { useUserStore } from '@/stores/user'
 import { userApi, memberApi, socialAuthApi } from '@/services/api'
 import { checkLogin, defaultAvatar } from '@/utils/common'
+import NutriIcon from '@/components/NutriIcon.vue'
+import BottomSheet from '@/components/BottomSheet.vue'
 
 const userStore = useUserStore()
 
@@ -508,7 +565,6 @@ async function saveProfile() {
       return
     }
 
-    // If phone changed and we have a verification code, update phone separately
     const currentPhone = (userStore.userInfo as any)?.phone || ''
     if (profileForm.phone && profileForm.phone !== currentPhone && profileForm.emailCode) {
       try {
@@ -532,7 +588,7 @@ async function saveProfile() {
   }
 }
 
-// --- Change password with validation matching web ---
+// --- Change password ---
 async function changePassword() {
   const { oldPassword, newPassword, confirmPassword } = passwordForm
   if (!oldPassword || !newPassword || !confirmPassword) {
@@ -705,7 +761,6 @@ onUnmounted(() => {
   background: #fff;
   border-radius: $radius-full;
   width: 40rpx; height: 40rpx;
-  font-size: 20rpx;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -733,6 +788,9 @@ onUnmounted(() => {
 }
 
 .vip-badge-tag {
+  display: flex;
+  align-items: center;
+  gap: 4rpx;
   background: linear-gradient(135deg, #FEF3C7, #FDE68A);
   color: #92400E;
   font-size: 20rpx;
@@ -779,7 +837,7 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: space-around;
-  background: #fff;
+  background: $card;
   margin: -16rpx 32rpx 24rpx;
   padding: 28rpx 16rpx;
   border-radius: $radius-xl;
@@ -811,6 +869,47 @@ onUnmounted(() => {
   background: $border;
 }
 
+/* ============ AI Grid ============ */
+.ai-grid {
+  display: flex;
+  gap: 16rpx;
+  padding: 8rpx 32rpx 0;
+}
+
+.ai-card {
+  flex: 1;
+  background: $card;
+  border-radius: $radius-xl;
+  padding: 28rpx 16rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  box-shadow: $shadow-sm;
+}
+
+.ai-icon-wrap {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: $radius-lg;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12rpx;
+}
+
+.ai-card-title {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: $foreground;
+}
+
+.ai-card-desc {
+  font-size: 20rpx;
+  color: $muted-foreground;
+  margin-top: 4rpx;
+}
+
 /* ============ Sections ============ */
 .section-label {
   font-size: 26rpx;
@@ -819,16 +918,7 @@ onUnmounted(() => {
   padding: 28rpx 32rpx 10rpx;
   display: flex;
   align-items: center;
-  gap: 12rpx;
-
-  &::before {
-    content: '';
-    display: inline-block;
-    width: 6rpx;
-    height: 28rpx;
-    border-radius: 3rpx;
-    background: $gradient-accent;
-  }
+  gap: 8rpx;
 }
 
 .card {
@@ -858,10 +948,6 @@ onUnmounted(() => {
     height: 1rpx;
     background: $border;
   }
-
-  &:active {
-    background: $muted;
-  }
 }
 
 .menu-icon-wrap {
@@ -873,8 +959,6 @@ onUnmounted(() => {
   margin-right: 20rpx;
   flex-shrink: 0;
 }
-
-.menu-icon { font-size: 32rpx; }
 
 .menu-text {
   flex: 1;
@@ -892,17 +976,11 @@ onUnmounted(() => {
 
 .menu-badge {
   font-size: 22rpx;
-  color: #059669;
-  background: #ECFDF5;
+  color: $accent-secondary;
+  background: $uni-primary-light;
   padding: 4rpx 14rpx;
   border-radius: $radius-full;
   font-weight: 500;
-}
-
-.menu-arrow {
-  font-size: 32rpx;
-  color: $muted-foreground;
-  opacity: 0.5;
 }
 
 /* ============ Logout ============ */
@@ -915,84 +993,16 @@ onUnmounted(() => {
   color: $uni-error;
   border-radius: $radius-xl;
   height: 88rpx;
-  line-height: 88rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
   font-size: 30rpx;
-  text-align: center;
   box-shadow: $shadow-sm;
   font-weight: 500;
 }
 
 .btn-logout::after { border: none; }
-
-/* ============ Bottom Sheet ============ */
-.sheet-mask {
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(15, 23, 42, 0.45);
-  z-index: 999;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-}
-
-.sheet {
-  background: $card;
-  border-radius: $radius-xl $radius-xl 0 0;
-  width: 100%;
-  max-width: 750rpx;
-  max-height: 85vh;
-  display: flex;
-  flex-direction: column;
-  animation: sheetUp 0.3s ease;
-  overflow: hidden;
-  box-sizing: border-box;
-}
-
-.sheet-sm {
-  max-height: 60vh;
-}
-
-@keyframes sheetUp {
-  from { transform: translateY(100%); }
-  to { transform: translateY(0); }
-}
-
-.sheet-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 36rpx 32rpx 24rpx;
-  flex-shrink: 0;
-}
-
-.sheet-title {
-  font-size: 34rpx;
-  font-weight: 700;
-  color: $foreground;
-}
-
-.sheet-close {
-  font-size: 36rpx;
-  color: $muted-foreground;
-  padding: 8rpx;
-  width: 56rpx;
-  height: 56rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: $muted;
-  border-radius: $radius-full;
-}
-
-.sheet-body {
-  padding: 24rpx 32rpx;
-  padding-bottom: calc(24rpx + env(safe-area-inset-bottom));
-  overflow-y: auto;
-  overflow-x: hidden;
-  flex: 1;
-  width: 100%;
-  box-sizing: border-box;
-}
 
 /* ============ Form controls ============ */
 .form-group {
@@ -1009,7 +1019,7 @@ onUnmounted(() => {
 }
 
 .form-input {
-  background: #F0F4F8;
+  background: $muted;
   border: none;
   border-radius: $radius-lg;
   padding: 20rpx 24rpx;
@@ -1020,12 +1030,10 @@ onUnmounted(() => {
   min-height: 80rpx;
   box-sizing: border-box;
   display: block;
-  position: relative;
-  z-index: 1;
 }
 
 .form-textarea {
-  background: #F0F4F8;
+  background: $muted;
   border: none;
   border-radius: $radius-lg;
   padding: 20rpx 24rpx;
@@ -1036,8 +1044,6 @@ onUnmounted(() => {
   min-height: 120rpx;
   box-sizing: border-box;
   display: block;
-  position: relative;
-  z-index: 1;
 }
 
 .form-hint {
@@ -1057,10 +1063,10 @@ onUnmounted(() => {
   text-align: center;
   padding: 16rpx 0;
   border-radius: $radius-full;
-  background: #F0F4F8;
+  background: $muted;
   font-size: 28rpx;
   color: $muted-foreground;
-  transition: all 0.2s;
+  transition: all $duration-fast;
 
   &.active {
     background: $gradient-accent;
@@ -1116,7 +1122,7 @@ onUnmounted(() => {
 .pwd-bar-fill {
   height: 100%;
   border-radius: 4rpx;
-  transition: width 0.3s, background 0.3s;
+  transition: width $duration-normal, background $duration-normal;
   &.weak { background: $uni-error; }
   &.medium { background: $uni-warning; }
   &.strong { background: $uni-success; }
@@ -1130,9 +1136,8 @@ onUnmounted(() => {
   &.strong { color: $uni-success; }
 }
 
-/* Save button */
+/* ============ Sheet buttons ============ */
 .sheet-save-btn {
-  margin-top: 16rpx;
   height: 88rpx;
   line-height: 88rpx;
   border-radius: $radius-full;
@@ -1160,6 +1165,19 @@ onUnmounted(() => {
 .btn-danger::after { border: none; }
 
 /* ============ Delete account ============ */
+.sheet-danger-header {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  padding: 8rpx 0;
+}
+
+.danger-title {
+  font-size: 34rpx;
+  font-weight: 700;
+  color: $uni-error;
+}
+
 .delete-warning {
   background: #FEF7F7;
   border-radius: $radius-lg;
@@ -1191,9 +1209,19 @@ onUnmounted(() => {
 }
 
 .checkbox-icon {
-  font-size: 36rpx;
-  color: $muted-foreground;
-  &.checked { color: $uni-error; }
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: $radius-sm;
+  border: 2rpx solid $border;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  &.checked {
+    border-color: $uni-error;
+    background: rgba(239, 68, 68, 0.08);
+  }
 }
 
 .checkbox-text {
@@ -1203,8 +1231,6 @@ onUnmounted(() => {
   flex: 1;
   line-height: 1.6;
 }
-
-.danger-color { color: $uni-error; }
 
 /* ============ About ============ */
 .about-body {
@@ -1216,14 +1242,13 @@ onUnmounted(() => {
 }
 
 .about-logo {
-  font-size: 96rpx;
   margin-bottom: 20rpx;
   width: 140rpx;
   height: 140rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #ECFDF5;
+  background: $uni-primary-light;
   border-radius: $radius-full;
 }
 

@@ -2,90 +2,15 @@
 import { onLaunch, onShow } from "@dcloudio/uni-app";
 import { useUserStore } from "@/stores/user";
 import { useAppStore } from "@/stores/app";
-import { setToken, setRefreshToken } from "@/utils/request";
 
-onLaunch((options: any) => {
+onLaunch(() => {
   const userStore = useUserStore();
   const appStore = useAppStore();
   userStore.restore()
   setTimeout(() => appStore.fetchConfig(), 0)
-
-  // #ifdef APP-PLUS
-  plus.globalEvent.addEventListener('newintent', () => {
-    setTimeout(() => {
-      const args = plus.runtime.arguments
-      console.log('[App] newintent args:', args)
-      if (args && args.startsWith('nutriai://')) {
-        processSchemeUrl(args)
-      }
-    }, 500)
-  })
-  const launchArgs = plus.runtime.arguments
-  console.log('[App] launch args:', launchArgs)
-  if (launchArgs && launchArgs.startsWith('nutriai://')) {
-    setTimeout(() => processSchemeUrl(launchArgs), 800)
-  }
-  // #endif
 });
 
-// #ifdef APP-PLUS
-let lastProcessedSchemeUrl = ''
-
-function processSchemeUrl(url: string) {
-  if (!url || url === lastProcessedSchemeUrl) return
-  lastProcessedSchemeUrl = url
-  handleSchemeUrl(url)
-}
-
-function handleSchemeUrl(url: string) {
-  try {
-    console.log('[App] handleSchemeUrl:', url)
-    if (!url || !url.startsWith('nutriai://')) return
-    const urlObj = new URL(url.replace('nutriai://', 'https://nutriai.app/'))
-    const token = urlObj.searchParams.get('token')
-    const refreshToken = urlObj.searchParams.get('refreshToken')
-    const action = urlObj.searchParams.get('action')
-
-    if (action === 'bind') {
-      const bindCode = urlObj.searchParams.get('code')
-      const provider = urlObj.searchParams.get('provider')
-      if (bindCode && provider) {
-        uni.navigateTo({
-          url: `/pages/auth/social-callback?action=bind&code=${bindCode}&provider=${provider}`
-        })
-      }
-      return
-    }
-
-    if (token) {
-      console.log('[App] 深度链接登录: token长度=', token.length)
-      setToken(token)
-      if (refreshToken) setRefreshToken(refreshToken)
-      const userStore = useUserStore()
-      userStore.restore()
-      userStore.fetchUserInfo()
-      uni.showToast({ title: '登录成功', icon: 'success' })
-      setTimeout(() => uni.reLaunch({ url: '/pages/index/index' }), 500)
-    } else {
-      console.warn('[App] 深度链接缺少token:', url)
-    }
-  } catch (e) {
-    console.error('[App] handleSchemeUrl error:', e)
-  }
-}
-// #endif
-
-onShow(() => {
-  // #ifdef APP-PLUS
-  // 从浏览器返回APP时再次检查深度链接（newintent可能丢失）
-  setTimeout(() => {
-    const args = plus.runtime.arguments
-    if (args && args.startsWith('nutriai://')) {
-      processSchemeUrl(args)
-    }
-  }, 600)
-  // #endif
-});
+onShow(() => {});
 </script>
 
 <style>
@@ -101,12 +26,6 @@ page {
   min-width: 0;
   -webkit-font-smoothing: antialiased;
 }
-
-/* #ifdef H5 */
-*, *::before, *::after { box-sizing: border-box; }
-uni-input, uni-textarea, input, textarea { max-width: 100%; box-sizing: border-box; }
-uni-page-body { width: 100%; max-width: 960px; margin: 0 auto; overflow-x: hidden; }
-/* #endif */
 
 /* ---- Layout ---- */
 .container {
@@ -171,10 +90,11 @@ uni-page-body { width: 100%; max-width: 960px; margin: 0 auto; overflow-x: hidde
   text-align: center;
   letter-spacing: 1rpx;
   box-shadow: 0 8rpx 24rpx rgba(16, 185, 129, 0.3);
+  transition: opacity 150ms, transform 150ms;
 }
 .btn-primary:active {
   opacity: 0.9;
-  transform: scale(0.98);
+  transform: scale(0.97);
 }
 .btn-outline {
   background: #fff;
@@ -412,16 +332,7 @@ uni-page-body { width: 100%; max-width: 960px; margin: 0 auto; overflow-x: hidde
   letter-spacing: 0.5rpx;
 }
 
-/* #ifdef H5 */
-.gradient-text {
-  background: linear-gradient(135deg, #10B981, #059669);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-/* #endif */
-/* #ifndef H5 */
 .gradient-text { color: #10B981; }
-/* #endif */
 
 /* ---- Shadows ---- */
 .shadow-sm { box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04); }
@@ -495,6 +406,114 @@ uni-page-body { width: 100%; max-width: 960px; margin: 0 auto; overflow-x: hidde
 }
 .bottom-placeholder {
   height: calc(120rpx + env(safe-area-inset-bottom));
+}
+
+/* ---- Transitions ---- */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 250ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+.slide-up-enter-active,
+.slide-up-leave-active {
+  transition: transform 300ms cubic-bezier(0.16, 1, 0.3, 1), opacity 300ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.slide-up-enter-from,
+.slide-up-leave-to {
+  transform: translateY(100%);
+  opacity: 0;
+}
+
+/* ---- Overlay ---- */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(15, 23, 42, 0.5);
+  z-index: 40;
+}
+
+/* ---- Luckin-style Category Sidebar ---- */
+.category-sidebar {
+  width: 180rpx;
+  background: #F5F7FA;
+  flex-shrink: 0;
+}
+.category-sidebar .cat-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100rpx;
+  padding: 0 16rpx;
+  font-size: 26rpx;
+  color: #8896AB;
+  position: relative;
+  transition: color 150ms, background 150ms;
+}
+.category-sidebar .cat-item.active {
+  color: #10B981;
+  font-weight: 600;
+  background: #fff;
+}
+.category-sidebar .cat-item.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6rpx;
+  height: 40rpx;
+  background: linear-gradient(180deg, #10B981, #059669);
+  border-radius: 0 3rpx 3rpx 0;
+}
+
+/* ---- Press Feedback ---- */
+.pressable:active {
+  transform: scale(0.97);
+  opacity: 0.85;
+}
+
+/* ---- Quantity Stepper (Luckin-style + / -) ---- */
+.stepper {
+  display: inline-flex;
+  align-items: center;
+  gap: 4rpx;
+}
+.stepper-btn {
+  width: 48rpx;
+  height: 48rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font-size: 0;
+  line-height: 1;
+}
+.stepper-btn.stepper-minus {
+  background: #F0F4F8;
+  color: #8896AB;
+}
+.stepper-btn.stepper-plus {
+  background: #10B981;
+  color: #fff;
+}
+.stepper-btn:active {
+  transform: scale(0.9);
+}
+.stepper-count {
+  min-width: 48rpx;
+  text-align: center;
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #1A1A2E;
 }
 </style>
 

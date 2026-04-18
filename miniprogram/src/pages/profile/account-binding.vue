@@ -22,42 +22,6 @@
       </view>
     </view>
 
-    <!-- #ifdef APP-PLUS -->
-    <!-- QQ APP Verify Banner -->
-    <view v-if="bindInfo.qqNeedAppVerify" class="card verify-banner">
-      <view class="verify-content">
-        <text class="verify-icon">💡</text>
-        <view class="verify-text">
-          <text class="verify-title">APP端QQ登录验证</text>
-          <text class="verify-desc">{{ bindInfo.qqBound
-            ? '检测到您的QQ账号尚未在APP端验证绑定。如需在APP端使用QQ登录，请点击下方按钮完成身份验证，验证一次后即可长期使用。'
-            : '绑定QQ后即可使用QQ快速登录APP端。请点击下方按钮，通过QQ授权完成绑定。' }}</text>
-        </view>
-      </view>
-      <button class="btn-verify" @tap="handleQqAppVerify" :loading="verifyingQq">
-        {{ bindInfo.qqBound ? 'QQ验证' : '绑定QQ' }}
-      </button>
-    </view>
-    <!-- #endif -->
-
-    <!-- #ifdef H5 -->
-    <!-- QQ Web Verify Banner (H5) -->
-    <view v-if="bindInfo.qqNeedWebVerify" class="card verify-banner">
-      <view class="verify-content">
-        <text class="verify-icon">💡</text>
-        <view class="verify-text">
-          <text class="verify-title">Web端QQ登录验证</text>
-          <text class="verify-desc">{{ bindInfo.qqBound
-            ? '检测到您的QQ账号尚未在网页端验证绑定。如需在网页端使用QQ登录，请点击下方按钮完成身份验证，验证一次后即可长期使用。'
-            : '绑定QQ后即可使用QQ快速登录网页端。请点击下方按钮，通过QQ授权完成绑定。' }}</text>
-        </view>
-      </view>
-      <button class="btn-verify" @tap="handleBind('qq')">
-        {{ bindInfo.qqBound ? 'QQ验证' : '绑定QQ' }}
-      </button>
-    </view>
-    <!-- #endif -->
-
     <!-- Social Accounts -->
     <view class="card">
       <text class="section-title">🔗 第三方账号</text>
@@ -104,18 +68,17 @@
           </view>
         </view>
         <button
-          v-if="bindInfo.qqBound && !bindInfo.qqNeedAppVerify && !bindInfo.qqNeedWebVerify"
+          v-if="bindInfo.qqBound"
           class="btn-small btn-unbind"
           @tap="handleUnbind('qq')"
           :loading="unbindingQq"
         >解绑</button>
         <button
-          v-else-if="!bindInfo.qqBound"
+          v-else
           class="btn-small btn-bind"
           @tap="handleBind('qq')"
           :loading="bindingQq"
         >绑定</button>
-        <view v-else-if="bindInfo.qqNeedAppVerify || bindInfo.qqNeedWebVerify" class="bind-tag tag-warn">需验证</view>
       </view>
     </view>
 
@@ -132,7 +95,7 @@
           <text class="summary-label">微信</text>
         </view>
         <view class="summary-item">
-          <text class="summary-dot" :class="bindInfo.qqBound && !bindInfo.qqNeedAppVerify && !bindInfo.qqNeedWebVerify ? 'dot-active' : (bindInfo.qqNeedAppVerify || bindInfo.qqNeedWebVerify) ? 'dot-warn' : 'dot-inactive'" />
+          <text class="summary-dot" :class="bindInfo.qqBound ? 'dot-active' : 'dot-inactive'" />
           <text class="summary-label">QQ</text>
         </view>
       </view>
@@ -196,16 +159,13 @@ const userStore = useUserStore()
 
 const bindInfo = reactive({
   wechatBound: false,
-  qqBound: false,
-  qqNeedAppVerify: false,
-  qqNeedWebVerify: false
+  qqBound: false
 })
 
 const bindingWechat = ref(false)
 const bindingQq = ref(false)
 const unbindingWechat = ref(false)
 const unbindingQq = ref(false)
-const verifyingQq = ref(false)
 
 // Email bind
 const showEmailBindDialog = ref(false)
@@ -243,8 +203,6 @@ async function loadBindInfo() {
     if (res.code === 200 && res.data) {
       bindInfo.wechatBound = !!res.data.wechatBound
       bindInfo.qqBound = !!res.data.qqBound
-      bindInfo.qqNeedAppVerify = !!res.data.qqNeedAppVerify
-      bindInfo.qqNeedWebVerify = !!res.data.qqNeedWebVerify
     }
   } catch {}
 }
@@ -377,88 +335,11 @@ async function handleMerge() {
   }
 }
 
-// ====== QQ APP Verify ======
-async function handleQqAppVerify() {
-  // #ifdef APP-PLUS
-  verifyingQq.value = true
-  try {
-    const services = await new Promise<any[]>((resolve, reject) => {
-      plus.oauth.getServices((s: any[]) => resolve(s), (e: any) => reject(e))
-    })
-    const qqService = services.find((s: any) => s.id === 'qq')
-    if (!qqService) {
-      uni.showToast({ title: '当前设备不支持QQ', icon: 'none' })
-      return
-    }
-    await new Promise<void>((resolve, reject) => {
-      qqService.login((result: any) => resolve(), (e: any) => reject(e))
-    })
-    const authResult = qqService.authResult
-    if (!authResult || !authResult.access_token) {
-      uni.showToast({ title: 'QQ授权失败', icon: 'none' })
-      return
-    }
-    const res = await socialAuthApi.bindQqToken(authResult.access_token) as any
-    if (res.code === 200) {
-      uni.showToast({ title: 'QQ验证成功', icon: 'success' })
-      bindInfo.qqNeedAppVerify = false
-    } else {
-      uni.showToast({ title: res.message || '验证失败', icon: 'none' })
-    }
-  } catch (e: any) {
-    console.error('QQ APP verify error:', e)
-    uni.showToast({ title: 'QQ验证失败', icon: 'none' })
-  } finally {
-    verifyingQq.value = false
-  }
-  // #endif
-}
-
+// ====== Bind / Unbind ======
 async function handleBind(provider: 'wechat' | 'qq') {
   const loading = provider === 'wechat' ? bindingWechat : bindingQq
   loading.value = true
 
-  if (provider === 'qq') {
-    // #ifdef APP-PLUS
-    try {
-      const services = await new Promise<any[]>((resolve, reject) => {
-        plus.oauth.getServices((s: any[]) => resolve(s), (e: any) => reject(e))
-      })
-      const qqService = services.find((s: any) => s.id === 'qq')
-      if (!qqService) {
-        uni.showToast({ title: '当前设备不支持QQ登录', icon: 'none' })
-        loading.value = false
-        return
-      }
-
-      await new Promise<void>((resolve, reject) => {
-        qqService.login((result: any) => resolve(), (e: any) => reject(e))
-      })
-
-      const authResult = qqService.authResult
-      if (!authResult || !authResult.access_token) {
-        uni.showToast({ title: 'QQ授权失败', icon: 'none' })
-        loading.value = false
-        return
-      }
-
-      const res = await socialAuthApi.bindQqToken(authResult.access_token) as any
-      if (res.code === 200) {
-        uni.showToast({ title: '绑定成功', icon: 'success' })
-        bindInfo.qqBound = true
-      } else {
-        uni.showToast({ title: res.message || '绑定失败', icon: 'none' })
-      }
-    } catch (e: any) {
-      console.error('QQ APP bind error:', e)
-      uni.showToast({ title: 'QQ绑定失败，请稍后重试', icon: 'none' })
-    }
-    loading.value = false
-    return
-    // #endif
-  }
-
-  // #ifdef MP-WEIXIN
   if (provider === 'wechat') {
     try {
       const loginRes: any = await new Promise((resolve, reject) => {
@@ -483,28 +364,10 @@ async function handleBind(provider: 'wechat' | 'qq') {
     }
     return
   }
-  // #endif
 
-  // #ifndef MP-WEIXIN
-  try {
-    let state = `h5_bind_${provider}`
-    const res = provider === 'wechat'
-      ? await socialAuthApi.getWechatAuthUrl(state) as any
-      : await socialAuthApi.getQqAuthUrl(state) as any
-
-    if (res.code === 200 && res.data) {
-      // #ifdef H5
-      window.location.href = res.data
-      // #endif
-    } else {
-      uni.showToast({ title: res.message || '获取授权地址失败', icon: 'none' })
-    }
-  } catch (e: any) {
-    uni.showToast({ title: e?.message || '操作失败', icon: 'none' })
-  } finally {
-    loading.value = false
-  }
-  // #endif
+  // QQ binding not supported in WeChat mini-program
+  uni.showToast({ title: 'QQ绑定请在APP或网页端操作', icon: 'none' })
+  loading.value = false
 }
 
 async function handleUnbind(provider: 'wechat' | 'qq') {
@@ -527,7 +390,7 @@ async function handleUnbind(provider: 'wechat' | 'qq') {
         if (res.code === 200) {
           uni.showToast({ title: '解绑成功', icon: 'success' })
           if (provider === 'wechat') bindInfo.wechatBound = false
-          else { bindInfo.qqBound = false; bindInfo.qqNeedAppVerify = false }
+          else bindInfo.qqBound = false
         } else {
           uni.showToast({ title: (res as any).message || '解绑失败', icon: 'none' })
         }

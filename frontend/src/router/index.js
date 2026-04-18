@@ -298,6 +298,12 @@ const routes = [
         name: 'AdminRefunds',
         component: () => import('@/views/admin/RefundManagement.vue'),
         meta: { title: '退款管理' }
+      },
+      {
+        path: 'merchants',
+        name: 'AdminMerchants',
+        component: () => import('@/views/admin/MerchantManagement.vue'),
+        meta: { title: '商家管理' }
       }
     ]
   },

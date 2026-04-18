@@ -63,6 +63,10 @@
             <el-icon><RefreshLeft /></el-icon>
             <span>退款管理</span>
           </el-menu-item>
+          <el-menu-item index="/admin/merchants">
+            <el-icon><Shop /></el-icon>
+            <span>商家管理</span>
+          </el-menu-item>
           <el-menu-item index="/admin/app-versions">
             <el-icon><Download /></el-icon>
             <span>APP版本</span>
@@ -122,7 +126,8 @@ import {
   List,
   Document,
   Ticket,
-  RefreshLeft
+  RefreshLeft,
+  Shop
 } from '@element-plus/icons-vue'
 import AlertNotification from '@/components/admin/AlertNotification.vue'
 import { useAuthStore } from '@/stores/auth'
@@ -151,7 +156,8 @@ const breadcrumbTitle = computed(() => {
     '/admin/recipes': '食谱管理',
     '/admin/meal-items': '营养餐管理',
     '/admin/meal-plans': '膳食计划',
-    '/admin/app-versions': 'APP版本管理'
+    '/admin/app-versions': 'APP版本管理',
+    '/admin/merchants': '商家管理'
   }
   return titles[route.path] || '管理后台'
 })

@@ -2,7 +2,7 @@
   <view class="container">
     <!-- VIP Gate -->
     <view v-if="!isVip && !loading" class="vip-gate card">
-      <view class="vip-icon">👑</view>
+      <NutriIcon name="crown" :size="64" color="#F59E0B" />
       <text class="vip-title">VIP 专属功能</text>
       <text class="vip-desc">AI 饮食计划为VIP会员专属功能，升级VIP即可解锁个性化饮食方案</text>
       <button class="btn-primary vip-btn" @tap="goVip">立即开通 VIP</button>
@@ -12,8 +12,11 @@
     <view v-if="isVip">
       <!-- Disclaimer -->
       <view class="disclaimer-tip" v-if="showDisclaimer">
-        <text>⚕️ AI饮食计划仅供参考，不能替代专业营养师或医生的建议。患有疾病者请遵医嘱。</text>
-        <text class="dismiss" @tap="showDisclaimer = false">✕</text>
+        <NutriIcon name="shield" :size="24" color="#10B981" />
+        <text>AI饮食计划仅供参考，不能替代专业营养师或医生的建议。患有疾病者请遵医嘱。</text>
+        <view class="dismiss pressable" @tap="showDisclaimer = false">
+          <NutriIcon name="x" :size="24" color="#8896AB" />
+        </view>
       </view>
 
       <!-- Tabs -->
@@ -39,11 +42,15 @@
       <view v-show="currentTab === 'form'" class="form-section">
         <!-- Profile loaded hint -->
         <view v-if="profileLoaded" class="profile-loaded-tip">
-          <text>✅ 已从健康档案自动填充个人数据</text>
+          <NutriIcon name="check-circle" :size="24" color="#10B981" />
+          <text>已从健康档案自动填充个人数据</text>
         </view>
 
         <view class="card">
-          <view class="form-title">📋 基本信息</view>
+          <view class="form-title">
+            <NutriIcon name="clipboard" :size="28" color="#10B981" />
+            基本信息
+          </view>
 
           <view class="input-group">
             <text class="label">身高 (cm)</text>
@@ -100,7 +107,10 @@
 
         <!-- Plan days -->
         <view class="card">
-          <view class="form-title">📅 计划天数</view>
+          <view class="form-title">
+            <NutriIcon name="calendar" :size="28" color="#10B981" />
+            计划天数
+          </view>
           <view class="days-chips flex">
             <view
               v-for="d in dayOptions"
@@ -114,7 +124,10 @@
 
         <!-- Preferences -->
         <view class="card">
-          <view class="form-title">🍽️ 饮食偏好</view>
+          <view class="form-title">
+            <NutriIcon name="utensils" :size="28" color="#10B981" />
+            饮食偏好
+          </view>
 
           <view class="input-group">
             <text class="label">饮食偏好（选填）</text>
@@ -138,7 +151,7 @@
         </view>
 
         <button class="btn-primary generate-btn" :disabled="isGenerating" @tap="handleGenerate">
-          {{ isGenerating ? '🤖 AI 生成中...' : '✨ 生成饮食计划' }}
+          {{ isGenerating ? 'AI 生成中...' : '生成饮食计划' }}
         </button>
       </view>
 
@@ -146,7 +159,7 @@
       <view v-if="isGenerating" class="loading-overlay flex-center">
         <view class="loading-card card">
           <view class="loading-spinner" />
-          <text class="loading-title">🤖 AI 正在生成饮食计划</text>
+          <text class="loading-title">AI 正在生成饮食计划</text>
           <text class="loading-status">{{ progressText }}</text>
 
           <!-- Progress bar -->
@@ -168,7 +181,7 @@
       <!-- ===== RESULT TAB ===== -->
       <view v-show="currentTab === 'result'" class="result-section">
         <view v-if="!generatedPlan" class="empty-state">
-          <text class="empty-icon">📋</text>
+          <NutriIcon name="clipboard" :size="48" color="#C4C4C4" />
           <text class="empty-text">暂无计划，请先生成</text>
         </view>
 
@@ -183,16 +196,16 @@
 
             <!-- Action buttons -->
             <view class="result-actions flex">
-              <view class="action-btn" @tap="openModifySheet">
-                <text class="action-icon">✏️</text>
+              <view class="action-btn pressable" @tap="openModifySheet">
+                <NutriIcon name="edit" :size="32" color="#10B981" />
                 <text class="action-label">修改</text>
               </view>
-              <view class="action-btn" @tap="handleExportPlan">
-                <text class="action-icon">📄</text>
+              <view class="action-btn pressable" @tap="handleExportPlan">
+                <NutriIcon name="download" :size="32" color="#3B82F6" />
                 <text class="action-label">导出</text>
               </view>
-              <view class="action-btn" @tap="handleClosePlan">
-                <text class="action-icon">🗑️</text>
+              <view class="action-btn pressable" @tap="handleClosePlan">
+                <NutriIcon name="trash" :size="32" color="#EF4444" />
                 <text class="action-label">关闭</text>
               </view>
             </view>
@@ -201,7 +214,10 @@
           <!-- Parsed daily plans -->
           <view v-for="(day, dayIdx) in parsedDays" :key="dayIdx" class="day-block">
             <view class="day-title-bar flex">
-              <text class="day-title">📅 第{{ dayIdx + 1 }}天</text>
+              <text class="day-title">
+                <NutriIcon name="calendar" :size="24" color="#10B981" />
+                第{{ dayIdx + 1 }}天
+              </text>
               <text v-if="day.totalCalories" class="day-cal text-secondary">≈{{ day.totalCalories }} kcal</text>
             </view>
 
@@ -253,7 +269,7 @@
         </view>
 
         <view v-if="!historyLoading && historyList.length === 0" class="empty-state">
-          <text class="empty-icon">📝</text>
+          <NutriIcon name="file-text" :size="48" color="#C4C4C4" />
           <text class="empty-text">暂无历史记录</text>
         </view>
 
@@ -272,8 +288,8 @@
             </view>
             <text class="history-date text-secondary">{{ formatDate(item.createdAt) }}</text>
           </view>
-          <view class="history-delete" @tap.stop="confirmDeleteHistory(item.planId || item.id)">
-            <text class="delete-icon">🗑️</text>
+          <view class="history-delete pressable" @tap.stop="confirmDeleteHistory(item.planId || item.id)">
+            <NutriIcon name="trash" :size="28" color="#EF4444" />
           </view>
         </view>
 
@@ -283,55 +299,36 @@
       </view>
     </view>
 
-    <!-- ===== PICKER MODALS ===== -->
-    <view class="picker-mask" v-if="showActivityPicker" @tap="showActivityPicker = false">
-      <view class="picker-content" @tap.stop>
-        <view class="picker-header flex-between">
-          <text @tap="showActivityPicker = false">取消</text>
-          <text class="picker-title">选择活动水平</text>
-          <text class="text-primary" @tap="showActivityPicker = false">确定</text>
-        </view>
+    <!-- Activity Level Picker -->
+    <BottomSheet v-model="showActivityPicker" title="选择活动水平">
         <view
-          class="picker-option"
+          class="picker-option pressable"
           v-for="opt in activityOptions"
           :key="opt.value"
           :class="{ selected: form.exerciseLevel === opt.value }"
           @tap="form.exerciseLevel = opt.value; showActivityPicker = false"
         >
           <text>{{ opt.label }}</text>
-          <text v-if="form.exerciseLevel === opt.value" class="check-mark">✓</text>
+          <NutriIcon v-if="form.exerciseLevel === opt.value" name="check" :size="28" color="#10B981" />
         </view>
-      </view>
-    </view>
+    </BottomSheet>
 
-    <view class="picker-mask" v-if="showGoalPicker" @tap="showGoalPicker = false">
-      <view class="picker-content" @tap.stop>
-        <view class="picker-header flex-between">
-          <text @tap="showGoalPicker = false">取消</text>
-          <text class="picker-title">选择饮食目标</text>
-          <text class="text-primary" @tap="showGoalPicker = false">确定</text>
-        </view>
+    <!-- Goal Picker -->
+    <BottomSheet v-model="showGoalPicker" title="选择饮食目标">
         <view
-          class="picker-option"
+          class="picker-option pressable"
           v-for="opt in goalOptions"
           :key="opt.value"
           :class="{ selected: form.goal === opt.value }"
           @tap="form.goal = opt.value; showGoalPicker = false"
         >
           <text>{{ opt.label }}</text>
-          <text v-if="form.goal === opt.value" class="check-mark">✓</text>
+          <NutriIcon v-if="form.goal === opt.value" name="check" :size="28" color="#10B981" />
         </view>
-      </view>
-    </view>
+    </BottomSheet>
 
     <!-- Modify suggestion sheet -->
-    <view class="picker-mask" v-if="showModifySheet" @tap="showModifySheet = false">
-      <view class="picker-content modify-sheet" @tap.stop>
-        <view class="picker-header flex-between">
-          <text @tap="showModifySheet = false">取消</text>
-          <text class="picker-title">修改建议</text>
-          <text class="text-primary" @tap="submitModify">{{ isModifying ? '修改中...' : '提交' }}</text>
-        </view>
+    <BottomSheet v-model="showModifySheet" title="修改建议">
         <view class="modify-body">
           <textarea
             v-model="modifySuggestion"
@@ -340,8 +337,12 @@
             :maxlength="500"
           />
         </view>
-      </view>
-    </view>
+        <template #footer>
+          <button class="btn-primary" :disabled="isModifying" @tap="submitModify">
+            {{ isModifying ? '修改中...' : '提交修改' }}
+          </button>
+        </template>
+    </BottomSheet>
   </view>
 </template>
 
@@ -352,6 +353,8 @@ import { dietPlanApi, vipApi } from '@/services/api'
 import { request } from '@/utils/request'
 import { checkLogin } from '@/utils/common'
 import { useUserStore } from '@/stores/user'
+import NutriIcon from '@/components/NutriIcon.vue'
+import BottomSheet from '@/components/BottomSheet.vue'
 
 // ---- Types ----
 interface DayMeal {

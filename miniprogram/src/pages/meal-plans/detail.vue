@@ -19,10 +19,18 @@
         <text v-for="t in plan.tags.split(',').slice(0, 5)" :key="t" class="tag-chip">{{ t.trim() }}</text>
       </view>
       <view class="meta-row">
-        <text class="meta-item" v-if="plan.suitableCrowd">👥 {{ plan.suitableCrowd }}</text>
-        <text class="meta-item">📅 {{ plan.durationDays }}天</text>
-        <text class="meta-item" v-if="plan.avgRating > 0">⭐ {{ Number(plan.avgRating).toFixed(1) }} ({{ plan.ratingCount }})</text>
-        <text class="meta-item">👥 {{ plan.followCount || 0 }}人跟随</text>
+        <text class="meta-item" v-if="plan.suitableCrowd">
+          <NutriIcon name="users" :size="22" color="#6366F1" /> {{ plan.suitableCrowd }}
+        </text>
+        <text class="meta-item">
+          <NutriIcon name="calendar" :size="22" color="#10B981" /> {{ plan.durationDays }}天
+        </text>
+        <text class="meta-item" v-if="plan.avgRating > 0">
+          <NutriIcon name="star" :size="22" color="#F59E0B" /> {{ Number(plan.avgRating).toFixed(1) }} ({{ plan.ratingCount }})
+        </text>
+        <text class="meta-item">
+          <NutriIcon name="users" :size="22" color="#6366F1" /> {{ plan.followCount || 0 }}人跟随
+        </text>
       </view>
     </view>
 
@@ -30,16 +38,18 @@
     <view class="section">
       <text class="section-title">目标营养</text>
       <view class="nutrition-grid">
-        <view class="nut-card"><text class="nut-icon">🔥</text><text class="nut-value">{{ plan.targetCalories || 0 }}</text><text class="nut-label">热量(kcal)</text></view>
-        <view class="nut-card"><text class="nut-icon">🥩</text><text class="nut-value">{{ plan.targetProtein || 0 }}g</text><text class="nut-label">蛋白质</text></view>
-        <view class="nut-card"><text class="nut-icon">🧈</text><text class="nut-value">{{ plan.targetFat || 0 }}g</text><text class="nut-label">脂肪</text></view>
-        <view class="nut-card"><text class="nut-icon">🌾</text><text class="nut-value">{{ plan.targetCarbs || 0 }}g</text><text class="nut-label">碳水</text></view>
+        <view class="nut-card"><NutriIcon name="flame" :size="28" color="#EF4444" /><text class="nut-value">{{ plan.targetCalories || 0 }}</text><text class="nut-label">热量(kcal)</text></view>
+        <view class="nut-card"><NutriIcon name="apple" :size="28" color="#8B5CF6" /><text class="nut-value">{{ plan.targetProtein || 0 }}g</text><text class="nut-label">蛋白质</text></view>
+        <view class="nut-card"><NutriIcon name="droplet" :size="28" color="#F59E0B" /><text class="nut-value">{{ plan.targetFat || 0 }}g</text><text class="nut-label">脂肪</text></view>
+        <view class="nut-card"><NutriIcon name="wheat" :size="28" color="#10B981" /><text class="nut-value">{{ plan.targetCarbs || 0 }}g</text><text class="nut-label">碳水</text></view>
       </view>
     </view>
 
     <!-- Follow progress (if following) -->
     <view class="section" v-if="isFollowing && progressData">
-      <text class="section-title">📊 跟随进度</text>
+      <text class="section-title">
+        <NutriIcon name="bar-chart" :size="24" color="#6366F1" /> 跟随进度
+      </text>
       <view class="progress-section">
         <view class="progress-bar-lg">
           <view class="progress-fill-lg" :style="{ width: progressData.progress + '%' }" />
@@ -73,7 +83,9 @@
     <!-- Meal sections -->
     <view v-for="meal in mealSections" :key="meal.type" class="section">
       <view class="meal-header">
-        <text class="section-title">{{ meal.icon }} {{ meal.label }}</text>
+        <text class="section-title">
+          <NutriIcon :name="meal.icon" :size="24" color="#10B981" /> {{ meal.label }}
+        </text>
         <!-- Checkin button per meal -->
         <view v-if="isFollowing" class="checkin-btn" :class="{ checked: isMealChecked(selectedDay, meal.type) }"
           @tap="toggleCheckin(selectedDay, meal.type)">
@@ -86,10 +98,18 @@
           <text class="meal-portion">{{ item.portion }}</text>
         </view>
         <view class="meal-nutrition-row">
-          <text class="meal-nut">🔥 {{ item.calories || 0 }}kcal</text>
-          <text class="meal-nut">🥩 {{ item.protein || 0 }}g</text>
-          <text class="meal-nut">🧈 {{ item.fat || 0 }}g</text>
-          <text class="meal-nut">🌾 {{ item.carbs || 0 }}g</text>
+          <text class="meal-nut">
+            <NutriIcon name="flame" :size="20" color="#EF4444" /> {{ item.calories || 0 }}kcal
+          </text>
+          <text class="meal-nut">
+            <NutriIcon name="apple" :size="20" color="#8B5CF6" /> {{ item.protein || 0 }}g
+          </text>
+          <text class="meal-nut">
+            <NutriIcon name="droplet" :size="20" color="#F59E0B" /> {{ item.fat || 0 }}g
+          </text>
+          <text class="meal-nut">
+            <NutriIcon name="wheat" :size="20" color="#10B981" /> {{ item.carbs || 0 }}g
+          </text>
         </view>
         <view v-if="item.recipeId || item.recipeCorpusId" class="recipe-link" @tap="goRecipe(item.recipeId || item.recipeCorpusId)">
           <text class="recipe-link-text">查看食谱 →</text>
@@ -102,7 +122,9 @@
 
     <!-- Rating section -->
     <view class="section">
-      <text class="section-title">⭐ 评价</text>
+      <text class="section-title">
+        <NutriIcon name="star" :size="24" color="#F59E0B" /> 评价
+      </text>
       <!-- My rating -->
       <view class="my-rating">
         <text class="rate-label">我的评分：</text>
@@ -135,15 +157,15 @@
     <!-- Fixed action bar -->
     <view class="action-bar">
       <view class="action-btn fav-btn" :class="{ favorited: isFavorited }" @tap="toggleFavorite">
-        <text class="action-icon">{{ isFavorited ? '❤️' : '🤍' }}</text>
+        <NutriIcon :name="isFavorited ? 'heart-fill' : 'heart'" :size="28" :color="isFavorited ? '#EF4444' : '#9CA3AF'" />
         <text class="action-label">{{ plan.favoriteCount || 0 }}</text>
       </view>
       <view class="action-btn follow-action" :class="{ following: isFollowing }" @tap="toggleFollow">
-        <text class="action-icon">{{ isFollowing ? '📋' : '➕' }}</text>
+        <NutriIcon :name="isFollowing ? 'clipboard' : 'plus'" :size="28" :color="isFollowing ? '#10B981' : '#6366F1'" />
         <text class="action-label">{{ isFollowing ? '取消跟随' : '开始跟随' }}</text>
       </view>
       <button class="action-btn share-btn" open-type="share">
-        <text class="action-icon">📤</text>
+        <NutriIcon name="share" :size="28" color="#10B981" />
         <text class="action-label">分享</text>
       </button>
     </view>
@@ -158,12 +180,13 @@
 import { ref, computed } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import { mealPlanApi } from '@/services/api'
+import NutriIcon from '@/components/NutriIcon.vue'
 
 const MEAL_TYPE_MAP: Record<string, { label: string; icon: string; order: number }> = {
-  BREAKFAST: { label: '早餐', icon: '🌅', order: 0 },
-  LUNCH: { label: '午餐', icon: '☀️', order: 1 },
-  DINNER: { label: '晚餐', icon: '🌙', order: 2 },
-  SNACK: { label: '加餐', icon: '🍎', order: 3 }
+  BREAKFAST: { label: '早餐', icon: 'sunrise', order: 0 },
+  LUNCH: { label: '午餐', icon: 'sun', order: 1 },
+  DINNER: { label: '晚餐', icon: 'moon', order: 2 },
+  SNACK: { label: '加餐', icon: 'cookie', order: 3 }
 }
 
 const difficultyMap: Record<string, string> = { EASY: '简单', MEDIUM: '中等', HARD: '困难' }

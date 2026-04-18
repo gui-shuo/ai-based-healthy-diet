@@ -1,13 +1,19 @@
 <template>
   <view class="container">
     <view class="page-header">
-      <text class="page-title">🔍 食物识别</text>
+      <view class="page-title-row">
+        <NutriIcon name="scan" :size="36" color="#10B981" />
+        <text class="page-title">食物识别</text>
+      </view>
       <text class="page-desc text-secondary">拍照或输入食物名称，获取营养信息</text>
     </view>
 
     <view class="disclaimer-tip" v-if="showDisclaimer">
-      <text>📋 上传食物图片即可识别营养成分，支持识别各类常见食物。营养数据由AI生成，仅供参考。</text>
-      <text class="dismiss" @tap="showDisclaimer = false">✕</text>
+      <NutriIcon name="info" :size="24" color="#10B981" />
+      <text>上传食物图片即可识别营养成分，支持识别各类常见食物。营养数据由AI生成，仅供参考。</text>
+      <view class="dismiss pressable" @tap="showDisclaimer = false">
+        <NutriIcon name="x" :size="24" color="#8896AB" />
+      </view>
     </view>
 
     <!-- Mode Tabs -->
@@ -16,12 +22,18 @@
         class="mode-tab flex-1 flex-center"
         :class="{ active: mode === 'photo' }"
         @tap="switchMode('photo')"
-      >📷 拍照识别</view>
+      >
+        <NutriIcon name="camera" :size="28" color="#fff" />
+        <text>拍照识别</text>
+      </view>
       <view
         class="mode-tab flex-1 flex-center"
         :class="{ active: mode === 'text' }"
         @tap="switchMode('text')"
-      >✏️ 文字搜索</view>
+      >
+        <NutriIcon name="edit" :size="28" :color="mode === 'text' ? '#fff' : '#1A1A2E'" />
+        <text>文字搜索</text>
+      </view>
     </view>
 
     <!-- Photo Mode -->
@@ -29,26 +41,35 @@
       <view class="card photo-area" @tap="!photoPath && chooseFromAlbum()">
         <image v-if="photoPath" :src="photoPath" class="preview-image" mode="aspectFit" />
         <view v-else class="photo-placeholder flex-center">
-          <text class="photo-icon">📷</text>
+          <NutriIcon name="camera" :size="64" color="#10B981" />
           <text class="photo-hint">点击上传或拍照识别食物</text>
           <text class="photo-sub-hint">支持 JPG / PNG / WebP，大图自动压缩</text>
         </view>
-        <view v-if="photoPath" class="remove-image-btn" @tap.stop="clearImage">✕</view>
+        <view v-if="photoPath" class="remove-image-btn pressable" @tap.stop="clearImage">
+          <NutriIcon name="x" :size="24" color="#fff" />
+        </view>
       </view>
 
       <view class="photo-actions flex">
-        <button class="btn-primary flex-1" @tap="takePhoto">📷 拍照</button>
-        <button class="btn-outline flex-1" @tap="chooseFromAlbum">🖼️ 相册</button>
+        <button class="btn-primary flex-1 pressable" @tap="takePhoto">
+          <NutriIcon name="camera" :size="28" color="#fff" />
+          <text>拍照</text>
+        </button>
+        <button class="btn-outline flex-1 pressable" @tap="chooseFromAlbum">
+          <NutriIcon name="image" :size="28" color="#10B981" />
+          <text>相册</text>
+        </button>
       </view>
 
       <button
         v-if="photoPath && !recognizing"
         class="btn-primary recognize-btn"
         @tap="recognizeCurrentPhoto"
-      >🔍 开始识别</button>
+      >开始识别</button>
 
       <view class="photo-tip">
-        💡 识别结果请以置信度为准，置信度越高结果越可靠。大图将自动压缩以加速识别。
+        <NutriIcon name="lightbulb" :size="24" color="#F59E0B" />
+        <text>识别结果请以置信度为准，置信度越高结果越可靠。大图将自动压缩以加速识别。</text>
       </view>
     </view>
 
@@ -72,12 +93,15 @@
         class="btn-primary search-btn"
         :disabled="!foodName.trim() || recognizing"
         @tap="searchByName"
-      >{{ recognizing ? '识别中...' : '🔍 识别食物' }}</button>
+      >{{ recognizing ? '识别中...' : '识别食物' }}</button>
     </view>
 
     <!-- Quick Food Chips -->
     <view class="card quick-section">
-      <text class="quick-title">⚡ 快捷识别</text>
+      <text class="quick-title">
+        <NutriIcon name="sparkles" :size="28" color="#F59E0B" />
+        快捷识别
+      </text>
       <view class="quick-chips">
         <view
           v-for="food in quickFoods"
@@ -104,7 +128,7 @@
       class="empty-section card flex-center"
     >
       <view class="empty-content">
-        <text class="empty-icon">🍽️</text>
+        <NutriIcon name="utensils" :size="48" color="#10B981" />
         <text class="empty-title">开始识别食物</text>
         <text class="empty-desc text-secondary">在上方输入食物名称或上传图片，AI将分析完整营养成分</text>
       </view>
@@ -113,7 +137,10 @@
     <!-- Recognition Results -->
     <view v-if="results.length > 0 && !recognizing" class="result-section">
       <view class="result-bar flex-between">
-        <text class="result-bar-title">🔬 识别结果</text>
+        <text class="result-bar-title">
+          <NutriIcon name="activity" :size="28" color="#10B981" />
+          识别结果
+        </text>
         <view class="result-bar-count">共 {{ results.length }} 种食物</view>
       </view>
 
@@ -146,33 +173,33 @@
           <!-- Core Nutrition -->
           <view class="nutrition-grid">
             <view class="nutrition-card calories-card">
-              <text class="n-icon">🔥</text>
+              <NutriIcon name="flame" :size="32" color="#EF4444" />
               <text class="n-value">{{ item.calories || 0 }}</text>
               <text class="n-unit">千卡</text>
               <text class="n-label">热量</text>
             </view>
             <view class="nutrition-card">
-              <text class="n-icon">🥩</text>
+              <NutriIcon name="apple" :size="32" color="#8B5CF6" />
               <text class="n-value">{{ nf(item.protein) }}g</text>
               <text class="n-label">蛋白质</text>
             </view>
             <view class="nutrition-card">
-              <text class="n-icon">🧈</text>
+              <NutriIcon name="droplet" :size="32" color="#F59E0B" />
               <text class="n-value">{{ nf(item.fat) }}g</text>
               <text class="n-label">脂肪</text>
             </view>
             <view class="nutrition-card">
-              <text class="n-icon">🍚</text>
+              <NutriIcon name="wheat" :size="32" color="#10B981" />
               <text class="n-value">{{ nf(item.carbs) }}g</text>
               <text class="n-label">碳水</text>
             </view>
             <view class="nutrition-card" v-if="item.fiber">
-              <text class="n-icon">🌾</text>
+              <NutriIcon name="wheat" :size="32" color="#6B7280" />
               <text class="n-value">{{ nf(item.fiber) }}g</text>
               <text class="n-label">膳食纤维</text>
             </view>
             <view class="nutrition-card" v-if="item.cholesterol">
-              <text class="n-icon">��</text>
+              <NutriIcon name="alert-circle" :size="32" color="#EF4444" />
               <text class="n-value">{{ nf(item.cholesterol) }}mg</text>
               <text class="n-label">胆固醇</text>
             </view>
@@ -181,7 +208,10 @@
           <!-- Minerals -->
           <view v-if="hasMinerals(item)" class="nutrition-sub-section">
             <view class="sub-section-header" @tap="toggleSection(index, 'mineral')">
-              <text class="sub-section-title">💎 矿物质</text>
+              <text class="sub-section-title">
+                <NutriIcon name="diamond" :size="24" color="#3B82F6" />
+                矿物质
+              </text>
               <text class="sub-section-arrow">{{ isSectionOpen(index, 'mineral') ? '▲' : '▼' }}</text>
             </view>
             <view v-show="isSectionOpen(index, 'mineral')" class="nutrition-grid-sm">
@@ -231,7 +261,10 @@
           <!-- Vitamins -->
           <view v-if="hasVitamins(item)" class="nutrition-sub-section">
             <view class="sub-section-header" @tap="toggleSection(index, 'vitamin')">
-              <text class="sub-section-title">🧪 维生素</text>
+              <text class="sub-section-title">
+                <NutriIcon name="pill" :size="24" color="#8B5CF6" />
+                维生素
+              </text>
               <text class="sub-section-arrow">{{ isSectionOpen(index, 'vitamin') ? '▲' : '▼' }}</text>
             </view>
             <view v-show="isSectionOpen(index, 'vitamin')" class="nutrition-grid-sm">
@@ -272,16 +305,19 @@
 
           <!-- Data Source -->
           <view v-if="item.source" class="data-source-row">
-            <text class="data-source-text">📋 数据来源: {{ sourceText(item.source) }}</text>
+            <NutriIcon name="clipboard" :size="24" color="#6B7280" />
+            <text class="data-source-text">数据来源: {{ sourceText(item.source) }}</text>
           </view>
 
           <!-- Save to Record -->
           <view class="result-actions flex">
-            <button class="btn-primary flex-1 record-btn" @tap.stop="openMealPicker(index)">
-              📝 记录到饮食
+            <button class="btn-primary flex-1 record-btn pressable" @tap.stop="openMealPicker(index)">
+              <NutriIcon name="edit" :size="24" color="#fff" />
+              <text>记录到饮食</text>
             </button>
-            <button class="btn-outline flex-1 record-btn" @tap.stop="goToRecord(item)">
-              📋 详细记录
+            <button class="btn-outline flex-1 record-btn pressable" @tap.stop="goToRecord(item)">
+              <NutriIcon name="clipboard" :size="24" color="#10B981" />
+              <text>详细记录</text>
             </button>
           </view>
         </view>
@@ -291,7 +327,7 @@
     <!-- Error State -->
     <view v-if="errorMsg && !recognizing" class="error-section card">
       <view class="flex-center" style="flex-direction: column; padding: 40rpx 0;">
-        <text class="error-icon">😅</text>
+        <NutriIcon name="alert-circle" :size="48" color="#EF4444" />
         <text class="error-text">{{ errorMsg }}</text>
         <text class="error-hint text-secondary">请尝试重新拍照或换个角度</text>
       </view>
@@ -300,7 +336,10 @@
     <!-- Recognition History -->
     <view v-if="history.length > 0" class="history-section">
       <view class="history-bar flex-between">
-        <text class="history-bar-title">📜 识别历史</text>
+        <text class="history-bar-title">
+          <NutriIcon name="history" :size="28" color="#10B981" />
+          识别历史
+        </text>
         <view class="history-bar-right flex">
           <text class="history-count">{{ history.length }} 条记录</text>
           <text class="history-clear" @tap="clearHistory">清空</text>
@@ -317,7 +356,9 @@
             <view
               class="history-type-badge"
               :class="item.type === 'text' ? 'badge-text' : 'badge-photo'"
-            >{{ item.type === 'text' ? '📝' : '📷' }}</view>
+            >
+              <NutriIcon :name="item.type === 'text' ? 'edit' : 'camera'" :size="24" color="#fff" />
+            </view>
             <view class="history-info">
               <text class="history-query">{{ item.query }}</text>
               <text class="history-time text-secondary">{{ formatTime(item.timestamp) }}</text>
@@ -344,26 +385,20 @@
       </view>
     </view>
 
-    <!-- Meal Type Picker Modal -->
-    <view v-if="showMealPicker" class="modal-overlay" @tap="showMealPicker = false">
-      <view class="modal-content" @tap.stop>
-        <text class="modal-title">选择餐次</text>
+    <!-- Meal Type Picker -->
+    <BottomSheet v-model="showMealPicker" title="选择餐次">
         <view class="meal-options">
           <view
             v-for="meal in mealTypes"
             :key="meal.value"
-            class="meal-option"
+            class="meal-option pressable"
             @tap="saveToRecord(meal.value)"
           >
-            <text class="meal-icon">{{ meal.icon }}</text>
+            <NutriIcon :name="meal.icon" :size="40" :color="meal.color" />
             <text class="meal-label">{{ meal.label }}</text>
           </view>
         </view>
-        <view class="modal-cancel" @tap="showMealPicker = false">
-          <text class="modal-cancel-text">取消</text>
-        </view>
-      </view>
-    </view>
+    </BottomSheet>
   </view>
 </template>
 
@@ -372,6 +407,8 @@ import { ref, reactive } from 'vue'
 import { onLoad, onPullDownRefresh } from '@dcloudio/uni-app'
 import { foodApi } from '@/services/api'
 import { checkLogin } from '@/utils/common'
+import NutriIcon from '@/components/NutriIcon.vue'
+import BottomSheet from '@/components/BottomSheet.vue'
 
 // ─── Types ───────────────────────────────────────────────────────
 interface RecognitionResult {
@@ -421,10 +458,10 @@ const MAX_HISTORY = 20
 const quickFoods = ['苹果', '香蕉', '鸡胸肉', '鸡蛋', '牛奶', '燕麦', '西兰花', '三文鱼', '米饭', '红薯']
 
 const mealTypes = [
-  { value: 'BREAKFAST', label: '早餐', icon: '🌅' },
-  { value: 'LUNCH', label: '午餐', icon: '☀️' },
-  { value: 'DINNER', label: '晚餐', icon: '🌙' },
-  { value: 'SNACK', label: '加餐', icon: '🍪' }
+  { value: 'BREAKFAST', label: '早餐', icon: 'sunrise', color: '#F59E0B' },
+  { value: 'LUNCH', label: '午餐', icon: 'sun', color: '#F97316' },
+  { value: 'DINNER', label: '晚餐', icon: 'moon', color: '#6366F1' },
+  { value: 'SNACK', label: '加餐', icon: 'cookie', color: '#EC4899' }
 ]
 
 // ─── State ───────────────────────────────────────────────────────
@@ -491,52 +528,12 @@ function handleImageChosen(filePath: string) {
 }
 
 function compressImage(filePath: string) {
-  // #ifdef H5
-  compressImageCanvas(filePath)
-  // #endif
-  // #ifndef H5
   uni.compressImage({
     src: filePath,
     quality: 60,
     success: (res) => { compressedPath.value = res.tempFilePath },
     fail: () => { compressedPath.value = filePath }
   })
-  // #endif
-}
-
-function compressImageCanvas(filePath: string) {
-  try {
-    const img = new Image()
-    img.onload = () => {
-      let { width, height } = img
-      const maxWidth = 1280
-      if (width > maxWidth) {
-        height = Math.round(height * maxWidth / width)
-        width = maxWidth
-      }
-      const canvas = document.createElement('canvas')
-      canvas.width = width
-      canvas.height = height
-      const ctx = canvas.getContext('2d')
-      if (!ctx) { compressedPath.value = filePath; return }
-      ctx.drawImage(img, 0, 0, width, height)
-      canvas.toBlob(
-        (blob) => {
-          if (blob) {
-            compressedPath.value = URL.createObjectURL(blob)
-          } else {
-            compressedPath.value = filePath
-          }
-        },
-        'image/jpeg',
-        0.7
-      )
-    }
-    img.onerror = () => { compressedPath.value = filePath }
-    img.src = filePath
-  } catch {
-    compressedPath.value = filePath
-  }
 }
 
 function clearImage() {

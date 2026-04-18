@@ -159,63 +159,6 @@ export const mealApi = {
   simulatePay: (orderNo: string) => request({ url: `/meals/orders/${orderNo}/simulate-pay`, method: 'POST' })
 }
 
-// ============ Admin APIs ============
-export const adminApi = {
-  // Dashboard
-  getDashboard: async () => {
-    const [mealRes, productRes] = await Promise.all([
-      request<any>({ url: '/admin/meal-orders/stats', showError: false }),
-      request<any>({ url: '/admin/product-orders/stats', showError: false })
-    ])
-    const m = (mealRes.code === 200 && mealRes.data) ? mealRes.data : {}
-    const p = (productRes.code === 200 && productRes.data) ? productRes.data : {}
-    return {
-      code: 200,
-      data: {
-        todayOrders: (m.preparing || 0) + (m.ready || 0) + (m.pendingPayment || 0),
-        todayRevenue: p.monthRevenue || '0.00',
-        totalMeals: m.total || 0,
-        totalProducts: p.totalOrders || 0
-      }
-    }
-  },
-  // Meal management
-  getMeals: (params?: any) => request({ url: '/admin/meals', data: params }),
-  createMeal: (data: any) => request({ url: '/admin/meals', method: 'POST', data }),
-  updateMeal: (id: number, data: any) => request({ url: `/admin/meals/${id}`, method: 'PUT', data }),
-  deleteMeal: (id: number) => request({ url: `/admin/meals/${id}`, method: 'DELETE' }),
-  toggleMealStatus: (id: number, data: any) => request({ url: `/admin/meals/${id}/status`, method: 'PUT', data }),
-  // Product management
-  getProducts: (params?: any) => request({ url: '/admin/products', data: params }),
-  createProduct: (data: any) => request({ url: '/admin/products', method: 'POST', data }),
-  updateProduct: (id: number, data: any) => request({ url: `/admin/products/${id}`, method: 'PUT', data }),
-  deleteProduct: (id: number) => request({ url: `/admin/products/${id}`, method: 'DELETE' }),
-  toggleProductStatus: (id: number, data: any) => request({ url: `/admin/products/${id}/status`, method: 'PUT', data }),
-  // Order management
-  getMealOrders: (params?: any) => request({ url: '/admin/meal-orders', data: params }),
-  updateMealOrderStatus: (orderNo: string, data: any) => request({ url: `/admin/meal-orders/${orderNo}/status`, method: 'PUT', data }),
-  getMealOrderStats: () => request({ url: '/admin/meal-orders/stats' }),
-  verifyPickupCode: (pickupCode: string) => request({ url: '/admin/meal-orders/verify-pickup', method: 'POST', data: { pickupCode } }),
-  getProductOrders: (params?: any) => request({ url: '/admin/product-orders', data: params }),
-  getAdminProductOrder: (orderNo: string) => request({ url: `/admin/product-orders/${orderNo}` }),
-  shipProductOrder: (orderNo: string, data: any) => request({ url: `/admin/product-orders/${orderNo}/ship`, method: 'PUT', data }),
-  updateProductOrderStatus: (orderNo: string, data: any) => request({ url: `/admin/product-orders/${orderNo}/status`, method: 'PUT', data }),
-  getProductOrderStats: () => request({ url: '/admin/product-orders/stats' }),
-  // Coupon admin
-  getCoupons: (params?: any) => request({ url: '/admin/coupons', data: params }),
-  createCoupon: (data: any) => request({ url: '/admin/coupons', method: 'POST', data }),
-  updateCoupon: (id: number, data: any) => request({ url: `/admin/coupons/${id}`, method: 'PUT', data }),
-  toggleCoupon: (id: number, data: any) => request({ url: `/admin/coupons/${id}/toggle`, method: 'PUT', data }),
-  deleteCoupon: (id: number) => request({ url: `/admin/coupons/${id}`, method: 'DELETE' }),
-  // Refund admin
-  getRefunds: (params?: any) => request({ url: '/admin/refunds', data: params }),
-  approveRefund: (id: number, data: any) => request({ url: `/admin/refunds/${id}/approve`, method: 'POST', data }),
-  rejectRefund: (id: number, data: any) => request({ url: `/admin/refunds/${id}/reject`, method: 'POST', data }),
-  completeRefund: (id: number) => request({ url: `/admin/refunds/${id}/complete`, method: 'POST' }),
-  // Upload
-  uploadImage: (filePath: string) => uploadFile({ url: '/community/upload', filePath, name: 'file' })
-}
-
 // ============ Feedback ============
 export const feedbackApi = {
   submit: (data: any) => request({ url: '/feedback', method: 'POST', data }),
@@ -233,15 +176,8 @@ export const addressApi = {
 
 // ============ Social Auth ============
 export const socialAuthApi = {
-  getWechatAuthUrl: (state = 'login') => request({ url: `/auth/social/wechat/auth-url?state=${state}` }),
-  getQqAuthUrl: (state = 'login') => request({ url: `/auth/social/qq/auth-url?state=${state}` }),
-  wechatLogin: (code: string) => request({ url: '/auth/social/wechat/login', method: 'POST', data: { code, provider: 'wechat' } }),
-  qqLogin: (code: string, state = '') => request({ url: '/auth/social/qq/login', method: 'POST', data: { code, provider: 'qq', state } }),
-  qqTokenLogin: (accessToken: string) => request({ url: '/auth/social/qq/token-login', method: 'POST', data: { access_token: accessToken } }),
   getBindInfo: () => request({ url: '/auth/social/bindinfo' }),
   bindWechat: (code: string) => request({ url: '/auth/social/bind/wechat', method: 'POST', data: { code } }),
-  bindQq: (code: string, state = '') => request({ url: '/auth/social/bind/qq', method: 'POST', data: { code, state } }),
-  bindQqToken: (accessToken: string) => request({ url: '/auth/social/bind/qq-token', method: 'POST', data: { access_token: accessToken } }),
   unbindWechat: () => request({ url: '/auth/social/unbind/wechat', method: 'DELETE' }),
   unbindQq: () => request({ url: '/auth/social/unbind/qq', method: 'DELETE' }),
   bindEmail: (email: string, code: string) => request({ url: '/auth/social/bind-email', method: 'POST', data: { email, code } }),
@@ -301,6 +237,50 @@ export const announcementApi = {
   markAllRead: () => request({ url: '/announcements/read-all', method: 'POST' }),
 }
 
+// ============ Admin / Merchant Management ============
+export const adminApi = {
+  // 商家管理
+  getMerchants: (params?: any) => request({ url: '/admin/merchants', data: params }),
+  getMerchant: (id: number) => request({ url: `/admin/merchants/${id}` }),
+  createMerchant: (data: any) => request({ url: '/admin/merchants', method: 'POST', data }),
+  updateMerchant: (id: number, data: any) => request({ url: `/admin/merchants/${id}`, method: 'PUT', data }),
+  deleteMerchant: (id: number) => request({ url: `/admin/merchants/${id}`, method: 'DELETE' }),
+  updateMerchantStatus: (id: number, status: string) =>
+    request({ url: `/admin/merchants/${id}/status`, method: 'PUT', data: { status } }),
+  getMerchantStats: () => request({ url: '/admin/merchants/stats' }),
+  // 营养餐管理
+  getMeals: (params?: any) => request({ url: '/admin/meals', data: params }),
+  getMeal: (id: number) => request({ url: `/admin/meals/${id}` }),
+  createMeal: (data: any) => request({ url: '/admin/meals', method: 'POST', data }),
+  updateMeal: (id: number, data: any) => request({ url: `/admin/meals/${id}`, method: 'PUT', data }),
+  deleteMeal: (id: number) => request({ url: `/admin/meals/${id}`, method: 'DELETE' }),
+  updateMealStatus: (id: number, isAvailable: boolean) =>
+    request({ url: `/admin/meals/${id}/status`, method: 'PUT', data: { isAvailable } }),
+  // 产品管理
+  getProducts: (params?: any) => request({ url: '/admin/products', data: params }),
+  getProduct: (id: number) => request({ url: `/admin/products/${id}` }),
+  createProduct: (data: any) => request({ url: '/admin/products', method: 'POST', data }),
+  updateProduct: (id: number, data: any) => request({ url: `/admin/products/${id}`, method: 'PUT', data }),
+  deleteProduct: (id: number) => request({ url: `/admin/products/${id}`, method: 'DELETE' }),
+  updateProductStatus: (id: number, status: string) =>
+    request({ url: `/admin/products/${id}/status`, method: 'PUT', data: { status } }),
+  // 营养餐订单
+  getMealOrders: (params?: any) => request({ url: '/admin/meal-orders', data: params }),
+  updateMealOrderStatus: (orderNo: string, status: string) =>
+    request({ url: `/admin/meal-orders/${orderNo}/status`, method: 'PUT', data: { status } }),
+  getMealOrderStats: () => request({ url: '/admin/meal-orders/stats' }),
+  verifyPickupCode: (pickupCode: string) =>
+    request({ url: '/admin/meal-orders/verify-pickup', method: 'POST', data: { pickupCode } }),
+  // 产品订单
+  getProductOrders: (params?: any) => request({ url: '/admin/product-orders', data: params }),
+  getProductOrder: (orderNo: string) => request({ url: `/admin/product-orders/${orderNo}` }),
+  shipProductOrder: (orderNo: string, data: any) =>
+    request({ url: `/admin/product-orders/${orderNo}/ship`, method: 'PUT', data }),
+  updateProductOrderStatus: (orderNo: string, status: string) =>
+    request({ url: `/admin/product-orders/${orderNo}/status`, method: 'PUT', data: { status } }),
+  getProductOrderStats: () => request({ url: '/admin/product-orders/stats' }),
+}
+
 // ============ Constants ============
 export const PostCategories = [
   { value: '饮食打卡', label: '🍽️ 饮食打卡' },
@@ -312,8 +292,8 @@ export const PostCategories = [
 ]
 
 export const MealTypes = [
-  { value: 'BREAKFAST', label: '早餐', icon: '🌅' },
-  { value: 'LUNCH', label: '午餐', icon: '☀️' },
-  { value: 'DINNER', label: '晚餐', icon: '🌙' },
-  { value: 'SNACK', label: '加餐', icon: '🍪' }
+  { value: 'BREAKFAST', label: '早餐', icon: 'sunrise', color: '#F59E0B' },
+  { value: 'LUNCH', label: '午餐', icon: 'sun', color: '#F97316' },
+  { value: 'DINNER', label: '晚餐', icon: 'moon', color: '#6366F1' },
+  { value: 'SNACK', label: '加餐', icon: 'cookie', color: '#EC4899' }
 ]

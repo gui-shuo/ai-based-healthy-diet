@@ -2,7 +2,9 @@
   <view class="consultation-page">
     <!-- Disclaimer -->
     <view class="disclaimer-bar" v-if="showDisclaimer">
-      <text class="disclaimer-text">🩺 咨询服务仅供参考，不构成医疗诊断。如有疾病请及时就医。</text>
+      <text class="disclaimer-text">
+        <NutriIcon name="heart" :size="22" color="#10B981" /> 咨询服务仅供参考，不构成医疗诊断。如有疾病请及时就医。
+      </text>
       <text class="dismiss-btn" @tap="showDisclaimer = false">✕</text>
     </view>
 
@@ -32,7 +34,7 @@
       <!-- Active Consultations Banner -->
       <view class="active-banner" v-if="activeOrders.length > 0">
         <view class="active-banner-label">
-          <text class="abl-icon">💬</text>
+          <NutriIcon name="message" :size="24" color="#10B981" />
           <text class="abl-text">进行中的咨询</text>
         </view>
         <view
@@ -95,7 +97,10 @@
             </view>
             <view class="nc-stat-div"></view>
             <view class="nc-stat">
-              <text class="nc-stat-val">⭐{{ formatRating(n.rating) }}</text>
+              <text class="nc-stat-val">
+                <NutriIcon name="star" :size="20" color="#F59E0B" />
+                {{ formatRating(n.rating) }}
+              </text>
               <text class="nc-stat-lbl">评分</text>
             </view>
             <view class="nc-stat-div"></view>
@@ -117,7 +122,7 @@
       </view>
 
       <view class="empty-state" v-if="!listLoading && filteredNutritionists.length === 0">
-        <text class="empty-icon">🧑‍⚕️</text>
+        <NutriIcon name="users" :size="64" color="#D1D5DB" />
         <text class="empty-text">{{ statusFilter === 'ALL' ? '暂无营养师' : '当前没有' + currentFilterLabel + '的营养师' }}</text>
       </view>
 
@@ -147,7 +152,9 @@
             </view>
           </view>
           <text class="aoc-desc" v-if="item.description">{{ item.description }}</text>
-          <view class="aoc-chat-btn" @tap="goChat(item.orderNo)">💬 继续咨询</view>
+          <view class="aoc-chat-btn" @tap="goChat(item.orderNo)">
+            <NutriIcon name="message" :size="22" color="#FFFFFF" /> 继续咨询
+          </view>
         </view>
       </view>
 
@@ -182,14 +189,16 @@
 
             <view class="oc-actions" v-if="hasActions(order)">
               <view v-if="order.paymentStatus === 'PENDING'" class="oc-act-btn pay" @tap="handlePay(order)">去支付</view>
-              <view v-if="order.status === 'IN_PROGRESS'" class="oc-act-btn chat" @tap="goChat(order.orderNo)">💬 聊天</view>
+              <view v-if="order.status === 'IN_PROGRESS'" class="oc-act-btn chat" @tap="goChat(order.orderNo)">
+                <NutriIcon name="message" :size="20" color="#FFFFFF" /> 聊天
+              </view>
               <view v-if="canRefund(order)" class="oc-act-btn refund" @tap="handleRefund(order)">退款</view>
             </view>
           </view>
         </view>
 
         <view class="empty-state" v-if="!ordersLoading && orders.length === 0">
-          <text class="empty-icon">📋</text>
+          <NutriIcon name="clipboard" :size="64" color="#D1D5DB" />
           <text class="empty-text">暂无咨询记录</text>
         </view>
 
@@ -220,7 +229,7 @@
               </view>
               <text class="dt-title">{{ detailNutritionist.title }}</text>
               <view class="dt-rating-row">
-                <text class="dt-stars">⭐ {{ formatRating(detailNutritionist.rating) }}</text>
+                <NutriIcon name="star" :size="20" color="#F59E0B" /> {{ formatRating(detailNutritionist.rating) }}
                 <text class="dt-sep">·</text>
                 <text class="dt-exp">{{ detailNutritionist.experienceYears || 0 }}年经验</text>
                 <text class="dt-sep">·</text>
@@ -289,7 +298,9 @@
           </view>
 
           <view class="bk-notice">
-            <text class="bk-notice-text">ℹ️ 模拟支付：点击确认后将自动完成支付流程</text>
+            <text class="bk-notice-text">
+              <NutriIcon name="info" :size="20" color="#6366F1" /> 模拟支付：点击确认后将自动完成支付流程
+            </text>
           </view>
         </view>
 
@@ -311,6 +322,7 @@ import { ref, computed } from 'vue'
 import { onLoad, onShow } from '@dcloudio/uni-app'
 import { consultationApi } from '@/services/api'
 import { checkLogin, formatTime, defaultAvatar } from '@/utils/common'
+import NutriIcon from '@/components/NutriIcon.vue'
 
 // ====== Tabs & UI ======
 const activeTab = ref('find')

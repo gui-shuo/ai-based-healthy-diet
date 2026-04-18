@@ -26,25 +26,25 @@
     <!-- Stats row -->
     <view class="section stats-row">
       <view class="stat-item">
-        <text class="stat-icon">⏱</text>
+        <NutriIcon name="clock" :size="28" color="#6366F1" />
         <text class="stat-value">{{ (recipe.prepTime || 0) + (recipe.cookingTime || 0) }}</text>
         <text class="stat-label">分钟</text>
       </view>
       <view class="stat-divider" />
       <view class="stat-item">
-        <text class="stat-icon">🍽</text>
+        <NutriIcon name="utensils" :size="28" color="#10B981" />
         <text class="stat-value">{{ recipe.servings || 1 }}</text>
         <text class="stat-label">份</text>
       </view>
       <view class="stat-divider" />
       <view class="stat-item">
-        <text class="stat-icon">🔥</text>
+        <NutriIcon name="flame" :size="28" color="#EF4444" />
         <text class="stat-value">{{ recipe.calories || 0 }}</text>
         <text class="stat-label">kcal</text>
       </view>
       <view class="stat-divider" />
       <view class="stat-item">
-        <text class="stat-icon">⭐</text>
+        <NutriIcon name="star" :size="28" color="#F59E0B" />
         <text class="stat-value">{{ (recipe.ratingAvg || 0).toFixed(1) }}</text>
         <text class="stat-label">评分</text>
       </view>
@@ -55,32 +55,32 @@
       <text class="section-title">营养成分</text>
       <view class="nutrition-grid">
         <view class="nutrition-item">
-          <text class="nut-icon nut-cal">🔥</text>
+          <NutriIcon name="flame" :size="32" color="#EF4444" />
           <text class="nut-value">{{ recipe.calories || 0 }}</text>
           <text class="nut-label">热量(kcal)</text>
         </view>
         <view class="nutrition-item">
-          <text class="nut-icon nut-protein">🥩</text>
+          <NutriIcon name="apple" :size="32" color="#8B5CF6" />
           <text class="nut-value">{{ recipe.protein || 0 }}g</text>
           <text class="nut-label">蛋白质</text>
         </view>
         <view class="nutrition-item">
-          <text class="nut-icon nut-fat">🫒</text>
+          <NutriIcon name="droplet" :size="32" color="#F59E0B" />
           <text class="nut-value">{{ recipe.fat || 0 }}g</text>
           <text class="nut-label">脂肪</text>
         </view>
         <view class="nutrition-item">
-          <text class="nut-icon nut-carbs">🌾</text>
+          <NutriIcon name="wheat" :size="32" color="#10B981" />
           <text class="nut-value">{{ recipe.carbs || 0 }}g</text>
           <text class="nut-label">碳水</text>
         </view>
         <view class="nutrition-item">
-          <text class="nut-icon nut-fiber">🥦</text>
+          <NutriIcon name="leaf" :size="32" color="#22C55E" />
           <text class="nut-value">{{ recipe.fiber || 0 }}g</text>
           <text class="nut-label">膳食纤维</text>
         </view>
         <view class="nutrition-item">
-          <text class="nut-icon nut-sodium">🧂</text>
+          <NutriIcon name="diamond" :size="32" color="#64748B" />
           <text class="nut-value">{{ recipe.sodium || 0 }}mg</text>
           <text class="nut-label">钠</text>
         </view>
@@ -136,7 +136,7 @@
           @tap="previewImage(step.image)"
         />
         <view class="step-tip" v-if="step.tips">
-          <text class="tip-icon">💡</text>
+          <NutriIcon name="lightbulb" :size="24" color="#F59E0B" />
           <text class="tip-text">{{ step.tips }}</text>
         </view>
       </view>
@@ -162,15 +162,15 @@
         :class="{ favorited: isFavorited }"
         @tap="toggleFavorite"
       >
-        <text class="action-icon">{{ isFavorited ? '❤️' : '🤍' }}</text>
+        <NutriIcon :name="isFavorited ? 'heart-fill' : 'heart'" :size="28" :color="isFavorited ? '#EF4444' : '#9CA3AF'" />
         <text class="action-label">{{ recipe.favoriteCount || 0 }}</text>
       </view>
       <view class="action-btn rate-btn" @tap="showRatingPopup = true">
-        <text class="action-icon">⭐</text>
+        <NutriIcon name="star" :size="28" color="#F59E0B" />
         <text class="action-label">评分</text>
       </view>
       <button class="action-btn share-btn" open-type="share">
-        <text class="action-icon">📤</text>
+        <NutriIcon name="share" :size="28" color="#10B981" />
         <text class="action-label">分享</text>
       </button>
     </view>
@@ -221,6 +221,7 @@
 import { ref, computed } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import { request } from '@/utils/request'
+import NutriIcon from '@/components/NutriIcon.vue'
 
 const props = defineProps({ id: String })
 

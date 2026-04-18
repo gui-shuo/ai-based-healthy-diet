@@ -100,3 +100,37 @@ $uni-font-size-paragraph: 15px;
 $uni-font-size-sm-px: 12px;
 $uni-font-size-base-px: 14px;
 $uni-font-size-lg-px: 16px;
+
+/* ============ Luckin-style Layout Tokens ============ */
+
+/* Navigation bar */
+$nav-bar-height: 88rpx;
+
+/* Category sidebar (Luckin-style left column) */
+$sidebar-width: 180rpx;
+$sidebar-bg: #F5F7FA;
+$sidebar-active-bg: #FFFFFF;
+$sidebar-active-color: $accent;
+
+/* Cart bar */
+$cart-bar-height: 100rpx;
+$cart-bar-bg: #1A1A2E;
+$cart-badge-bg: $accent;
+
+/* Store selector */
+$store-bar-height: 80rpx;
+
+/* Animation timing */
+$duration-fast: 150ms;
+$duration-normal: 250ms;
+$duration-slow: 350ms;
+$ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+$ease-in-out: cubic-bezier(0.45, 0, 0.55, 1);
+
+/* Z-index scale */
+$z-sticky: 10;
+$z-nav: 20;
+$z-cart-bar: 30;
+$z-overlay: 40;
+$z-modal: 50;
+$z-toast: 100;

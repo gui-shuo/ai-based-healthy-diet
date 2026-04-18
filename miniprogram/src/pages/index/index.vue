@@ -1,41 +1,52 @@
 <template>
   <view class="page">
-    <!-- Custom Navigation Bar -->
-    <view class="nav-bar" :style="{ paddingTop: statusBarHeight + 'px' }">
-      <view class="nav-bar-content">
-        <view class="nav-left">
+    <!-- Navigation Bar -->
+    <NutriNavBar :show-back="false" bg-color="#FFFFFF" float>
+      <template #left>
+        <view class="nav-brand-wrap">
           <image class="nav-logo" src="/static/images/logo.png" mode="aspectFit" />
           <text class="nav-brand">NutriAI</text>
         </view>
-        <view class="nav-right">
-          <view class="nav-search" @tap="goTo('/pages/recipes/index')">
-            <text class="search-icon">🔍</text>
+      </template>
+      <template #title><view /></template>
+      <template #right>
+        <view class="nav-actions">
+          <view class="nav-icon-btn pressable" @tap="goTo('/pages/recipes/index')">
+            <NutriIcon name="search" :size="36" color="#1A1A2E" />
           </view>
-          <view class="nav-bell" @tap="goTo('/pages/announcements/index')">
-            <text class="bell-icon">🔔</text>
+          <view class="nav-icon-btn pressable" @tap="goTo('/pages/announcements/index')">
+            <NutriIcon name="bell" :size="36" color="#1A1A2E" />
             <view v-if="unreadCount > 0" class="unread-dot" />
           </view>
         </view>
-      </view>
-    </view>
+      </template>
+    </NutriNavBar>
 
     <scroll-view class="content" scroll-y :style="{ paddingTop: navBarTotalHeight + 'px' }">
+      <!-- Store Selector -->
+      <StoreSelector
+        :store-name="currentStore.name"
+        :store-address="currentStore.address"
+        @tap="onStoreTap"
+      />
+
       <!-- Hero Banner -->
       <view class="hero-section">
-        <view class="hero-card" @tap="goToMeals">
+        <view class="hero-card pressable" @tap="goToMeals">
           <view class="hero-text-area">
             <view class="hero-label">
-              <text class="hero-label-text">🔥 限时推荐</text>
+              <NutriIcon name="flame" :size="24" color="#fff" />
+              <text class="hero-label-text">限时推荐</text>
             </view>
             <text class="hero-title">科学抗炎 · 营养定制</text>
             <text class="hero-desc">专业营养师配比，每日新鲜现做</text>
             <view class="hero-btn">
               <text class="hero-btn-text">立即点餐</text>
-              <text class="hero-btn-arrow">→</text>
+              <NutriIcon name="arrow-right" :size="28" color="#059669" />
             </view>
           </view>
           <view class="hero-visual">
-            <text class="hero-emoji">🥗</text>
+            <NutriIcon name="salad" :size="140" color="rgba(255,255,255,0.35)" />
           </view>
         </view>
       </view>
@@ -43,9 +54,14 @@
       <!-- Quick Service Entries -->
       <view class="service-section">
         <view class="service-grid">
-          <view class="service-item" v-for="f in features" :key="f.label" @tap="handleFeatureTap(f)">
+          <view
+            class="service-item pressable"
+            v-for="f in features"
+            :key="f.label"
+            @tap="handleFeatureTap(f)"
+          >
             <view class="service-icon-wrap" :style="{ background: f.bg }">
-              <text class="service-icon">{{ f.icon }}</text>
+              <NutriIcon :name="f.icon" :size="44" :color="f.color" />
             </view>
             <text class="service-label">{{ f.label }}</text>
           </view>
@@ -53,9 +69,9 @@
       </view>
 
       <!-- Member Benefits Bar -->
-      <view class="member-bar" @tap="goTo('/pages/member/index')">
+      <view class="member-bar pressable" @tap="goTo('/pages/member/index')">
         <view class="member-left">
-          <text class="member-icon">👑</text>
+          <NutriIcon name="crown" :size="40" color="#92400E" />
           <view class="member-info">
             <text class="member-title" v-if="userStore.isLoggedIn">{{ userStore.userInfo?.nickname || '会员用户' }}</text>
             <text class="member-title" v-else>开通会员享专属优惠</text>
@@ -64,6 +80,7 @@
         </view>
         <view class="member-btn">
           <text class="member-btn-text">{{ userStore.isLoggedIn ? '查看权益' : '立即开通' }}</text>
+          <NutriIcon name="chevron-right" :size="24" color="#FEF3C7" />
         </view>
       </view>
 
@@ -74,16 +91,17 @@
             <view class="section-bar" />
             <text class="section-name">今日推荐</text>
           </view>
-          <view class="section-link" @tap="goToMeals">
+          <view class="section-link pressable" @tap="goToMeals">
             <text class="section-link-text">全部</text>
-            <text class="section-link-arrow">›</text>
+            <NutriIcon name="chevron-right" :size="24" color="#8896AB" />
           </view>
         </view>
         <scroll-view class="meal-scroll" scroll-x :show-scrollbar="false">
-          <view class="meal-card" v-for="meal in featuredMeals" :key="meal.id" @tap="goToMealDetail(meal.id)">
+          <view class="meal-card pressable" v-for="meal in featuredMeals" :key="meal.id" @tap="goToMealDetail(meal.id)">
             <view class="meal-img-wrap">
-              <image class="meal-img" :src="meal.imageUrl || '/static/images/meal-placeholder.png'" mode="aspectFill" />
+              <image class="meal-img" :src="meal.imageUrl || '/static/images/meal-placeholder.png'" mode="aspectFill" lazy-load />
               <view class="meal-cal-badge" v-if="meal.calories">
+                <NutriIcon name="flame" :size="20" color="#fff" />
                 <text class="meal-cal-text">{{ meal.calories }}kcal</text>
               </view>
             </view>
@@ -93,9 +111,9 @@
                 <text class="meal-tag" v-for="tag in (meal.tags || []).slice(0, 2)" :key="tag">{{ tag }}</text>
               </view>
               <view class="meal-price-row">
-                <text class="meal-price"><text class="yen">¥</text>{{ meal.price }}</text>
-                <view class="meal-add-btn">
-                  <text class="meal-add-icon">+</text>
+                <PriceTag :price="meal.price" />
+                <view class="meal-add-btn pressable">
+                  <NutriIcon name="plus" :size="28" color="#fff" />
                 </view>
               </view>
             </view>
@@ -110,21 +128,21 @@
             <view class="section-bar" />
             <text class="section-name">营养好物</text>
           </view>
-          <view class="section-link" @tap="goToShop">
+          <view class="section-link pressable" @tap="goToShop">
             <text class="section-link-text">进入商城</text>
-            <text class="section-link-arrow">›</text>
+            <NutriIcon name="chevron-right" :size="24" color="#8896AB" />
           </view>
         </view>
         <view class="product-grid">
-          <view class="prod-card" v-for="prod in featuredProducts" :key="prod.id" @tap="goToProductDetail(prod.id)">
+          <view class="prod-card pressable" v-for="prod in featuredProducts" :key="prod.id" @tap="goToProductDetail(prod.id)">
             <view class="prod-img-wrap">
-              <image class="prod-img" :src="prod.imageUrl || prod.image || '/static/images/product-placeholder.png'" mode="aspectFill" />
+              <image class="prod-img" :src="prod.imageUrl || prod.image || '/static/images/product-placeholder.png'" mode="aspectFill" lazy-load />
             </view>
             <view class="prod-info">
               <text class="prod-name">{{ prod.name }}</text>
               <view class="prod-price-row">
-                <text class="prod-price"><text class="yen">¥</text>{{ formatPrice(prod.salePrice || prod.price) }}</text>
-                <view class="prod-buy-btn" @tap.stop="goToProductDetail(prod.id)">
+                <PriceTag :price="formatPrice(prod.salePrice || prod.price)" size="sm" />
+                <view class="prod-buy-btn pressable" @tap.stop="goToProductDetail(prod.id)">
                   <text class="prod-buy-text">购买</text>
                 </view>
               </view>
@@ -149,13 +167,22 @@ import { onShow } from '@dcloudio/uni-app'
 import { useUserStore } from '@/stores/user'
 import { useAppStore } from '@/stores/app'
 import { mealApi, productApi, announcementApi } from '@/services/api'
+import NutriNavBar from '@/components/NutriNavBar.vue'
+import NutriIcon from '@/components/NutriIcon.vue'
+import StoreSelector from '@/components/StoreSelector.vue'
+import PriceTag from '@/components/PriceTag.vue'
 
 const userStore = useUserStore()
 const appStore = useAppStore()
 
-const statusBarHeight = ref(0)
 const navBarTotalHeight = ref(0)
 const unreadCount = ref(0)
+
+// Store selection (to be connected to store API later)
+const currentStore = ref({
+  name: 'NutriAI 营养餐厅',
+  address: '点击选择最近门店'
+})
 
 const mockMeals = [
   { id: 1, name: '地中海抗炎沙拉', price: '28.00', calories: 380, tags: ['抗炎', '低GI'], imageUrl: '' },
@@ -174,15 +201,20 @@ const featuredProducts = ref<any[]>(mockProducts)
 const hasLoaded = ref(false)
 
 const features = [
-  { icon: '🤖', label: 'AI营养师', path: '/pages/ai-chat/index', isTab: true, bg: 'linear-gradient(135deg, #ECFDF5, #D1FAE5)' },
-  { icon: '📸', label: '食物识别', path: '/pages/food-recognition/index', bg: 'linear-gradient(135deg, #EFF6FF, #DBEAFE)' },
-  { icon: '📋', label: '饮食计划', path: '/pages/diet-plan/index', bg: 'linear-gradient(135deg, #F5F3FF, #EDE9FE)' },
-  { icon: '📝', label: '饮食记录', path: '/pages/food-records/index', bg: 'linear-gradient(135deg, #FFFBEB, #FEF3C7)' },
-  { icon: '👨‍⚕️', label: '营养咨询', path: '/pages/consultation/index', bg: 'linear-gradient(135deg, #FFF1F2, #FFE4E6)' },
-  { icon: '🍳', label: '食谱库', path: '/pages/recipes/index', bg: 'linear-gradient(135deg, #FFF7ED, #FFEDD5)' },
-  { icon: '💊', label: '营养商城', path: '/pages/product-shop/index', isTab: true, bg: 'linear-gradient(135deg, #F0FDF4, #DCFCE7)' },
-  { icon: '👤', label: '个人中心', path: '/pages/profile/index', isTab: true, bg: 'linear-gradient(135deg, #F8FAFC, #F1F5F9)' }
+  { icon: 'sparkles', label: 'AI营养师', path: '/pages/ai-chat/index', isTab: true, bg: 'linear-gradient(135deg, #ECFDF5, #D1FAE5)', color: '#10B981' },
+  { icon: 'camera', label: '食物识别', path: '/pages/food-recognition/index', bg: 'linear-gradient(135deg, #EFF6FF, #DBEAFE)', color: '#3B82F6' },
+  { icon: 'clipboard', label: '饮食计划', path: '/pages/diet-plan/index', bg: 'linear-gradient(135deg, #F5F3FF, #EDE9FE)', color: '#8B5CF6' },
+  { icon: 'edit', label: '饮食记录', path: '/pages/food-records/index', bg: 'linear-gradient(135deg, #FFFBEB, #FEF3C7)', color: '#F59E0B' },
+  { icon: 'stethoscope', label: '营养咨询', path: '/pages/consultation/index', bg: 'linear-gradient(135deg, #FFF1F2, #FFE4E6)', color: '#EF4444' },
+  { icon: 'book-open', label: '食谱库', path: '/pages/recipes/index', bg: 'linear-gradient(135deg, #FFF7ED, #FFEDD5)', color: '#F97316' },
+  { icon: 'shopping-bag', label: '营养商城', path: '/pages/product-shop/index', isTab: true, bg: 'linear-gradient(135deg, #F0FDF4, #DCFCE7)', color: '#22C55E' },
+  { icon: 'user', label: '个人中心', path: '/pages/profile/index', isTab: true, bg: 'linear-gradient(135deg, #F8FAFC, #F1F5F9)', color: '#64748B' }
 ]
+
+function onStoreTap() {
+  // TODO: Navigate to store selection page (Phase 4/5)
+  uni.showToast({ title: '门店选择即将上线', icon: 'none' })
+}
 
 async function fetchFeaturedMeals() {
   try {
@@ -256,20 +288,18 @@ function goTo(url: string) {
 
 onShow(() => {
   const windowInfo = uni.getWindowInfo()
-  statusBarHeight.value = windowInfo.statusBarHeight || 0
-  navBarTotalHeight.value = statusBarHeight.value + 44
+  const statusBarHeight = windowInfo.statusBarHeight || 0
+  navBarTotalHeight.value = statusBarHeight + 44
 
   userStore.restore()
   if (!hasLoaded.value) {
     hasLoaded.value = true
-    // Defer heavy API calls to avoid blocking WeChat miniprogram JS thread on launch
     setTimeout(() => {
       fetchFeaturedMeals()
       fetchFeaturedProducts()
       fetchUnreadCount()
     }, 500)
   } else {
-    // On subsequent visits only refresh lightweight data
     fetchUnreadCount()
   }
 })
@@ -278,24 +308,11 @@ onShow(() => {
 <style scoped lang="scss">
 .page {
   min-height: 100vh;
-  background: #F5F7FA;
+  background: $background;
 }
 
-/* ---- Navigation Bar ---- */
-.nav-bar {
-  position: fixed;
-  top: 0; left: 0; right: 0;
-  z-index: 999;
-  background: #fff;
-}
-.nav-bar-content {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  height: 88rpx;
-  padding: 0 32rpx;
-}
-.nav-left {
+/* ---- Navigation ---- */
+.nav-brand-wrap {
   display: flex;
   align-items: center;
 }
@@ -308,25 +325,24 @@ onShow(() => {
 .nav-brand {
   font-size: 36rpx;
   font-weight: 800;
-  color: #10B981;
+  color: $accent;
   letter-spacing: 1rpx;
 }
-.nav-right {
+.nav-actions {
   display: flex;
   align-items: center;
-  gap: 20rpx;
+  gap: 16rpx;
 }
-.nav-search, .nav-bell {
+.nav-icon-btn {
   width: 64rpx;
   height: 64rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #F5F7FA;
+  background: $muted;
   border-radius: 50%;
   position: relative;
 }
-.search-icon, .bell-icon { font-size: 32rpx; }
 .unread-dot {
   position: absolute;
   top: 10rpx;
@@ -350,9 +366,9 @@ onShow(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: linear-gradient(135deg, #10B981, #059669);
-  border-radius: 28rpx;
-  padding: 36rpx 32rpx;
+  background: linear-gradient(135deg, $accent, $accent-secondary);
+  border-radius: $radius-xl;
+  padding: 40rpx 32rpx;
   position: relative;
   overflow: hidden;
 }
@@ -362,14 +378,16 @@ onShow(() => {
 }
 .hero-label {
   display: inline-flex;
+  align-items: center;
+  gap: 8rpx;
   margin-bottom: 16rpx;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 6rpx 20rpx;
+  border-radius: $radius-full;
 }
 .hero-label-text {
   font-size: 22rpx;
   color: #fff;
-  background: rgba(255, 255, 255, 0.2);
-  padding: 6rpx 20rpx;
-  border-radius: 100rpx;
   font-weight: 500;
 }
 .hero-title {
@@ -392,23 +410,17 @@ onShow(() => {
   gap: 8rpx;
   background: #fff;
   padding: 16rpx 36rpx;
-  border-radius: 100rpx;
+  border-radius: $radius-full;
+  transition: transform $duration-fast;
 }
 .hero-btn-text {
   font-size: 26rpx;
   font-weight: 600;
-  color: #059669;
-}
-.hero-btn-arrow {
-  font-size: 26rpx;
-  color: #059669;
+  color: $accent-secondary;
 }
 .hero-visual {
   z-index: 1;
-}
-.hero-emoji {
-  font-size: 100rpx;
-  opacity: 0.9;
+  margin-right: -8rpx;
 }
 
 /* ---- Service Grid ---- */
@@ -418,34 +430,30 @@ onShow(() => {
 .service-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 20rpx 0;
-  background: #fff;
-  border-radius: 24rpx;
-  padding: 28rpx 16rpx;
-  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
+  gap: 24rpx 0;
+  background: $card;
+  border-radius: $radius-xl;
+  padding: 32rpx 16rpx;
+  box-shadow: $shadow-sm;
 }
 .service-item {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10rpx;
-  &:active { opacity: 0.7; }
+  gap: 12rpx;
 }
 .service-icon-wrap {
-  width: 88rpx;
-  height: 88rpx;
-  border-radius: 22rpx;
+  width: 96rpx;
+  height: 96rpx;
+  border-radius: $radius-lg;
   display: flex;
   align-items: center;
   justify-content: center;
 }
-.service-icon {
-  font-size: 40rpx;
-}
 .service-label {
   font-size: 22rpx;
   font-weight: 500;
-  color: #1A1A2E;
+  color: $foreground;
   text-align: center;
 }
 
@@ -457,7 +465,7 @@ onShow(() => {
   margin: 24rpx 32rpx 0;
   padding: 24rpx 28rpx;
   background: linear-gradient(135deg, #FEF3C7, #FDE68A);
-  border-radius: 20rpx;
+  border-radius: $radius-lg;
 }
 .member-left {
   display: flex;
@@ -465,9 +473,6 @@ onShow(() => {
   gap: 16rpx;
   flex: 1;
   min-width: 0;
-}
-.member-icon {
-  font-size: 40rpx;
 }
 .member-info {
   display: flex;
@@ -489,9 +494,12 @@ onShow(() => {
   margin-top: 4rpx;
 }
 .member-btn {
+  display: flex;
+  align-items: center;
+  gap: 4rpx;
   background: #92400E;
   padding: 10rpx 24rpx;
-  border-radius: 100rpx;
+  border-radius: $radius-full;
   flex-shrink: 0;
 }
 .member-btn-text {
@@ -518,14 +526,14 @@ onShow(() => {
 .section-bar {
   width: 6rpx;
   height: 30rpx;
-  background: linear-gradient(180deg, #10B981, #059669);
+  background: linear-gradient(180deg, $accent, $accent-secondary);
   border-radius: 3rpx;
   margin-right: 12rpx;
 }
 .section-name {
   font-size: 32rpx;
   font-weight: 700;
-  color: #1A1A2E;
+  color: $foreground;
 }
 .section-link {
   display: flex;
@@ -534,11 +542,7 @@ onShow(() => {
 }
 .section-link-text {
   font-size: 24rpx;
-  color: #8896AB;
-}
-.section-link-arrow {
-  font-size: 28rpx;
-  color: #8896AB;
+  color: $muted-foreground;
 }
 
 /* ---- Meal Cards ---- */
@@ -551,12 +555,11 @@ onShow(() => {
   flex-direction: column;
   width: 300rpx;
   margin-right: 20rpx;
-  background: #fff;
-  border-radius: 24rpx;
+  background: $card;
+  border-radius: $radius-xl;
   overflow: hidden;
-  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
+  box-shadow: $shadow-sm;
   vertical-align: top;
-  &:active { transform: scale(0.97); }
 }
 .meal-img-wrap {
   position: relative;
@@ -566,15 +569,18 @@ onShow(() => {
 .meal-img {
   width: 300rpx;
   height: 200rpx;
-  background: #F0F4F8;
+  background: $muted;
 }
 .meal-cal-badge {
   position: absolute;
   bottom: 12rpx;
   right: 12rpx;
-  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  gap: 4rpx;
+  background: rgba(0, 0, 0, 0.55);
   padding: 4rpx 14rpx;
-  border-radius: 100rpx;
+  border-radius: $radius-full;
 }
 .meal-cal-text {
   font-size: 20rpx;
@@ -587,7 +593,7 @@ onShow(() => {
 .meal-name {
   font-size: 28rpx;
   font-weight: 600;
-  color: #1A1A2E;
+  color: $foreground;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -601,10 +607,10 @@ onShow(() => {
 }
 .meal-tag {
   font-size: 20rpx;
-  color: #059669;
+  color: $accent-secondary;
   background: #ECFDF5;
   padding: 4rpx 12rpx;
-  border-radius: 6rpx;
+  border-radius: $radius-sm;
   font-weight: 500;
 }
 .meal-price-row {
@@ -612,29 +618,15 @@ onShow(() => {
   align-items: center;
   justify-content: space-between;
 }
-.meal-price {
-  font-size: 32rpx;
-  font-weight: 700;
-  color: #EF4444;
-}
-.yen {
-  font-size: 22rpx;
-}
 .meal-add-btn {
   width: 48rpx;
   height: 48rpx;
-  background: linear-gradient(135deg, #10B981, #059669);
+  background: linear-gradient(135deg, $accent, $accent-secondary);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   box-shadow: 0 4rpx 12rpx rgba(16, 185, 129, 0.3);
-}
-.meal-add-icon {
-  font-size: 32rpx;
-  font-weight: 700;
-  color: #fff;
-  line-height: 1;
 }
 
 /* ---- Product Grid ---- */
@@ -645,11 +637,10 @@ onShow(() => {
   padding: 0 32rpx;
 }
 .prod-card {
-  background: #fff;
-  border-radius: 20rpx;
+  background: $card;
+  border-radius: $radius-lg;
   overflow: hidden;
-  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
-  &:active { transform: scale(0.97); }
+  box-shadow: $shadow-sm;
 }
 .prod-img-wrap {
   width: 100%;
@@ -658,7 +649,7 @@ onShow(() => {
 .prod-img {
   width: 100%;
   height: 200rpx;
-  background: #F0F4F8;
+  background: $muted;
 }
 .prod-info {
   padding: 12rpx 16rpx 16rpx;
@@ -666,7 +657,7 @@ onShow(() => {
 .prod-name {
   font-size: 24rpx;
   font-weight: 500;
-  color: #1A1A2E;
+  color: $foreground;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -678,19 +669,14 @@ onShow(() => {
   align-items: center;
   justify-content: space-between;
 }
-.prod-price {
-  font-size: 28rpx;
-  font-weight: 700;
-  color: #EF4444;
-}
 .prod-buy-btn {
   background: #ECFDF5;
   padding: 6rpx 16rpx;
-  border-radius: 8rpx;
+  border-radius: $radius-sm;
 }
 .prod-buy-text {
   font-size: 20rpx;
-  color: #059669;
+  color: $accent-secondary;
   font-weight: 600;
 }
 
@@ -704,13 +690,13 @@ onShow(() => {
 .footer-line {
   width: 64rpx;
   height: 4rpx;
-  background: #E5E7EB;
+  background: $border;
   border-radius: 2rpx;
   margin-bottom: 24rpx;
 }
 .footer-text {
   font-size: 22rpx;
-  color: #8896AB;
+  color: $muted-foreground;
   margin-bottom: 8rpx;
 }
 .footer-copy {
